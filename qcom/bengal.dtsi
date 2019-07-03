@@ -1,4 +1,8 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
+#include <dt-bindings/clock/qcom,dispcc-bengal.h>
+#include <dt-bindings/clock/qcom,gcc-bengal.h>
+#include <dt-bindings/clock/qcom,gpucc-bengal.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. BENGAL";
@@ -10,8 +14,8 @@
 		#address-cells = <2>;
 		#size-cells = <0>;
 
-		CPU0: CPU@0 {
-			device-type = "cpu";
+		CPU0: cpu@0 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x0>;
 			enable-method = "psci";
@@ -38,8 +42,8 @@
 			};
 		};
 
-		CPU1: CPU@1 {
-			device-type = "cpu";
+		CPU1: cpu@1 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x1>;
 			enable-method = "psci";
@@ -62,8 +66,8 @@
 			};
 		};
 
-		CPU2: CPU@2 {
-			device-type = "cpu";
+		CPU2: cpu@2 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x2>;
 			enable-method = "psci";
@@ -86,8 +90,8 @@
 			};
 		};
 
-		CPU3: CPU@3 {
-			device-type = "cpu";
+		CPU3: cpu@3 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x3>;
 			enable-method = "psci";
@@ -110,8 +114,8 @@
 			};
 		};
 
-		CPU4: CPU@100 {
-			device-type = "cpu";
+		CPU4: cpu@100 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x100>;
 			enable-method = "psci";
@@ -138,8 +142,8 @@
 			};
 		};
 
-		CPU5: CPU@101 {
-			device-type = "cpu";
+		CPU5: cpu@101 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x101>;
 			enable-method = "psci";
@@ -162,8 +166,8 @@
 			};
 		};
 
-		CPU6: CPU@102 {
-			device-type = "cpu";
+		CPU6: cpu@102 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x102>;
 			enable-method = "psci";
@@ -186,8 +190,8 @@
 			};
 		};
 
-		CPU7: CPU@103 {
-			device-type = "cpu";
+		CPU7: cpu@103 {
+			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x103>;
 			enable-method = "psci";
@@ -542,4 +546,120 @@
 			qcom,dump-id = <0x27>;
 		};
 	};
+
+	clocks {
+		xo_board: xo_board {
+			compatible = "fixed-clock";
+			clock-frequency = <19200000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
+
+		sleep_clk: sleep_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32764>;
+			clock-output-names = "sleep_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mul = <1>;
+		clock-div = <1>;
+		#clock-cells = <0>;
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mul = <1>;
+		clock-div = <1>;
+		#clock-cells = <0>;
+	};
+
+	rpmcc: qcom,rpmcc {
+		compatible = "qcom,dummycc";
+		clock-output-names = "rpmcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gcc: qcom,gcc@1400000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	dispcc: qcom,dispcc@5f00000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "dispcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gpucc: qcom,gpucc@5990000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gpucc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
 };
+
+#include "bengal-gdsc.dtsi"
+
+&gcc_camss_top_gdsc {
+	status = "ok";
+};
+
+&gcc_ufs_phy_gdsc {
+	status = "ok";
+};
+
+&gcc_usb30_prim_gdsc {
+	status = "ok";
+};
+
+&gcc_vcodec0_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&gcc_venus_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu1_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu0_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mm_snoc_mmu_tbu_rt_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mm_snoc_mmu_tbu_nrt_gdsc {
+	status = "ok";
+};
+
+&mdss_core_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&gpu_cx_gdsc {
+	parent-supply = <&VDD_CX_LEVEL>;
+	status = "ok";
+};
+
+&gpu_gx_gdsc {
+	parent-supply = <&VDD_CX_LEVEL>;
+	status = "ok";
+};
+
+#include "bengal-regulator.dtsi"

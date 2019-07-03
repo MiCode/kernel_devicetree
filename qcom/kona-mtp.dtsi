@@ -96,6 +96,7 @@
 	compatible = "qcom,ufs-phy-qmp-v4-card";
 
 	vdda-phy-supply = <&pm8150_l5>; /* 0.88v */
+	vdda-phy-always-on;
 	vdda-pll-supply = <&pm8150_l9>; /* 1.2v */
 	vdda-phy-max-microamp = <87100>;
 	vdda-pll-max-microamp = <18300>;
@@ -262,7 +263,7 @@
 
 &pm8150b_charger {
 	status = "ok";
-	qcom,sec-charger-config = <1>;
+	qcom,sec-charger-config = <0>;
 	qcom,auto-recharge-soc = <98>;
 	io-channels = <&pm8150b_vadc ADC_MID_CHG_DIV6>,
 		      <&pm8150b_vadc ADC_USB_IN_I>,
@@ -279,6 +280,7 @@
 	qcom,sw-jeita-enable;
 	qcom,wd-bark-time-secs = <16>;
 	qcom,suspend-input-on-debug-batt;
+	qcom,fcc-stepping-enable;
 };
 
 &pm8150b_fg {
@@ -301,6 +303,12 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 #include "smb1390.dtsi"
+
+	halo,hl6111r@25 {
+		compatible = "halo,hl6111r";
+		reg = <0x25>;
+		status = "ok";
+	};
 };
 
 &smb1390 {
@@ -312,7 +320,6 @@
 &smb1390_charger {
 	io-channels = <&pm8150b_vadc ADC_AMUX_THM2>;
 	io-channel-names = "cp_die_temp";
-	status = "ok";
 };
 
 &pm8150_vadc {
@@ -500,6 +507,12 @@
 };
 
 &dsi_sim_dsc_375_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&tlmm 75 0>;
+};
+
+&dsi_sim_dsc_10b_cmd {
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,platform-reset-gpio = <&tlmm 75 0>;

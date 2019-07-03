@@ -3,20 +3,54 @@
 #include "lito-pmic-overlay.dtsi"
 #include "lito-camera-sensor-mtp.dtsi"
 #include "lito-sde-display.dtsi"
+#include "lito-thermal-overlay.dtsi"
 
 &soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
 
-};
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
 
-/ {
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8150l_gpios 5 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+
+	qmp_dp_phy_core_supply: qmp_dp_phy_core_supply {
+		compatible = "regulator-fixed";
+		regulator-name = "core_supply";
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
+		enable-active-high;
+		gpio = <&pm8150l_gpios 12 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb_eldo13>;
+	};
+
 	mtp_batterydata: qcom,battery-data {
 		qcom,batt-id-range-pct = <15>;
 		#include "qg-batterydata-alium-3600mah.dtsi"
 	};
 };
 
+&usb_qmp_dp_phy {
+	core-supply = <&qmp_dp_phy_core_supply>;
+};
+
+&sde_dp {
+	vdda-0p9-supply = <&qmp_dp_phy_core_supply>;
+};
+
 &ufsphy_mem {
-	compatible = "qcom,ufs-phy-qmp-v4-card";
+	compatible = "qcom,ufs-phy-qmp-v4-lito";
 
 	vdda-phy-supply = <&pm8150_l5>;
 	vdda-pll-supply = <&pm8150_l9>;
@@ -165,6 +199,7 @@
 	qcom,charger-temp-max = <800>;
 	qcom,smb-temp-max = <800>;
 	qcom,suspend-input-on-debug-batt;
+	qcom,fcc-stepping-enable;
 };
 
 &pm7250b_qg {
@@ -236,4 +271,27 @@
 
 &sde_dsi {
 	qcom,dsi-default-panel = <&dsi_sw43404_amoled_video>;
+};
+
+&qupv3_se0_i2c {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	nq@28 {
+		compatible = "qcom,nq-nci";
+		reg = <0x28>;
+		qcom,nq-irq = <&tlmm 34 0x00>;
+		qcom,nq-ven = <&tlmm 12 0x00>;
+		qcom,nq-firm = <&tlmm 35 0x00>;
+		qcom,nq-clkreq = <&tlmm 31 0x00>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <34 0>;
+		interrupt-names = "nfc_irq";
+		pinctrl-names = "nfc_active", "nfc_suspend";
+		pinctrl-0 = <&nfc_int_active &nfc_enable_active
+				&nfc_clk_req_active>;
+		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend
+				&nfc_clk_req_suspend>;
+	};
 };

@@ -1,9 +1,33 @@
 #include "lito-pmic-overlay.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include "lito-audio-overlay.dtsi"
+#include "lito-thermal-overlay.dtsi"
+#include "lito-camera-sensor-qrd.dtsi"
+#include "lito-sde-display.dtsi"
 
 &soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
 
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8150l_gpios 5 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "qg-batterydata-atl466271_3300mAh.dtsi"
+	};
 };
 
 &qupv3_se7_i2c {
@@ -80,7 +104,7 @@
 };
 
 &ufsphy_mem {
-	compatible = "qcom,ufs-phy-qmp-v4-card";
+	compatible = "qcom,ufs-phy-qmp-v4-lito";
 
 	vdda-phy-supply = <&pm8150_l5>;
 	vdda-pll-supply = <&pm8150_l9>;
@@ -163,6 +187,7 @@
 			   "conn_temp",
 			   "sbux_res",
 			   "vph_voltage";
+	qcom,battery-data = <&qrd_batterydata>;
 	qcom,sec-charger-config = <1>;
 	qcom,auto-recharge-soc = <98>;
 	qcom,step-charging-enable;
@@ -170,6 +195,7 @@
 	qcom,charger-temp-max = <800>;
 	qcom,smb-temp-max = <800>;
 	qcom,suspend-input-on-debug-batt;
+	qcom,fcc-stepping-enable;
 };
 
 &pm7250b_qg {
@@ -182,6 +208,18 @@
 	qcom,hold-soc-while-full;
 	qcom,linearize-soc;
 	qcom,cl-feedback-on;
+};
+
+&wsa881x_0212 {
+	compatible = "qcom,wsa881x";
+	reg = <0x10 0x20170212>;
+	qcom,spkr-sd-n-node = <&wsa_spkr_en1>;
+};
+
+&wsa881x_0214 {
+	compatible = "qcom,wsa881x";
+	reg = <0x10 0x21170214>;
+	qcom,spkr-sd-n-node = <&wsa_spkr_en1>;
 };
 
 &lito_snd {
@@ -250,4 +288,61 @@
 	qcom,msm-mbhc-usbc-audio-supported = <1>;
 	qcom,msm-mbhc-hphl-swh = <0>;
 	qcom,msm-mbhc-gnd-swh = <0>;
+};
+
+&dsi_sw43404_amoled_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <1023>;
+	qcom,mdss-brightness-max-level = <255>;
+	qcom,platform-te-gpio = <&tlmm 10 0>;
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_sw43404_amoled_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <1023>;
+	qcom,mdss-brightness-max-level = <255>;
+	qcom,platform-te-gpio = <&tlmm 10 0>;
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_sw43404_amoled_fhd_plus_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <1023>;
+	qcom,mdss-brightness-max-level = <255>;
+	qcom,platform-te-gpio = <&tlmm 10 0>;
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&sde_dsi {
+	qcom,dsi-default-panel = <&dsi_sw43404_amoled_video>;
+};
+
+&qupv3_se0_i2c {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	nq@28 {
+		compatible = "qcom,nq-nci";
+		reg = <0x28>;
+		qcom,nq-irq = <&tlmm 34 0x00>;
+		qcom,nq-ven = <&tlmm 12 0x00>;
+		qcom,nq-firm = <&tlmm 35 0x00>;
+		qcom,nq-clkreq = <&tlmm 31 0x00>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <34 0>;
+		interrupt-names = "nfc_irq";
+		pinctrl-names = "nfc_active", "nfc_suspend";
+		pinctrl-0 = <&nfc_int_active &nfc_enable_active
+				&nfc_clk_req_active>;
+		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend
+				&nfc_clk_req_suspend>;
+	};
 };

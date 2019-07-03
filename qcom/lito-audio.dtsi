@@ -27,10 +27,18 @@
 			#clock-cells = <1>;
 		};
 
+		lpass_audio_hw_vote: vote_lpass_audio_hw {
+			compatible = "qcom,audio-ref-clk";
+			qcom,codec-ext-clk-src = <AUDIO_LPASS_AUDIO_HW_VOTE>;
+			#clock-cells = <1>;
+		};
+
 		bolero: bolero-cdc {
 			compatible = "qcom,bolero-codec";
-			clock-names = "lpass_core_hw_vote";
-			clocks = <&lpass_core_hw_vote 0>;
+			clock-names = "lpass_core_hw_vote",
+					"lpass_audio_hw_vote";
+			clocks = <&lpass_core_hw_vote 0>,
+					<&lpass_audio_hw_vote 0>;
 			bolero-clk-rsc-mngr {
 				compatible = "qcom,bolero-clk-rsc-mngr";
 			};
@@ -51,12 +59,6 @@
 			};
 		};
 	};
-
-	voice_mhi_audio: qcom,voice-mhi-audio {
-		compatible = "qcom,voice-mhi-audio";
-		memory-region = <&mailbox_mem>;
-		voice_mhi_voting;
-	};
 };
 
 &q6core {
@@ -64,7 +66,7 @@
 		compatible = "qcom,kona-asoc-snd";
 		qcom,mi2s-audio-intf = <1>;
 		qcom,auxpcm-audio-intf = <1>;
-		qcom,wcn-btfm = <0>;
+		qcom,wcn-btfm = <1>;
 		qcom,ext-disp-audio-rx = <0>;
 
 		asoc-platform = <&pcm0>, <&pcm1>, <&pcm2>, <&voip>, <&voice>,
@@ -81,9 +83,10 @@
 		asoc-cpu = <&dai_dp>,
 				<&dai_mi2s0>, <&dai_mi2s1>,
 				<&dai_mi2s2>, <&dai_mi2s3>,
-				<&dai_mi2s4>, <&dai_pri_auxpcm>,
+				<&dai_mi2s4>, <&dai_mi2s5>, <&dai_pri_auxpcm>,
 				<&dai_sec_auxpcm>, <&dai_tert_auxpcm>,
 				<&dai_quat_auxpcm>, <&dai_quin_auxpcm>,
+				<&dai_sen_auxpcm>,
 				<&afe_pcm_rx>, <&afe_pcm_tx>, <&afe_proxy_rx>,
 				<&afe_proxy_tx>, <&incall_record_rx>,
 				<&incall_record_tx>, <&incall_music_rx>,
@@ -95,6 +98,7 @@
 				<&dai_tert_tdm_rx_0>, <&dai_tert_tdm_tx_0>,
 				<&dai_quat_tdm_rx_0>, <&dai_quat_tdm_tx_0>,
 				<&dai_quin_tdm_rx_0>, <&dai_quin_tdm_tx_0>,
+				<&dai_sen_tdm_rx_0>, <&dai_sen_tdm_tx_0>,
 				<&wsa_cdc_dma_0_rx>, <&wsa_cdc_dma_0_tx>,
 				<&wsa_cdc_dma_1_rx>, <&wsa_cdc_dma_1_tx>,
 				<&wsa_cdc_dma_2_tx>,
@@ -110,10 +114,11 @@
 		asoc-cpu-names = "msm-dai-q6-dp.24608",
 				"msm-dai-q6-mi2s.0", "msm-dai-q6-mi2s.1",
 				"msm-dai-q6-mi2s.2", "msm-dai-q6-mi2s.3",
-				"msm-dai-q6-mi2s.4", "msm-dai-q6-auxpcm.1",
+				"msm-dai-q6-mi2s.4", "msm-dai-q6-mi2s.5",
+				"msm-dai-q6-auxpcm.1",
 				"msm-dai-q6-auxpcm.2", "msm-dai-q6-auxpcm.3",
 				"msm-dai-q6-auxpcm.4", "msm-dai-q6-auxpcm.5",
-				"msm-dai-q6-dev.224",
+				"msm-dai-q6-auxpcm.6", "msm-dai-q6-dev.224",
 				"msm-dai-q6-dev.225", "msm-dai-q6-dev.241",
 				"msm-dai-q6-dev.240", "msm-dai-q6-dev.32771",
 				"msm-dai-q6-dev.32772", "msm-dai-q6-dev.32773",
@@ -126,6 +131,7 @@
 				"msm-dai-q6-tdm.36896", "msm-dai-q6-tdm.36897",
 				"msm-dai-q6-tdm.36912", "msm-dai-q6-tdm.36913",
 				"msm-dai-q6-tdm.36928", "msm-dai-q6-tdm.36929",
+				"msm-dai-q6-tdm.36944", "msm-dai-q6-tdm.36945",
 				"msm-dai-cdc-dma-dev.45056",
 				"msm-dai-cdc-dma-dev.45057",
 				"msm-dai-cdc-dma-dev.45058",
@@ -148,5 +154,14 @@
 				"msm-dai-cdc-dma-dev.45115",
 				"msm-dai-cdc-dma-dev.45116",
 				"msm-dai-cdc-dma-dev.45118";
+		fsa4480-i2c-handle = <&fsa4480>;
+	};
+};
+
+&qupv3_se9_i2c {
+	status = "ok";
+	fsa4480: fsa4480@43 {
+		compatible = "qcom,fsa4480-i2c";
+		reg = <0x43>;
 	};
 };

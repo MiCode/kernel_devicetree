@@ -334,12 +334,11 @@
 &smb1390_charger {
 	io-channels = <&pm8150b_vadc ADC_AMUX_THM2>;
 	io-channel-names = "cp_die_temp";
-	status = "ok";
 };
 
 &pm8150b_charger {
 	status = "ok";
-	qcom,sec-charger-config = <1>;
+	qcom,sec-charger-config = <0>;
 	qcom,auto-recharge-soc = <98>;
 	io-channels = <&pm8150b_vadc ADC_MID_CHG_DIV6>,
 		      <&pm8150b_vadc ADC_USB_IN_I>,
@@ -355,6 +354,9 @@
 	qcom,sw-jeita-enable;
 	qcom,wd-bark-time-secs = <16>;
 	qcom,suspend-input-on-debug-batt;
+	qcom,fcc-stepping-enable;
+	qcom,thermal-mitigation = <5325000 4500000 4000000 3500000 3000000
+				2500000 2000000 1500000 1000000 500000>;
 };
 
 &pm8150b_fg {
@@ -558,6 +560,12 @@
 };
 
 &dsi_sim_dsc_375_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&tlmm 75 0>;
+};
+
+&dsi_sim_dsc_10b_cmd {
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
