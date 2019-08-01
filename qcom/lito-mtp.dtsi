@@ -24,11 +24,11 @@
 		};
 	};
 
-	qmp_dp_phy_core_supply: qmp_dp_phy_core_supply {
+	vdda_usb_ss_dp_core: vdda_usb_ss_dp_core {
 		compatible = "regulator-fixed";
-		regulator-name = "core_supply";
-		regulator-min-microvolt = <1200000>;
-		regulator-max-microvolt = <1200000>;
+		regulator-name = "vdd_supply";
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <880000>;
 		enable-active-high;
 		gpio = <&pm8150l_gpios 12 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
@@ -38,15 +38,16 @@
 	mtp_batterydata: qcom,battery-data {
 		qcom,batt-id-range-pct = <15>;
 		#include "qg-batterydata-alium-3600mah.dtsi"
+		#include "qg-batterydata-atl466271_3300mAh.dtsi"
 	};
 };
 
 &usb_qmp_dp_phy {
-	core-supply = <&qmp_dp_phy_core_supply>;
+	vdd-supply = <&vdda_usb_ss_dp_core>;
 };
 
 &sde_dp {
-	vdda-0p9-supply = <&qmp_dp_phy_core_supply>;
+	vdda-0p9-supply = <&vdda_usb_ss_dp_core>;
 };
 
 &ufsphy_mem {
@@ -142,29 +143,25 @@
 	};
 };
 
-&spmi_bus {
-	qcom,pm7250b@2 {
-		pm7250b_adc_tm_iio: adc_tm@3400 {
-			compatible = "qcom,adc-tm5-iio";
-			reg = <0x3400 0x100>;
-			#thermal-sensor-cells = <1>;
-			io-channels = <&pm7250b_vadc ADC_GPIO3_PU2>;
+&pm7250b_adc_tm {
+	io-channels = <&pm7250b_vadc ADC_AMUX_THM1_PU2>,
+			<&pm7250b_vadc ADC_GPIO2_PU2>,
+			<&pm7250b_vadc ADC_GPIO3_PU2>,
+			<&pm7250b_vadc ADC_GPIO4_PU2>;
 
-			bmr_s_therm {
-				reg = <ADC_GPIO3_PU2>;
-				qcom,ratiometric;
-				qcom,hw-settle-time = <200>;
-			};
-		};
+	bmr_s_therm@54 {
+		reg = <ADC_GPIO3_PU2>;
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
 	};
 };
 
 &thermal_zones {
 	mmw-pa4-usr {
 		polling-delay-passive = <0>;
-		polling-delay = <5000>;
+		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm7250b_adc_tm_iio ADC_GPIO3_PU2>;
+		thermal-sensors = <&pm7250b_adc_tm ADC_GPIO3_PU2>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -237,6 +234,11 @@
 		st,x-flip = <1>;
 		st,y-flip = <1>;
 	};
+};
+
+&qupv3_se9_i2c {
+	/* Override sleep state of pins */
+	pinctrl-1 = <&qupv3_se9_i2c_active>;
 };
 
 &dsi_sw43404_amoled_video {

@@ -24,11 +24,11 @@
 		};
 	};
 
-	qmp_dp_phy_core_supply: qmp_dp_phy_core_supply {
+	vdda_usb_ss_dp_core: vdda_usb_ss_dp_core {
 		compatible = "regulator-fixed";
-		regulator-name = "core_supply";
-		regulator-min-microvolt = <1200000>;
-		regulator-max-microvolt = <1200000>;
+		regulator-name = "vdd_supply";
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <880000>;
 		enable-active-high;
 		gpio = <&pm8150l_gpios 12 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
@@ -37,11 +37,11 @@
 };
 
 &usb_qmp_dp_phy {
-	core-supply = <&qmp_dp_phy_core_supply>;
+	vdd-supply = <&vdda_usb_ss_dp_core>;
 };
 
 &sde_dp {
-	vdda-0p9-supply = <&qmp_dp_phy_core_supply>;
+	vdda-0p9-supply = <&vdda_usb_ss_dp_core>;
 };
 
 &pm7250b_vadc {
@@ -149,6 +149,18 @@
 		"TX DMIC4", "MIC BIAS4",
 		"MIC BIAS4", "Digital Mic4",
 		"TX DMIC5", "MIC BIAS4",
+		"MIC BIAS4", "Digital Mic5",
+		"DMIC1", "MIC BIAS3",
+		"MIC BIAS3", "Digital Mic0",
+		"DMIC2", "MIC BIAS3",
+		"MIC BIAS3", "Digital Mic1",
+		"DMIC3", "MIC BIAS1",
+		"MIC BIAS1", "Digital Mic2",
+		"DMIC4", "MIC BIAS1",
+		"MIC BIAS1", "Digital Mic3",
+		"DMIC5", "MIC BIAS4",
+		"MIC BIAS4", "Digital Mic4",
+		"DMIC6", "MIC BIAS4",
 		"MIC BIAS4", "Digital Mic5",
 		"IN1_HPHL", "HPHL_OUT",
 		"IN2_HPHR", "HPHR_OUT",
@@ -325,6 +337,11 @@
 	};
 };
 
+&qupv3_se9_i2c {
+	/* Override sleep state of pins */
+	pinctrl-1 = <&qupv3_se9_i2c_active>;
+};
+
 &dsi_sw43404_amoled_video {
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
@@ -391,6 +408,33 @@
 	qcom,mdss-dsi-bl-min-level = <1>;
 	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+	qcom,platform-en-gpio = <&pm8150l_gpios 9 0>;
+	qcom,platform-bklight-en-gpio = <&pm8150l_gpios 10 0>;
+};
+
+&dsi_nt35695b_truly_fhd_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_no_labibb>;
+	qcom,panel-sec-supply-entries = <&dsi_panel_pwr_supply_no_labibb>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_external";
+	qcom,mdss-dsi-sec-bl-pmic-control-type = "bl_ctrl_external";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,platform-te-gpio = <&tlmm 10 0>;
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+	qcom,platform-sec-reset-gpio = <&pm8150l_gpios 11 0>;
+	qcom,platform-en-gpio = <&pm8150l_gpios 9 0>;
+	qcom,platform-bklight-en-gpio = <&pm8150l_gpios 10 0>;
+};
+
+&dsi_nt35695b_truly_fhd_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_no_labibb>;
+	qcom,panel-sec-supply-entries = <&dsi_panel_pwr_supply_no_labibb>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_external";
+	qcom,mdss-dsi-sec-bl-pmic-control-type = "bl_ctrl_external";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+	qcom,platform-sec-reset-gpio = <&pm8150l_gpios 11 0>;
 	qcom,platform-en-gpio = <&pm8150l_gpios 9 0>;
 	qcom,platform-bklight-en-gpio = <&pm8150l_gpios 10 0>;
 };
