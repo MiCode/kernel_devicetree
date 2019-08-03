@@ -38,8 +38,7 @@
 
 	mem-offline {
 		compatible = "qcom,mem-offline";
-		offline-sizes = <0x1 0x40000000 0x0 0x80000000>,
-				<0x1 0xc0000000 0x0 0xc0000000>,
+		offline-sizes = <0x1 0xc0000000 0x0 0x80000000>,
 				<0x2 0xc0000000 0x1 0x40000000>;
 		granule = <512>;
 		mboxes = <&qmp_aop 0>;
@@ -473,7 +472,7 @@
 		};
 	};
 
-	reserved-memory {
+	reserved_memory: reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
@@ -607,13 +606,18 @@
 		};
 
 		cont_splash_memory: cont_splash_region@9c000000 {
-			reg = <0x0 0x9c000000 0x0 0x02400000>;
+			reg = <0x0 0x9c000000 0x0 0x02300000>;
 			label = "cont_splash_region";
 		};
 
 		disp_rdump_memory: disp_rdump_region@9c000000 {
 			reg = <0x0 0x9c000000 0x0 0x00800000>;
 			label = "disp_rdump_region";
+		};
+
+		dfps_data_memory: dfps_data_region@9e300000 {
+			reg = <0x0 0x9e300000 0x0 0x0100000>;
+			label = "dfps_data_region";
 		};
 
 		dump_mem: mem_dump_region {
@@ -713,7 +717,7 @@
 			 <&apps_smmu 0x182f 0x0>,
 			 <&apps_smmu 0x1830 0x1>;
 		qcom,iommu-dma-addr-pool = <0x40000000 0xc0000000>;
-		qcom,iommu-dma = "bypass";
+		qcom,iommu-dma = "atomic";
 		status = "ok";
 
 		/* Slimbus Slave DT for QCA6390 */
@@ -1112,9 +1116,9 @@
 		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
 	};
 
-	npu_llcc_ddr_bwmon: qcom,npu-llcc-ddr-bwmon@0x9092000 {
+	npu_llcc_ddr_bwmon: qcom,npu-llcc-ddr-bwmon@0x9093000 {
 		compatible = "qcom,bimc-bwmon5";
-		reg = <0x9092000 0x1000>;
+		reg = <0x9093000 0x1000>;
 		reg-names = "base";
 		interrupts = <GIC_SPI 81 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,hw-timer-hz = <19200000>;
@@ -1187,6 +1191,24 @@
 			<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0>;
 		qcom,active-only;
 		operating-points-v2 = <&ddr_bw_opp_table>;
+	};
+
+	qoslat_opp_table: qoslat-opp-table {
+		compatible = "operating-points-v2";
+		opp-0 {
+			opp-hz = /bits/ 64 < 0 >;
+		};
+
+		opp-1 {
+			opp-hz = /bits/ 64 < 1 >;
+		};
+	};
+
+	cpu4_cpu_ddr_qoslat: qcom,cpu4-cpu-ddr-qoslat {
+		compatible = "qcom,devfreq-qoslat";
+		governor = "powersave";
+		operating-points-v2 = <&qoslat_opp_table>;
+		mboxes = <&qmp_aop 0>;
 	};
 
 	cpu0_memlat_cpugrp: qcom,cpu0-cpugrp {
@@ -1351,6 +1373,15 @@
 					< 2380800 MHZ_TO_MBPS(1017, 4) >,
 					< 2500000 MHZ_TO_MBPS(2736, 4) >;
 			};
+		};
+
+		cpu4_qoslatmon: qcom,cpu4-qoslatmon {
+			compatible = "qcom,arm-memlat-mon";
+			qcom,target-dev = <&cpu4_cpu_ddr_qoslat>;
+			qcom,cachemiss-ev = <0x2A>;
+			qcom,core-dev-table =
+				<  300000 0 >,
+				< 3000000 1 >;
 		};
 	};
 
@@ -2386,9 +2417,9 @@
 
 	};
 
-	qcom_seecom: qseecom@82200000 {
+	qcom_seecom: qseecom@82400000 {
 		compatible = "qcom,qseecom";
-		reg = <0x82200000 0x2200000>;
+		reg = <0x82400000 0x3A00000>;
 		reg-names = "secapp-region";
 		memory-region = <&qseecom_mem>;
 		qcom,hlos-num-ce-hw-instances = <1>;
@@ -2458,8 +2489,8 @@
 
 	pdc: interrupt-controller@b220000 {
 		compatible = "qcom,kona-pdc";
-		reg = <0xb220000 0x30000>;
-		qcom,pdc-ranges = <0 480 30>, <42 522 52>, <94 609 30>;
+		reg = <0xb220000 0x30000>, <0x17c000f0 0x60>;
+		qcom,pdc-ranges = <0 480 94>, <94 609 31>, <125 63 1>, <126 716 12>;
 		#interrupt-cells = <2>;
 		interrupt-parent = <&intc>;
 		interrupt-controller;
@@ -3267,10 +3298,34 @@
 		status = "disabled";
 	};
 
+	ufscard_ice: ufscardice@1db0000 {
+		compatible = "qcom,ice";
+		reg = <0x1db0000 0x8000>;
+		qcom,enable-ice-clk;
+		clock-names = "ufs_core_clk", "bus_clk",
+				"iface_clk", "ice_core_clk";
+		clocks = <&clock_gcc GCC_UFS_CARD_AXI_HW_CTL_CLK>,
+			<&clock_gcc GCC_UFS_1X_CLKREF_EN>,
+			<&clock_gcc GCC_UFS_CARD_AHB_CLK>,
+			<&clock_gcc GCC_UFS_CARD_ICE_CORE_CLK>;
+		qcom,op-freq-hz = <0>, <0>, <0>, <300000000>;
+		vdd-hba-supply = <&ufs_card_gdsc>;
+		qcom,msm-bus,name = "ufs_card_ice_noc";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+				<1 650 0 0>,    /* No vote */
+				<1 650 1000 0>; /* Max. bandwidth */
+		qcom,bus-vector-names = "MIN",
+					"MAX";
+		qcom,instance-type = "ufscard";
+	};
+
 	ufsphy_card: ufsphy_card@1da7000 {
 		reg = <0x1da7000 0xe00>; /* PHY regs */
 		reg-names = "phy_mem";
 		#phy-cells = <0>;
+		ufs-qcom-crypto = <&ufscard_ice>;
 
 		lanes-per-direction = <1>;
 
@@ -3290,6 +3345,7 @@
 		interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
 		phys = <&ufsphy_card>;
 		phy-names = "ufsphy";
+		ufs-qcom-crypto = <&ufscard_ice>;
 
 		lanes-per-direction = <1>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
@@ -3497,11 +3553,17 @@
 		qcom,spss-fuse1-bit = <27>;
 		qcom,spss-fuse2-addr = <0x00780234>;
 		qcom,spss-fuse2-bit = <26>;
+		qcom,spss-fuse3-addr = <0x007801E8>; // IAR_FEATURE_ENABLED fuse
+		qcom,spss-fuse3-bit = <10>;
+		qcom,spss-fuse4-addr = <0x00780218>; // IAR_STATE fuse
+		qcom,spss-fuse4-bit = <1>; // 0x00780214 bits 33-35
 		qcom,spss-dev-firmware-name  = "spss1d";  /* 8 chars max */
 		qcom,spss-test-firmware-name = "spss1t";  /* 8 chars max */
 		qcom,spss-prod-firmware-name = "spss1p";  /* 8 chars max */
 		qcom,spss-debug-reg-addr = <0x01886020>;
 		qcom,spss-emul-type-reg-addr = <0x01fc8004>;
+		qcom,pil-addr = <0x8BE00000>; // see pil_spss_mem
+		qcom,pil-size = <0x0F0000>; // padding to 960 KB
 		status = "ok";
 	};
 
@@ -3578,6 +3640,7 @@
 		qcom,smmu-fast-map;
 		qcom,bandwidth-vote-for-ipa;
 		qcom,use-64-bit-dma-mask;
+		qcom,ipa-endp-delay-wa;
 		qcom,msm-bus,name = "ipa";
 		qcom,msm-bus,num-cases = <5>;
 		qcom,msm-bus,num-paths = <5>;
@@ -3671,7 +3734,7 @@
 		glink_npu: npu {
 			qcom,remote-pid = <10>;
 			transport = "smem";
-			mboxes = <&ipcc_mproc IPCC_CLIENT_NPU
+			mboxes = <&msm_npu IPCC_CLIENT_NPU
 				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
 			mbox-names = "npu_smem";
 			interrupt-parent = <&ipcc_mproc>;
@@ -4262,13 +4325,19 @@
 		qcom_cedev_ns_cb {
 			compatible = "qcom,qcedev,context-bank";
 			label = "ns_context";
-			iommus = <&apps_smmu 0x592 0>;
+			iommus = <&apps_smmu 0x592 0>,
+				 <&apps_smmu 0x598 0>,
+				 <&apps_smmu 0x599 0>,
+				 <&apps_smmu 0x59F 0>;
 		};
 
 		qcom_cedev_s_cb {
 			compatible = "qcom,qcedev,context-bank";
 			label = "secure_context";
-			iommus = <&apps_smmu 0x593 0>;
+			iommus = <&apps_smmu 0x593 0>,
+				 <&apps_smmu 0x59C 0>,
+				 <&apps_smmu 0x59D 0>,
+				 <&apps_smmu 0x59E 0>;
 			qcom,iommu-vmid = <0x9>; /* VMID_CP_BITSTREAM */
 			qcom,secure-context-bank;
 		};
@@ -4695,7 +4764,7 @@
 		qcom,max-num-gpii = <15>;
 		qcom,gpii-mask = <0x7ff>;
 		qcom,ev-factor = <2>;
-		qcom,gpii_offset;
+		qcom,gpi-ee-offset = <0x1000>;
 		iommus = <&apps_smmu 0x5b6 0x0>;
 		qcom,smmu-cfg = <0x1>;
 		qcom,iommu-dma-addr-pool = <0x100000 0x100000>;
@@ -4720,7 +4789,7 @@
 		qcom,max-num-gpii = <10>;
 		qcom,gpii-mask = <0x3f>;
 		qcom,ev-factor = <2>;
-		qcom,gpii_offset;
+		qcom,gpi-ee-offset = <0x6000>;
 		iommus = <&apps_smmu 0x56 0x0>;
 		qcom,smmu-cfg = <0x1>;
 		qcom,iommu-dma-addr-pool = <0x100000 0x100000>;
@@ -4745,14 +4814,14 @@
 		qcom,max-num-gpii = <10>;
 		qcom,gpii-mask = <0x3f>;
 		qcom,ev-factor = <2>;
-		qcom,gpii_offset;
+		qcom,gpi-ee-offset = <0x6000>;
 		iommus = <&apps_smmu 0x76 0x0>;
 		qcom,smmu-cfg = <0x1>;
 		qcom,iommu-dma-addr-pool = <0x100000 0x100000>;
 		status = "ok";
 	};
 
-	qcom,cnss-qca6390@b0000000 {
+	wlan: qcom,cnss-qca6390@b0000000 {
 		compatible = "qcom,cnss-qca6390";
 		reg = <0xb0000000 0x10000>,
 		      <0xb2e5510 0x5c0>;
@@ -4764,13 +4833,37 @@
 		qcom,wlan-rc-num = <0>;
 		qcom,wlan-ramdump-dynamic = <0x400000>;
 		qcom,smmu-s1-enable;
+		qcom,cmd_db_name = "smpf2";
+
+		qcom,msm-bus,name = "msm-cnss";
+		qcom,msm-bus,num-cases = <6>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+		/* no vote */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 0 0>,
+		/* idle: 0-18 Mbps, ddr freq: 100 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 400000>,
+		/* low: 18-60 Mbps, ddr freq: 200 MHz*/
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 800000>,
+		/* medium: 60-240 Mbps, ddr freq: 451.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 30000 1804800>,
+		/* high: 240 - 800 Mbps, ddr freq: 451.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 100000 1804800>,
+		/* very high: 800 - 1400 Mbps, ddr freq: 1555.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 175000 6220800>;
 
 		vdd-wlan-aon-supply = <&pm8150_s6>;
+		qcom,vdd-wlan-aon-config = <950000 950000 0 0 1>;
 		vdd-wlan-dig-supply = <&pm8009_s2>;
+		qcom,vdd-wlan-dig-config = <950000 952000 0 0 1>;
 		vdd-wlan-io-supply = <&pm8150_s4>;
+		qcom,vdd-wlan-io-config = <1800000 1800000 0 0 1>;
 		vdd-wlan-rfa1-supply = <&pm8150_s5>;
+		qcom,vdd-wlan-rfa1-config = <1900000 1900000 0 0 1>;
 		vdd-wlan-rfa2-supply = <&pm8150a_s8>;
+		qcom,vdd-wlan-rfa2-config = <1350000 1350000 0 0 1>;
 		wlan-ant-switch-supply = <&pm8150a_l5>;
+		qcom,wlan-ant-switch-config = <1800000 1800000 0 0 0>;
 
 		mhi,max-channels = <30>;
 		mhi,timeout = <10000>;

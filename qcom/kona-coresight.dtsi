@@ -187,6 +187,15 @@
 						<&funnel_merg_out_funnel_swao>;
 				};
 			};
+
+			port@5 {
+				reg = <5>;
+				funnel_swao_in_lpass_lpi: endpoint {
+					slave-mode;
+					remote-endpoint=
+						<&lpass_lpi_out_funnel_swao>;
+				};
+			};
 		};
 	};
 
@@ -967,6 +976,20 @@
 			tpdm_dl_north_out_tpda_dl_north: endpoint {
 				remote-endpoint =
 					<&tpda_dl_north_in_tpdm_dl_north>;
+			};
+		};
+	};
+
+	tpdm_lpass_lpi: tpdm@6b26000 {
+		compatible = "qcom,coresight-dummy";
+
+		coresight-name = "coresight-tpdm-lpass-lpi";
+		qcom,dummy-source;
+
+		port {
+			lpass_lpi_out_funnel_swao: endpoint {
+				remote-endpoint =
+					<&funnel_swao_in_lpass_lpi>;
 			};
 		};
 	};
@@ -2796,7 +2819,7 @@
 		reg-names = "cti-base";
 
 		coresight-name = "coresight-cti-gpu_cortex_m3";
-
+		status = "disabled";
 		clocks =  <&clock_aop QDSS_CLK>,
 			<&clock_gpucc GPU_CC_CXO_CLK>,
 			<&clock_gcc GCC_DDRSS_GPU_AXI_CLK>,
@@ -2833,7 +2856,7 @@
 		reg-names = "cti-base";
 
 		coresight-name = "coresight-cti-gpu_isdb_cti";
-
+		status = "disabled";
 		clocks =  <&clock_aop QDSS_CLK>,
 			<&clock_gpucc GPU_CC_CXO_CLK>,
 			<&clock_gcc GCC_DDRSS_GPU_AXI_CLK>,
@@ -3172,7 +3195,7 @@
 		compatible = "qcom,coresight-remote-etm";
 
 		coresight-name = "coresight-npu-etm0";
-		qcom,inst-id = <2>;
+		qcom,inst-id = <14>;
 
 		port {
 			npu_etm0_out_funnel_npu: endpoint {

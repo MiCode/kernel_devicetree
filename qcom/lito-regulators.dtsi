@@ -32,16 +32,21 @@
 		};
 	};
 
-	/*
-	 * RPMh does not provide support for PM8150 S4 because it is always-on
-	 * at 1.8 V in auto mode.  Therefore, use a stub regulator for S4.
-	 */
-	S4A: pm8150_s4: regulator-pm8150-s4 {
-		compatible = "qcom,stub-regulator";
-		regulator-name = "pm8150_s4";
-		qcom,hpm-min-load = <100000>;
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
+	rpmh-regulator-smpa4 {
+		compatible = "qcom,rpmh-vrm-regulator";
+		qcom,resource-name = "smpa4";
+		qcom,regulator-type = "pmic5-hfsmps";
+		qcom,supported-modes =
+			<RPMH_REGULATOR_MODE_RET
+			 RPMH_REGULATOR_MODE_AUTO>;
+		qcom,mode-threshold-currents = <0 1>;
+		S4A: pm8150_s4: regulator-pm8150-s4 {
+			regulator-name = "pm8150_s4";
+			qcom,set = <RPMH_REGULATOR_SET_ALL>;
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+		};
 	};
 
 	rpmh-regulator-smpa5 {
@@ -405,11 +410,14 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 1>;
+		proxy-supply = <&pm8150_l16>;
 		L16A: pm8150_l16: regulator-pm8150-l16 {
 			regulator-name = "pm8150_l16";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt = <2600000>;
 			regulator-max-microvolt = <3304000>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-current = <857000>;
 			qcom,init-voltage = <2600000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_LPM>;
 		};
@@ -562,11 +570,14 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 1>;
+		proxy-supply = <&pm8150a_l1>;
 		L1C: pm8150a_l1: regulator-pm8150a-l1 {
 			regulator-name = "pm8150a_l1";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1896000>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-current = <62000>;
 			qcom,init-voltage = <1800000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_LPM>;
 		};
@@ -789,5 +800,7 @@
 		reg = <0xff1000 0x84>;
 		regulator-name = "refgen";
 		regulator-enable-ramp-delay = <5>;
+		proxy-supply = <&refgen>;
+		qcom,proxy-consumer-enable;
 	};
 };

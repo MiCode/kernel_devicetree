@@ -110,6 +110,10 @@
 						 4700000 4700000
 						 4700000>;
 
+		qcom,sde-max-per-pipe-bw-high-kbps = <4700000 4700000
+						      4700000 4700000
+						      4700000>;
+
 		/* offsets are relative to "mdp_phys + qcom,sde-off */
 		qcom,sde-sspp-clk-ctrl = <0x2ac 0>, <0x2b4 0>,
 					 <0x2ac 8>, <0x2b4 8>, <0x2c4 8>;
@@ -139,7 +143,7 @@
 		qcom,sde-max-dest-scaler-input-linewidth = <2048>;
 		qcom,sde-max-dest-scaler-output-linewidth = <2560>;
 		qcom,sde-max-bw-low-kbps = <5800000>;
-		qcom,sde-max-bw-high-kbps = <5800000>;
+		qcom,sde-max-bw-high-kbps = <8600000>;
 		qcom,sde-min-core-ib-kbps = <2400000>;
 		qcom,sde-min-llcc-ib-kbps = <800000>;
 		qcom,sde-min-dram-ib-kbps = <800000>;
@@ -225,7 +229,7 @@
 			qcom,sde-dspp-hist = <0x800 0x00010007>;
 			qcom,sde-dspp-sixzone= <0x900 0x00010007>;
 			qcom,sde-dspp-vlut = <0xa00 0x00010008>;
-			qcom,sde-dspp-gamut = <0x1000 0x00040001>;
+			qcom,sde-dspp-gamut = <0x1000 0x00040002>;
 			qcom,sde-dspp-pcc = <0x1700 0x00040000>;
 			qcom,sde-dspp-gc = <0x17c0 0x00010008>;
 			qcom,sde-dspp-dither = <0x82c 0x00010007>;
@@ -538,6 +542,8 @@
 
 		qcom,max-pclk-frequency-khz = <675000>;
 
+		qcom,mst-enable;
+
 		qcom,ctrl-supply-entries {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -559,8 +565,8 @@
 			qcom,phy-supply-entry@0 {
 				reg = <0>;
 				qcom,supply-name = "vdda-0p9";
-				qcom,supply-min-voltage = <1200000>;
-				qcom,supply-max-voltage = <1200000>;
+				qcom,supply-min-voltage = <880000>;
+				qcom,supply-max-voltage = <880000>;
 				qcom,supply-enable-load = <36000>;
 				qcom,supply-disable-load = <0>;
 			};
@@ -586,8 +592,9 @@
 		compatible = "qcom,dsi-phy-v4.1";
 		label = "dsi-phy-0";
 		cell-index = <0>;
-		reg = <0xae94400 0x800>;
-		reg-names = "dsi_phy";
+		reg = <0xae94400 0x800>,
+			<0xae94200 0x100>;
+		reg-names = "dsi_phy", "dyn_refresh_base";
 		vdda-0p9-supply = <&L5A>;
 		qcom,platform-strength-ctrl = [55 03
 						55 03
@@ -618,8 +625,9 @@
 		compatible = "qcom,dsi-phy-v4.1";
 		label = "dsi-phy-1";
 		cell-index = <1>;
-		reg = <0xae96400 0x800>;
-		reg-names = "dsi_phy";
+		reg = <0xae96400 0x800>,
+			<0xae96200 0x100>;
+		reg-names = "dsi_phy", "dyn_refresh_base";
 		vdda-0p9-supply = <&L5A>;
 		qcom,platform-strength-ctrl = [55 03
 						55 03

@@ -75,11 +75,25 @@
 		"VA_AIF1 CAP", "VA_SWR_CLK",
 		"VA_AIF2 CAP", "VA_SWR_CLK",
 		"VA_AIF3 CAP", "VA_SWR_CLK",
-		"VA DMIC0", "MIC BIAS3",
-		"VA DMIC1", "MIC BIAS3",
-		"VA DMIC2", "MIC BIAS1",
-		"VA DMIC3", "MIC BIAS1",
-		"VA DMIC5", "MIC BIAS4",
+		"VA MIC BIAS3", "Digital Mic0",
+		"VA MIC BIAS3", "Digital Mic1",
+		"VA MIC BIAS1", "Digital Mic2",
+		"VA MIC BIAS1", "Digital Mic3",
+		"VA MIC BIAS4", "Digital Mic5",
+		"VA DMIC0", "VA MIC BIAS3",
+		"VA DMIC1", "VA MIC BIAS3",
+		"VA DMIC2", "VA MIC BIAS1",
+		"VA DMIC3", "VA MIC BIAS1",
+		"VA DMIC5", "VA MIC BIAS4",
+		"VA SWR_ADC1", "VA_SWR_CLK",
+		"VA SWR_MIC0", "VA_SWR_CLK",
+		"VA SWR_MIC1", "VA_SWR_CLK",
+		"VA SWR_MIC2", "VA_SWR_CLK",
+		"VA SWR_MIC3", "VA_SWR_CLK",
+		"VA SWR_MIC4", "VA_SWR_CLK",
+		"VA SWR_MIC5", "VA_SWR_CLK",
+		"VA SWR_MIC6", "VA_SWR_CLK",
+		"VA SWR_MIC7", "VA_SWR_CLK",
 		"VA SWR_MIC0", "DMIC1_OUTPUT",
 		"VA SWR_MIC1", "DMIC2_OUTPUT",
 		"VA SWR_MIC2", "DMIC3_OUTPUT",
@@ -141,6 +155,7 @@
 		st,reset-gpio = <&tlmm 38 0x00>;
 		st,regulator_dvdd = "vdd";
 		st,regulator_avdd = "avdd";
+		panel = <&dsi_sw43404_amoled_cmd &dsi_sw43404_amoled_video>;
 	};
 };
 
@@ -366,6 +381,7 @@
 	qcom,linearize-soc;
 	qcom,five-pin-battery;
 	qcom,cl-wt-enable;
+	qcom,soc-scale-mode-en;
 	/* ESR fast calibration */
 	qcom,fg-esr-timer-chg-fast = <0 7>;
 	qcom,fg-esr-timer-dischg-fast = <0 7>;
@@ -526,6 +542,7 @@
 	qcom,mdss-brightness-max-level = <255>;
 	qcom,platform-te-gpio = <&tlmm 66 0>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-panel-test-pin = <&tlmm 46 0>;
 };
 
 &dsi_sw43404_amoled_video {
@@ -535,6 +552,7 @@
 	qcom,mdss-dsi-bl-max-level = <1023>;
 	qcom,mdss-brightness-max-level = <255>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-panel-test-pin = <&tlmm 46 0>;
 };
 
 &dsi_sw43404_amoled_fhd_plus_cmd {
@@ -545,6 +563,7 @@
 	qcom,mdss-brightness-max-level = <255>;
 	qcom,platform-te-gpio = <&tlmm 66 0>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-panel-test-pin = <&tlmm 46 0>;
 };
 
 &dsi_sim_cmd {
@@ -721,17 +740,21 @@
 		qca,bt-vdd-dig-supply = <&pm8009_s2>;
 		qca,bt-vdd-rfa1-supply = <&pm8150_s5>;
 		qca,bt-vdd-rfa2-supply = <&pm8150a_s8>;
+		qca,bt-vdd-asd-supply = <&pm8150_l16>;
 
 		qca,bt-vdd-aon-voltage-level = <950000 950000>;
 		qca,bt-vdd-dig-voltage-level = <950000 952000>;
 		qca,bt-vdd-rfa1-voltage-level = <1900000 1900000>;
 		qca,bt-vdd-rfa2-voltage-level = <1350000 1350000>;
+		qca,bt-vdd-asd-voltage-level = <3024000 3304000>;
+
+		qca,bt-vdd-asd-current-level = <10000>;
 	};
 };
 
 &usb0 {
 	dwc3@a600000 {
-		maximum-speed = "super-speed";
+		maximum-speed = "super-speed-plus";
 	};
 };
 
