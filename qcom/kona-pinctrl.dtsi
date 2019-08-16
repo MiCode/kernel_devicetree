@@ -9,7 +9,9 @@
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
 		irqdomain-map = <0 0 &pdc 79 0>,
+				<1 0 &pdc 84 0>,
 				<2 0 &pdc 80 0>,
+				<3 0 &pdc 82 0>,
 				<4 0 &pdc 107 0>,
 				<7 0 &pdc 43 0>,
 				<11 0 &pdc 42 0>,
@@ -39,7 +41,9 @@
 				<70 0 &pdc 85 0>,
 				<77 0 &pdc 46 0>,
 				<80 0 &pdc 90 0>,
+				<81 0 &pdc 91 0>,
 				<83 0 &pdc 97 0>,
+				<84 0 &pdc 98 0>,
 				<86 0 &pdc 99 0>,
 				<88 0 &pdc 101 0>,
 				<89 0 &pdc 102 0>,
@@ -709,6 +713,19 @@
 
 				config {
 					pins = "gpio81";
+					drive-strength = <2>;
+					bias-pull-up;
+				};
+			};
+
+			pcie0_clkreq_sleep: pcie0_clkreq_sleep {
+				mux {
+					pins = "gpio80";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio80";
 					drive-strength = <2>;
 					bias-pull-up;
 				};
@@ -2639,6 +2656,72 @@
 				pins = "gpio107","gpio108";
 				bias-pull-down; /* PULL DOWN */
 				drive-strength = <2>; /* 2 MA */
+			};
+		};
+
+		tsif0_signals_active: tsif0_signals_active {
+			tsif1_clk {
+				pins = "gpio69"; /* TSIF0 CLK */
+				function = "tsif0_clk";
+			};
+
+			tsif1_en {
+				pins = "gpio70"; /* TSIF0 Enable */
+				function = "tsif0_en";
+			};
+
+			tsif1_data {
+				pins = "gpio71"; /* TSIF0 DATA */
+				function = "tsif0_data";
+			};
+
+			signals_cfg {
+				pins = "gpio69", "gpio70", "gpio71";
+				drive_strength = <2>;	/* 2 mA */
+				bias-pull-down;		/* pull down */
+			};
+		};
+
+		/* sync signal is only used if configured to mode-2 */
+		tsif0_sync_active: tsif0_sync_active {
+			tsif1_sync {
+				pins = "gpio72";	/* TSIF0 SYNC */
+				function = "tsif0_sync";
+				drive_strength = <2>;	/* 2 mA */
+				bias-pull-down;		/* pull down */
+			};
+		};
+
+		tsif1_signals_active: tsif1_signals_active {
+			tsif2_clk {
+				pins = "gpio73"; /* TSIF1 CLK */
+				function = "tsif1_clk";
+			};
+
+			tsif2_en {
+				pins = "gpio74"; /* TSIF1 Enable */
+				function = "tsif1_en";
+			};
+
+			tsif2_data {
+				pins = "gpio75"; /* TSIF1 DATA */
+				function = "tsif1_data";
+			};
+
+			signals_cfg {
+				pins = "gpio73", "gpio74", "gpio75";
+				drive_strength = <2>;	/* 2 mA */
+				bias-pull-down;		/* pull down */
+			};
+		};
+
+		/* sync signal is only used if configured to mode-2 */
+		tsif1_sync_active: tsif1_sync_active {
+			tsif2_sync {
+				pins = "gpio76";	/* TSIF1 SYNC */
+				function = "tsif1_sync";
+				drive_strength = <2>;	/* 2 mA */
+				bias-pull-down;		/* pull down */
 			};
 		};
 
