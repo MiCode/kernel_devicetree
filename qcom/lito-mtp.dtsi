@@ -1,7 +1,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include "lito-audio-overlay.dtsi"
 #include "lito-pmic-overlay.dtsi"
-#include "lito-camera-sensor-mtp.dtsi"
+#include "camera/lito-camera-sensor-mtp.dtsi"
 #include "lito-sde-display.dtsi"
 #include "lito-thermal-overlay.dtsi"
 
@@ -65,7 +65,7 @@
 	vdd-hba-supply = <&ufs_phy_gdsc>;
 	vdd-hba-fixed-regulator;
 	vcc-supply = <&pm8150a_l7>;
-	vccc-voltage-level = <2856000 2960000>;
+	vcc-voltage-level = <2950000 2960000>;
 	vccq2-supply = <&pm8150_s4>;
 	vcc-max-microamp = <800000>;
 	vccq2-max-microamp = <800000>;
@@ -162,6 +162,7 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm7250b_adc_tm ADC_GPIO3_PU2>;
+		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -215,7 +216,9 @@
 &qupv3_se7_i2c {
 	#address-cells = <1>;
 	#size-cells = <0>;
+
 	status = "ok";
+	qcom,i2c-touch-active = "st,fts";
 
 	st_fts@49 {
 		compatible = "st,fts";
@@ -233,6 +236,9 @@
 		st,regulator_avdd = "avdd";
 		st,x-flip = <1>;
 		st,y-flip = <1>;
+		st,power_on_suspend;
+		panel = <&dsi_sw43404_amoled_cmd &dsi_sw43404_amoled_video
+			 &dsi_sw43404_amoled_fhd_plus_cmd>;
 	};
 };
 
@@ -296,4 +302,28 @@
 		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend
 				&nfc_clk_req_suspend>;
 	};
+};
+
+&dsi_sim_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_sim_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_dual_sim_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_dual_sim_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
 };

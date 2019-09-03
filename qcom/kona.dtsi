@@ -38,8 +38,7 @@
 
 	mem-offline {
 		compatible = "qcom,mem-offline";
-		offline-sizes = <0x1 0x40000000 0x0 0x80000000>,
-				<0x1 0xc0000000 0x0 0xc0000000>,
+		offline-sizes = <0x1 0xc0000000 0x0 0x80000000>,
 				<0x2 0xc0000000 0x1 0x40000000>;
 		granule = <512>;
 		mboxes = <&qmp_aop 0>;
@@ -1117,9 +1116,9 @@
 		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
 	};
 
-	npu_llcc_ddr_bwmon: qcom,npu-llcc-ddr-bwmon@0x9092000 {
+	npu_llcc_ddr_bwmon: qcom,npu-llcc-ddr-bwmon@0x9093000 {
 		compatible = "qcom,bimc-bwmon5";
-		reg = <0x9092000 0x1000>;
+		reg = <0x9093000 0x1000>;
 		reg-names = "base";
 		interrupts = <GIC_SPI 81 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,hw-timer-hz = <19200000>;
@@ -2418,9 +2417,9 @@
 
 	};
 
-	qcom_seecom: qseecom@82200000 {
+	qcom_seecom: qseecom@82400000 {
 		compatible = "qcom,qseecom";
-		reg = <0x82200000 0x2200000>;
+		reg = <0x82400000 0x3A00000>;
 		reg-names = "secapp-region";
 		memory-region = <&qseecom_mem>;
 		qcom,hlos-num-ce-hw-instances = <1>;
@@ -2491,7 +2490,7 @@
 	pdc: interrupt-controller@b220000 {
 		compatible = "qcom,kona-pdc";
 		reg = <0xb220000 0x30000>, <0x17c000f0 0x60>;
-		qcom,pdc-ranges = <0 480 30>, <42 522 52>, <94 609 30>;
+		qcom,pdc-ranges = <0 480 94>, <94 609 31>, <125 63 1>, <126 716 12>;
 		#interrupt-cells = <2>;
 		interrupt-parent = <&intc>;
 		interrupt-controller;
@@ -3299,10 +3298,34 @@
 		status = "disabled";
 	};
 
+	ufscard_ice: ufscardice@1db0000 {
+		compatible = "qcom,ice";
+		reg = <0x1db0000 0x8000>;
+		qcom,enable-ice-clk;
+		clock-names = "ufs_core_clk", "bus_clk",
+				"iface_clk", "ice_core_clk";
+		clocks = <&clock_gcc GCC_UFS_CARD_AXI_HW_CTL_CLK>,
+			<&clock_gcc GCC_UFS_1X_CLKREF_EN>,
+			<&clock_gcc GCC_UFS_CARD_AHB_CLK>,
+			<&clock_gcc GCC_UFS_CARD_ICE_CORE_CLK>;
+		qcom,op-freq-hz = <0>, <0>, <0>, <300000000>;
+		vdd-hba-supply = <&ufs_card_gdsc>;
+		qcom,msm-bus,name = "ufs_card_ice_noc";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+				<1 650 0 0>,    /* No vote */
+				<1 650 1000 0>; /* Max. bandwidth */
+		qcom,bus-vector-names = "MIN",
+					"MAX";
+		qcom,instance-type = "ufscard";
+	};
+
 	ufsphy_card: ufsphy_card@1da7000 {
 		reg = <0x1da7000 0xe00>; /* PHY regs */
 		reg-names = "phy_mem";
 		#phy-cells = <0>;
+		ufs-qcom-crypto = <&ufscard_ice>;
 
 		lanes-per-direction = <1>;
 
@@ -3322,6 +3345,7 @@
 		interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
 		phys = <&ufsphy_card>;
 		phy-names = "ufsphy";
+		ufs-qcom-crypto = <&ufscard_ice>;
 
 		lanes-per-direction = <1>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
@@ -3529,11 +3553,18 @@
 		qcom,spss-fuse1-bit = <27>;
 		qcom,spss-fuse2-addr = <0x00780234>;
 		qcom,spss-fuse2-bit = <26>;
+		qcom,spss-fuse3-addr = <0x007801E8>; // IAR_FEATURE_ENABLED fuse
+		qcom,spss-fuse3-bit = <10>;
+		qcom,spss-fuse4-addr = <0x00780218>; // IAR_STATE fuse
+		qcom,spss-fuse4-bit = <1>; // 0x00780214 bits 33-35
 		qcom,spss-dev-firmware-name  = "spss1d";  /* 8 chars max */
 		qcom,spss-test-firmware-name = "spss1t";  /* 8 chars max */
 		qcom,spss-prod-firmware-name = "spss1p";  /* 8 chars max */
 		qcom,spss-debug-reg-addr = <0x01886020>;
 		qcom,spss-emul-type-reg-addr = <0x01fc8004>;
+		pil-mem = <&pil_spss_mem>;
+		qcom,pil-addr = <0x8BE00000>; // backward compatible
+		qcom,pil-size = <0x0F0000>; // padding to 960 KB
 		status = "ok";
 	};
 
@@ -3786,6 +3817,7 @@
 			qcom,slpi_qrtr {
 				qcom,net-id = <2>;
 				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
 				qcom,intents = <0x800  5
 						0x2000 3
 						0x4400 2>;
@@ -4791,7 +4823,7 @@
 		status = "ok";
 	};
 
-	qcom,cnss-qca6390@b0000000 {
+	wlan: qcom,cnss-qca6390@b0000000 {
 		compatible = "qcom,cnss-qca6390";
 		reg = <0xb0000000 0x10000>,
 		      <0xb2e5510 0x5c0>;
@@ -4803,21 +4835,24 @@
 		qcom,wlan-rc-num = <0>;
 		qcom,wlan-ramdump-dynamic = <0x400000>;
 		qcom,smmu-s1-enable;
+		qcom,cmd_db_name = "smpf2";
 
 		qcom,msm-bus,name = "msm-cnss";
-		qcom,msm-bus,num-cases = <5>;
+		qcom,msm-bus,num-cases = <6>;
 		qcom,msm-bus,num-paths = <1>;
 		qcom,msm-bus,vectors-KBps =
 		/* no vote */
 		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 0 0>,
-		/* idle: 0-18 Mbps */
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 240000>,
-		/* low: 18-60 Mbps*/
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 960000>,
-		/* medium: 60-240 Mbps */
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 30000 5600000>,
-		/* high: 240 - 1400 Mbps */
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 175000 9600000>;
+		/* idle: 0-18 Mbps, ddr freq: 451.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 1804800>,
+		/* low: 18-60 Mbps, ddr freq: 451.2 MHz*/
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 1804800>,
+		/* medium: 60-240 Mbps, ddr freq: 451.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 30000 1804800>,
+		/* high: 240 - 800 Mbps, ddr freq: 451.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 100000 1804800>,
+		/* very high: 800 - 1400 Mbps, ddr freq: 1555.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 175000 6220800>;
 
 		vdd-wlan-aon-supply = <&pm8150_s6>;
 		qcom,vdd-wlan-aon-config = <950000 950000 0 0 1>;
@@ -4934,6 +4969,7 @@
 			mhi_qrtr {
 				mhi,chan = "IPCR";
 				qcom,net-id = <0>;
+				qcom,low-latency;
 			};
 		};
 	};
@@ -4958,6 +4994,66 @@
 		clock-names = "rf_clk";
 		qcom,keep-radio-on-during-sleep;
 		status = "disabled";
+	};
+
+	tspp: msm_tspp@8880000 {
+		compatible = "qcom,msm_tspp";
+		reg = <0x088a7000 0x200>, /* MSM_TSIF0_PHYS */
+		      <0x088a8000 0x200>, /* MSM_TSIF1_PHYS */
+		      <0x088a9000 0x1000>, /* MSM_TSPP_PHYS  */
+		      <0x08884000 0x23000>; /* MSM_TSPP_BAM_PHYS */
+		reg-names = "MSM_TSIF0_PHYS",
+			"MSM_TSIF1_PHYS",
+			"MSM_TSPP_PHYS",
+			"MSM_TSPP_BAM_PHYS";
+		interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>,/*TSIF_TSPP_IRQ*/
+			<GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>, /* TSIF0_IRQ */
+			<GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>, /* TSIF1_IRQ */
+			<GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>; /* TSIF_BAM_IRQ */
+		interrupt-names = "TSIF_TSPP_IRQ",
+			"TSIF0_IRQ",
+			"TSIF1_IRQ",
+			"TSIF_BAM_IRQ";
+
+		clock-names = "iface_clk", "ref_clk";
+		clocks = <&clock_gcc GCC_TSIF_AHB_CLK>,
+			<&clock_gcc GCC_TSIF_REF_CLK>;
+
+		qcom,msm-bus,name = "tsif";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+				<82 512 0 0>, /* No vote */
+				<82 512 12288 24576>;
+				/* Max. bandwidth, 2xTSIF, each max of 96Mbps */
+
+		pinctrl-names = "disabled",
+			"tsif0-mode1", "tsif0-mode2",
+			"tsif1-mode1", "tsif1-mode2",
+			"dual-tsif-mode1", "dual-tsif-mode2";
+
+		pinctrl-0 = <>;				/* disabled */
+		pinctrl-1 = <&tsif0_signals_active>;	/* tsif0-mode1 */
+		pinctrl-2 = <&tsif0_signals_active
+			&tsif0_sync_active>;		/* tsif0-mode2 */
+		pinctrl-3 = <&tsif1_signals_active>;	/* tsif1-mode1 */
+		pinctrl-4 = <&tsif1_signals_active
+			&tsif1_sync_active>;		/* tsif1-mode2 */
+		pinctrl-5 = <&tsif0_signals_active
+			&tsif1_signals_active>;		/* dual-tsif-mode1 */
+		pinctrl-6 = <&tsif0_signals_active
+			&tsif0_sync_active
+			&tsif1_signals_active
+			&tsif1_sync_active>;		/* dual-tsif-mode2 */
+
+		memory-region = <&qseecom_mem>;
+		iommus = <&apps_smmu 0xA0 0x00>;
+		qcom,iommu-dma-addr-pool = <0x10000000  0x40000000>;
+		qcom,smmu-s1-enable;
+	};
+
+	demux {
+		compatible = "qcom,demux";
 	};
 };
 
@@ -5018,7 +5114,7 @@
 #include "msm-rdbg.dtsi"
 
 #include "kona-pm.dtsi"
-#include "kona-camera.dtsi"
+#include "camera/kona-camera.dtsi"
 #include "kona-qupv3.dtsi"
 #include "kona-audio.dtsi"
 #include "kona-thermal.dtsi"

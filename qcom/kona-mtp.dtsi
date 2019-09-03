@@ -3,7 +3,7 @@
 
 #include "kona-pmic-overlay.dtsi"
 #include "kona-sde-display.dtsi"
-#include "kona-camera-sensor-mtp.dtsi"
+#include "camera/kona-camera-sensor-mtp.dtsi"
 #include "kona-audio-overlay.dtsi"
 #include "kona-thermal-overlay.dtsi"
 
@@ -154,6 +154,7 @@
 	#size-cells = <0>;
 
 	status = "ok";
+	qcom,i2c-touch-active = "st,fts";
 
 	st_fts@49 {
 		compatible = "st,fts";
@@ -171,6 +172,8 @@
 		st,regulator_avdd = "avdd";
 		st,x-flip = <1>;
 		st,y-flip = <1>;
+		panel = <&dsi_sw43404_amoled_cmd &dsi_sw43404_amoled_video
+			 &dsi_sw43404_amoled_fhd_plus_cmd>;
 	};
 };
 
@@ -184,11 +187,15 @@
 		qca,bt-vdd-dig-supply = <&pm8009_s2>;
 		qca,bt-vdd-rfa1-supply = <&pm8150_s5>;
 		qca,bt-vdd-rfa2-supply = <&pm8150a_s8>;
+		qca,bt-vdd-asd-supply = <&pm8150_l16>;
 
 		qca,bt-vdd-aon-voltage-level = <950000 950000>;
 		qca,bt-vdd-dig-voltage-level = <950000 952000>;
 		qca,bt-vdd-rfa1-voltage-level = <1900000 1900000>;
 		qca,bt-vdd-rfa2-voltage-level = <1350000 1350000>;
+		qca,bt-vdd-asd-voltage-level = <3024000 3304000>;
+
+		qca,bt-vdd-asd-current-level = <10000>;
 	};
 
 	kona_mtp_batterydata: qcom,battery-data {
@@ -263,7 +270,7 @@
 
 &pm8150b_charger {
 	status = "ok";
-	qcom,sec-charger-config = <0>;
+	qcom,sec-charger-config = <1>;
 	qcom,auto-recharge-soc = <98>;
 	io-channels = <&pm8150b_vadc ADC_MID_CHG_DIV6>,
 		      <&pm8150b_vadc ADC_USB_IN_I>,
@@ -280,7 +287,6 @@
 	qcom,sw-jeita-enable;
 	qcom,wd-bark-time-secs = <16>;
 	qcom,suspend-input-on-debug-batt;
-	qcom,fcc-stepping-enable;
 };
 
 &pm8150b_fg {
@@ -321,6 +327,16 @@
 &smb1390_charger {
 	io-channels = <&pm8150b_vadc ADC_AMUX_THM2>;
 	io-channel-names = "cp_die_temp";
+	qcom,parallel-output-mode = <2>;
+	status = "ok";
+};
+
+&smb1390_slave {
+	status = "ok";
+};
+
+&smb1390_slave_charger {
+	status = "ok";
 };
 
 &pm8150_vadc {
@@ -474,6 +490,7 @@
 	qcom,mdss-brightness-max-level = <255>;
 	qcom,platform-te-gpio = <&tlmm 66 0>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-panel-test-pin = <&tlmm 46 0>;
 };
 
 &dsi_sw43404_amoled_video {
@@ -483,6 +500,7 @@
 	qcom,mdss-dsi-bl-max-level = <1023>;
 	qcom,mdss-brightness-max-level = <255>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-panel-test-pin = <&tlmm 46 0>;
 };
 
 &dsi_sw43404_amoled_fhd_plus_cmd {
@@ -493,6 +511,7 @@
 	qcom,mdss-brightness-max-level = <255>;
 	qcom,platform-te-gpio = <&tlmm 66 0>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-panel-test-pin = <&tlmm 46 0>;
 };
 
 &dsi_sim_cmd {
@@ -567,7 +586,7 @@
 		};
 	};
 
-	xo-therm-adc {
+	xo-therm-usr {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";

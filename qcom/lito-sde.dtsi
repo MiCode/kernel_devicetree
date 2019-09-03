@@ -6,11 +6,13 @@
 		reg = <0xae00000 0x84208>,
 		      <0xaeb0000 0x2008>,
 		      <0xaeac000 0x214>,
-		      <0xae8f000 0x02c>;
+		      <0xae8f000 0x02c>,
+		      <0xaf50000 0x038>;
 		reg-names = "mdp_phys",
 			"vbif_phys",
 			"regdma_phys",
-			"sid_phys";
+			"sid_phys",
+			"swfuse_phys";
 
 		clocks =
 			<&gcc GCC_DISP_AHB_CLK>,
@@ -86,6 +88,7 @@
 
 		qcom,sde-dsc-off = <0x81000 0x81400>;
 		qcom,sde-dsc-size = <0x140>;
+		qcom,sde-dsc-pair-mask = <2 1>;
 
 		qcom,sde-dither-off = <0x30e0 0x30e0 0x30e0
 					0x30e0>;
@@ -391,6 +394,7 @@
 		compatible = "qcom,dsi-ctrl-hw-v2.4";
 		label = "dsi-ctrl-0";
 		cell-index = <0>;
+		frame-threshold-time-us = <1000>;
 		reg = <0xae94000 0x400>,
 			<0xaf08000 0x4>;
 		reg-names = "dsi_ctrl", "disp_cc_base";
@@ -439,6 +443,7 @@
 	mdss_dsi1: qcom,mdss_dsi1_ctrl {
 		compatible = "qcom,dsi-ctrl-hw-v2.4";
 		label = "dsi-ctrl-1";
+		frame-threshold-time-us = <1000>;
 		cell-index = <1>;
 		reg = <0xae96000 0x400>,
 			<0xaf08000 0x4>;
@@ -488,7 +493,7 @@
 		cell-index = <0>;
 		compatible = "qcom,dp-display";
 
-		vdda-lp2-supply = <&L9A>;
+		vdda-1p2-supply = <&L9A>;
 		reg =	<0xae90000 0x0dc>,
 			<0xae90200 0x0c0>,
 			<0xae90400 0x508>,
@@ -497,14 +502,13 @@
 			<0x88ea200 0x150>,
 			<0x88ea600 0x150>,
 			<0xaf02000 0x2c4>,
-			<0x780000 0x6228>,
 			<0x88ea040 0x10>,
 			<0x88e8000 0x20>,
 			<0x0aee1000 0x2a>,
 			<0xae91400 0x095>;
 		reg-names =	"dp_ahb", "dp_aux", "dp_link",
 				"dp_p0", "dp_phy", "dp_ln_tx0", "dp_ln_tx1",
-				"dp_mmss_cc", "qfprom_physical", "dp_pll",
+				"dp_mmss_cc", "dp_pll",
 				"usb3_dp_com", "hdcp_physical", "dp_p1";
 
 		interrupt-parent = <&mdss_mdp>;
@@ -541,6 +545,8 @@
 		qcom,aux-cfg9-settings = [44 03];
 
 		qcom,max-pclk-frequency-khz = <675000>;
+
+		qcom,mst-enable;
 
 		qcom,ctrl-supply-entries {
 			#address-cells = <1>;
@@ -590,8 +596,9 @@
 		compatible = "qcom,dsi-phy-v4.1";
 		label = "dsi-phy-0";
 		cell-index = <0>;
-		reg = <0xae94400 0x800>;
-		reg-names = "dsi_phy";
+		reg = <0xae94400 0x800>,
+			<0xae94200 0x100>;
+		reg-names = "dsi_phy", "dyn_refresh_base";
 		vdda-0p9-supply = <&L5A>;
 		qcom,platform-strength-ctrl = [55 03
 						55 03
@@ -622,8 +629,9 @@
 		compatible = "qcom,dsi-phy-v4.1";
 		label = "dsi-phy-1";
 		cell-index = <1>;
-		reg = <0xae96400 0x800>;
-		reg-names = "dsi_phy";
+		reg = <0xae96400 0x800>,
+			<0xae96200 0x100>;
+		reg-names = "dsi_phy", "dyn_refresh_base";
 		vdda-0p9-supply = <&L5A>;
 		qcom,platform-strength-ctrl = [55 03
 						55 03

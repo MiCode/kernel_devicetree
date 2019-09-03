@@ -8,6 +8,7 @@
 	msm_bus: qcom,kgsl-busmon {
 		label = "kgsl-busmon";
 		compatible = "qcom,kgsl-busmon";
+		operating-points-v2 = <&gpu_opp_table>;
 	};
 
 	gpubw: qcom,gpubw {
@@ -19,6 +20,16 @@
 
 	gpu_opp_table: gpu-opp-table {
 		compatible = "operating-points-v2";
+
+		opp-750000000 {
+			opp-hz = /bits/ 64 <750000000>;
+			opp-microvolt = <RPMH_REGULATOR_LEVEL_TURBO>;
+		};
+
+		opp-700000000 {
+			opp-hz = /bits/ 64 <700000000>;
+			opp-microvolt = <RPMH_REGULATOR_LEVEL_NOM_L1>;
+		};
 
 		opp-625000000 {
 			opp-hz = /bits/ 64 <625000000>;
@@ -106,17 +117,17 @@
 		qcom,msm-bus,vectors-KBps =
 				<26 512 0 0>,
 				<26 512 0 400000>,      /* 1 bus=100 */
-				<26 512 0 600000>,      /* 2 bus=150 */
-				<26 512 0 800000>,      /* 3 bus=200 */
-				<26 512 0 1200000>,     /* 4 bus=300 */
-				<26 512 0 1648000>,     /* 5 bus=412 */
-				<26 512 0 2188000>,     /* 6 bus=547 */
-				<26 512 0 2724000>,     /* 7 bus=681 */
-				<26 512 0 3072000>,     /* 8 bus=768 */
-				<26 512 0 4068000>,     /* 9 bus=1017 */
-				<26 512 0 5412000>,     /* 10 bus=1353 */
-				<26 512 0 6220000>,     /* 11 bus=1555 */
-				<26 512 0 7216000>;     /* 12 bus=1804 */
+				<26 512 0 800000>,      /* 2 bus=200 */
+				<26 512 0 1200000>,     /* 3 bus=300 */
+				<26 512 0 1804800>,     /* 4 bus=451 */
+				<26 512 0 2188000>,     /* 5 bus=547 */
+				<26 512 0 2724000>,     /* 6 bus=681 */
+				<26 512 0 3072000>,     /* 7 bus=768 */
+				<26 512 0 4068000>,     /* 8 bus=1017 */
+				<26 512 0 5412000>,     /* 9 bus=1353 */
+				<26 512 0 6220000>,     /* 10 bus=1555 */
+				<26 512 0 7216000>,     /* 11 bus=1804 */
+				<26 512 0 8371200>;     /* 12 bus=2092 */
 
 		/* GDSC regulator names */
 		regulator-names = "vddcx", "vdd";
@@ -124,33 +135,11 @@
 		vddcx-supply = <&gpu_cx_gdsc>;
 		vdd-supply = <&gpu_gx_gdsc>;
 
-		nvmem-cells = <&gpu_speed_bin>;
-		nvmem-cell-names = "speed_bin";
+		nvmem-cells = <&gpu_speed_bin>, <&gpu_gaming_bin>;
+		nvmem-cell-names = "speed_bin", "gaming_bin";
 
 		/* GPU OPP data */
 		operating-points-v2 = <&gpu_opp_table>;
-
-		qcom,l3-pwrlevels {
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			compatible = "qcom,l3-pwrlevels";
-
-			qcom,l3-pwrlevel@0 {
-				reg = <0>;
-				qcom,l3-freq = <0>;
-			};
-
-			qcom,l3-pwrlevel@1 {
-				reg = <1>;
-				qcom,l3-freq = <864000000>;
-			};
-
-			qcom,l3-pwrlevel@2 {
-				reg = <2>;
-				qcom,l3-freq = <1344000000>;
-			};
-		};
 
 		/* GPU Mempools */
 		qcom,gpu-mempools {
@@ -210,8 +199,8 @@
 				qcom,gpu-pwrlevel@0 {
 					reg = <0>;
 					qcom,gpu-freq = <625000000>;
-					qcom,bus-freq = <11>;
-					qcom,bus-min = <10>;
+					qcom,bus-freq = <10>;
+					qcom,bus-min = <9>;
 					qcom,bus-max = <12>;
 				};
 
@@ -219,27 +208,27 @@
 				qcom,gpu-pwrlevel@1 {
 					reg = <1>;
 					qcom,gpu-freq = <500000000>;
-					qcom,bus-freq = <9>;
-					qcom,bus-min = <8>;
-					qcom,bus-max = <11>;
+					qcom,bus-freq = <8>;
+					qcom,bus-min = <7>;
+					qcom,bus-max = <10>;
 				};
 
 				/* SVS */
 				qcom,gpu-pwrlevel@2 {
 					reg = <2>;
 					qcom,gpu-freq = <400000000>;
-					qcom,bus-freq = <8>;
-					qcom,bus-min = <6>;
-					qcom,bus-max = <9>;
+					qcom,bus-freq = <7>;
+					qcom,bus-min = <5>;
+					qcom,bus-max = <8>;
 				};
 
 				/* Low SVS */
 				qcom,gpu-pwrlevel@3 {
 					reg = <3>;
 					qcom,gpu-freq = <275000000>;
-					qcom,bus-freq = <6>;
-					qcom,bus-min = <6>;
-					qcom,bus-max = <8>;
+					qcom,bus-freq = <5>;
+					qcom,bus-min = <5>;
+					qcom,bus-max = <7>;
 				};
 
 				qcom,gpu-pwrlevel@4 {
@@ -264,8 +253,8 @@
 				qcom,gpu-pwrlevel@0 {
 					reg = <0>;
 					qcom,gpu-freq = <625000000>;
-					qcom,bus-freq = <11>;
-					qcom,bus-min = <10>;
+					qcom,bus-freq = <10>;
+					qcom,bus-min = <9>;
 					qcom,bus-max = <12>;
 				};
 
@@ -273,27 +262,27 @@
 				qcom,gpu-pwrlevel@1 {
 					reg = <1>;
 					qcom,gpu-freq = <500000000>;
-					qcom,bus-freq = <9>;
-					qcom,bus-min = <8>;
-					qcom,bus-max = <11>;
+					qcom,bus-freq = <8>;
+					qcom,bus-min = <7>;
+					qcom,bus-max = <10>;
 				};
 
 				/* SVS */
 				qcom,gpu-pwrlevel@2 {
 					reg = <2>;
 					qcom,gpu-freq = <400000000>;
-					qcom,bus-freq = <8>;
-					qcom,bus-min = <6>;
-					qcom,bus-max = <9>;
+					qcom,bus-freq = <7>;
+					qcom,bus-min = <5>;
+					qcom,bus-max = <8>;
 				};
 
 				/* Low SVS */
 				qcom,gpu-pwrlevel@3 {
 					reg = <3>;
 					qcom,gpu-freq = <275000000>;
-					qcom,bus-freq = <6>;
-					qcom,bus-min = <6>;
-					qcom,bus-max = <8>;
+					qcom,bus-freq = <5>;
+					qcom,bus-min = <5>;
+					qcom,bus-max = <7>;
 				};
 
 				qcom,gpu-pwrlevel@4 {
@@ -317,8 +306,8 @@
 				qcom,gpu-pwrlevel@0 {
 					reg = <0>;
 					qcom,gpu-freq = <540000000>;
-					qcom,bus-freq = <9>;
-					qcom,bus-min = <8>;
+					qcom,bus-freq = <8>;
+					qcom,bus-min = <7>;
 					qcom,bus-max = <12>;
 				};
 
@@ -326,18 +315,18 @@
 				qcom,gpu-pwrlevel@1 {
 					reg = <1>;
 					qcom,gpu-freq = <400000000>;
-					qcom,bus-freq = <8>;
-					qcom,bus-min = <6>;
-					qcom,bus-max = <9>;
+					qcom,bus-freq = <7>;
+					qcom,bus-min = <5>;
+					qcom,bus-max = <8>;
 				};
 
 				/* Low SVS */
 				qcom,gpu-pwrlevel@2 {
 					reg = <2>;
 					qcom,gpu-freq = <275000000>;
-					qcom,bus-freq = <6>;
-					qcom,bus-min = <6>;
-					qcom,bus-max = <8>;
+					qcom,bus-freq = <5>;
+					qcom,bus-min = <5>;
+					qcom,bus-max = <7>;
 				};
 
 				qcom,gpu-pwrlevel@3 {
@@ -427,22 +416,19 @@
 		mboxes = <&qmp_aop 0>;
 		mbox-names = "aop";
 
-		qcom,gmu-pwrlevels {
-			#address-cells = <1>;
-			#size-cells = <0>;
+		qcom,gpu-acd-table {
+			/* Corresponds to levels in the GPU perf table */
+			qcom,acd-enable-by-level = <0x7e>;
+			qcom,acd-stride = <0x1>;
+			qcom,acd-num-levels = <0x6>;
 
-			compatible = "qcom,gmu-pwrlevels";
-
-			/* GMU power levels must go from lowest to highest */
-			qcom,gmu-pwrlevel@0 {
-				reg = <0>;
-				qcom,gmu-freq = <0>;
-			};
-
-			qcom,gmu-pwrlevel@1 {
-				reg = <1>;
-				qcom,gmu-freq = <200000000>;
-			};
+			/* ACDCR */
+			qcom,acd-data = <0x802F5FFD	/* LowSVS*/
+					0x802F5FFD	/* SVS */
+					0x802F5FFD	/* SVS_L1 */
+					0x802F5FFD	/* NOM */
+					0x802F5FFD	/* NOM_L1 */
+					0x802F5FFD>;	/* TURBO */
 		};
 
 		gmu_user: gmu_user {

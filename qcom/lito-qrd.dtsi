@@ -2,7 +2,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include "lito-audio-overlay.dtsi"
 #include "lito-thermal-overlay.dtsi"
-#include "lito-camera-sensor-qrd.dtsi"
+#include "camera/lito-camera-sensor-qrd.dtsi"
 #include "lito-sde-display.dtsi"
 
 &soc {
@@ -46,7 +46,8 @@
 
 &usb2_phy0 {
 	qcom,param-override-seq =
-		<0x0d 0x70
+		<0xa7 0x6c
+		0x0d 0x70
 		0x27 0x74>;
 };
 
@@ -59,6 +60,7 @@
 	#size-cells = <0>;
 
 	status = "ok";
+	qcom,i2c-touch-active = "st,fts";
 
 	st_fts@49 {
 		compatible = "st,fts";
@@ -76,6 +78,9 @@
 		st,regulator_avdd = "avdd";
 		st,x-flip;
 		st,y-flip;
+		st,power_on_suspend;
+		panel = <&dsi_sw43404_amoled_cmd &dsi_sw43404_amoled_video
+			 &dsi_sw43404_amoled_fhd_plus_cmd>;
 	};
 };
 
@@ -142,7 +147,7 @@
 	vdd-hba-supply = <&ufs_phy_gdsc>;
 	vdd-hba-fixed-regulator;
 	vcc-supply = <&pm8150a_l7>;
-	vccc-voltage-level = <2856000 2960000>;
+	vcc-voltage-level = <2950000 2960000>;
 	vccq2-supply = <&pm8150_s4>;
 	vcc-max-microamp = <800000>;
 	vccq2-max-microamp = <800000>;
@@ -234,6 +239,82 @@
 	qcom,cl-feedback-on;
 };
 
+&thermal_zones {
+	xo-therm-step {
+		polling-delay-passive = <2000>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8150_adc_tm ADC_XO_THERM_PU2>;
+		wake-capable-sensor;
+		trips {
+			gold_plus_trip: gold-plus-trip {
+				temperature = <46000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			gold_trip: gold-trip {
+				temperature = <48000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			silver_trip: silver-trip {
+				temperature = <52000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			cx_emer_trip: cx-emer-trip {
+				temperature = <52000>;
+				hysteresis = <4000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			skin_cpu7 {
+				trip = <&gold_plus_trip>;
+					/* throttle from fmax to 1516800KHz */
+				cooling-device =
+					<&CPU7 THERMAL_NO_LIMIT
+						(THERMAL_MAX_LIMIT-3)>;
+			};
+
+			skin_cpu6 {
+				trip = <&gold_trip>;
+					/* throttle from fmax to 1478400KHz */
+				cooling-device =
+					<&CPU6 THERMAL_NO_LIMIT
+						(THERMAL_MAX_LIMIT-3)>;
+			};
+
+			skin_cpu0 {
+				trip = <&silver_trip>;
+					/* throttle from fmax to 1459200KHz */
+				cooling-device = <&CPU0 THERMAL_NO_LIMIT
+						(THERMAL_MAX_LIMIT-5)>;
+			};
+
+			skin_gpu {
+				trip = <&cx_emer_trip>;
+				cooling-device = <&msm_gpu (THERMAL_MAX_LIMIT-1)
+						(THERMAL_MAX_LIMIT-1)>;
+			};
+
+			skin_modem {
+				trip = <&cx_emer_trip>;
+				cooling-device = <&modem_pa 3 3>;
+			};
+
+			skin_cdsp {
+				trip = <&cx_emer_trip>;
+				cooling-device = <&msm_cdsp_rm 5 5>;
+			};
+		};
+	};
+};
+
 &wsa881x_0212 {
 	compatible = "qcom,wsa881x";
 	reg = <0x10 0x20170212>;
@@ -295,6 +376,18 @@
 		"VA DMIC3", "MIC BIAS1",
 		"VA DMIC4", "MIC BIAS4",
 		"VA DMIC5", "MIC BIAS4",
+		"VA SWR_ADC0", "VA_SWR_CLK",
+		"VA SWR_ADC1", "VA_SWR_CLK",
+		"VA SWR_ADC2", "VA_SWR_CLK",
+		"VA SWR_ADC3", "VA_SWR_CLK",
+		"VA SWR_MIC0", "VA_SWR_CLK",
+		"VA SWR_MIC1", "VA_SWR_CLK",
+		"VA SWR_MIC2", "VA_SWR_CLK",
+		"VA SWR_MIC3", "VA_SWR_CLK",
+		"VA SWR_MIC4", "VA_SWR_CLK",
+		"VA SWR_MIC5", "VA_SWR_CLK",
+		"VA SWR_MIC6", "VA_SWR_CLK",
+		"VA SWR_MIC7", "VA_SWR_CLK",
 		"VA SWR_ADC1", "ADC2_OUTPUT",
 		"VA SWR_MIC0", "DMIC1_OUTPUT",
 		"VA SWR_MIC1", "DMIC2_OUTPUT",
@@ -369,4 +462,28 @@
 		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend
 				&nfc_clk_req_suspend>;
 	};
+};
+
+&dsi_sim_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_sim_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_dual_sim_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
+};
+
+&dsi_dual_sim_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,platform-reset-gpio = <&pm8150l_gpios 3 0>;
 };
