@@ -322,7 +322,6 @@
 			<0x88ea200 0x200>,
 			<0x88ea600 0x200>,
 			<0xaf02000 0x1a0>,
-			<0x780000 0x621c>,
 			<0x88ea040 0x10>,
 			<0x88e8000 0x20>,
 			<0x0aee1000 0x034>,
@@ -330,7 +329,7 @@
 		/* dp_ctrl: dp_ahb, dp_aux, dp_link, dp_p0 */
 		reg-names = "dp_ahb", "dp_aux", "dp_link",
 			"dp_p0", "dp_phy", "dp_ln_tx0", "dp_ln_tx1",
-			"dp_mmss_cc", "qfprom_physical", "dp_pll",
+			"dp_mmss_cc", "dp_pll",
 			"usb3_dp_com", "hdcp_physical", "dp_p1";
 
 		interrupt-parent = <&mdss_mdp>;
@@ -455,6 +454,17 @@
 			    <20000 20512 0 6400000>,
 			    <20000 20512 0 6400000>;
 		};
+
+		qcom,sde-reg-bus {
+			qcom,msm-bus,name = "disp_rsc_reg";
+			qcom,msm-bus,num-cases = <4>;
+			qcom,msm-bus,num-paths = <1>;
+			qcom,msm-bus,vectors-KBps =
+				<1 590 0 0>,
+				<1 590 0 76800>,
+				<1 590 0 150000>,
+				<1 590 0 300000>;
+		};
 	};
 
 	mdss_rotator: qcom,mdss_rotator@aea8800 {
@@ -521,7 +531,8 @@
 		smmu_rot_unsec: qcom,smmu_rot_unsec_cb {
 			compatible = "qcom,smmu_sde_rot_unsec";
 			iommus = <&apps_smmu 0x215C 0x0400>;
-			qcom,iommu-dma = "disabled";
+			qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+			qcom,iommu-faults = "non-fatal";
 		};
 	};
 

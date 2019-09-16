@@ -1798,26 +1798,34 @@
 	};
 
 	tsens0: tsens@c222000 {
-		compatible = "qcom,tsens24xx";
+		compatible = "qcom,tsens26xx";
 		reg = <0xc222000 0x8>,
 			<0xc263000 0x1ff>;
 		reg-names = "tsens_srot_physical",
 				"tsens_tm_physical";
+
 		interrupts-extended = <&pdc 26 IRQ_TYPE_LEVEL_HIGH>,
-				<&pdc 28 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "tsens-upper-lower", "tsens-critical";
+				<&pdc 28 IRQ_TYPE_LEVEL_HIGH>,
+				<&pdc 20 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "tsens-upper-lower",
+				"tsens-critical", "tsens-0C";
+		0C-sensor-num = <16>;
 		#thermal-sensor-cells = <1>;
 	};
 
 	tsens1: tsens@c223000 {
-		compatible = "qcom,tsens24xx";
+		compatible = "qcom,tsens26xx";
 		reg = <0xc223000 0x8>,
 			<0xc265000 0x1ff>;
 		reg-names = "tsens_srot_physical",
 			"tsens_tm_physical";
+
 		interrupts-extended = <&pdc 27 IRQ_TYPE_LEVEL_HIGH>,
-				<&pdc 29 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "tsens-upper-lower", "tsens-critical";
+				<&pdc 29 IRQ_TYPE_LEVEL_HIGH>,
+				<&pdc 21 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "tsens-upper-lower",
+				"tsens-critical", "tsens-0C";
+		0C-sensor-num = <16>;
 		#thermal-sensor-cells = <1>;
 	};
 
@@ -2477,6 +2485,7 @@
 
 			qcom,modem_qrtr {
 				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
 				qcom,intents = <0x800  5
 						0x2000 3
 						0x4400 2>;
@@ -2515,6 +2524,7 @@
 
 			qcom,adsp_qrtr {
 				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
 				qcom,intents = <0x800  5
 						0x2000 3
 						0x4400 2>;
@@ -2745,9 +2755,9 @@
 		reg = <0x3000000 0x00100>;
 
 		vdd_lpi_cx-supply = <&L18A_LEVEL>;
-		qcom,vdd_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		qcom,vdd_lpi_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
 		vdd_lpi_mx-supply = <&L4A_LEVEL>;
-		qcom,vdd_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		qcom,vdd_lpi_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
 		qcom,proxy-reg-names = "vdd_lpi_cx", "vdd_lpi_mx";
 
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
@@ -3458,6 +3468,7 @@
 		qcom,bandwidth-vote-for-ipa;
 		qcom,use-64-bit-dma-mask;
 		qcom,msm-bus,name = "ipa";
+		qcom,wan-use-skb-page;
 		qcom,msm-bus,num-cases = <5>;
 		qcom,msm-bus,num-paths = <5>;
 		qcom,msm-bus,vectors-KBps =
@@ -3584,6 +3595,10 @@
 		qcom,pas-id = <23>;
 		qcom,firmware-name = "npu";
 		memory-region = <&pil_npu_mem>;
+
+		/* Outputs to npu */
+		qcom,smem-states = <&npu_smp2p_out 0>;
+		qcom,smem-state-names = "qcom,force-stop";
 	};
 
 	qfprom: qfprom@780000 {

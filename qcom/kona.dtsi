@@ -1098,6 +1098,8 @@
 		compatible = "qcom,bimc-bwmon4";
 		reg = <0x00060400 0x300>, <0x00060300 0x200>;
 		reg-names = "base", "global_base";
+		qcom,msm_bus = <154 10070>;
+		qcom,msm_bus_name = "npu_bwmon_cdsp";
 		clocks = <&clock_gcc GCC_NPU_BWMON_CFG_AHB_CLK>,
 				<&clock_gcc GCC_NPU_BWMON_AXI_CLK>;
 		clock-names = "npu_bwmon_ahb", "npu_bwmon_axi";
@@ -1137,6 +1139,8 @@
 		compatible = "qcom,bimc-bwmon4";
 		reg = <0x00070300 0x300>, <0x00070200 0x200>;
 		reg-names = "base", "global_base";
+		qcom,msm_bus = <154 10070>;
+		qcom,msm_bus_name = "npudsp_bwmon_cdsp";
 		clocks = <&clock_gcc GCC_NPU_BWMON_CFG_AHB_CLK>,
 				<&clock_gcc GCC_NPU_BWMON_AXI_CLK>;
 		clock-names = "npu_bwmon_ahb", "npu_bwmon_axi";
@@ -3636,7 +3640,6 @@
 		qcom,mhi-event-ring-id-limits = <9 11>; /* start and end */
 		qcom,modem-cfg-emb-pipe-flt;
 		qcom,ipa-wdi3-over-gsi;
-		qcom,use-ipa-pm;
 		qcom,arm-smmu;
 		qcom,smmu-fast-map;
 		qcom,bandwidth-vote-for-ipa;
@@ -3684,7 +3687,9 @@
 		qcom,bus-vector-names = "MIN", "SVS2", "SVS", "NOMINAL",
 			"TURBO";
 		qcom,throughput-threshold = <600 2500 5000>;
-		qcom,scaling-exceptions = <>;
+		qcom,scaling-exceptions = "wdi", "0", "600", "1200",
+			"USB DPL", "0", "2500", "5000", "ODL", "0",
+			"2500", "5000";
 
 		qcom,entire-ipa-block-size = <0x100000>;
 		qcom,register-collection-on-crash;
@@ -3817,6 +3822,7 @@
 			qcom,slpi_qrtr {
 				qcom,net-id = <2>;
 				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
 				qcom,intents = <0x800  5
 						0x2000 3
 						0x4400 2>;
@@ -4133,6 +4139,10 @@
 		qcom,pas-id = <23>;
 		qcom,firmware-name = "npu";
 		memory-region = <&pil_npu_mem>;
+
+		/* Outputs to npu */
+		qcom,smem-states = <&npu_smp2p_out 0>;
+		qcom,smem-state-names = "qcom,force-stop";
 	};
 
 	qcom,smp2p_sleepstate {
@@ -4842,10 +4852,10 @@
 		qcom,msm-bus,vectors-KBps =
 		/* no vote */
 		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 0 0>,
-		/* idle: 0-18 Mbps, ddr freq: 100 MHz */
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 400000>,
-		/* low: 18-60 Mbps, ddr freq: 200 MHz*/
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 800000>,
+		/* idle: 0-18 Mbps, ddr freq: 451.2 MHz */
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 1804800>,
+		/* low: 18-60 Mbps, ddr freq: 451.2 MHz*/
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 1804800>,
 		/* medium: 60-240 Mbps, ddr freq: 451.2 MHz */
 		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 30000 1804800>,
 		/* high: 240 - 800 Mbps, ddr freq: 451.2 MHz */
@@ -4968,6 +4978,7 @@
 			mhi_qrtr {
 				mhi,chan = "IPCR";
 				qcom,net-id = <0>;
+				qcom,low-latency;
 			};
 		};
 	};

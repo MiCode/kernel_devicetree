@@ -6,11 +6,13 @@
 		reg = <0xae00000 0x84208>,
 		      <0xaeb0000 0x2008>,
 		      <0xaeac000 0x214>,
-		      <0xae8f000 0x02c>;
+		      <0xae8f000 0x02c>,
+		      <0xaf50000 0x038>;
 		reg-names = "mdp_phys",
 			"vbif_phys",
 			"regdma_phys",
-			"sid_phys";
+			"sid_phys",
+			"swfuse_phys";
 
 		clocks =
 			<&gcc GCC_DISP_AHB_CLK>,
@@ -314,6 +316,16 @@
 			    <20000 20512 0 6400000>,
 			    <20000 20512 0 6400000>;
 		};
+		qcom,sde-reg-bus {
+			qcom,msm-bus,name = "disp_rsc_reg";
+			qcom,msm-bus,num-cases = <4>;
+			qcom,msm-bus,num-paths = <1>;
+			qcom,msm-bus,vectors-KBps =
+				<1 590 0 0>,
+				<1 590 0 76800>,
+				<1 590 0 150000>,
+				<1 590 0 300000>;
+		};
 	};
 
 	mdss_rotator: qcom,mdss_rotator {
@@ -416,7 +428,7 @@
 			qcom,ctrl-supply-entry@0 {
 				reg = <0>;
 				qcom,supply-name = "vdda-1p2";
-				qcom,supply-min-voltage = <1200000>;
+				qcom,supply-min-voltage = <1152000>;
 				qcom,supply-max-voltage = <1200000>;
 				qcom,supply-enable-load = <21800>;
 				qcom,supply-disable-load = <0>;
@@ -465,7 +477,7 @@
 			qcom,ctrl-supply-entry@0 {
 				reg = <0>;
 				qcom,supply-name = "vdda-1p2";
-				qcom,supply-min-voltage = <1200000>;
+				qcom,supply-min-voltage = <1152000>;
 				qcom,supply-max-voltage = <1200000>;
 				qcom,supply-enable-load = <21800>;
 				qcom,supply-disable-load = <0>;
@@ -491,7 +503,7 @@
 		cell-index = <0>;
 		compatible = "qcom,dp-display";
 
-		vdda-lp2-supply = <&L9A>;
+		vdda-1p2-supply = <&L9A>;
 		reg =	<0xae90000 0x0dc>,
 			<0xae90200 0x0c0>,
 			<0xae90400 0x508>,
@@ -500,14 +512,13 @@
 			<0x88ea200 0x150>,
 			<0x88ea600 0x150>,
 			<0xaf02000 0x2c4>,
-			<0x780000 0x6228>,
 			<0x88ea040 0x10>,
 			<0x88e8000 0x20>,
 			<0x0aee1000 0x2a>,
 			<0xae91400 0x095>;
 		reg-names =	"dp_ahb", "dp_aux", "dp_link",
 				"dp_p0", "dp_phy", "dp_ln_tx0", "dp_ln_tx1",
-				"dp_mmss_cc", "qfprom_physical", "dp_pll",
+				"dp_mmss_cc", "dp_pll",
 				"usb3_dp_com", "hdcp_physical", "dp_p1";
 
 		interrupt-parent = <&mdss_mdp>;
@@ -554,7 +565,7 @@
 			qcom,ctrl-supply-entry@0 {
 				reg = <0>;
 				qcom,supply-name = "vdda-1p2";
-				qcom,supply-min-voltage = <1200000>;
+				qcom,supply-min-voltage = <1152000>;
 				qcom,supply-max-voltage = <1200000>;
 				qcom,supply-enable-load = <21800>;
 				qcom,supply-disable-load = <0>;
