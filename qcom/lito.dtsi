@@ -2084,7 +2084,7 @@
 			<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
 			<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
 		freq-table-hz =
-			<37500000 300000000>,
+			<50000000 200000000>,
 			<0 0>,
 			<0 0>,
 			<37500000 150000000>,
@@ -2209,6 +2209,56 @@
 
 		qcom,scaling-lower-bus-speed-mode = "DDR52";
 
+		qcom,msm-bus,name = "sdhc1";
+		qcom,msm-bus,num-cases = <9>;
+		qcom,msm-bus,num-paths = <3>;
+		qcom,msm-bus,vectors-KBps =
+			/* No vote */
+			<150 10073 0 0>,
+			<135 512 0 0>,
+			<1 825 0 0>,
+			/* 400 KB/s*/
+			<150 10073 1000 7600>,
+			<135 512 1000 90000>,
+			<1 825 2000 6600>,
+			/* 20 MB/s */
+			<150 10073 25000 76000>,
+			<135 512 25000 900000>,
+			<1 825 20000 66000>,
+			/* 25 MB/s */
+			<150 10073 50000 76000>,
+			<135 512 50000 900000>,
+			<1 825 30000 66000>,
+			/* 50 MB/s */
+			<150 10073 50000 76000>,
+			<135 512 80000 900000>,
+			<1 825 40000 66000>,
+			/* 100 MB/s */
+			<150 10073 50000 76000>,
+			<135 512 100000 900000>,
+			<1 825 50000 66000>,
+			/* 200 MB/s */
+			<150 10073 50000 76000>,
+			<150 512 150000 900000>,
+			<1 825 80000 76000>,
+			/* 400 MB/s */
+			<150 10073 261438 2300000>,
+			<135 512 261438 4700000>,
+			<1 825 300000 300000>,
+			/* Max. bandwidth */
+			<150 10073 1338562 4096000>,
+			<135 512 1338562 4096000>,
+			<1 825 1338562 4096000>;
+		qcom,bus-bw-vectors-bps = <0 400000 20000000 25000000 50000000
+			100750000 200000000 400000000 4294967295>;
+
+		/* PM QoS */
+		qcom,pm-qos-irq-type = "affine_irq";
+		qcom,pm-qos-irq-latency = <67 67>;
+		qcom,pm-qos-cpu-groups = <0x3f 0xc0>;
+		qcom,pm-qos-cmdq-latency-us = <67 67>, <67 67>;
+		qcom,pm-qos-legacy-latency-us = <67 67>, <67 67>;
+
 		clocks = <&gcc GCC_SDCC1_AHB_CLK>,
 			<&gcc GCC_SDCC1_APPS_CLK>,
 			<&gcc GCC_SDCC1_ICE_CORE_CLK>;
@@ -2241,6 +2291,51 @@
 				      "SDR104";
 
 		qcom,devfreq,freq-table = <50000000 202000000>;
+
+		qcom,msm-bus,name = "sdhc2";
+		qcom,msm-bus,num-cases = <8>;
+		qcom,msm-bus,num-paths = <3>;
+		qcom,msm-bus,vectors-KBps =
+			/* No vote */
+			<81 10073 0 0>,
+			<135 512 0 0>,
+			<1 825 0 0>,
+			/* 400 KB/s*/
+			<81 10073 1000 7600>,
+			<135 512 1000 90000>,
+			<1 825 2000 6600>,
+			/* 20 MB/s */
+			<81 10073 25000 76000>,
+			<135 512 25000 900000>,
+			<1 825 20000 66000>,
+			/* 25 MB/s */
+			<81 10073 50000 76000>,
+			<135 512 50000 900000>,
+			<1 825 30000 66000>,
+			/* 50 MB/s */
+			<81 10073 50000 76000>,
+			<135 512 80000 900000>,
+			<1 825 40000 66000>,
+			/* 100 MB/s */
+			<81 10073 50000 76000>,
+			<135 512 100000 900000>,
+			<1 825 50000 66000>,
+			/* 200 MB/s */
+			<81 10073 261438 2300000>,
+			<135 512 261438 4700000>,
+			<1 825 300000 300000>,
+			/* Max. bandwidth */
+			<81 10073 1338562 4096000>,
+			<135 512 1338562 4096000>,
+			<1 825 1338562 4096000>;
+		qcom,bus-bw-vectors-bps = <0 400000 20000000 25000000 50000000
+			100750000 200000000 400000000 4294967295>;
+
+		/* PM QoS */
+		qcom,pm-qos-irq-type = "affine_irq";
+		qcom,pm-qos-irq-latency = <67 67>;
+		qcom,pm-qos-cpu-groups = <0x3f 0xc0>;
+		qcom,pm-qos-legacy-latency-us = <67 67>, <67 67>;
 
 		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
 			<&gcc GCC_SDCC2_APPS_CLK>;
@@ -2767,12 +2862,14 @@
 		qcom,pas-id = <1>;
 		qcom,proxy-timeout-ms = <10000>;
 		qcom,smem-id = <423>;
+		qcom,minidump-id = <5>;
 		qcom,sysmon-id = <1>;
 		qcom,ssctl-instance-id = <0x14>;
 		qcom,firmware-name = "adsp";
 		memory-region = <&pil_adsp_mem>;
 		qcom,signal-aop;
 		qcom,complete-ramdump;
+		qcom,minidump-as-elf32;
 
 		/* Inputs from lpass */
 		interrupts-extended = <&pdc 16 IRQ_TYPE_LEVEL_HIGH>,
@@ -2810,12 +2907,14 @@
 		qcom,pas-id = <18>;
 		qcom,proxy-timeout-ms = <10000>;
 		qcom,smem-id = <601>;
+		qcom,minidump-id = <7>;
 		qcom,sysmon-id = <7>;
 		qcom,ssctl-instance-id = <0x17>;
 		qcom,firmware-name = "cdsp";
 		memory-region = <&pil_cdsp_mem>;
 		qcom,complete-ramdump;
 		qcom,signal-aop;
+		qcom,minidump-as-elf32;
 
 		qcom,msm-bus,name = "pil-cdsp";
 		qcom,msm-bus,num-cases = <2>;
@@ -3171,14 +3270,14 @@
 		BW_OPP_ENTRY(2092, 4); /* 7980 MB/s */
 	};
 
-	npu_npu_ddr_bw: qcom,npu-npu-ddr-bw {
+	npu_npu_llcc_bw: qcom,npu-npu-llcc-bw {
 		compatible = "qcom,devbw";
 		governor = "performance";
-		qcom,src-dst-ports = <MSM_BUS_MASTER_NPU MSM_BUS_SLAVE_EBI_CH0>;
+		qcom,src-dst-ports = <MSM_BUS_MASTER_NPU MSM_BUS_SLAVE_LLCC>;
 		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
 	};
 
-	npu_npu_ddr_bwmon: qcom,npu-npu-ddr-bwmon@9960300 {
+	npu_npu_llcc_bwmon: qcom,npu-npu-llcc-bwmon@9960300 {
 		compatible = "qcom,bimc-bwmon4";
 		reg = <0x00060400 0x300>, <0x00060300 0x200>;
 		reg-names = "base", "global_base";
@@ -3194,7 +3293,25 @@
 		interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,mport = <0>;
 		qcom,hw-timer-hz = <19200000>;
-		qcom,target-dev = <&npu_npu_ddr_bw>;
+		qcom,target-dev = <&npu_npu_llcc_bw>;
+		qcom,count-unit = <0x10000>;
+	};
+
+	npu_llcc_ddr_bw: qcom,npu-llcc-ddr-bw {
+		compatible = "qcom,devbw";
+		governor = "performance";
+		qcom,src-dst-ports = <MSM_BUS_SLAVE_LLCC MSM_BUS_SLAVE_EBI_CH0>;
+		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
+	};
+
+	npu_llcc_ddr_bwmon: qcom,npu-llcc-ddr-bwmon@90CE000 {
+		compatible = "qcom,bimc-bwmon5";
+		reg = <0x90CE000 0x1000>;
+		reg-names = "base";
+		interrupts = <GIC_SPI 263 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,mport = <0>;
+		qcom,hw-timer-hz = <19200000>;
+		qcom,target-dev = <&npu_llcc_ddr_bw>;
 		qcom,count-unit = <0x10000>;
 	};
 
@@ -3481,29 +3598,29 @@
 
 		/* SVS2 */
 		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_LLCC 150000 500000>,
-		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 150000 1804000>,
-		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 75000 300000>,
+		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 150000 700000>,
+		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 75000 700000>,
 		<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_IPA_CFG 0 76800>,
 		<MSM_BUS_MASTER_IPA_CORE MSM_BUS_SLAVE_IPA_CORE 0 150>,
 
 		/* SVS */
 		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_LLCC 625000 1200000>,
-		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 625000 3072000>,
-		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 312500 700000>,
+		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 625000 1100000>,
+		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 312500 1500000>,
 		<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_IPA_CFG 0 150000>,
 		<MSM_BUS_MASTER_IPA_CORE MSM_BUS_SLAVE_IPA_CORE 0 260>,
 
 		/* NOMINAL */
 		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_LLCC 1250000 2400000>,
-		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 1250000 6220800>,
-		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 625000 1500000>,
+		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 1250000 1800000>,
+		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 625000 3100000>,
 		<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_IPA_CFG 0 400000>,
 		<MSM_BUS_MASTER_IPA_CORE MSM_BUS_SLAVE_IPA_CORE 0 450>,
 
 		/* TURBO */
 		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_LLCC 2000000 3500000>,
-		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 2000000 7219000>,
-		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 1000000 1920000>,
+		<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0 2000000 2000000>,
+		<MSM_BUS_MASTER_IPA MSM_BUS_SLAVE_OCIMEM 1000000 4100000>,
 		<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_IPA_CFG 0 400000>,
 		<MSM_BUS_MASTER_IPA_CORE MSM_BUS_SLAVE_IPA_CORE 0 550>;
 
@@ -3635,6 +3752,10 @@
 		stm_debug_fuse: stm@20f0 {
 			reg = <0x20f0 0x4>;
 		};
+	};
+
+	qcom,demux {
+		compatible = "qcom,demux";
 	};
 };
 
