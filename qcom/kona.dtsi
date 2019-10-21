@@ -38,7 +38,8 @@
 
 	mem-offline {
 		compatible = "qcom,mem-offline";
-		offline-sizes = <0x1 0xc0000000 0x0 0x80000000>,
+		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
+				<0x1 0xc0000000 0x0 0x80000000>,
 				<0x2 0xc0000000 0x1 0x40000000>;
 		granule = <512>;
 		mboxes = <&qmp_aop 0>;
@@ -576,6 +577,14 @@
 			reusable;
 			alignment = <0x0 0x400000>;
 			size = <0x0 0xA000000>;
+		};
+
+		cnss_wlan_mem: cnss_wlan_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1400000>;
 		};
 
 		/* global autoconfigured region for contiguous allocations */
@@ -3319,7 +3328,7 @@
 	};
 
 	extcon_storage_cd: extcon_storage_cd {
-		compatible = "extcon-gpio";
+		compatible = "extcon-storage-cd-gpio";
 		extcon-id = <62>; /* EXTCON_MECHANICAL */
 		status = "disabled";
 	};
@@ -4017,6 +4026,8 @@
 		qcom,firmware-name = "spss";
 		memory-region = <&pil_spss_mem>;
 		qcom,spss-scsr-bits = <24 25>;
+		/* use extra size for IAR memory */
+		qcom,extra-size = <4096>;
 
 		mboxes = <&qmp_aop 0>;
 		mbox-names = "spss-pil";
@@ -4830,9 +4841,9 @@
 		/* no vote */
 		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 0 0>,
 		/* idle: 0-18 Mbps, ddr freq: 451.2 MHz */
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 1804800>,
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 2250 1600000>,
 		/* low: 18-60 Mbps, ddr freq: 451.2 MHz*/
-		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 1804800>,
+		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 7500 1600000>,
 		/* medium: 60-240 Mbps, ddr freq: 451.2 MHz */
 		<MSM_BUS_MASTER_PCIE MSM_BUS_SLAVE_FIRST 30000 1804800>,
 		/* high: 240 - 800 Mbps, ddr freq: 451.2 MHz */
@@ -5057,6 +5068,7 @@
 	cnss_pci: cnss_pci {
 		reg = <0 0 0 0 0>;
 		qcom,iommu-group = <&cnss_pci_iommu_group>;
+		memory-region = <&cnss_wlan_mem>;
 
 		#address-cells = <1>;
 		#size-cells = <1>;

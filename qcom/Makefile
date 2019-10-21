@@ -38,15 +38,23 @@ endif
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_ARCH_LITO) += lito-rumi-overlay.dtbo \
                 lito-mtp-overlay.dtbo \
+                lito-v2-mtp-overlay.dtbo \
                 lito-cdp-overlay.dtbo \
+                lito-v2-cdp-overlay.dtbo \
                 lito-atp-overlay.dtbo \
-                lito-qrd-overlay.dtbo
+                lito-v2-atp-overlay.dtbo \
+                lito-qrd-overlay.dtbo \
+                lito-v2-qrd-overlay.dtbo
 
 lito-rumi-overlay.dtbo-base := lito.dtb lito-v2.dtb
-lito-mtp-overlay.dtbo-base := lito.dtb lito-v2.dtb
-lito-cdp-overlay.dtbo-base := lito.dtb lito-v2.dtb
-lito-atp-overlay.dtbo-base := lito.dtb lito-v2.dtb
-lito-qrd-overlay.dtbo-base := lito.dtb lito-v2.dtb
+lito-mtp-overlay.dtbo-base := lito.dtb
+lito-v2-mtp-overlay.dtbo-base := lito-v2.dtb
+lito-cdp-overlay.dtbo-base := lito.dtb
+lito-v2-cdp-overlay.dtbo-base := lito-v2.dtb
+lito-atp-overlay.dtbo-base := lito.dtb
+lito-v2-atp-overlay.dtbo-base := lito-v2.dtb
+lito-qrd-overlay.dtbo-base := lito.dtb
+lito-v2-qrd-overlay.dtbo-base := lito-v2.dtb
 else
 dtb-$(CONFIG_ARCH_LITO) += lito-rumi.dtb \
                 lito-mtp.dtb \
@@ -62,11 +70,14 @@ endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
         dtbo-$(CONFIG_ARCH_BENGAL) += \
-                bengal-rumi-overlay.dtbo
+                bengal-rumi-overlay.dtbo \
+                bengal-qrd-overlay.dtbo
 
 bengal-rumi-overlay.dtbo-base := bengal.dtb
+bengal-qrd-overlay.dtbo-base := bengal.dtb
 else
-dtb-$(CONFIG_ARCH_BENGAL) += bengal-rumi.dtb
+dtb-$(CONFIG_ARCH_BENGAL) += bengal-rumi.dtb \
+                bengal-qrd.dtb
 endif
 
 always		:= $(dtb-y)

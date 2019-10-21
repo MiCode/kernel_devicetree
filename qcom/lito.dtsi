@@ -20,7 +20,7 @@
 / {
 	model = "Qualcomm Technologies, Inc. Lito";
 	compatible = "qcom,lito";
-	qcom,msm-id = <400 0x10000>;
+	qcom,msm-id = <400 0x10000>, <440 0x10000>;
 	interrupt-parent = <&intc>;
 
 	#address-cells = <2>;
@@ -1380,13 +1380,17 @@
 		qcom_cedev_ns_cb {
 			compatible = "qcom,qcedev,context-bank";
 			label = "ns_context";
-			iommus = <&apps_smmu 0x512 0>;
+			iommus = <&apps_smmu 0x512 0>,
+				<&apps_smmu 0x518 0x1>,
+				<&apps_smmu 0x51F 0>;
 		};
 
 		qcom_cedev_s_cb {
 			compatible = "qcom,qcedev,context-bank";
 			label = "secure_context";
-			iommus = <&apps_smmu 0x513 0>;
+			iommus = <&apps_smmu 0x513 0>,
+				<&apps_smmu 0x51C 0x1>,
+				<&apps_smmu 0x51E 0>;
 			qcom,iommu-vmid = <0x9>; /* VMID_CP_BITSTREAM */
 			qcom,secure-context-bank;
 		};
@@ -1841,6 +1845,7 @@
 			"iface_clk",
 			"core_clk_unipro",
 			"core_clk_ice",
+			"core_clk_ice_hw_ctl",
 			"ref_clk",
 			"tx_lane0_sync_clk",
 			"rx_lane0_sync_clk",
@@ -1851,6 +1856,7 @@
 			<&gcc GCC_UFS_PHY_AHB_CLK>,
 			<&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
 			<&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
+			<&gcc GCC_UFS_PHY_ICE_CORE_HW_CTL_CLK>,
 			<&rpmhcc RPMH_CXO_CLK>,
 			<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
 			<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
@@ -1860,6 +1866,7 @@
 			<0 0>,
 			<0 0>,
 			<37500000 150000000>,
+			<75000000 300000000>,
 			<75000000 300000000>,
 			<0 0>,
 			<0 0>,
@@ -3212,6 +3219,18 @@
 		BW_OPP_ENTRY(1066, 16); /* 16265 MB/s */
 	};
 
+	suspendable_llcc_bw_opp_table: suspendable-llcc-bw-opp-table {
+		compatible = "operating-points-v2";
+		BW_OPP_ENTRY(   0, 16); /*     0 MB/s */
+		BW_OPP_ENTRY( 150, 16); /*  2288 MB/s */
+		BW_OPP_ENTRY( 300, 16); /*  4577 MB/s */
+		BW_OPP_ENTRY( 466, 16); /*  7110 MB/s */
+		BW_OPP_ENTRY( 600, 16); /*  9155 MB/s */
+		BW_OPP_ENTRY( 806, 16); /* 12298 MB/s */
+		BW_OPP_ENTRY( 933, 16); /* 14236 MB/s */
+		BW_OPP_ENTRY(1066, 16); /* 16265 MB/s */
+	};
+
 	cpu_cpu_llcc_bw: qcom,cpu-cpu-llcc-bw {
 		compatible = "qcom,devbw";
 		governor = "performance";
@@ -3286,7 +3305,7 @@
 		compatible = "qcom,devbw";
 		governor = "performance";
 		qcom,src-dst-ports = <MSM_BUS_MASTER_NPU MSM_BUS_SLAVE_LLCC>;
-		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
+		operating-points-v2 = <&suspendable_llcc_bw_opp_table>;
 	};
 
 	npu_npu_llcc_bwmon: qcom,npu-npu-llcc-bwmon@9960300 {
@@ -3662,7 +3681,6 @@
 		qcom,iommu-dma-addr-pool = <0x20000000 0x40000000>;
 		/* modem tables in IMEM */
 		qcom,additional-mapping = <0x146a9000 0x146a9000 0x2000>;
-		dma-coherent;
 		qcom,iommu-dma = "fastmap";
 		qcom,ipa-q6-smem-size = <26624>;
 	};
@@ -3709,6 +3727,7 @@
 		vdd-1.3-rfa-supply = <&L2C>;
 		vdd-3.3-ch0-supply = <&L10C>;
 		qcom,vdd-cx-mx-config = <0 0>;
+		qcom,vdd-3.3-ch0-config = <3000000 3312000>;
 		qcom,smp2p_map_wlan_1_in {
 			interrupts-extended = <&smp2p_wlan_1_in 0 0>,
 					      <&smp2p_wlan_1_in 1 0>;
@@ -3865,6 +3884,7 @@
 
 &npu_core_gdsc {
 	status = "ok";
+	qcom,retain-regs;
 };
 
 &mvsc_gdsc {
