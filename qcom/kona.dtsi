@@ -576,7 +576,7 @@
 			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 			reusable;
 			alignment = <0x0 0x400000>;
-			size = <0x0 0xA000000>;
+			size = <0x0 0xA400000>;
 		};
 
 		cnss_wlan_mem: cnss_wlan_region {
@@ -1069,6 +1069,29 @@
 		qcom,hw-timer-hz = <19200000>;
 		qcom,target-dev = <&npudsp_npu_ddr_bw>;
 		qcom,count-unit = <0x10000>;
+	};
+
+	npu_npu_ddr_latfloor: qcom,npu-npu-ddr-latfloor {
+		compatible = "qcom,devbw-ddr";
+		governor = "powersave";
+		qcom,src-dst-ports = <MSM_BUS_MASTER_NPU MSM_BUS_SLAVE_EBI_CH0>;
+		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
+	};
+
+	npu_staticmap_mon: qcom,npu-staticmap-mon {
+		compatible = "qcom,static-map";
+		qcom,target-dev = <&npu_npu_ddr_latfloor>;
+		clocks = <&clock_npucc NPU_CC_CAL_HM0_CLK>;
+		clock-names = "cal_hm0_clk";
+		qcom,dev_clk = "cal_hm0_clk";
+		qcom,core-dev-table =
+				<       0 MHZ_TO_MBPS(    0, 4) >,
+				<  300000 MHZ_TO_MBPS(  451, 4) >,
+				<  406000 MHZ_TO_MBPS(  768, 4) >,
+				<  533000 MHZ_TO_MBPS( 1555, 4) >,
+				<  730000 MHZ_TO_MBPS( 1804, 4) >,
+				<  920000 MHZ_TO_MBPS( 2092, 4) >,
+				< 1000000 MHZ_TO_MBPS( 2736, 4) >;
 	};
 
 	cpu0_cpu_llcc_lat: qcom,cpu0-cpu-llcc-lat {
@@ -2385,18 +2408,15 @@
 		qcom,support-shutdown;
 		qcom,pil-force-shutdown;
 		qcom,esoc-skip-restart-for-mdm-crash;
-		qcom,esoc-spmi-soft-reset;
-		pinctrl-names = "default", "mdm_active", "mdm_suspend";
-		pinctrl-0 = <&ap2mdm_pon_reset_default>;
-		pinctrl-1 = <&ap2mdm_active &mdm2ap_active>;
-		pinctrl-2 = <&ap2mdm_sleep &mdm2ap_sleep>;
+		pinctrl-names = "mdm_active", "mdm_suspend";
+		pinctrl-0 = <&ap2mdm_active &mdm2ap_active>;
+		pinctrl-1 = <&ap2mdm_sleep &mdm2ap_sleep>;
 		interrupt-map = <0 &tlmm 1 0x3
 				1 &tlmm 3 0x3>;
 		qcom,mdm2ap-errfatal-gpio = <&tlmm 1 0x00>;
 		qcom,ap2mdm-errfatal-gpio = <&tlmm 57 0x00>;
 		qcom,mdm2ap-status-gpio   = <&tlmm 3 0x00>;
 		qcom,ap2mdm-status-gpio   = <&tlmm 56 0x00>;
-		qcom,ap2mdm-soft-reset-gpio = <&tlmm 145 GPIO_ACTIVE_LOW>;
 		qcom,mdm-link-info = "0306_02.01.00";
 		status = "ok";
 	};
@@ -4946,7 +4966,7 @@
 		mhi_events {
 			mhi_event@0 {
 				mhi,num-elements = <32>;
-				mhi,intmod = <1>;
+				mhi,intmod = <0>;
 				mhi,msi = <1>;
 				mhi,priority = <1>;
 				mhi,brstmode = <2>;
@@ -4955,7 +4975,7 @@
 
 			mhi_event@1 {
 				mhi,num-elements = <256>;
-				mhi,intmod = <1>;
+				mhi,intmod = <0>;
 				mhi,msi = <2>;
 				mhi,priority = <1>;
 				mhi,brstmode = <2>;
@@ -4967,6 +4987,7 @@
 				mhi,chan = "IPCR";
 				qcom,net-id = <0>;
 				qcom,low-latency;
+				mhi,early-notify;
 			};
 		};
 	};
@@ -5052,6 +5073,19 @@
 
 	demux {
 		compatible = "qcom,demux";
+	};
+
+	qfprom: qfprom@780000 {
+		compatible = "qcom,qfprom";
+		reg = <0x00784000 0x3000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		read-only;
+		ranges;
+
+		gpu_lm_efuse: gpu_lm_efuse@5c8 {
+			reg = <0x5c8 0x4>;
+		};
 	};
 };
 
