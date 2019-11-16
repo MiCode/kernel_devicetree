@@ -16,7 +16,7 @@
 	model = "Qualcomm Technologies, Inc. BENGAL";
 	compatible = "qcom,bengal";
 	qcom,msm-id = <417 0x10000>;
-	interrupt-parent = <&intc>;
+	interrupt-parent = <&wakegic>;
 
 	#address-cells = <2>;
 	#size-cells = <2>;
@@ -43,6 +43,9 @@
 			d-cache-size = <0x8000>;
 			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs0>;
+			#cooling-cells = <2>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -67,6 +70,8 @@
 			d-cache-size = <0x8000>;
 			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs0>;
 
 			L1_I_1: l1-icache {
 				compatible = "arm,arch-cache";
@@ -87,6 +92,8 @@
 			d-cache-size = <0x8000>;
 			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs0>;
 
 			L1_I_2: l1-icache {
 				compatible = "arm,arch-cache";
@@ -107,6 +114,8 @@
 			d-cache-size = <0x8000>;
 			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs0>;
 
 			L1_I_3: l1-icache {
 				compatible = "arm,arch-cache";
@@ -127,6 +136,9 @@
 			d-cache-size = <0x10000>;
 			i-cache-size = <0x10000>;
 			next-level-cache = <&L2_1>;
+			qcom,freq-domain = <&cpufreq_hw 1 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs1>;
+			#cooling-cells = <2>;
 			L2_1: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -151,6 +163,8 @@
 			d-cache-size = <0x10000>;
 			i-cache-size = <0x10000>;
 			next-level-cache = <&L2_1>;
+			qcom,freq-domain = <&cpufreq_hw 1 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs1>;
 
 			L1_I_101: l1-icache {
 				compatible = "arm,arch-cache";
@@ -171,6 +185,8 @@
 			d-cache-size = <0x10000>;
 			i-cache-size = <0x10000>;
 			next-level-cache = <&L2_1>;
+			qcom,freq-domain = <&cpufreq_hw 1 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs1>;
 
 			L1_I_102: l1-icache {
 				compatible = "arm,arch-cache";
@@ -191,6 +207,8 @@
 			d-cache-size = <0x10000>;
 			i-cache-size = <0x10000>;
 			next-level-cache = <&L2_1>;
+			qcom,freq-domain = <&cpufreq_hw 1 7>;
+			qcom,lmh-dcvs = <&lmh_dcvs1>;
 
 			L1_I_103: l1-icache {
 				compatible = "arm,arch-cache";
@@ -401,6 +419,7 @@
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
 		interrupt-controller;
+		interrupt-parent = <&intc>;
 		#redistributor-regions = <1>;
 		redistributor-stride = <0x0 0x20000>;
 		reg = <0xf200000 0x10000>,     /* GICD */
@@ -521,6 +540,41 @@
 			qcom,allocate-on-request;
 			label = "modem";
 		};
+	};
+
+	slim_aud: slim@a5c0000 {
+		cell-index = <1>;
+		compatible = "qcom,slim-ngd";
+		reg = <0xa5c0000 0x2c000>,
+			<0xa584000 0x20000>, <0xa66e000 0x2000>;
+		reg-names = "slimbus_physical",
+			"slimbus_bam_physical", "slimbus_lpass_mem";
+		interrupts = <GIC_SPI 283 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 284 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "slimbus_irq", "slimbus_bam_irq";
+		qcom,apps-ch-pipes = <0x0>;
+		qcom,ea-pc = <0x360>;
+		status = "ok";
+	};
+
+	wakegic: wake-gic {
+		compatible = "qcom,mpm-gic-bengal", "qcom,mpm-gic";
+		interrupts-extended = <&wakegic GIC_SPI 171
+						IRQ_TYPE_EDGE_RISING>;
+		reg = <0x45f01b8 0x1000>,
+			<0xf011008 0x4>;  /* MSM_APCS_GCC_BASE 4K */
+		reg-names = "vmpm", "ipc";
+		qcom,num-mpm-irqs = <96>;
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		#interrupt-cells = <3>;
+	};
+
+	wakegpio: wake-gpio {
+		compatible = "qcom,mpm-gpio";
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		#interrupt-cells = <2>;
 	};
 
 	timer {
@@ -1160,6 +1214,14 @@
 		#clock-cells = <1>;
 	};
 
+	qcom,rmtfs_sharedmem@0 {
+		compatible = "qcom,sharedmem-uio";
+		reg = <0x0 0x200000>;
+		reg-names = "rmtfs";
+		qcom,client-id = <0x00000001>;
+		qcom,guard-memory;
+	};
+
 	gcc: qcom,gcc@1400000 {
 		compatible = "qcom,bengal-gcc", "syscon";
 		reg = <0x1400000 0x1f0000>;
@@ -1212,6 +1274,17 @@
 		clock-names = "xo_clk_src";
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
 		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-hw";
+		reg = <0xf521000 0x1000>, <0xf523000 0x1000>;
+		reg-names = "freq-domain0", "freq-domain1";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>, <&gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		qcom,no-accumulative-counter;
+		qcom,max-lut-entries = <12>;
+		#freq-domain-cells = <2>;
 	};
 
 	tcsr_mutex_block: syscon@00340000 {
@@ -2212,6 +2285,7 @@
 };
 
 #include "msm-arm-smmu-bengal.dtsi"
+#include "pm6125-rpm-regulator.dtsi"
 #include "bengal-regulator.dtsi"
 #include "bengal-pm.dtsi"
 #include "bengal-pinctrl.dtsi"
