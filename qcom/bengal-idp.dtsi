@@ -3,6 +3,7 @@
 #include <dt-bindings/input/input.h>
 #include "bengal-audio-overlay.dtsi"
 #include "bengal-thermal-overlay.dtsi"
+#include "bengal-sde-display.dtsi"
 
 &soc {
 	mtp_batterydata: qcom,battery-data {
@@ -113,4 +114,101 @@
 			gpio-key,wakeup;
 		};
 	};
+};
+
+&sdhc_1 {
+	vdd-supply = <&L24A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L11A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	pinctrl-names = "active", "sleep";
+	pinctrl-0 = <&sdc1_clk_on &sdc1_cmd_on &sdc1_data_on
+					&sdc1_rclk_on>;
+	pinctrl-1 = <&sdc1_clk_off &sdc1_cmd_off &sdc1_data_off
+					&sdc1_rclk_off>;
+
+	status = "ok";
+};
+
+&sdhc_2 {
+	vdd-supply = <&L22A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L5A>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "active", "sleep";
+	pinctrl-0 = <&sdc2_clk_on  &sdc2_cmd_on &sdc2_data_on &sdc2_cd_on>;
+	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
+
+	cd-gpios = <&tlmm 88 GPIO_ACTIVE_LOW>;
+
+	status = "ok";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v3-660";
+
+	vdda-phy-supply = <&L4A>; /* 0.9v */
+	vdda-pll-supply = <&L12A>; /* 1.8v */
+	vdda-phy-max-microamp = <51400>;
+	vdda-pll-max-microamp = <14200>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+	vdd-hba-fixed-regulator;
+	vcc-supply = <&L24A>;
+	vcc-voltage-level = <2950000 2960000>;
+	vccq2-supply = <&L11A>;
+	vcc-max-microamp = <600000>;
+	vccq2-max-microamp = <600000>;
+
+	qcom,vddp-ref-clk-supply = <&L18A>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+	qcom,vddp-ref-clk-min-uV = <1232000>;
+	qcom,vddp-ref-clk-max-uV = <1232000>;
+
+	status = "ok";
+};
+
+&pm6125_pwm {
+	status = "ok";
+};
+
+&dsi_td4330_truly_v2_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_pwm";
+	pwms = <&pm6125_pwm 0 0>;
+	qcom,bl-pmic-pwm-period-usecs = <100>;
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,platform-reset-gpio = <&tlmm 82 0>;
+	qcom,platform-bklight-en-gpio = <&pmi632_gpios 6 0>;
+};
+
+&dsi_td4330_truly_v2_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_pwm";
+	pwms = <&pm6125_pwm 0 0>;
+	qcom,bl-pmic-pwm-period-usecs = <100>;
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,platform-te-gpio = <&tlmm 81 0>;
+	qcom,platform-reset-gpio = <&tlmm 82 0>;
+	qcom,platform-bklight-en-gpio = <&pmi632_gpios 6 0>;
+};
+
+&sde_dsi {
+	qcom,dsi-default-panel = <&dsi_td4330_truly_v2_video>;
 };

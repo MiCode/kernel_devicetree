@@ -1699,6 +1699,8 @@
 			<0x9810000 0x10000>;
 		reg-names = "cc", "qdsp6ss", "qdsp6ss_pll";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		nvmem-cells = <&npu_efuse>;
+		nvmem-cell-names = "npu-bin";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -3617,6 +3619,7 @@
 		qcom,arm-smmu;
 		qcom,smmu-fast-map;
 		qcom,bandwidth-vote-for-ipa;
+		qcom,ipa-endp-delay-wa;
 		qcom,use-64-bit-dma-mask;
 		qcom,msm-bus,name = "ipa";
 		qcom,wan-use-skb-page;
@@ -3781,6 +3784,10 @@
 			reg = <0x6008 0x4>;
 		};
 
+		npu_efuse: npu@6010 {
+			reg = <0x6010 0x4>;
+		};
+
 		feat_conf10: feat_conf10@602c {
 			reg = <0x602c 0x4>;
 		};
@@ -3817,6 +3824,7 @@
 
 &usb30_prim_gdsc {
 	status = "ok";
+	qcom,retain-regs;
 };
 
 &hlos1_vote_mmnoc_mmu_tbu_hf0_gdsc {
@@ -3878,6 +3886,7 @@
 
 &gpu_cx_gdsc {
 	parent-supply = <&VDD_CX_LEVEL>;
+	vdd_parent-supply = <&VDD_CX_LEVEL>;
 	status = "ok";
 };
 
@@ -3961,12 +3970,14 @@
 
 &L1P {
 	regulator-max-microvolt = <1056000>;
-	qcom,min-dropout-voltage = <225000>;
+	/* Reduced the headroom by 16mV for AHC */
+	qcom,min-dropout-voltage = <209000>;
 };
 
 &L2P {
 	regulator-max-microvolt = <1104000>;
-	qcom,min-dropout-voltage = <225000>;
+	/* Reduced the headroom by 16mV for AHC */
+	qcom,min-dropout-voltage = <209000>;
 };
 
 &L3P {
