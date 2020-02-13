@@ -7,7 +7,6 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/clock/qcom,videocc-lagoon.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
-#include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Lagoon";
@@ -21,7 +20,6 @@
 
 	aliases {
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
-		serial0 = &qupv3_se9_2uart; /* Debug Console */
 	};
 
 	cpus {
@@ -325,23 +323,6 @@
 		};
 	};
 
-	firmware: firmware {
-		android {
-			compatible = "android,firmware";
-				fstab {
-					compatible = "android,fstab";
-						vendor {
-							compatible = "android,vendor";
-							dev = "/dev/block/platform/soc/1d84000.ufshc/by-name/vendor";
-							type = "ext4";
-							mnt_flags = "ro,barrier=1,discard";
-							fsmgr_flags = "wait,slotselect";
-							status = "ok";
-						};
-				};
-		};
-	};
-
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
@@ -352,126 +333,6 @@
 	};
 
 	soc: soc { };
-
-	reserved_memory: reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		hyp_region: hyp_region@80000000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x80000000 0x0 0x600000>;
-		};
-
-		xbl_aop_mem: xbl_aop_mem@80700000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x80700000 0x0 0x180000>;
-		};
-
-		sec_apps_mem: sec_apps_region@808ff000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x808ff000 0x0 0x1000>;
-		};
-
-		smem_region: smem@80900000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x80900000 0x0 0x200000>;
-		};
-
-		removed_region: removed_region@80b00000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x80b00000 0x0 0x3900000>;
-		};
-
-		pil_camera_mem: camera_region@86000000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x86000000 0x0 0x500000>;
-		};
-
-		npu_mem: npu_region@86500000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x86500000 0x0 0x500000>;
-		};
-
-		pil_video_mem: pil_video_region@86a00000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x86a00000 0x0 0x500000>;
-		};
-
-		pil_cdsp_mem: cdsp_regions@86f00000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x86f00000 0x0 0x1e00000>;
-		};
-
-		pil_adsp_mem: pil_adsp_region@88d00000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x88d00000 0x0 0x2800000>;
-		};
-
-		wlan_fw_mem: wlan_fw_region@8b500000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x8b500000 0x0 0x200000>;
-		};
-
-		pil_ipa_fw_mem: ipa_fw_region@8b700000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x8b700000 0x0 0x10000>;
-		};
-
-		pil_ipa_gsi_mem: ipa_gsi_region@8b710000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x8b710000 0x0 0x5400>;
-		};
-
-		pil_gpu_mem: gpu_region@8b715400 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x8b715400 0x0 0x2000>;
-		};
-
-		pil_modem_mem: modem_region@8b800000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x8b800000 0x0 0xf800000>;
-		};
-
-		cdsp_sec_mem: cdsp_sec_regions@0x9f400000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			reg = <0x0 0x9f400000 0x0 0x1e00000>;
-		};
-
-		secure_display_memory: secure_display_region {
-			compatible = "shared-dma-pool";
-			alloc-ranges = <0 0x00000000 0 0xffffffff>;
-			reusable;
-			alignment = <0 0x400000>;
-			size = <0 0x8c00000>;
-		};
-
-		/* global autoconfigured region for contiguous allocations */
-		linux,cma {
-			compatible = "shared-dma-pool";
-			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
-			reusable;
-			alignment = <0x0 0x400000>;
-			size = <0x0 0x2000000>;
-			linux,cma-default;
-		};
-	};
 };
 
 &soc {
@@ -619,14 +480,6 @@
 		status = "disabled";
 	};
 
-	qcom,rmtfs_sharedmem@0 {
-		compatible = "qcom,sharedmem-uio";
-		reg = <0x0 0x200000>;
-		reg-names = "rmtfs";
-		qcom,client-id = <0x00000001>;
-		qcom,guard-memory;
-	};
-
 	timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <GIC_PPI 1 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
@@ -693,52 +546,6 @@
 			reg = <0x17c2d000 0x1000>;
 			status = "disabled";
 		};
-	};
-
-	pdc: interrupt-controller@b220000 {
-		compatible = "qcom,lagoon-pdc";
-		reg = <0xb220000 0x30000>, <0x17c000f0 0x64>;
-		qcom,pdc-ranges = <0 480 94>, <94 609 31>, <125 63 1>,
-				  <126 657 12>, <138 139 15>;
-		#interrupt-cells = <2>;
-		interrupt-parent = <&intc>;
-		interrupt-controller;
-	};
-
-	apps_rsc: rsc@18200000 {
-		label = "apps_rsc";
-		compatible = "qcom,rpmh-rsc";
-		reg = <0x18200000 0x10000>,
-		      <0x18210000 0x10000>,
-		      <0x18220000 0x10000>;
-		reg-names = "drv-0", "drv-1", "drv-2";
-		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
-			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
-			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,tcs-offset = <0xd00>;
-		qcom,drv-id = <2>;
-		qcom,tcs-config = <ACTIVE_TCS  2>,
-				  <SLEEP_TCS   3>,
-				  <WAKE_TCS    3>,
-				  <CONTROL_TCS 1>;
-
-		system_pm {
-			compatible = "qcom,system-pm";
-		};
-	};
-
-	disp_rsc: rsc@af20000 {
-		label = "disp_rsc";
-		compatible = "qcom,rpmh-rsc";
-		reg = <0xaf20000 0x10000>;
-		reg-names = "drv-0";
-		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,tcs-offset = <0x1c00>;
-		qcom,drv-id = <0>;
-		qcom,tcs-config = <ACTIVE_TCS  0>,
-				  <SLEEP_TCS   1>,
-				  <WAKE_TCS    1>,
-				  <CONTROL_TCS 1>;
 	};
 
 	qcom,msm-imem@146ab000 {
@@ -814,32 +621,6 @@
 		qcom,wakeup-enable;
 		qcom,scandump-sizes = <0x10100 0x10100 0x10100 0x10100
 				0x10100 0x10100 0x25900 0x25900>;
-	};
-
-	qcom,chd_sliver {
-		compatible = "qcom,core-hang-detect";
-		label = "silver";
-		qcom,threshold-arr = <0x18000058 0x18010058
-				0x18020058 0x18030058
-				0x18040058 0x18050058>;
-		qcom,config-arr = <0x18000060 0x18010060
-				0x18020060 0x18030060
-				0x18040060 0x18050060>;
-	};
-
-	qcom,chd_gold {
-		compatible = "qcom,core-hang-detect";
-		label = "gold";
-		qcom,threshold-arr = <0x18060058 0x18070058>;
-		qcom,config-arr = <0x18060060 0x18070060>;
-	};
-
-	kryo-erp {
-		compatible = "arm,arm64-kryo-cpu-erp";
-		interrupts = <GIC_PPI 6 IRQ_TYPE_LEVEL_HIGH>,
-			     <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "l1-l2-faultirq",
-				  "l3-scu-faultirq";
 	};
 
 	cpuss_dump {
@@ -996,27 +777,6 @@
 		};
 	};
 
-	thermal_zones: thermal-zones {};
-
-	spmi_bus: qcom,spmi@c440000 {
-		compatible = "qcom,spmi-pmic-arb";
-		reg = <0xc440000 0x1100>,
-			<0xc600000 0x2000000>,
-			<0xe600000 0x100000>,
-			<0xe700000 0xa0000>,
-			<0xc40a000 0x26000>;
-		reg-names = "core", "chnls", "obsrvr", "intr", "cnfg";
-		interrupt-names = "periph_irq";
-		interrupts-extended = <&pdc 1 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,ee = <0>;
-		qcom,channel = <0>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		interrupt-controller;
-		#interrupt-cells = <4>;
-		cell-index = <0>;
-	};
-
 	clocks {
 		xo_board: xo-board {
 			compatible = "fixed-clock";
@@ -1107,7 +867,6 @@
 };
 
 #include "lagoon-gdsc.dtsi"
-#include "lagoon-usb.dtsi"
 
 &gcc_pcie_0_gdsc {
 	qcom,support-hw-trigger;
@@ -1183,15 +942,5 @@
 	status = "ok";
 };
 
-#include "msm-arm-smmu-lagoon.dtsi"
 #include "lagoon-pinctrl.dtsi"
-#include "lagoon-pm.dtsi"
 #include "lagoon-stub-regulator.dtsi"
-#include "pm6350.dtsi"
-#include "lagoon-ion.dtsi"
-#include "lagoon-qupv3.dtsi"
-
-/*Debug UART*/
-&qupv3_se9_2uart {
-	status = "ok";
-};
