@@ -39,6 +39,7 @@ ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_ARCH_LITO) += lito-rumi-overlay.dtbo \
                 lito-mtp-overlay.dtbo \
                 lito-v2-mtp-overlay.dtbo \
+                picasso-sm7250-overlay.dtbo \
                 lito-cdp-overlay.dtbo \
                 lito-v2-cdp-overlay.dtbo \
                 lito-atp-overlay.dtbo \
@@ -55,9 +56,15 @@ lito-atp-overlay.dtbo-base := lito.dtb
 lito-v2-atp-overlay.dtbo-base := lito-v2.dtb
 lito-qrd-overlay.dtbo-base := lito.dtb
 lito-v2-qrd-overlay.dtbo-base := lito-v2.dtb
+lito-mtp-overlay.dtbo-base := lito.dtb lito-v2.dtb
+picasso-sm7250-overlay.dtbo-base := lito.dtb lito-v2.dtb
+lito-cdp-overlay.dtbo-base := lito.dtb lito-v2.dtb
+lito-atp-overlay.dtbo-base := lito.dtb lito-v2.dtb
+lito-qrd-overlay.dtbo-base := lito.dtb lito-v2.dtb
 else
 dtb-$(CONFIG_ARCH_LITO) += lito-rumi.dtb \
                 lito-mtp.dtb \
+                picasso-sm7250.dtb \
                 lito-cdp.dtb \
                 lito-atp.dtb \
                 lito-qrd.dtb \
@@ -80,32 +87,17 @@ ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
                 bengal-rumi-overlay.dtbo \
                 bengal-qrd-overlay.dtbo \
                 bengal-idp-overlay.dtbo \
-                bengal-idp-usbc-overlay.dtbo \
-                bengalp-idp-overlay.dtbo
+                bengal-idp-usbc-overlay.dtbo
 
 bengal-rumi-overlay.dtbo-base := bengal.dtb
 bengal-qrd-overlay.dtbo-base := bengal.dtb
 bengal-idp-overlay.dtbo-base := bengal.dtb
 bengal-idp-usbc-overlay.dtbo-base := bengal.dtb
-bengalp-idp-overlay.dtbo-base := bengalp.dtb
 else
 dtb-$(CONFIG_ARCH_BENGAL) += bengal-rumi.dtb \
                 bengal-qrd.dtb \
 		bengal-idp.dtb \
-		bengal-idp-usbc.dtb \
-		bengalp-idp.dtb
-endif
-
-ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
-        dtbo-$(CONFIG_ARCH_SCUBA) += \
-                scuba-rumi-overlay.dtbo \
-                scuba-idp-overlay.dtbo
-
-scuba-rumi-overlay.dtbo-base := scuba.dtb
-scuba-idp-overlay.dtbo-base := scuba.dtb
-else
-dtb-$(CONFIG_ARCH_SCUBA) += scuba-rumi.dtb \
-	scuba-idp.dtb
+		bengal-idp-usbc.dtb
 endif
 
 always		:= $(dtb-y)
