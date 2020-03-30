@@ -36,17 +36,9 @@
 	#size-cells = <2>;
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
-	mem-offline {
-		compatible = "qcom,mem-offline";
-		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
-				<0x1 0xc0000000 0x0 0x80000000>,
-				<0x2 0xc0000000 0x1 0x40000000>;
-		granule = <512>;
-		mboxes = <&qmp_aop 0>;
-	};
-
 	aliases {
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
+		ufshc2 = &ufshc_card; /* Removable UFS slot */
 		sdhc2 = &sdhc_2; /* SDC2 SD card slot */
 		pci-domain0 = &pcie0; /* PCIe0 domain */
 		pci-domain1 = &pcie1; /* PCIe1 domain */
@@ -367,7 +359,7 @@
 			compatible = "android,firmware";
 			vbmeta {
 				compatible = "android,vbmeta";
-				parts = "vbmeta,boot,system,vendor,dtbo";
+				parts = "vbmeta,boot,system,vendor,dtbo,recovery";
 			};
 
 			fstab {
@@ -377,7 +369,7 @@
 					dev = "/dev/block/platform/soc/1d84000.ufshc/by-name/vendor";
 					type = "ext4";
 					mnt_flags = "ro,barrier=1,discard";
-					fsmgr_flags = "wait,slotselect,avb";
+					fsmgr_flags = "wait,avb";
 					status = "ok";
 				};
 			};
@@ -478,19 +470,19 @@
 		pil_adsp_mem: pil_adsp_region@8a100000 {
 			compatible = "removed-dma-pool";
 			no-map;
-			reg = <0x0 0x8a100000 0x0 0x1d00000>;
+			reg = <0x0 0x8a100000 0x0 0x2500000>;
 		};
 
-		pil_spss_mem: pil_spss_region@8be00000 {
+		pil_spss_mem: pil_spss_region@8c600000 {
 			compatible = "removed-dma-pool";
 			no-map;
-			reg = <0x0 0x8be00000 0x0 0x100000>;
+			reg = <0x0 0x8c600000 0x0 0x100000>;
 		};
 
-		cdsp_secure_heap: cdsp_secure_heap@8bf00000 {
+		cdsp_secure_heap: cdsp_secure_heap@8c700000 {
 			compatible = "removed-dma-pool";
 			no-map;
-			reg = <0x0 0x8bf00000 0x0 0x4600000>;
+			reg = <0x0 0x8c700000 0x0 0x4600000>;
 		};
 
 		adsp_mem: adsp_region {
@@ -523,7 +515,7 @@
 		};
 
 		disp_rdump_memory: disp_rdump_region@9c000000 {
-			reg = <0x0 0x9c000000 0x0 0x00800000>;
+			reg = <0x0 0x9c000000 0x0 0x02400000>;
 			label = "disp_rdump_region";
 		};
 
@@ -620,6 +612,9 @@
 	compatible = "simple-bus";
 
 	thermal_zones: thermal-zones {
+	};
+
+	maxim_ds28e16: maxim_ds28e16 {
 	};
 
 	slim_aud: slim@3ac0000 {
@@ -2572,6 +2567,13 @@
 		qcom,retain-regs;
 	};
 
+	ufs_card_gdsc: qcom,gdsc@175004 {
+		compatible = "qcom,gdsc";
+		reg = <0x175004 0x4>;
+		regulator-name = "ufs_card_gdsc";
+		qcom,retain-regs;
+	};
+
 	ufs_phy_gdsc: qcom,gdsc@177004 {
 		compatible = "qcom,gdsc";
 		reg = <0x177004 0x4>;
@@ -2728,7 +2730,6 @@
 			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_CAMERA_CFG 0 0>,
 			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_CAMERA_CFG 0 1>;
 		qcom,retain-regs;
-		qcom,gds-timeout = <500>;
 	};
 
 	/* DISP_CC GDSC */
@@ -3225,6 +3226,127 @@
 		status = "disabled";
 	};
 
+	ufscard_ice: ufscardice@1db0000 {
+		compatible = "qcom,ice";
+		reg = <0x1db0000 0x8000>;
+		qcom,enable-ice-clk;
+		clock-names = "ufs_core_clk", "bus_clk",
+				"iface_clk", "ice_core_clk";
+		clocks = <&clock_gcc GCC_UFS_CARD_AXI_HW_CTL_CLK>,
+			<&clock_gcc GCC_UFS_1X_CLKREF_EN>,
+			<&clock_gcc GCC_UFS_CARD_AHB_CLK>,
+			<&clock_gcc GCC_UFS_CARD_ICE_CORE_CLK>;
+		qcom,op-freq-hz = <0>, <0>, <0>, <300000000>;
+		vdd-hba-supply = <&ufs_card_gdsc>;
+		qcom,msm-bus,name = "ufs_card_ice_noc";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+				<1 650 0 0>,    /* No vote */
+				<1 650 1000 0>; /* Max. bandwidth */
+		qcom,bus-vector-names = "MIN",
+					"MAX";
+		qcom,instance-type = "ufscard";
+	};
+
+	ufsphy_card: ufsphy_card@1da7000 {
+		reg = <0x1da7000 0xe00>; /* PHY regs */
+		reg-names = "phy_mem";
+		#phy-cells = <0>;
+		ufs-qcom-crypto = <&ufscard_ice>;
+
+		lanes-per-direction = <1>;
+
+		clock-names = "ref_clk_src",
+			"ref_clk",
+			"ref_aux_clk";
+		clocks = <&clock_rpmh RPMH_CXO_CLK>,
+			<&clock_gcc GCC_UFS_1X_CLKREF_EN>,
+			<&clock_gcc GCC_UFS_CARD_PHY_AUX_HW_CTL_CLK>;
+
+		status = "disabled";
+	};
+
+	ufshc_card: ufshc_card@1da4000 {
+		compatible = "qcom,ufshc";
+		reg = <0x1da4000 0x3000>;
+		interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
+		phys = <&ufsphy_card>;
+		phy-names = "ufsphy";
+		ufs-qcom-crypto = <&ufscard_ice>;
+
+		lanes-per-direction = <1>;
+		dev-ref-clk-freq = <0>; /* 19.2 MHz */
+
+		clock-names =
+			"core_clk",
+			"bus_aggr_clk",
+			"iface_clk",
+			"core_clk_unipro",
+			"core_clk_ice",
+			"ref_clk",
+			"tx_lane0_sync_clk",
+			"rx_lane0_sync_clk";
+		clocks =
+			<&clock_gcc GCC_UFS_CARD_AXI_HW_CTL_CLK>,
+			<&clock_gcc GCC_AGGRE_UFS_CARD_AXI_HW_CTL_CLK>,
+			<&clock_gcc GCC_UFS_CARD_AHB_CLK>,
+			<&clock_gcc GCC_UFS_CARD_UNIPRO_CORE_HW_CTL_CLK>,
+			<&clock_gcc GCC_UFS_CARD_ICE_CORE_CLK>,
+			<&clock_rpmh RPMH_CXO_CLK>,
+			<&clock_gcc GCC_UFS_CARD_TX_SYMBOL_0_CLK>,
+			<&clock_gcc GCC_UFS_CARD_RX_SYMBOL_0_CLK>;
+		freq-table-hz =
+			<50000000 200000000>,
+			<0 0>,
+			<0 0>,
+			<37500000 150000000>,
+			<37500000 300000000>,
+			<0 0>,
+			<0 0>,
+			<0 0>;
+
+		qcom,msm-bus,name = "ufshc_card";
+		qcom,msm-bus,num-cases = <9>;
+		qcom,msm-bus,num-paths = <2>;
+		qcom,msm-bus,vectors-KBps =
+		<122 512 0 0>, <1 756 0 0>,          /* No vote */
+		<122 512 922 0>, <1 756 1000 0>,     /* PWM G1 */
+		<122 512 127796 0>, <1 756 1000 0>,  /* HS G1 RA */
+		<122 512 255591 0>, <1 756 1000 0>,  /* HS G2 RA */
+		<122 512 2097152 0>, <1 756 102400 0>,  /* HS G3 RA */
+		<122 512 149422 0>, <1 756 1000 0>,  /* HS G1 RB */
+		<122 512 298189 0>, <1 756 1000 0>,  /* HS G2 RB */
+		<122 512 2097152 0>, <1 756 102400 0>,  /* HS G3 RB */
+		<122 512 7643136 0>, <1 756 307200 0>; /* Max. bandwidth */
+		qcom,bus-vector-names = "MIN",
+		"PWM_G1_L1",
+		"HS_RA_G1_L1", "HS_RA_G2_L1", "HS_RA_G3_L1",
+		"HS_RB_G1_L1", "HS_RB_G2_L1", "HS_RB_G3_L1",
+		"MAX";
+
+		/* PM QoS */
+		qcom,pm-qos-cpu-groups = <0x0f 0xf0>;
+		qcom,pm-qos-cpu-group-latency-us = <70 70>;
+		qcom,pm-qos-default-cpu = <0>;
+
+		/*
+		 * Note: this instance doesn't have control over UFS device
+		 * reset
+		 */
+
+		resets = <&clock_gcc GCC_UFS_CARD_BCR>;
+		reset-names = "core_reset";
+
+		status = "disabled";
+	};
+
+	extcon_storage_cd: extcon_storage_cd {
+		compatible = "extcon-storage-cd-gpio";
+		extcon-id = <62>; /* EXTCON_MECHANICAL */
+		status = "disabled";
+	};
+
 	ipcc_mproc: qcom,ipcc@408000 {
 		compatible = "qcom,ipcc";
 		reg = <0x408000 0x1000>;
@@ -3369,7 +3491,7 @@
 		qcom,spss-debug-reg-addr = <0x01886020>;
 		qcom,spss-emul-type-reg-addr = <0x01fc8004>;
 		pil-mem = <&pil_spss_mem>;
-		qcom,pil-addr = <0x8BE00000>; // backward compatible
+		qcom,pil-addr = <0x8C600000>; // see pil_spss_mem
 		qcom,pil-size = <0x0F0000>; // padding to 960 KB
 		status = "ok";
 	};
@@ -3379,6 +3501,8 @@
 
 		/* predefined channels, remote side is server */
 		qcom,spcom-ch-names = "sp_kernel", "sp_ssr";
+		/* rmb_err shared register physical address */
+		qcom,spcom-rmb-err-reg-addr = <0x188103c>;
 		/* sp2soc rmb shared register physical address and bmsk */
 		qcom,spcom-sp2soc-rmb-reg-addr = <0x01881020>;
 		qcom,spcom-sp2soc-rmb-initdone-bit = <24>;
@@ -3974,7 +4098,6 @@
 		qcom,fastrpc-adsp-audio-pdr;
 		qcom,fastrpc-adsp-sensors-pdr;
 		qcom,rpc-latency-us = <235>;
-		qcom,qos-cores = <0 1 2 3>;
 
 		qcom,msm_fastrpc_compute_cb1 {
 			compatible = "qcom,msm-fastrpc-compute-cb";
@@ -4609,8 +4732,8 @@
 		interrupts = <GIC_SPI 506 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 508 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "tsens-upper-lower", "tsens-critical";
-		tsens-reinit-wa;
 		#thermal-sensor-cells = <1>;
+		tsens-reinit-wa;
 	};
 
 	tsens1: tsens@c223000 {
@@ -4622,13 +4745,13 @@
 		interrupts = <GIC_SPI 507 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 509 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "tsens-upper-lower", "tsens-critical";
-		tsens-reinit-wa;
 		#thermal-sensor-cells = <1>;
+		tsens-reinit-wa;
 	};
 
 	qcom,msm-rtb {
 		compatible = "qcom,msm-rtb";
-		qcom,rtb-size = <0x100000>;
+		qcom,rtb-size = <0x400000>;
 	};
 
 	qcom,mpm2-sleep-counter@c221000 {
@@ -4728,6 +4851,8 @@
 		qcom,wlan-ramdump-dynamic = <0x400000>;
 		qcom,smmu-s1-enable;
 		qcom,cmd_db_name = "smpf2";
+		use-nv-mac;
+		qcom,set-wlaon-pwr-ctrl;
 
 		qcom,msm-bus,name = "msm-cnss";
 		qcom,msm-bus,num-cases = <6>;

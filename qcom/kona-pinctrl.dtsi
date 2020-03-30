@@ -75,17 +75,7 @@
 				<142 0 &pdc 60 0>,
 				<143 0 &pdc 61 0>,
 				<147 0 &pdc 109 0>, /* bi_mx_lpass_1_aoss_mx  */
-				<150 0 &pdc 110 0>,
-				<157 0 &pdc 111 0>,
-				<158 0 &pdc 112 0>,
-				<160 0 &pdc 113 0>,
-				<162 0 &pdc 114 0>,
-				<164 0 &pdc 115 0>,
-				<166 0 &pdc 116 0>,
-				<167 0 &pdc 117 0>,
-				<175 0 &pdc 118 0>,
-				<177 0 &pdc 119 0>,
-				<179 0 &pdc 120 0>;
+				<157 0 &pdc 111 0>; /* set wpc irq gpio to pdc */
 		irqdomain-map-mask = <0xff 0>;
 		irqdomain-map-pass-thru = <0 0xff>;
 
@@ -307,6 +297,49 @@
 					drive-strength = <2>;
 					bias-pull-up;
 				};
+			};
+		};
+
+		/* AW8697_RESET_N */
+		aw8697_gpio_reset: aw8697_gpio_reset {
+			mux {
+				 pins = "gpio130";
+				 function = "gpio";
+			};
+
+			config {
+				pins = "gpio130";
+				drive-strength = <2>;
+				bias-disable;
+				output-low;
+			};
+		};
+		/* AW8697_RESET_N, state device active*/
+		aw8697_gpio_reset_output_high: aw8697_gpio_reset_output_high {
+			mux {
+				pins = "gpio130";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio130";
+				drive-strength = <2>;
+				bias-disable;
+				output-high;
+			};
+		};
+		/* AW8697_INTERRUPT_N */
+		aw8697_gpio_int: aw8697_gpio_int {
+			mux {
+				 pins = "gpio129";
+				 function = "gpio";
+			};
+
+			config {
+				pins = "gpio129";
+				drive-strength = <2>;
+				bias-pull-up;
+				input-enable;
 			};
 		};
 
@@ -1939,6 +1972,32 @@
 			};
 		};
 
+		cs35l41_int_speaker: cs35l41_int_speaker {
+			mux {
+				pins = "gpio113";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio113";
+				bias-pull-up;
+				drive-strength = <8>;
+				input-enable;
+			};
+		};
+
+		cs35l41_int_speaker_rcv: cs35l41_int_speaker_rcv {
+			mux {
+				pins = "gpio112";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio112";
+				bias-pull-up;
+				drive-strength = <8>;
+				input-enable;
+			};
+		};
+
 		tert_mi2s_sck {
 			tert_mi2s_sck_sleep: tert_mi2s_sck_sleep {
 				mux {
@@ -2153,7 +2212,7 @@
 			config {
 				pins = "gpio94";
 				bias-disable; /* No PULL */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2167,7 +2226,7 @@
 			config {
 				pins = "gpio94";
 				bias-pull-down; /* PULL DOWN */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2181,7 +2240,7 @@
 			config {
 				pins = "gpio95";
 				bias-disable; /* No PULL */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2195,7 +2254,7 @@
 			config {
 				pins = "gpio95";
 				bias-pull-down; /* PULL DOWN */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2209,7 +2268,7 @@
 			config {
 				pins = "gpio96";
 				bias-disable; /* No PULL */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2223,7 +2282,7 @@
 			config {
 				pins = "gpio96";
 				bias-pull-down; /* PULL DOWN */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2237,7 +2296,7 @@
 			config {
 				pins = "gpio97";
 				bias-disable; /* No PULL */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2251,7 +2310,7 @@
 			config {
 				pins = "gpio97";
 				bias-pull-down; /* PULL DOWN */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2265,7 +2324,7 @@
 			config {
 				pins = "gpio98";
 				bias-disable; /* No PULL */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2279,7 +2338,7 @@
 			config {
 				pins = "gpio98";
 				bias-pull-down; /* PULL DOWN */
-				drive-strength = <2>; /* 2 MA */
+				drive-strength = <4>; /* 4 MA */
 			};
 		};
 
@@ -2371,12 +2430,12 @@
 		cam_sensor_active_rear_aux: cam_sensor_active_rear_aux {
 			/* RESET REARAUX */
 			mux {
-				pins = "gpio92";
+				pins = "gpio62";
 				function = "gpio";
 			};
 
 			config {
-				pins = "gpio92";
+				pins = "gpio62";
 				bias-disable; /* No PULL */
 				drive-strength = <2>; /* 2 MA */
 			};
@@ -2385,12 +2444,12 @@
 		cam_sensor_suspend_rear_aux: cam_sensor_suspend_rear_aux {
 			/* RESET REARAUX */
 			mux {
-				pins = "gpio92";
+				pins = "gpio62";
 				function = "gpio";
 			};
 
 			config {
-				pins = "gpio92";
+				pins = "gpio62";
 				bias-pull-down; /* PULL DOWN */
 				drive-strength = <2>; /* 2 MA */
 				output-low;
