@@ -1,0 +1,159 @@
+#include "lagoon-audio-overlay.dtsi"
+
+&bolero {
+	qcom,num-macros = <3>;
+};
+
+&wsa_macro {
+	status = "disabled";
+};
+
+&wcd937x_codec {
+	status = "ok";
+	qcom,cdc-micbias1-mv = <2750>;
+	qcom,cdc-micbias2-mv = <2750>;
+	qcom,cdc-micbias3-mv = <2750>;
+	qcom,cdc-micbias4-mv = <2750>;
+};
+
+&wcd938x_codec {
+	status = "disabled";
+};
+
+&wcd937x_rx_slave {
+	status = "ok";
+};
+
+&wcd937x_tx_slave {
+	status = "ok";
+};
+
+&wcd938x_tx_slave {
+	status = "disabled";
+};
+
+&wcd938x_rx_slave {
+	status = "disabled";
+};
+
+
+&dai_mi2s2 {
+	qcom,msm-mi2s-rx-lines = <1>;
+	qcom,msm-mi2s-tx-lines = <2>;
+};
+
+
+&lagoon_snd {
+	qcom,model = "lito-lagoonqrd-snd-card";
+	qcom,msm-mi2s-master = <1>, <1>, <1>, <1>, <1>, <1>;
+	qcom,wcn-btfm = <1>;
+	qcom,ext-disp-audio-rx = <0>;
+	qcom,audio-routing =
+		"AMIC1", "MIC BIAS1",
+		"MIC BIAS1", "Analog Mic1",
+		"AMIC2", "MIC BIAS2",
+		"MIC BIAS2", "Analog Mic2",
+		"AMIC3", "MIC BIAS3",
+		"MIC BIAS3", "Analog Mic3",
+		"IN1_HPHL", "HPHL_OUT",
+		"IN2_HPHR", "HPHR_OUT",
+		"IN3_AUX", "AUX_OUT",
+		"TX SWR_ADC0", "ADC1_OUTPUT",
+		"TX SWR_ADC2", "ADC2_OUTPUT",
+		"TX SWR_ADC3", "ADC3_OUTPUT",
+		"RX_TX DEC0_INP", "TX DEC0 MUX",
+		"RX_TX DEC1_INP", "TX DEC1 MUX",
+		"RX_TX DEC2_INP", "TX DEC2 MUX",
+		"RX_TX DEC3_INP", "TX DEC3 MUX",
+		"VA_AIF1 CAP", "VA_SWR_CLK",
+		"VA_AIF2 CAP", "VA_SWR_CLK",
+		"VA_AIF3 CAP", "VA_SWR_CLK",
+		"VA DMIC0", "VA MIC BIAS3",
+		"VA DMIC1", "VA MIC BIAS3",
+		"VA DMIC2", "VA MIC BIAS1",
+		"VA DMIC3", "VA MIC BIAS1",
+		"VA DMIC4", "VA MIC BIAS4",
+		"VA DMIC5", "VA MIC BIAS4",
+		"VA SWR_ADC0", "VA_SWR_CLK",
+		"VA SWR_ADC1", "VA_SWR_CLK",
+		"VA SWR_ADC2", "VA_SWR_CLK",
+		"VA SWR_ADC3", "VA_SWR_CLK",
+		"VA SWR_MIC0", "VA_SWR_CLK",
+		"VA SWR_MIC1", "VA_SWR_CLK",
+		"VA SWR_MIC2", "VA_SWR_CLK",
+		"VA SWR_MIC3", "VA_SWR_CLK",
+		"VA SWR_MIC4", "VA_SWR_CLK",
+		"VA SWR_MIC5", "VA_SWR_CLK",
+		"VA SWR_MIC6", "VA_SWR_CLK",
+		"VA SWR_MIC7", "VA_SWR_CLK",
+		"VA SWR_ADC0", "ADC1_OUTPUT",
+		"VA SWR_ADC2", "ADC2_OUTPUT",
+		"VA SWR_ADC3", "ADC3_OUTPUT",
+		"VA SWR_MIC0", "DMIC1_OUTPUT",
+		"VA SWR_MIC1", "DMIC2_OUTPUT",
+		"VA SWR_MIC2", "DMIC3_OUTPUT",
+		"VA SWR_MIC3", "DMIC4_OUTPUT",
+		"VA SWR_MIC4", "DMIC5_OUTPUT",
+		"VA SWR_MIC5", "DMIC6_OUTPUT",
+		"VA SWR_MIC6", "DMIC7_OUTPUT",
+		"VA SWR_MIC7", "DMIC8_OUTPUT";
+	qcom,msm-mbhc-hphl-swh = <1>;
+	qcom,msm-mbhc-gnd-swh = <1>;
+	qcom,tert-mi2s-gpios = <&cdc_tert_tdm_gpios>;
+	asoc-codec  = <&stub_codec>, <&bolero>;
+	asoc-codec-names = "msm-stub-codec.1", "bolero_codec";
+	qcom,wsa-max-devs = <0>;
+	qcom,wsa-devs = <&wsa883x_0221>;
+	qcom,wsa-aux-dev-prefix = "SpkrLeft";
+	qcom,codec-max-aux-devs = <1>;
+	qcom,msm-mbhc-usbc-audio-supported = <0>;
+	qcom,codec-aux-devs = <&wcd937x_codec>;
+	qcom,msm_audio_ssr_devs = <&audio_apr>, <&q6core>,
+				<&lpi_tlmm>, <&bolero>;
+};
+
+&soc {
+	cdc_tert_tdm_gpios: tert_tdm_pinctl {
+		compatible = "qcom,msm-cdc-pinctrl";
+		pinctrl-names = "aud_active", "aud_sleep";
+		pinctrl-0 = <&tert_tdm_clk_active &tert_tdm_ws_active
+			&tert_tdm_din_active &tert_tdm_dout_active>;
+		pinctrl-1 = <&tert_tdm_clk_sleep &tert_tdm_ws_sleep
+			&tert_tdm_din_sleep &tert_tdm_dout_sleep>;
+	};
+};
+
+&cdc_dmic01_gpios{
+	status = "disabled";
+};
+
+&cdc_dmic23_gpios{
+	status = "disabled";
+};
+
+&cdc_dmic45_gpios{
+	status = "disabled";
+};
+
+&wsa_swr_gpios {
+	status = "disabled";
+};
+
+&wsa_spkr_en1 {
+	status = "disabled";
+};
+
+&wsa_spkr_en2 {
+	status = "disabled";
+};
+
+&qupv3_se10_i2c {
+	status = "ok";
+	fsa4480: fsa4480@42 {
+		status = "disabled";
+		compatible = "qcom,fsa4480-i2c";
+		reg = <0x42>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&fsa_usbc_ana_en>;
+	};
+};
