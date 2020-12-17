@@ -12,7 +12,7 @@
 	interrupt-controller;
 	#interrupt-cells = <4>;
 
-	qcom,pm8150@0 {
+	pm8150_0: qcom,pm8150@0 {
 		compatible = "qcom,spmi-pmic";
 		reg = <0 SPMI_USID>;
 		#address-cells = <1>;
@@ -28,25 +28,24 @@
 		};
 
 		qcom,power-on@800 {
-			compatible = "qcom,qpnp-power-on";
-			reg = <0x800>;
-			interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>,
-				     <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
-			interrupt-names = "kpdpwr", "resin";
-			qcom,pon-dbc-delay = <15625>;
-			qcom,kpdpwr-sw-debounce;
-			qcom,system-reset;
-			qcom,store-hard-reset-reason;
+			compatible = "qcom,pm8998-pon";
+			reg = <0x0800>;
+			mode-bootloader = <0x2>;
+			mode-recovery = <0x1>;
 
-			qcom,pon_1 {
-				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR>;
-				qcom,pull-up;
+			pon_pwrkey: pwrkey {
+				compatible = "qcom,pm8941-pwrkey";
+				interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>;
+				debounce = <15625>;
+				bias-pull-up;
 				linux,code = <KEY_POWER>;
 			};
 
-			qcom,pon_2 {
-				qcom,pon-type = <PON_POWER_ON_TYPE_RESIN>;
-				qcom,pull-up;
+			pon_resin: resin {
+				compatible = "qcom,pm8941-resin";
+				interrupts = <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
+				debounce = <15625>;
+				bias-pull-up;
 				linux,code = <KEY_VOLUMEDOWN>;
 			};
 		};
@@ -66,7 +65,7 @@
 			compatible = "qcom,pm8941-rtc";
 			reg = <0x6000>, <0x6100>;
 			reg-names = "rtc", "alarm";
-			interrupts = <0x0 0x61 0x1 IRQ_TYPE_EDGE_BOTH>;
+			interrupts = <0x0 0x61 0x1 IRQ_TYPE_NONE>;
 		};
 
 		pm8150_gpios: pinctrl@c000 {
@@ -114,13 +113,16 @@
 		};
 
 		pm8150_adc_tm: adc_tm@3500 {
-			compatible = "qcom,adc-tm5";
+			compatible = "qcom,spmi-adc-tm5";
 			reg = <0x3500>;
 			interrupts = <0x0 0x35 0x0 IRQ_TYPE_EDGE_RISING>;
 			interrupt-names = "threshold";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			#thermal-sensor-cells = <1>;
+			io-channels = <&pm8150_vadc ADC5_XO_THERM_100K_PU>,
+					<&pm8150_vadc ADC5_AMUX_THM1_100K_PU>,
+					<&pm8150_vadc ADC5_AMUX_THM2_100K_PU>;
 		};
 	};
 
@@ -138,24 +140,25 @@
 		polling-delay = <0>;
 		thermal-governor = "step_wise";
 		thermal-sensors = <&pm8150_tz>;
+		wake-capable-sensor;
 
 		trips {
 			pm8150_trip0: trip0 {
-				temperature = <95000>;
+				temperature = <105000>;
 				hysteresis = <0>;
 				type = "passive";
 			};
 
 			pm8150_trip1: trip1 {
-				temperature = <115000>;
+				temperature = <125000>;
 				hysteresis = <0>;
-				type = "passive";
+				type = "critical";
 			};
 
 			trip2 {
-				temperature = <145000>;
+				temperature = <155000>;
 				hysteresis = <0>;
-				type = "passive";
+				type = "critical";
 			};
 		};
 	};
