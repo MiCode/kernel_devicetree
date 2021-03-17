@@ -11,8 +11,8 @@
 	qcom,pm6350@0 {
 		compatible = "qcom,spmi-pmic";
 		reg = <0 SPMI_USID>;
-		#address-cells = <1>;
-		#size-cells = <1>;
+		#address-cells = <2>;
+		#size-cells = <0>;
 
 		pm6350_revid: qcom,revid@100 {
 			compatible = "qcom,qpnp-revid";
@@ -23,8 +23,12 @@
 			compatible = "qcom,qpnp-power-on";
 			reg = <0x800 0x100>;
 			interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>,
-				     <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
-			interrupt-names = "kpdpwr", "resin";
+				     <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>,
+				     <0x0 0x8 0x3 IRQ_TYPE_EDGE_RISING>,
+				     <0x0 0x8 0x4 IRQ_TYPE_EDGE_BOTH>,
+				     <0x0 0x8 0x5 IRQ_TYPE_EDGE_BOTH>;
+			interrupt-names = "kpdpwr", "resin", "kpdpwr-bark",
+					"resin-bark", "kpdpwr-resin-bark";
 			qcom,pon-dbc-delay = <15625>;
 			qcom,kpdpwr-sw-debounce;
 			qcom,system-reset;
@@ -33,13 +37,28 @@
 			qcom,pon_1 {
 				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR>;
 				qcom,pull-up;
+				qcom,use-bark;
 				linux,code = <KEY_POWER>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <PON_POWER_OFF_TYPE_HARD_RESET>;
 			};
 
 			qcom,pon_2 {
 				qcom,pon-type = <PON_POWER_ON_TYPE_RESIN>;
 				qcom,pull-up;
 				linux,code = <KEY_VOLUMEDOWN>;
+			};
+
+			qcom,pon_3 {
+				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR_RESIN>;
+				qcom,support-reset = <1>;
+				qcom,pull-up;
+				qcom,s1-timer = <1352>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <PON_POWER_OFF_TYPE_WARM_RESET>;
+				qcom,use-bark;
 			};
 		};
 
@@ -87,8 +106,8 @@
 	qcom,pm6350@1 {
 		compatible ="qcom,spmi-pmic";
 		reg = <1 SPMI_USID>;
-		#address-cells = <1>;
-		#size-cells = <1>;
+		#address-cells = <2>;
+		#size-cells = <0>;
 
 		pm6350_pwm: qcom,pwms@6000 {
 			status = "disabled";
