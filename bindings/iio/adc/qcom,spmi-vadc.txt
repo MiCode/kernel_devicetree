@@ -11,6 +11,7 @@ VADC node:
     Usage: required
     Value type: <string>
     Definition: Should contain "qcom,spmi-vadc".
+                Should contain "qcom,spmi-adc5-gen3" for PMIC5 Gen3 ADC driver.
                 Should contain "qcom,spmi-adc7" for PMIC7 ADC driver.
                 Should contain "qcom,spmi-adc5" for PMIC5 ADC driver.
                 Should contain "qcom,spmi-adc-rev2" for PMIC rev2 ADC driver.
@@ -20,6 +21,8 @@ VADC node:
     Usage: required
     Value type: <prop-encoded-array>
     Definition: VADC base address in the SPMI PMIC register map.
+            Debug ADC peripheral base address in the SPMI PMIC
+            register map. Debug peripheral address is optional.
 
 - #address-cells:
     Usage: required
@@ -52,7 +55,8 @@ Channel node properties:
             See include/dt-bindings/iio/qcom,spmi-vadc.h
 
 - label:
-    Usage: required for "qcom,spmi-adc5", "qcom,spmi-adc7" and "qcom,spmi-adc-rev2"
+    Usage: required for "qcom,spmi-adc5", "qcom,spmi-adc7", "qcom,spmi-adc5-gen3"
+    and "qcom,spmi-adc-rev2"
     Value type: <empty>
     Definition: ADC input of the platform as seen in the schematics.
             For thermistor inputs connected to generic AMUX or GPIO inputs
@@ -70,9 +74,9 @@ Channel node properties:
             - For compatible property "qcom,spmi-adc5", valid values are
               250, 420 and 840. If property is not found, default value of
               840 is used.
-            - For compatible property "qcom,spmi-adc7", valid values are
-              85, 340 and 1360. If property is not found, default value of
-              1360 is used.
+            - For compatible property "qcom,spmi-adc7" and "qcom,spmi-adc5-gen3",
+              valid values are 85, 340 and 1360. If property is not found, default
+              value of 1360 is used.
             - For compatible property "qcom,spmi-adc-rev2", valid values are 256,
               512 and 1024. If property is not present, default value is 1024.
 
@@ -97,9 +101,10 @@ Channel node properties:
               channel calibration. If property is not found, channel will be
               calibrated with 0.625V and 1.25V reference channels, also
               known as absolute calibration.
-            - For compatible property "qcom,spmi-adc5", "qcom,spmi-adc7" and
-              "qcom,spmi-adc-rev2", if this property is specified VADC will
-              use the VDD reference (1.875V) and GND for channel calibration.
+            - For compatible property "qcom,spmi-adc5", "qcom,spmi-adc7",
+              "qcom,spmi-adc5-gen3" and "qcom,spmi-adc-rev2", if this property
+              is specified VADC will use the VDD reference (1.875V) and GND for
+              channel calibration.
               If property is not found, channel will be calibrated with 0V
               and 1.25V reference channels, also known as absolute calibration.
 
@@ -123,8 +128,8 @@ Channel node properties:
               Certain controller digital versions have valid values of
               15, 100, 200, 300, 400, 500, 600, 700, 1, 2, 4, 8, 16, 32, 64, 128 ms
               If property is not found, channel will use 15us.
-            - For compatible property "qcom,spmi-adc7", delay = 15us for
-              value 0, 100us * (value) for values < 8, 1ms for value 8
+            - For compatible property "qcom,spmi-adc7" or "qcom,spmi-adc5-gen3",
+              delay = 15us for value 0, 100us * (value) for values < 8, 1ms for value 8
               and 2ms * (value - 8) otherwise.
               Valid values are: 15, 100, 200, 300, 400, 500, 600, 700, 1000, 2000,
               4000, 8000, 16000, 32000, 64000, 128000 us.
@@ -140,8 +145,9 @@ Channel node properties:
             - For compatible property "qcom,spmi-vadc", valid values
               are: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
               If property is not found, 1 sample will be used.
-            - For compatible property "qcom,spmi-adc5", "qcom,spmi-adc7"
-              and "qcom,spmi-adc-rev2", valid values are: 1, 2, 4, 8, 16.
+            - For compatible property "qcom,spmi-adc5", "qcom,spmi-adc7",
+              "qcom,spmi-adc5-gen3" and "qcom,spmi-adc-rev2",
+              valid values are: 1, 2, 4, 8, 16.
               If property is not found, 1 sample will be used.
 
 - qcom,scale-fn-type:
@@ -149,8 +155,29 @@ Channel node properties:
     Value type: <u32>
     Definition: The index of the VADC scale function used to convert raw ADC
             code to physical scaled units for the channel. Defined for compatible
-            properties "qcom,spmi-adc5" and "qcom,spmi-adc7".
+            properties "qcom,spmi-adc5", "qcom,spmi-adc5-gen3" and "qcom,spmi-adc7".
             See include/dt-bindings/iio/qcom,spmi-vadc.h.
+
+- qcom,adc-tm-type:
+    Usage: optional
+    Value type: <u32>
+    Definition: Type of ADC_TM usage defined for a given channel. Valid values
+            are 0-3. Defined for compatible property "qcom,spmi-adc5-gen3".
+            - Value 0 indicates it will not be used for ADC_TM.
+            - Value 1 indicates it will be used for thermistors, for detecting
+              temperature threshold violations and temperature reads.
+            - Value 2 indicates it will be used for thermistors, for temperature
+              reads alone.
+            - Value 3 indicates it will be used for non-thermal clients, for
+              detecting threshold violations for that channel.
+
+- qcom,rscale-type:
+    Usage: optional
+    Value type: <u32>
+    Definition: Type of reverse scaling function used for ADC_TM channels. Valid only
+            for the case of non-thermal ADC_TM client. Valid value at present is only
+            0 for reverse scaling of default voltage scaling function. Defined for
+            compatible property "qcom,spmi-adc5-gen3".
 
 NOTE:
 
@@ -160,7 +187,7 @@ configuration nodes should be defined:
 VADC_REF_625MV and/or VADC_SPARE1(based on PMIC version) VADC_REF_1250MV,
 VADC_GND_REF and VADC_VDD_VADC.
 
-Example:
+Example1:
 
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
 #include <linux/irq.h>
@@ -191,4 +218,50 @@ Example:
 	usb {
 		io-channels = <&pmic_vadc VADC_LR_MUX10_USB_ID>;
 		io-channel-names = "vadc";
+	};
+
+Example2:
+
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm5100.h>
+#include <linux/irq.h>
+/* ... */
+
+	/* VADC node */
+	pm5100_adc: adc@8000 {
+		compatible = "qcom,spmi-adc-gen3";
+		reg = <0x8000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <0x0 0x80 0x0 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "adc";
+		#io-channel-cells = <1>;
+		io-channel-ranges;
+		#thermal-sensor-cells = <1>;
+
+		pm5100_die_temp {
+			reg = <PM5100_ADC5_GEN3_DIE_TEMP>;
+			label = "pm5100_die_temp";
+			qcom,pre-scaling = <1 1>;
+		};
+
+		pm5100_xo_therm {
+			reg = <PM5100_ADC5_GEN3_XO_THERM>;
+			label = "pm5100_xo_therm";
+			qcom,ratiometric;
+			qcom,hw-settle-time = <200>;
+			qcom,pre-scaling = <1 1>;
+			qcom,adc-tm-type = <1>;
+		};
+
+		pm5100_vph_pwr {
+			reg = <PM5100_ADC5_GEN3_VPH_PWR>;
+			label = "pm5100_vph_pwr";
+			qcom,pre-scaling = <1 3>;
+		};
+	};
+
+	/* IIO client node */
+	batt {
+		io-channels = <&pm5100_adc PM5100_ADC5_GEN3_VPH_PWR>;
+		io-channel-names = "vph_pwr";
 	};
