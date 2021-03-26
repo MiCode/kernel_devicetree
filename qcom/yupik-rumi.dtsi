@@ -1,0 +1,88 @@
+#include <dt-bindings/clock/qcom,gcc-yupik.h>
+
+&soc {
+	timer {
+		clock-frequency = <5000000>;
+	};
+
+	timer@17c20000 {
+		clock-frequency = <5000000>;
+	};
+
+	wdog: qcom,wdt@17c10000 {
+		status = "disabled";
+	};
+
+	usb_emu_phy_0: usb_emu_phy@a720000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x0a720000 0x9500>;
+
+		qcom,emu-init-seq = <0xffff 0x4
+				     0xfff0 0x4
+				     0x100000 0x20
+				     0x0 0x20
+				     0x101f0 0x20
+				     0x100000 0x3c
+				     0x0 0x3c
+				     0x10060 0x3c
+				     0x0 0x4>;
+	};
+
+};
+
+&usb0 {
+	/delete-property/ extcon;
+	dwc3@a600000 {
+		usb-phy = <&usb_emu_phy_0>, <&usb_nop_phy>;
+		maximum-speed = "high-speed";
+		dr_mode = "peripheral";
+	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+
+	vdda-phy-supply = <&L10C>;
+	vdda-pll-supply = <&L6B>;
+	vdda-phy-max-microamp = <97100>;
+	vdda-pll-max-microamp = <18400>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+	vdd-hba-fixed-regulator;
+
+	vcc-supply = <&L7B>;
+	vcc-max-microamp = <800000>;
+
+	vccq-supply = <&L9B>;
+	vccq-max-microamp = <900000>;
+
+	qcom,vddp-ref-clk-supply = <&L9B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,disable-lpm;
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	status = "ok";
+};
+
+/* Debug UART console */
+&qupv3_se5_2uart {
+	qcom,rumi_platform;
+};
+
+&gcc {
+	clocks = <&bi_tcxo>, <&sleep_clk>;
+};
+
+&gpucc {
+	clocks = <&bi_tcxo>, <&gcc GCC_GPU_GPLL0_CLK_SRC>,
+		<&gcc GCC_GPU_GPLL0_DIV_CLK_SRC>, <&gcc GCC_GPU_CFG_AHB_CLK>;
+};
