@@ -1,5 +1,9 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,gcc-scuba.h>
+#include <dt-bindings/clock/qcom,gpucc-scuba.h>
+#include <dt-bindings/clock/qcom,dispcc-scuba.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
 
 / {
 
@@ -30,6 +34,7 @@
 			reg = <0x0 0x0>;
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -50,6 +55,7 @@
 			reg = <0x0 0x1>;
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L1_I_1: l1-icache {
 				compatible = "arm,arch-cache";
 			};
@@ -65,6 +71,7 @@
 			reg = <0x0 0x2>;
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L1_I_2: l1-icache {
 				compatible = "arm,arch-cache";
 			};
@@ -80,6 +87,7 @@
 			reg = <0x0 0x3>;
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L1_I_3: l1-icache {
 				compatible = "arm,arch-cache";
 			};
@@ -232,8 +240,168 @@
 		};
 	};
 
+	clocks {
+		xo_board: xo-board {
+			compatible = "fixed-clock";
+			clock-frequency = <38400000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
 
+		sleep_clk: sleep-clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32000>;
+			clock-output-names = "chip_sleep_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	rpmcc: clock-controller {
+		compatible = "qcom,rpmcc-scuba";
+		#clock-cells = <1>;
+	};
+
+	gcc: clock-controller@1400000 {
+		compatible = "qcom,scuba-gcc", "syscon";
+		reg = <0x1400000 0x1f0000>;
+		reg-names = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&rpmcc RPM_SMD_XO_A_CLK_SRC>,
+			 <&sleep_clk>;
+		clock-names = "bi_tcxo", "bi_tcxo_ao", "sleep_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	dispcc: clock-controller@5f00000 {
+		compatible = "qcom,scuba-dispcc", "syscon";
+		reg = <0x5f00000 0x20000>;
+		reg-names = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&rpmcc RPM_SMD_XO_A_CLK_SRC>,
+			 <&gcc GCC_DISP_GPLL0_DIV_CLK_SRC>,
+			 <&sleep_clk>;
+		clock-names = "bi_tcxo", "bi_tcxo_ao",
+				"gcc_disp_gpll0_div_clk_src",
+				"sleep_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gpucc: clock-controller@5990000 {
+		compatible = "qcom,scuba-gpucc", "syscon";
+		reg = <0x5990000 0x9000>;
+		reg-names = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>, <&gcc GPLL0>;
+		clock-names = "bi_tcxo", "gpll0_out_main";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	mccc_debug: syscon@447d200 {
+		compatible = "syscon";
+		reg = <0x447d200 0x100>;
+	};
+
+	cpucc_debug: syscon@f11101c {
+		compatible = "syscon";
+		reg = <0xf11101c 0x4>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,scuba-debugcc";
+		qcom,gcc = <&gcc>;
+		qcom,dispcc = <&dispcc>;
+		qcom,gpucc = <&gpucc>;
+		qcom,mccc = <&mccc_debug>;
+		qcom,cpucc = <&cpucc_debug>;
+		clock-names = "xo_clk_src";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-hw";
+		reg = <0xf521000 0x1400>;
+		reg-names = "freq-domain0";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>, <&gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		qcom,no-accumulative-counter;
+		qcom,max-lut-entries = <12>;
+		#freq-domain-cells = <1>;
+	};
 };
 
 #include "pm2250-rpm-regulator.dtsi"
 #include "scuba-regulator.dtsi"
+#include "monaco-gdsc.dtsi"
+
+&gcc_camss_top_gdsc {
+	status = "ok";
+};
+
+&gcc_usb30_prim_gdsc {
+	status = "ok";
+};
+
+&gcc_vcodec0_gdsc {
+	reg = <0x1458098 0x4>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&gcc_venus_gdsc {
+	reg = <0x145807c 0x4>;
+	status = "ok";
+};
+
+&hlos1_vote_mm_snoc_mmu_tbu_rt_gdsc {
+	qcom,gds-timeout = <500>;
+	status = "ok";
+};
+
+&hlos1_vote_mm_snoc_mmu_tbu_nrt_gdsc {
+	qcom,gds-timeout = <500>;
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu1_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu0_gdsc {
+	status = "ok";
+};
+
+&mdss_core_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&gpu_gx_sw_reset {
+	reg = <0x5991008 0x4>;
+};
+
+&gpu_cx_hw_ctrl {
+	reg = <0x5991540 0x4>;
+};
+
+&gpu_gx_domain_addr {
+	reg = <0x5991508 0x4>;
+};
+
+&gpu_cx_gdsc {
+	reg = <0x599106c 0x4>;
+	/delete-property/ qcom,gds-timeout;
+	/delete-property/ qcom,clk-dis-wait-val;
+	status = "ok";
+};
+
+&gpu_gx_gdsc {
+	reg = <0x599100c 0x4>;
+	status = "ok";
+};
