@@ -78,6 +78,7 @@ endif
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_ARCH_WAIPIO) += waipio-rumi-overlay.dtbo \
 	waipio-mtp-pm8008-overlay.dtbo \
+	zeus-sm8450-pm8008-overlay.dtbo \
 	waipio-cdp-pm8008-overlay.dtbo \
 	waipio-qrd-pm8008-overlay.dtbo \
 	waipio-atp-pm8008-overlay.dtbo \
@@ -88,6 +89,7 @@ dtbo-$(CONFIG_ARCH_WAIPIO) += waipio-rumi-overlay.dtbo \
 
 waipio-rumi-overlay.dtbo-base := waipio.dtb waipiop.dtb
 waipio-mtp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb
+zeus-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb
 waipio-cdp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb
 waipio-qrd-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb
 waipio-atp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb
