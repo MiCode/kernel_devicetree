@@ -46,7 +46,12 @@
 			reg = <0x0 0x100>;
 			enable-method = "spin-table";
 			cpu-release-addr = <0x0 0x90000000>;
-			next-level-cache = <&L2_0>;
+			next-level-cache = <&L2_1>;
+			L2_1: l2-cache {
+			      compatible = "arm,arch-cache";
+			      cache-level = <2>;
+			      next-level-cache = <&L3_0>;
+			};
 		};
 
 		CPU2: cpu@200 {
@@ -55,12 +60,7 @@
 			reg = <0x0 0x200>;
 			enable-method = "spin-table";
 			cpu-release-addr = <0x0 0x90000000>;
-			next-level-cache = <&L2_2>;
-			L2_2: l2-cache {
-			      compatible = "arm,arch-cache";
-			      cache-level = <2>;
-			      next-level-cache = <&L3_0>;
-			};
+			next-level-cache = <&L2_1>;
 		};
 
 		CPU3: cpu@300 {
@@ -69,7 +69,12 @@
 			reg = <0x0 0x300>;
 			enable-method = "spin-table";
 			cpu-release-addr = <0x0 0x90000000>;
-			next-level-cache = <&L2_2>;
+			next-level-cache = <&L2_3>;
+			L2_3: l2-cache {
+			      compatible = "arm,arch-cache";
+			      cache-level = <2>;
+			      next-level-cache = <&L3_0>;
+			};
 		};
 
 		CPU4: cpu@400 {
@@ -142,22 +147,22 @@
 				core2 {
 					cpu = <&CPU2>;
 				};
-
-				core3 {
-					cpu = <&CPU3>;
-				};
 			};
 
 			cluster1 {
 				core0 {
-					cpu = <&CPU4>;
+					cpu = <&CPU3>;
 				};
 
 				core1 {
-					cpu = <&CPU5>;
+					cpu = <&CPU4>;
 				};
 
 				core2 {
+					cpu = <&CPU5>;
+				};
+
+				core3 {
 					cpu = <&CPU6>;
 				};
 			};
