@@ -18,13 +18,15 @@ Properties:
   Value type:	<string>
   Definition: 	It can be one of following:
 		"qcom,hv-haptics",
-		"qcom,pm8350b-haptics".
+		"qcom,pm8350b-haptics",
+		"qcom,pm5100-haptics".
 
 - reg:
   Usage:	required
   Value type:	<prop-encoded-array>
   Definition:	Register base for following haptics modules: HAPTICS_CFG,
-		HAPTICS_PATTERN, HAPTICS_BOOST.
+		HAPTICS_PATTERN, HAPTICS_BOOST. HAPTICS_BOOST register base
+		is not applicable for PM5100.
 
 - interrupts:
   Usage:	required
@@ -76,9 +78,11 @@ Properties:
   Value type:	<u32>
   Definition:	Specifies the FIFO empty threshold. The "fifo-empty" IRQ will be
 		triggered when the number of the samples in the FIFO is less
-		than the threshold. For PM8350B v1, allowed value is 1 - 103
-		and the default value is 48. For PM8350B v2, allowed value is
-		1 - 639 and the default value is 280.
+		than the threshold. For PM8350B v1, allowed value is 0 - 104
+		in multiple of 4 and the default value is 48. For PM8350B v2,
+		allowed value is 0 - 640 in multiple of 40 and the default
+		value is 280. For PM5100, allowed value is 0 - 1024 in multiple
+		of 32 and the default value is 288.
 
 - qcom,use-erm:
   Usage:	optional
@@ -91,33 +95,36 @@ Properties:
   Value type:	<string>
   Definition:	The nvmem cell name of the SDAM module where the closed-loop
 		brake calibration settings can be stored. It must be
-		"hap_cl_brake".
+		"hap_cl_brake". Not applicable for PM5100.
 
 - nvmem-cells:
   Usage:	optional
   Value type:	<phandle>
   Definition:	Phandle of the nvmem cell to store the closed-loop brake
 		calibration settings. Please refer to nvmem bindings as
-		described in bindings/nvmem/nvmem.txt.
+		described in bindings/nvmem/nvmem.txt. Not applicable
+		for PM5100.
 
 - nvmem-names:
   Usage:	optional
   Value type:	<string>
   Definition:	The nvmem device name of the SDAM module used for haptics
-		configuration. It must be "hap_cfg_sdam".
+		configuration. It must be "hap_cfg_sdam". Not applicable for
+		PM5100.
 
 - nvmem:
   Usage:	optional
   Value type:	<phandle>
   Definition:	Phandle of the nvmem device used for haptics configuration.
 		Please refer to nvmem bindings as described in bindings/nvmem/nvmem.txt.
+		Not applicable for PM5100.
 
 - qcom,pbs-client:
   Usage:	optional
   Value type:	<phandle>
   Definition:	Phandle of the PBS client used for triggering PBS to configure
 		haptics ISC (short circuit current) config during LRA impedance
-		detection.
+		detection. Not applicable for PM5100.
 
 The following properties are only required when LRA actuator is used:
 
