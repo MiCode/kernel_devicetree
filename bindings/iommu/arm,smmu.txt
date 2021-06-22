@@ -354,10 +354,15 @@ The qcom,qsmmu-v500 device implements a number of register regions containing
 debug functionality. Each register region maps to a separate tbu from the
 arm mmu-500 implementation.
 
-** TBU required properties:
+** TBU/QTB required properties:
 
 - compatible    : Should be one of:
                         "qcom,qsmmuv500-tbu"
+
+                  "qcom,qtb500" can be used in conjunction with
+                  "qcom,qsmmuv500-tbu", as the QTB500 is an implementation
+                  of a TBU with different features/enhancements than a regular
+                  TBU.
 
 - reg           : Base address and size.
 
@@ -367,7 +372,7 @@ arm mmu-500 implementation.
 
 -qcom,iova-width: The maximum number of bits that a TBU can support for IOVAs.
 
-** TBU optional properties:
+** TBU/QTB optional properties:
 
 -qcom,opt-out-tbu-halting:
 		  Allow certain TBUs to opt-out from being halted for the
@@ -375,7 +380,25 @@ arm mmu-500 implementation.
 		  considerable impact to the system such as deadlocks on demand.
 		  Such TBUs can be opted out to be halted from software.
 
+** QTB required properties:
+-interconnects:
+		  The interconnect path to vote for prior to accessing the QTB
+		  registers.
+
+-qcom,num-qtb-ports:
+		  Specifies the number of ports that a QTB has for incoming
+		  transactions.
+
+** QTB optional properties:
+
+-qcom,no-qtb-atos-halt:
+		  Specifies that a TBU does not need to be halted for performing
+		  ATOS debugging.
+
 Example:
+
+TBU:
+
 smmu {
 	compatible = "qcom,qsmmu-v500";
 	tbu@0x1000 {
@@ -383,5 +406,19 @@ smmu {
 		reg = <0x1000 0x1000>;
 		qcom,stream-id-range = <0x800 0x400>;
 		qcom,iova-width = <36>;
+	};
+};
+
+QTB:
+
+smmu {
+	compatible = "qcom,qsmmu-v500";
+	qtb@0x1000 {
+		compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+		regs = <0x1000 0x1000>;
+		qcom,stream-id-range = <0x800 0x400>;
+		qcom,iova-width = <36>;
+		interconnects = <&system_noc MASTER_A1NOC_SNOC &mc_virt SLAVE_EBI1>;
+		qcom,num-qtb-ports = <1>;
 	};
 };
