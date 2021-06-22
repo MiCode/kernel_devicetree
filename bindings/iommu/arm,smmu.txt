@@ -152,12 +152,6 @@ conditions.
 		  Some hardware may not have full support for atos debugging
 		  in tandem with other features like power collapse.
 
--qcom,opt-out-tbu-halting:
-		  Allow certain TBUs to opt-out from being halted for the
-		  ATOS operation to proceed. Halting certain TBUs would cause
-		  considerable impact to the system such as deadlocks on demand.
-		  Such TBUs can be opted out to be halted from software.
-
 - qcom,deferred-regulator-disable-delay : The time delay for deferred regulator
                   disable in ms. In case of unmap call, regulator is
                   enabled/disabled. This may introduce additional delay. For
@@ -367,23 +361,24 @@ arm mmu-500 implementation.
 
 - reg           : Base address and size.
 
-- reg-names	: "base" and "status-reg" are expected
-		"base" is the main TBU register region.
-		"status-reg" indicates whether hw can process a new request.
-
 -qcom,stream-id-range:
 		Pair of values describing the smallest supported stream-id
 		and the size of the entire set.
+
+** TBU optional properties:
+
+-qcom,opt-out-tbu-halting:
+		  Allow certain TBUs to opt-out from being halted for the
+		  ATOS operation to proceed. Halting certain TBUs would cause
+		  considerable impact to the system such as deadlocks on demand.
+		  Such TBUs can be opted out to be halted from software.
 
 Example:
 smmu {
 	compatible = "qcom,qsmmu-v500";
 	tbu@0x1000 {
 		compatible = "qcom,qsmmuv500-tbu";
-		regs = <0x1000 0x1000>,
-			<0x2000 0x8>;
-		reg-names = "base",
-			"status-reg";
+		reg = <0x1000 0x1000>;
 		qcom,stream-id-range = <0x800 0x400>;
 	};
 };
