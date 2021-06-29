@@ -11,12 +11,13 @@ VADC node:
     Usage: required
     Value type: <string>
     Definition: Should contain "qcom,spmi-vadc".
-                Should contain "qcom,spmi-adc5-gen3" for PMIC5 Gen3 ADC driver.
-                Should contain "qcom,spmi-adc7" for PMIC7 ADC driver.
-                Should contain "qcom,spmi-adc5" for PMIC5 ADC driver.
-                Should contain "qcom,spmi-adc-rev2" for PMIC rev2 ADC driver.
+                Should contain "qcom,spmi-adc5-gen3" for PMIC5 Gen3 ADC.
+                Should contain "qcom,spmi-adc7" for PMIC7 ADC.
+                Should contain "qcom,spmi-adc5" for PMIC5 ADC.
+                Should contain "qcom,spmi-adc-rev2" for PMIC rev2 ADC.
                 Should contain "qcom,pms405-adc" for PMS405 PMIC
-		Should contain "qcom,spmi-adc5-lite" for PMIC5 ADC-lite driver.
+                Should contain "qcom,spmi-adc5-lite" for PMIC5 ADC-lite.
+                Should contain "qcom,spmi-adc7-sw-calib" for PMIC7 SW-calibrated ADC.
 - reg:
     Usage: required
     Value type: <prop-encoded-array>
@@ -108,6 +109,19 @@ Channel node properties:
               If property is not found, channel will be calibrated with 0V
               and 1.25V reference channels, also known as absolute calibration.
 
+- qcom,no-cal:
+    Usage: optional
+    Value type: <empty>
+    Definition: Channel calibration type.
+            - For compatible property "qcom,spmi-adc7-sw-calib", if this property
+              is specified for a channel, VADC will not use any reference channels
+              for that channel's calibration. It is needed for the three calibration
+              channels alone (ADC7_REF_GND, ADC7_1P25VREF and ADC7_VREF_VADC),
+              mutually exclusive with ratiometric calibration and not meant for any
+              other compatible property. If property is not found, channel will be
+              calibrated with 0.625V and 1.25V reference channels, also known as
+              absolute calibration.
+
 - qcom,hw-settle-time:
     Usage: optional
     Value type: <u32>
@@ -187,6 +201,11 @@ configuration nodes should be defined:
 VADC_REF_625MV and/or VADC_SPARE1(based on PMIC version) VADC_REF_1250MV,
 VADC_GND_REF and VADC_VDD_VADC.
 
+For compatible property "qcom,spmi-adc7-sw-calib" following channels, also
+known as reference point channels, are used for result calibration and their
+channel configuration nodes should be defined:
+ADC7_REF_GND, ADC7_1P25VREF and ADC7_VREF_VADC.
+
 Example1:
 
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
@@ -264,4 +283,35 @@ Example2:
 	batt {
 		io-channels = <&pm5100_adc PM5100_ADC5_GEN3_VPH_PWR>;
 		io-channel-names = "vph_pwr";
+	};
+
+Example3:
+
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
+#include <linux/irq.h>
+/* ... */
+
+	/* VADC node */
+	pmr735a_vadc: vadc@3600 {
+		compatible = "qcom,spmi-adc7-sw-calib";
+		reg = <0x3600>, <0x3900>;
+		reg-names = "adc5-sw-calib-pbs-base", "adc5-sw-calib-cmn-base";
+		interrupts = <0x4 0x36 0x0 IRQ_TYPE_EDGE_RISING>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#io-channel-cells = <1>;
+		io-channel-ranges;
+
+		/* Channel node */
+		pmr735a_die_temp {
+			reg = <ADC7_DIE_TEMP>;
+			label = "pmr735a_die_temp";
+			qcom,pre-scaling = <1 1>;
+		};
+	};
+
+	/* IIO client node */
+	pmr735a_tz {
+		io-channels = <&pmr735a_vadc ADC7_DIE_TEMP>;
+		io-channel-names = "thermal";
 	};
