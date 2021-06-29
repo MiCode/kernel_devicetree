@@ -28,10 +28,17 @@ properties:
           - qcom,spmi-adc5-lite
           - qcom,spmi-adc-rev2
           - qcom,spmi-adc7
+          - qcom,spmi-adc7-sw-calib
 
   reg:
-    description: VADC base address in the SPMI PMIC register map
-    maxItems: 1
+    minItems: 1
+    maxItems: 2
+    description: |
+      - For compatible property "qcom,spmi-vadc", "qcom,spmi-adc5", "qcom,spmi-adc-rev2",
+        "qcom,spmi-adc7", "qcom,spmi-adc5-lite", reg is the VADC base address.
+      - For compatible property "qcom,spmi-adc7-sw-calib", two registers are required.
+        First register is the VADC peripheral base address and the second is the
+        ADC common peripheral base addess.
 
   '#address-cells':
     const: 1
@@ -60,11 +67,15 @@ patternProperties:
     additionalProperties: false
     description: |
       Represents the external channels which are connected to the ADC.
-      For compatible property "qcom,spmi-vadc" following channels, also known as
-      reference point channels, are used for result calibration and their channel
-      configuration nodes should be defined:
-      VADC_REF_625MV and/or VADC_SPARE1(based on PMIC version) VADC_REF_1250MV,
-      VADC_GND_REF and VADC_VDD_VADC.
+      - For compatible property "qcom,spmi-vadc" following channels, also known as
+        reference point channels, are used for result calibration and their channel
+        configuration nodes should be defined:
+        VADC_REF_625MV and/or VADC_SPARE1(based on PMIC version) VADC_REF_1250MV,
+        VADC_GND_REF and VADC_VDD_VADC.
+      - For compatible property "qcom,spmi-adc7-sw-calib" following channels, also known as
+        reference point channels, are used for result calibration and their channel
+        configuration nodes should be defined:
+        ADC7_REF_GND, ADC7_1P25VREF and ADC7_VREF_VADC.
 
     properties:
       reg:
@@ -127,6 +138,17 @@ patternProperties:
               reference channels, also known as absolute calibration.
         type: boolean
 
+      qcom,no-cal:
+        description: |
+            - For compatible property "qcom,spmi-adc7-sw-calib", if this property
+              is specified for a channel, VADC will not use any reference channels
+              for that channel's calibration. It is needed for the three calibration
+              channels alone, mutually exclusive with ratiometric calibration and
+              not meant for any other compatible property. If this property is not
+              found, then the channel will be calibrated with 0.625V and 1.25V
+              reference channels, also known as absolute calibration.
+        type: boolean
+
       qcom,hw-settle-time:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
@@ -161,6 +183,9 @@ allOf:
             const: qcom,spmi-vadc
 
     then:
+      properties:
+        reg:
+          maxItems: 1
       patternProperties:
         "^channel@[0-9a-f]+$":
           properties:
@@ -177,6 +202,8 @@ allOf:
               enum: [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512 ]
               default: 1
 
+            qcom,no-cal: false
+
   - if:
       properties:
         compatible:
@@ -184,6 +211,9 @@ allOf:
             const: qcom,spmi-adc-rev2
 
     then:
+      properties:
+        reg:
+          maxItems: 1
       patternProperties:
         "^channel@[0-9a-f]+$":
           properties:
@@ -200,6 +230,8 @@ allOf:
               enum: [ 1, 2, 4, 8, 16 ]
               default: 1
 
+            qcom,no-cal: false
+
   - if:
       properties:
         compatible:
@@ -207,6 +239,9 @@ allOf:
             const: qcom,spmi-adc5
 
     then:
+      properties:
+        reg:
+          maxItems: 1
       patternProperties:
         "^channel@[0-9a-f]+$":
           properties:
@@ -223,6 +258,8 @@ allOf:
               enum: [ 1, 2, 4, 8, 16 ]
               default: 1
 
+            qcom,no-cal: false
+
   - if:
       properties:
         compatible:
@@ -230,6 +267,9 @@ allOf:
             const: qcom,spmi-adc5-lite
 
     then:
+      properties:
+        reg:
+          maxItems: 1
       patternProperties:
         "^channel@[0-9a-f]+$":
           properties:
@@ -246,6 +286,8 @@ allOf:
               enum: [ 1, 2, 4, 8, 16 ]
               default: 1
 
+            qcom,no-cal: false
+
   - if:
       properties:
         compatible:
@@ -253,6 +295,9 @@ allOf:
             const: qcom,spmi-adc7
 
     then:
+      properties:
+        reg:
+          maxItems: 1
       patternProperties:
         "^channel@[0-9a-f]+$":
           properties:
@@ -268,6 +313,39 @@ allOf:
             qcom,avg-samples:
               enum: [ 1, 2, 4, 8, 16 ]
               default: 1
+
+            qcom,no-cal: false
+
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: qcom,spmi-adc7-sw-calib
+
+    then:
+      properties:
+        reg:
+          minItems: 2
+      patternProperties:
+        "^channel@[0-9a-f]+$":
+          properties:
+            qcom,decimation:
+              enum: [ 85, 340, 1360 ]
+              default: 1360
+
+            qcom,hw-settle-time:
+              enum: [ 15, 100, 200, 300, 400, 500, 600, 700, 1000, 2000, 4000,
+                      8000, 16000, 32000, 64000, 128000 ]
+              default: 15
+
+            qcom,avg-samples:
+              enum: [ 1, 2, 4, 8, 16 ]
+              default: 1
+
+          not:
+            required:
+              - qcom,no-cal
+              - qcom,ratiometric
 
 additionalProperties: false
 
