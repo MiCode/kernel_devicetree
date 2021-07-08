@@ -649,9 +649,79 @@
 		#reset-cells = <1>;
 	};
 
+	pcie_0_pipe_clk: pcie_0_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_0_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_1_phy_aux_clk: pcie_1_phy_aux_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_1_phy_aux_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_1_pipe_clk: pcie_1_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_1_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	ufs_phy_rx_symbol_0_clk: ufs_phy_rx_symbol_0_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "ufs_phy_rx_symbol_0_clk";
+		#clock-cells = <0>;
+	};
+
+	ufs_phy_rx_symbol_1_clk: ufs_phy_rx_symbol_1_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "ufs_phy_rx_symbol_1_clk";
+		#clock-cells = <0>;
+	};
+
+	ufs_phy_tx_symbol_0_clk: ufs_phy_tx_symbol_0_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "ufs_phy_tx_symbol_0_clk";
+		#clock-cells = <0>;
+	};
+
+	usb3_phy_wrapper_gcc_usb30_pipe_clk: usb3_phy_wrapper_gcc_usb30_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+		#clock-cells = <0>;
+	};
+
 	gcc: clock-controller@100000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,kalama-gcc", "syscon";
+		reg = <0x100000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mxa-supply = <&VDD_MXA_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&pcie_0_pipe_clk>,
+			 <&pcie_1_phy_aux_clk>,
+			 <&pcie_1_pipe_clk>,
+			 <&sleep_clk>,
+			 <&ufs_phy_rx_symbol_0_clk>,
+			 <&ufs_phy_rx_symbol_1_clk>,
+			 <&ufs_phy_tx_symbol_0_clk>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+		clock-names = "bi_tcxo",
+			      "pcie_0_pipe_clk",
+			      "pcie_1_phy_aux_clk",
+			      "pcie_1_pipe_clk",
+			      "sleep_clk",
+			      "ufs_phy_rx_symbol_0_clk",
+			      "ufs_phy_rx_symbol_1_clk",
+			      "ufs_phy_tx_symbol_0_clk",
+			      "usb3_phy_wrapper_gcc_usb30_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -727,45 +797,101 @@
 		regulator-name = "disp_cc_mdss_core_int2_gdsc";
 	};
 
+	gcc_apcs_gdsc_vote_ctrl: syscon@152020{
+		compatible = "syscon";
+		reg = <0x152020 0x4>;
+	};
+
 	/* GCC GDSCs */
-	gcc_pcie_0_gdsc: qcom,gdsc@16b004 {
-		compatible = "qcom,stub-regulator";
+	gcc_pcie_0_gdsc: qcom,gdsc@17b004 {
+		compatible = "qcom,gdsc";
+		reg = <0x17B004 0x4>;
 		regulator-name = "gcc_pcie_0_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
+		qcom,no-status-check-on-disable;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 0>;
 	};
 
-	gcc_pcie_0_phy_gdsc: qcom,gdsc@16c000 {
-		compatible = "qcom,stub-regulator";
+	gcc_pcie_0_phy_gdsc: qcom,gdsc@17c000 {
+		compatible = "qcom,gdsc";
+		reg = <0x17C000 0x4>;
 		regulator-name = "gcc_pcie_0_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
+		qcom,no-status-check-on-disable;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 3>;
 	};
 
-	gcc_pcie_1_gdsc: qcom,gdsc@18d004 {
-		compatible = "qcom,stub-regulator";
+	gcc_pcie_1_gdsc: qcom,gdsc@19d004 {
+		compatible = "qcom,gdsc";
+		reg = <0x19d004 0x4>;
 		regulator-name = "gcc_pcie_1_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
+		qcom,no-status-check-on-disable;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 1>;
 	};
 
-	gcc_pcie_1_phy_gdsc: qcom,gdsc@18e000 {
-		compatible = "qcom,stub-regulator";
+	gcc_pcie_1_phy_gdsc: qcom,gdsc@19e000 {
+		compatible = "qcom,gdsc";
+		reg = <0x19e000 0x4>;
 		regulator-name = "gcc_pcie_1_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
+		qcom,no-status-check-on-disable;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 4>;
 	};
 
-	gcc_ufs_mem_phy_gdsc: qcom,gdsc@19e000 {
-		compatible = "qcom,stub-regulator";
+	gcc_ufs_mem_phy_gdsc: qcom,gdsc@1ae000 {
+		compatible = "qcom,gdsc";
+		reg = <0x1ae000 0x4>;
 		regulator-name = "gcc_ufs_mem_phy_gdsc";
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 	};
 
-	gcc_ufs_phy_gdsc: qcom,gdsc@177004 {
-		compatible = "qcom,stub-regulator";
+	gcc_ufs_phy_gdsc: qcom,gdsc@187004 {
+		compatible = "qcom,gdsc";
+		reg = <0x187004  0x4>;
 		regulator-name = "gcc_ufs_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		proxy-supply = <&gcc_ufs_phy_gdsc>;
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		qcom,proxy-consumer-enable;
+		qcom,retain-regs;
 	};
 
-	gcc_usb30_prim_gdsc: qcom,gdsc@139004 {
-		compatible = "qcom,stub-regulator";
+	gcc_usb30_prim_gdsc: qcom,gdsc@149004 {
+		compatible = "qcom,gdsc";
+		reg = <0x149004  0x4>;
 		regulator-name = "gcc_usb30_prim_gdsc";
+		proxy-supply = <&gcc_usb30_prim_gdsc>;
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		qcom,proxy-consumer-enable;
+		qcom,retain-regs;
 	};
 
-	gcc_usb3_phy_gdsc: qcom,gdsc@150018 {
-		compatible = "qcom,stub-regulator";
+	gcc_usb3_phy_gdsc: qcom,gdsc@160018 {
+		compatible = "qcom,gdsc";
+		reg = <0x160018 0x4>;
 		regulator-name = "gcc_usb3_phy_gdsc";
+		clocks = <&gcc 0>;
+		qcom,gds-timeout = <500>;
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 	};
 
 	/* GPU_CC GDSCs */
