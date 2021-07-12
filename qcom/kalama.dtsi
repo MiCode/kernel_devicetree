@@ -637,8 +637,18 @@
 	};
 
 	camcc: clock-controller@ade0000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "camcc_clocks";
+		compatible = "qcom,kalama-camcc", "syscon";
+		reg = <0xade0000 0x20000>;
+		reg-name = "cc_base";
+		vdd_mm-supply = <&VDD_MM_LEVEL>;
+		vdd_mxa-supply = <&VDD_MXA_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>,
+			 <&gcc GCC_CAMERA_AHB_CLK>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -752,48 +762,102 @@
 
 	/* CAM_CC GDSCs */
 	cam_cc_bps_gdsc: qcom,gdsc@adf0004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf0004 0x4>;
 		regulator-name = "cam_cc_bps_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_ife_0_gdsc: qcom,gdsc@adf1004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf1004 0x4>;
 		regulator-name = "cam_cc_ife_0_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_ife_1_gdsc: qcom,gdsc@adf2004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf2004 0x4>;
 		regulator-name = "cam_cc_ife_1_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_ife_2_gdsc: qcom,gdsc@adf2294 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf2294 0x4>;
 		regulator-name = "cam_cc_ife_2_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_ipe_0_gdsc: qcom,gdsc@adf03b8 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf03b8 0x4>;
 		regulator-name = "cam_cc_ipe_0_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_sbi_gdsc: qcom,gdsc@adf052c {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf052c 0x4>;
 		regulator-name = "cam_cc_sbi_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_sfe_0_gdsc: qcom,gdsc@adf3280 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf3280 0x4>;
 		regulator-name = "cam_cc_sfe_0_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_sfe_1_gdsc: qcom,gdsc@adf33e0 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf33e0 0x4>;
 		regulator-name = "cam_cc_sfe_1_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	cam_cc_titan_top_gdsc: qcom,gdsc@adf4058 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xadf4058 0x4>;
 		regulator-name = "cam_cc_titan_top_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	/* DISP_CC GDSCs */
