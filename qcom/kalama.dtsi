@@ -1158,6 +1158,24 @@
 		status = "disabled";
 	};
 
+	tcsr_mutex_block: syscon@1f40000 {
+		compatible = "syscon";
+		reg = <0x1f40000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+
+	smem: qcom,smem {
+		compatible = "qcom,smem";
+		memory-region = <&smem_mem>;
+		depends-on-supply = <&tcsr_mutex>;
+		hwlocks = <&tcsr_mutex 3>;
+	};
+
 	tcsr: syscon@1fc0000 {
 	      compatible = "syscon";
 	      reg = <0x1fc0000 0x30000>;
