@@ -734,8 +734,17 @@
 	};
 
 	videocc: clock-controller@abf0000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "videocc_clocks";
+		compatible = "qcom,kalama-videocc", "syscon";
+		reg = <0xabf0000 0x10000>;
+		reg-name = "cc_base";
+		vdd_mm-supply = <&VDD_MM_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>,
+			 <&gcc GCC_VIDEO_AHB_CLK>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -907,23 +916,48 @@
 
 	/* VIDEO_CC GDSCs */
 	video_cc_mvs0_gdsc: qcom,gdsc@abf80a4 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xabf80a4 0x4>;
 		regulator-name = "video_cc_mvs0_gdsc";
+		parent-supply = <&video_cc_mvs0c_gdsc>;
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+		qcom,gds-timeout = <500>;
+		qcom,support-hw-trigger;
+		qcom,retain-regs;
 	};
 
 	video_cc_mvs0c_gdsc: qcom,gdsc@abf804c {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xabf804c 0x4>;
 		regulator-name = "video_cc_mvs0c_gdsc";
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	video_cc_mvs1_gdsc: qcom,gdsc@abf80cc {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xabf80cc 0x4>;
 		regulator-name = "video_cc_mvs1_gdsc";
-	};
+		parent-supply = <&video_cc_mvs1c_gdsc>;
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+		qcom,gds-timeout = <500>;
+		qcom,support-hw-trigger;
+		qcom,retain-regs;	};
 
 	video_cc_mvs1c_gdsc: qcom,gdsc@abf8078 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xabf8078 0x4>;
 		regulator-name = "video_cc_mvs1c_gdsc";
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		clock-names = "ahb_clk";
+		clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+		qcom,gds-timeout = <500>;
+		qcom,retain-regs;
 	};
 
 	ufsphy_mem: ufsphy_mem@1d80000 {
