@@ -30,6 +30,8 @@
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
 	};
 
+	firmware: firmware { };
+
 	cpus {
 		#address-cells = <2>;
 		#size-cells = <0>;
@@ -984,6 +986,18 @@
 			<0 0>;
 
 		status = "disabled";
+	};
+
+	tcsr: syscon@1fc0000 {
+	      compatible = "syscon";
+	      reg = <0x1fc0000 0x30000>;
+	};
+};
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
+		qcom,dload-mode = <&tcsr 0x13000>;
 	};
 };
 
