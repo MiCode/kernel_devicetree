@@ -26,12 +26,22 @@
 	#size-cells = <2>;
 
 	chosen: chosen {
-		bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 kernel.panic_on_rcu_stall=1 swiotlb=0 loop.max_part=7 cgroup.memory=nokmem,nosocket pcie_ports=compat service_locator.enable=1 msm_rtb.filter=0x237 allow_mismatched_32bit_el0 cpufreq.default_governor=performance pelt=8 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 reap_mem_when_killed_by=lmkd irqaffinity=0-3";
+		bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 kernel.panic_on_rcu_stall=1 swiotlb=0 loop.max_part=7 cgroup.memory=nokmem,nosocket pcie_ports=compat service_locator.enable=1 msm_rtb.filter=0x237 allow_mismatched_32bit_el0 cpufreq.default_governor=performance pelt=8 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 irqaffinity=0-3 ftrace_dump_on_oops";
 	};
 
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
+	ddr-regions { };
 
 	reserved_memory: reserved-memory { };
+
+	mem-offline {
+		compatible = "qcom,mem-offline";
+		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
+				<0x1 0xc0000000 0x0 0x80000000>,
+				<0x2 0xc0000000 0x1 0x40000000>;
+		granule = <512>;
+		mboxes = <&qmp_aop 0>;
+	};
 
 	aliases: aliases {
 		serial0 = &qupv3_se7_2uart;
@@ -353,12 +363,7 @@
 
 	xbl_ramdump_mem: xbl_ramdump_region@a6b80000 {
 		no-map;
-		reg = <0x0 0xa6b80000 0x0 0x280000>;
-	};
-
-	xbl_sc_mem: xbl_sc_region@a6e00000 {
-		no-map;
-		reg = <0x0 0xa6e00000 0x0 0x40000>;
+		reg = <0x0 0x80640000 0x0 0x1c0000>;
 	};
 
 	aop_image_mem: aop_image_region@80800000 {
@@ -475,6 +480,10 @@
 		no-map;
 		reg = <0x0 0x9f500000 0x0 0x3100000>;
 	};
+	xbl_sc_mem: xbl_sc_region@a6e00000 {
+		no-map;
+		reg = <0x0 0xa6e00000 0x0 0x40000>;
+    };
 
 	global_sync_mem: global_sync_region@a6f00000 {
 		no-map;
@@ -488,11 +497,6 @@
 	oem_vm_mem: oem_vm_region@bb000000 {
 		no-map;
 		//reg = <0x0 0xbb000000 0x0 0x5000000>;
-	};
-
-	mte_mem: mte_region@c0000000 {
-		no-map;
-		reg = <0x0 0xc0000000 0x0 0x20000000>;
 	};
 
 	qheebsp_reserved_mem: qheebsp_reserved_region@e0000000 {
@@ -557,20 +561,17 @@
 		reg = <0x0 0xed900000 0x0 0x3b00000>;
 	};
 
-	/*
-	 * Statically determine address to ensure that this CMA area's
-	 * allocation is not impacted by fragmentation from smaller regions
-	 * being allocated first.
-	 */
 	non_secure_display_memory: non_secure_display_region {
 		compatible = "shared-dma-pool";
 		reusable;
-		reg = <0x0 0xf2800000 0x0 0xd800000>;
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		size = <0x0 0xa400000>;
+		alignment = <0x0 0x400000>;
 	};
 
 	va_md_mem: va_md_mem_region {
 		compatible = "shared-dma-pool";
-		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		alloc-ranges = <0x1 0x00000000 0xfffffffe 0xffffffff>;
 		reusable;
 		size = <0 0x1000000>;
 	};
@@ -623,7 +624,7 @@
 		size = <0x0 0x1C00000>;
 	};
 
-	cdsp_eva_mem: cdsp_region {
+	cdsp_eva_mem: cdsp_eva_region {
 		compatible = "shared-dma-pool";
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
@@ -1048,7 +1049,8 @@
 			qcom,pmic_glink_log_rpmsg {
 				qcom,glink-channels = "PMIC_LOGS_ADSP_APPS";
 				qcom,intents = <0x800 5
-						0xc00 3>;
+						0xc00 3
+						0x2000 1>;
 			};
 
 		};
@@ -1220,6 +1222,12 @@
 		qcom,vmid = <50>;
 		qcom,firmware-name = "cpusys_vm";
 		memory-region = <&cpusys_vm_mem>;
+	};
+
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		qcom,master;
+		tlmm-vm-gpio-list = <365 366 367 368 301 305 387 388>;
 	};
 
 	ssc_sensors: qcom,msm-ssc-sensors {
@@ -1409,6 +1417,10 @@
 
 		qcom,battery_debug {
 			compatible = "qcom,battery-debug";
+		};
+
+		qcom,charger_ulog_glink {
+			compatible = "qcom,charger-ulog-glink";
 		};
 
 		qcom,spmi_glink_debug {
@@ -2047,6 +2059,12 @@
 		clock-names = "xo", "alternate";
 		qcom,lut-row-size = <4>;
 		qcom,skip-enable-check;
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int",
+				  "dcvsh1_int",
+				  "dcvsh2_int";
 		#freq-domain-cells = <2>;
 	};
 
@@ -2206,6 +2224,7 @@
 		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
 		iommus = <&apps_smmu 0x0584 0x0011>;
 		qcom,iommu-dma = "atomic";
+		dma-coherent;
 
 		qcom_cedev_ns_cb {
 			compatible = "qcom,qcedev,context-bank";
@@ -2214,6 +2233,7 @@
 				<&apps_smmu 0x59A 0x0>,
 				<&apps_smmu 0x59F 0x0>,
 				<&apps_smmu 0x598 0x5>;
+			dma-coherent;
 		};
 
 		qcom_cedev_s_cb {
@@ -2387,6 +2407,7 @@
 		qos0 {
 			mask = <0xf0>;
 			vote = <44>;
+			perf;
 		};
 
 		qos1 {
@@ -2984,6 +3005,7 @@
 		qcom,pmu-events-tbl =
 			< 0x0008 0xFF 0x02 0xFF >,
 			< 0x0011 0xFF 0x01 0xFF >,
+			< 0x0023 0xFF 0xFF 0xFF >,
 			< 0x0017 0xFF 0xFF 0xFF >,
 			< 0x002A 0xFF 0xFF 0xFF >,
 			< 0x1000 0xFF 0xFF 0xFF >;
@@ -3097,6 +3119,7 @@
 
 	qcom_memlat: qcom,memlat {
 		compatible = "qcom,memlat";
+		qcom,stall-ev = <0x23>;
 
 		ddr {
 			compatible = "qcom,memlat-grp";
@@ -3533,6 +3556,13 @@
 			qcom,iommu-group = <>;
 		};
 	};
+
+	mhi_qrtr_cnss {
+		compatible = "qcom,qrtr-mhi";
+		qcom,dev-id = <0x1103>;
+		qcom,net-id = <0>;
+		qcom,low-latency;
+	};
 };
 
 #include "ipcc-test.dtsi"
@@ -3598,36 +3628,5 @@
 	fsa4480: fsa4480@42 {
 		compatible = "qcom,fsa4480-i2c";
 		reg = <0x42>;
-	};
-};
-
-&pcie1_rp {
-	#address-cells = <5>;
-	#size-cells = <0>;
-
-	mhi0: qcom,mhi@0 {
-		reg = <0 0 0 0 0 >;
-
-		interconnects = <&pcie_noc MASTER_PCIE_1 &mc_virt SLAVE_EBI1>;
-		interconnect-names = "pcie_to_ddr";
-
-		qcom,mhi-bus-bw-cfg =
-		<0 0>, /* no vote */
-		<250000 0>, /* avg bw / AB: 2 GBps, peak bw / IB: no vote */
-		<500000 0>, /* avg bw / AB: 4 GBps, peak bw / IB: no vote */
-		<1000000 0>, /* avg bw / AB: 8 GBps, peak bw / IB: no vote */
-		<2000000 0>; /* avg bw / AB: 16 GBps, peak bw / IB: no vote */
-
-		qcom,iommu-group = <&mhi0_iommu_group>;
-
-		#address-cells = <1>;
-		#size-cells = <1>;
-
-		mhi0_iommu_group: mhi0_iommu_group {
-			qcom,iommu-msi-size = <0x1000>;
-			qcom,iommu-dma-addr-pool = <0x20000000 0x0fffffff>;
-			qcom,iommu-dma = "fastmap";
-			qcom,iommu-pagetable = "coherent";
-		};
 	};
 };
