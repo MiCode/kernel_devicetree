@@ -248,6 +248,19 @@
 		status = "ok";
 		touch,name = "xiaomi-touch";
 	};
+
+    gamekey: gamekey {
+        compatible = "xm,gamekey";
+        status = "ok";
+        key_left = <&tlmm 171 0x00>;
+        hall_left = <&tlmm 71 0x00>;
+        key_right = <&tlmm 172 0x00>;
+        hall_right = <&tlmm 62 0x00>;
+        debounce_time = <5>;        /*unit in ms*/
+        pinctrl-names = "gamekey_active", "gamekey_suspend";
+        pinctrl-0 = <&gk_hall_act_left &gk_hall_act_right &gk_key_act_left &gk_key_act_right>;
+        pinctrl-1 = <&gk_hall_sup &gk_key_sup_left &gk_key_sup_right>;
+    };
 };
 &tlmm {
 	mi_ts_active: mi_ts_active {
@@ -302,6 +315,78 @@
 			drive-strength = <2>;
 			bias-pull-up;
 			input-enable;
+		};
+	};
+    /* gamekey */
+    gk_hall_act_left: gk_hall_act_left {
+		mux {
+			pins = "gpio71";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio71";
+			input-enable;
+			bias-disable;
+		};
+	};
+	gk_hall_act_right: gk_hall_act_right {
+		mux {
+			pins = "gpio62";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio62";
+			input-enable;
+			bias-disable;
+		};
+	};
+
+	gk_hall_sup: gk_hall_sup {
+	};
+
+	gk_key_act_left: gk_key_act_left {
+		mux {
+			pins = "gpio171";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio171";
+			drive-strength = <2>;
+			bias-pull-up;
+			input-enable;
+		};
+	};
+	gk_key_act_right: gk_key_act_right {
+		mux {
+			pins = "gpio172";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio172";
+			drive-strength = <2>;
+			bias-pull-up;
+			input-enable;
+		};
+	};
+
+	gk_key_sup_left: gk_key_sup_left {
+		mux {
+			pins = "gpio171";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio171";
+			bias-disable;
+		};
+	};
+	gk_key_sup_right: gk_key_sup_right {
+		mux {
+			pins = "gpio172";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio172";
+			bias-disable;
 		};
 	};
 };
