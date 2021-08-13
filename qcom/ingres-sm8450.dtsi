@@ -398,3 +398,77 @@
 		};
 	};
 };
+/*fingerprint start*/
+&L7C {
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	qcom,init-voltage = <3300000>;
+};
+&soc {
+	fingerprint_goodix {
+		compatible = "goodix,fingerprint";
+		fp_vdd_vreg-supply = <&L7C>;
+		goodix,gpio-reset = <&tlmm 41 0x0>;
+		goodix,gpio-irq = <&tlmm 40 0x0>;
+		status = "ok";
+        };
+	fingerprint_fpc {
+		status = "ok";
+		compatible = "fpc,fpc1020";
+		interrupt-parent = <&tlmm>;
+		interrupts = <40 0x0>;
+		fpc,gpio_rst    = <&tlmm 41 0x0>;
+		fpc,gpio_irq    = <&tlmm 40 0x0>;
+		fp_vdd_vreg-supply = <&L7C>;
+		pinctrl-names = "fpc1020_reset_reset",
+                                "fpc1020_reset_active",
+                                "fpc1020_irq_active";
+
+		pinctrl-0 = <&msm_gpio_reset>;
+		pinctrl-1 = <&msm_gpio_reset_output_high>;
+		pinctrl-2 = <&msm_gpio_irq>;
+	};
+};
+
+&tlmm {
+        /* FP_RESET_N */
+	msm_gpio_reset: msm_gpio_reset {
+		mux {
+			pins = "gpio41";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio41";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+        /* FP_RESET_N, state device active*/
+	msm_gpio_reset_output_high: msm_gpio_reset_output_high {
+		mux {
+			pins = "gpio41";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio41";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+        /* FP_INT_N */
+	msm_gpio_irq: msm_gpio_irq {
+		mux {
+			pins = "gpio40";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio40";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};
+/*fingerprint end*/
+
