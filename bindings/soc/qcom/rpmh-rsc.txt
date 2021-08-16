@@ -30,7 +30,12 @@ will be an aggregate of the sleep votes from each of those subsystems. Clients
 may request a sleep value for their shared resources in addition to the active
 mode requests.
 
+[Top Level Node]
 Properties:
+- label:
+	Usage: optional
+	Value type: <string>
+	Definition: Name for the RSC. The name would be used in trace logs.
 
 - compatible:
 	Usage: required
@@ -57,11 +62,37 @@ Properties:
 	Definition: The interrupt that trips when a message complete/response
 	           is received for this DRV from the accelerators.
 
+- qcom,drv-count:
+	Usage: required
+	Value type: <u32>
+	Definition: Number of the DRVs in the RSC block.
+
+- qcom,hw-channel:
+	Usage: optional
+	Value type: bool
+	Definition: Specifies if the channel is in HW, defaults to SW channel if not present.
+
+Each RSC can have multiple DRV child node for DRV specific configuration
+[Node bindings for drv@id]
+
 - qcom,drv-id:
 	Usage: required
 	Value type: <u32>
 	Definition: The id of the DRV in the RSC block that will be used by
 		    this controller.
+
+- qcom,tcs-offset:
+	Usage: required
+	Value type: <u32>
+	Definition: Specifies the start address of TCSes in this DRV.
+
+- clocks:
+	Usage: optional
+	Value type: phandle + clock reference to the AHB clock
+	Definition: AHB clock for the RSC.
+
+Each DRV can have multiple channel child node for channel specific configuration
+[Node bindings for channel@id]
 
 - qcom,tcs-config:
 	Usage: required
@@ -78,11 +109,6 @@ Properties:
 	            CONTROL_TCS
 	- Cell #2 (Number of TCS): <u32>
 
-- label:
-	Usage: optional
-	Value type: <string>
-	Definition: Name for the RSC. The name would be used in trace logs.
-
 Drivers that want to use the RSC to communicate with RPMH must specify their
 bindings as child nodes of the RSC controllers they wish to communicate with.
 
@@ -96,22 +122,29 @@ DRV2: 0x179C0000 + 0x10000 = 0x179D0000
 DRV2: 0x179C0000 + 0x10000 * 2 = 0x179E0000
 TCS-OFFSET: 0xD00
 
-	apps_rsc: rsc@179c0000 {
+	apps_rsc: rsc@17a00000 {
 		label = "apps_rsc";
 		compatible = "qcom,rpmh-rsc";
-		reg = <0x179c0000 0x10000>,
-		      <0x179d0000 0x10000>,
-		      <0x179e0000 0x10000>;
+		reg = <0x17a00000 0x10000>,
+		      <0x17a10000 0x10000>,
+		      <0x17a20000 0x10000>;
 		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
 		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,tcs-offset = <0xd00>;
-		qcom,drv-id = <2>;
-		qcom,tcs-config = <ACTIVE_TCS  2>,
-				  <SLEEP_TCS   3>,
-				  <WAKE_TCS    3>,
-				  <CONTROL_TCS 1>;
+
+		apps_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0xd00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    2>,
+						  <SLEEP_TCS     3>,
+						  <WAKE_TCS      3>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
 	};
 
 Example 2:
@@ -127,11 +160,103 @@ TCS-OFFSET: 0x1C00
 		compatible = "qcom,rpmh-rsc";
 		reg = <0xaf20000 0x10000>;
 		reg-names = "drv-0";
+		qcom,drv-count = <1>;
 		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,tcs-offset = <0x1c00>;
-		qcom,drv-id = <0>;
-		qcom,tcs-config = <ACTIVE_TCS  0>,
-				  <SLEEP_TCS   1>,
-				  <WAKE_TCS    1>,
-				  <CONTROL_TCS 0>;
+		disp_rsc_drv0: drv@0 {
+			qcom,drv-id = <0>;
+			qcom,tcs-offset = <0x1c00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <SLEEP_TCS     1>,
+						  <WAKE_TCS      1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+	};
+
+Example 3:
+
+For a TCS whose RSC base address is 0xadd9000 and is at DRV id of 0,1,2, the
+register offsets for DRVs start at 0x520, the register calculations are like
+this -
+DRV0: 0xadd9000
+TCS-OFFSET: 0x520
+DRV1: 0xada9000
+TCS-OFFSET: 0x520
+DRV2: 0xadb9000
+TCS-OFFSET: 0x520
+
+	cam_rsc: rsc@add9000 {
+		label = "cam_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0xadd9000 0x1000>,
+		      <0xadda000 0x1000>,
+		      <0xaddb000 0x1000>;
+		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
+		qcom,hw-channel;
+		interrupts = <GIC_SPI 368 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 369 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 370 IRQ_TYPE_LEVEL_HIGH>;
+
+		cam_rsc_drv0: drv@0 {
+			qcom,drv-id = <0>;
+			qcom,tcs-offset = <0x520>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			channel@1 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+
+		cam_rsc_drv1: drv@1 {
+			qcom,drv-id = <1>;
+			qcom,tcs-offset = <0x520>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			channel@1 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+
+		cam_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0x520>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			channel@1 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
 	};
