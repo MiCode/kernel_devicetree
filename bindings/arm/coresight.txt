@@ -105,11 +105,48 @@ its hardware characteristcs.
 	  coresight component and CPU in the same power domain. When the CPU
 	  powers down the coresight component also powers down and loses its
 	  context. This property is currently only used for the ETM 4.x driver.
+		- Coresight Trace, Profiling & Diagnostic module:
+			"qcom,coresight-tpda"
+			"qcom,coresight-tpdm"
+
+		- Coresight control register:
+			"qcom,coresight-csr"
+
+		- Coresight Hardware Event
+			"qcom,coresight-hwevent"
+
+		- Coresight dummy device:
+			"qcom,coresight-dummy"
+
+		- Coresight remote ETM:
+			"qcom,coresight-remote-etm"
+
+	* port or ports: see "Graph bindings for Coresight" below.
+
+* Additional required property for coresight-tgu devices:
+	* tgu-steps: must be present. Indicates number of steps supported
+	  by the TGU.
+	* tgu-conditions: must be present. Indicates the number of conditions
+	  supported by the TGU.
+	* tgu-regs: must be present. Indicates the number of regs supported
+	  by the TGU.
+	* tgu-timer-counters: must be present. Indicates the number of timers and
+	  counters available in the TGU to do a comparision.
+
+* Optional properties for all components:
+	* reg-names: names corresponding to each reg property value.
+
+	* qcom,proxy-regs: List of regulators required.
+
+	* qcom,proxy-clks: List of additional clocks required.
 
 * Optional properties for ETM/PTMs:
 
 	* arm,cp14: must be present if the system accesses ETM/PTM management
 	  registers via co-processor 14.
+
+	* qcom,tupwr-disable: For ETM, don't keep trace unit powered across
+	  power collapse.
 
 	* qcom,skip-power-up: boolean. Indicates that an implementation can
 	  skip powering up the trace unit. TRCPDCR.PU does not have to be set
@@ -127,15 +164,116 @@ its hardware characteristcs.
 	* arm,scatter-gather: boolean. Indicates that the TMC-ETR can safely
 	  use the SG mode on this system.
 
-* Optional property for CATU :
+	* usb_bam_support: boolean. Indicates that the TMC-ETR supports usb
+	  bam connection.
+
+	* csr-atid-offset: When there are two ETRs, each of the ETR has its own ATID config
+	  csr registers. It is the ETR_ATID0 register offset to the CSR base address.
+
+	* csr-irqctrl-offset: When there are two ETRs, each of the ETR has its own ETRIRQCTRL
+	  register. It is the IRQCTRL register offset to the CSR base address.
+
+	* byte-cntr-name: The name of the byte-cntr
+
+	* byte-cntr-class-name: The name for class_create in byte-cntr driver.
+
+* Optional property for CATU and APSS :
 	* interrupts : Exactly one SPI may be listed for reporting the address
-	  error
+	  error for CATU and four interrupts for TGU to get trigger from four
+	  type of events.
+
+* Required property for TPDAs:
+
+	* qcom,tpda-atid: must be present. Specifies the ATID for TPDA.
+
+* Optional properties for TPDAs:
+
+	* qcom,bc-elem-size: specifies the BC element size supported by each
+	  monitor connected to the aggregator on each port. Should be specified
+	  in pairs (port, bc element size).
+
+	* qcom,tc-elem-size: specifies the TC element size supported by each
+	  monitor connected to the aggregator on each port. Should be specified
+	  in pairs (port, tc element size).
+
+	* qcom,dsb-elem-size: specifies the DSB element size supported by each
+	  monitor connected to the aggregator on each port. Should be specified
+	  in pairs (port, dsb element size).
+
+	* qcom,cmb-elem-size: specifies the CMB element size supported by each
+	  monitor connected to the aggregator on each port. Should be specified
+	  in pairs (port, cmb element size).
+
+* Optional properties for TPDM:
+
+	* qcom,clk-enable: specifies whether additional clock bit needs to be
+	  set for M4M TPDM.
+
+	* qcom,msr-fix-req: boolean, indicating if MSRs need to be programmed
+	  after enabling the subunit.
+
+	* qcom,cmb-msr-skip: boolean, indicating cmb MSR don't need to be programmed.
+
+	* qcom,hw-enable-check: Check if the tpdm need to be probed as some tpdms
+	  are not enabled in secure device.
+
+* Optional properties for CSRs:
+
+	* qcom,usb-bam-support: boolean, indicates CSR has the ability to operate on
+	  usb bam, include enable,disable and flush.
+
+	* qcom,hwctrl-set-support: boolean, indicates CSR has the ability to operate on
+	  to "HWCTRL" register.
+
+	* qcom,set-byte-cntr-support:boolean, indicates CSR has the ability to operate on
+	  to "BYTECNT" register.
+
+	* qcom,timestamp-support:boolean, indicates CSR support sys interface to read
+	  timestamp value.
+
+	* qcom,perflsheot-set-support: boolean, indicates PERFLSHEOT bit of USBFLSHCTRL
+	  register will be set to 1 when usb sink is enabled.
+
+	* qcom,msr-support: boolean, indicates that CSR supports configure msr config for
+	  tpdm.
+
+* Required property for Remote ETMs:
+
+	* qcom,inst-id: must be present. QMI instance id for remote ETMs.
+
+* Optional properties for funnels:
+
+	* source: specifies the source that binds to this output port. Only
+	  trace from that source routes to this output port.
+
+	* qcom,duplicate-funnel: boolean, indicates its a duplicate of an
+	  existing funnel. Funnel devices are now capable of supporting
+	  multiple-input and multiple-output configuration with in built
+	  hardware filtering for TPDM devices. Each set of input-output
+	  combination is treated as independent funnel device.
+	  funnel-base-dummy and funnel-base-real reg-names must be specified
+	  when this property is enabled.
+
+	* reg-names: funnel-base-dummy: dummy register space used by a
+	  duplicate funnel. Should be a valid register address space that
+	  no other device is using.
+
+	* reg-names: funnel-base-real: actual register space for the
+	  duplicate funnel.
 
 * Optional property for configurable replicators:
 
 	* qcom,replicator-loses-context: boolean. Indicates that the replicator
 	  will lose register context when AMBA clock is removed which is observed
 	  in some replicator designs.
+
+* Optional property for CTIs:
+
+	* qcom,extended_cti: boolean. Indicates that cti is an extended cti.
+
+* Optional property for all source components:
+	* atid: atid for the trace data of the source. If the data has two atids, configure
+	  two ids for the source. This is for multi ETR sink.
 
 Graph bindings for Coresight
 -------------------------------
@@ -393,5 +531,25 @@ Example:
 		};
 	};
 
+6. TGUs
+	ipcb_tgu: tgu@6b0c000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x0003b999>;
+		reg = <0x06B0C000 0x1000>;
+		reg-names = "tgu-base";
+		tgu-steps = <3>;
+		tgu-conditions = <4>;
+		tgu-regs = <4>;
+		tgu-timer-counters = <8>;
+		interrupts = <GIC_SPI 23 IRQ_TYPE_TRIGGER_HIGH>,
+			     <GIC_SPI 24 IRQ_TYPE_TRIGGER_HIGH>,
+			     <GIC_SPI 25 IRQ_TYPE_TRIGGER_HIGH>,
+			     <GIC_SPI 26 IRQ_TYPE_TRIGGER_HIGH>;
+
+		coresight-name = "coresight-tgu-ipcb";
+
+		clocks = <&clock_aop QDSS_CLK>;
+		clock-names = "apb_pclk";
+	};
 [1]. There is currently two version of STM: STM32 and STM500.  Both
 have the same HW interface and as such don't need an explicit binding name.
