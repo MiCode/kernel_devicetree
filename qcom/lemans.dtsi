@@ -4,6 +4,7 @@
 #include <dt-bindings/clock/qcom,gcc-lemans.h>
 #include <dt-bindings/clock/qcom,gpucc-lemans.h>
 #include <dt-bindings/clock/qcom,videocc-lemans.h>
+#include <dt-bindings/interconnect/qcom,lemans.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
@@ -455,6 +456,10 @@
 				clocks = <&xo_board>;
 				status = "okay";
 			};
+
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+			};
 		};
 	};
 
@@ -810,6 +815,124 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo_clk_src";
 		#clock-cells = <1>;
+	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,lemans-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,lemans-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	config_noc: interconnect@014C0000 {
+		compatible = "qcom,lemans-config_noc";
+		reg = <0x014C0000 0x13080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@01680000 {
+		compatible = "qcom,lemans-system_noc";
+		reg = <0x01680000 0x15080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	aggre1_noc:interconnect@016C0000 {
+		compatible = "qcom,lemans-aggre1_noc";
+		reg = <0x016C0000 0x18080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
+			<&gcc GCC_AGGRE_NOC_QUPV3_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB2_PRIM_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_SEC_AXI_CLK>;
+	};
+
+	aggre2_noc: interconnect@01700000 {
+		compatible = "qcom,lemans-aggre2_noc";
+		reg = <0x01700000 0x1B080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&gcc GCC_AGGRE_UFS_CARD_AXI_CLK>,
+			<&rpmhcc RPMH_IPA_CLK>;
+	};
+
+	pcie_anoc: interconnect@01760000 {
+		compatible = "qcom,lemans-pcie_anoc";
+		reg = <0x01760000 0xC080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gpdsp_anoc: interconnect@01780000 {
+		compatible = "qcom,lemans-gpdsp_anoc";
+		reg = <0x01780000 0xE080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mmss_noc: interconnect@017A0000 {
+		compatible = "qcom,lemans-mmss_noc";
+		reg = <0x017A0000 0x40000>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	lpass_ag_noc: interconnect@03C40000 {
+		compatible = "qcom,lemans-lpass_ag_noc";
+		reg = <0x3C40000 0x17200>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	dc_noc: interconnect@090E0000 {
+		compatible = "qcom,lemans-dc_noc";
+		reg = <0x090E0000 0x5080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gem_noc: interconnect@09100000 {
+		compatible = "qcom,lemans-gem_noc";
+		reg = <0x09100000 0xF6080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&gcc GCC_DDRSS_GPU_AXI_CLK>;
+	};
+
+	nspa_noc: interconnect@260C0000 {
+		compatible = "qcom,lemans-nspa_noc";
+		reg = <0x260C0000 0x16080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	nspb_noc: interconnect@2A0C0000 {
+		compatible = "qcom,lemans-nspb_noc";
+		reg = <0x2A0C0000 0x16080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 };
 
