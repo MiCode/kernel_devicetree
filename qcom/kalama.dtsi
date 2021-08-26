@@ -764,6 +764,20 @@
 		#reset-cells = <1>;
 	};
 
+	cpuss-sleep-stats@17800054 {
+	      compatible = "qcom,cpuss-sleep-stats";
+	      reg = <0x17800054 0x4>, <0x17810054 0x4>, <0x17820054 0x4>,
+		    <0x17830054 0x4>, <0x17840054 0x4>, <0x17850054 0x4>,
+		    <0x17860054 0x4>, <0x17870054 0x4>, <0x178a0098 0x4>,
+		    <0x178c0000 0x10000>;
+	      reg-names = "seq_lpm_cntr_cfg_cpu0", "seq_lpm_cntr_cfg_cpu1",
+			  "seq_lpm_cntr_cfg_cpu2", "seq_lpm_cntr_cfg_cpu3",
+			  "seq_lpm_cntr_cfg_cpu4", "seq_lpm_cntr_cfg_cpu5",
+			  "seq_lpm_cntr_cfg_cpu6", "seq_lpm_cntr_cfg_cpu7",
+			  "l3_seq_lpm_cntr_cfg", "apss_seq_mem_base";
+	      num-cpus = <8>;
+	};
+
 	dispcc: clock-controller@af00000 {
 		compatible = "qcom,kalama-dispcc", "syscon";
 		reg = <0xaf00000 0x20000>;
@@ -1285,6 +1299,19 @@
 		memory-region = <&smem_mem>;
 		depends-on-supply = <&tcsr_mutex>;
 		hwlocks = <&tcsr_mutex 3>;
+	};
+
+	soc-sleep-stats@c3f0000 {
+		compatible = "qcom,rpmh-sleep-stats";
+		reg = <0xc3f0000 0x400>;
+		ss-name = "modem", "adsp", "adsp_island",
+			  "cdsp", "slpi", "slpi_island",
+			  "apss";
+	};
+
+	subsystem-sleep-stats@c3f0000 {
+		compatible = "qcom,subsystem-sleep-stats";
+		reg = <0xc3f0000 0x400>;
 	};
 
 	tcsr: syscon@1fc0000 {
