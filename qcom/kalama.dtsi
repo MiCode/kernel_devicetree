@@ -7,6 +7,7 @@
 #include <dt-bindings/clock/qcom,videocc-kalama.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/interconnect/qcom,kalama.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
 / {
@@ -1301,6 +1302,27 @@
 		memory-region = <&smem_mem>;
 		depends-on-supply = <&tcsr_mutex>;
 		hwlocks = <&tcsr_mutex 3>;
+	};
+
+	aoss_qmp: power-controller@c300000 {
+		compatible = "qcom,kalama-aoss-qmp";
+		reg = <0xc300000 0x400>;
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_AOP
+			      IPCC_MPROC_SIGNAL_GLINK_QMP
+			      IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&ipcc_mproc IPCC_CLIENT_AOP
+			  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+
+		#power-domain-cells = <1>;
+		#clock-cells = <0>;
+	};
+
+	qmp_aop: qcom,qmp-aop {
+		compatible = "qcom,qmp-mbox";
+		qcom,qmp = <&aoss_qmp>;
+		label = "aop";
+		#mbox-cells = <1>;
 	};
 
 	soc-sleep-stats@c3f0000 {
