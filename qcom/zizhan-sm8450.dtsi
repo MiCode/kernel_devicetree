@@ -41,6 +41,12 @@
 	regulator-max-microvolt = <3200000>;
 	qcom,init-voltage = <3200000>;
 };
+
+&S1C {
+	regulator-boot-on;
+	regulator-always-on;
+};
+
 &tlmm {
 	mi_ts_active: mi_ts_active {
 		mux {
@@ -138,38 +144,90 @@
 	};
 };
 
-&qupv3_se4_spi {
+&qupv3_se1_i2c {
 	status = "ok";
-	fts@0 {
+	wl2866d_pm:willsemi,ldo@28 {
+		compatible = "willsemi,wl2866d";
+		reg = <0x28>;/*slave address*/
+		index = <0>;
+
+		wl2866d_dvdd1:on,wl2866d@0{
+			offset = /bits/ 16 <0x0000>;
+			regulator-name ="wl2866d-dvdd1";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1800000>;
+			min-dropout-voltage = <80000>;
+			iout_ua = <500000>;
+			init-voltage = <1800000>;
+		};
+
+		wl2866d_dvdd2:on,wl2866d@1{
+			offset = /bits/ 16 <0x0001>;
+			regulator-name ="wl2866d-dvdd2";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1800000>;
+			min-dropout-voltage = <80000>;
+			iout_ua = <500000>;
+			init-voltage = <1800000>;
+		};
+
+		wl2866d_avdd1:on,wl2866d@2{
+			offset = /bits/ 16 <0x0002>;
+			regulator-name ="wl2866d-avdd1";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <4300000>;
+			min-dropout-voltage = <90000>;
+			iout_ua = <300000>;
+			init-voltage = <3000000>;
+		};
+
+		wl2866d_avdd2:on,wl2866d@3{
+			offset = /bits/ 16 <0x0003>;
+			regulator-name ="wl2866d-avdd2";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <4300000>;
+			min-dropout-voltage = <90000>;
+			iout_ua = <300000>;
+			init-voltage = <3300000>;
+		};
+	};
+};
+
+&qupv3_se19_spi {
+	status = "ok";
+	fts-sec@0 {
 		status = "ok";
-		compatible = "st,spi";
+		compatible = "st,spi-sec";
 		reg = <0x0>;
 		interrupt-parent = <&tlmm>;
-		interrupts = <21 0x2008>;
+		interrupts = <119 0x2008>;
 		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
 		pinctrl-0 = <&mi_ts_active>;
 		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		avdd-supply = <&L7C>;
-		vdd-supply = <&L2C>;
+		avdd-supply = <&wl2866d_avdd2>;
+		vdd-supply = <&wl2866d_dvdd2>;
 		/*panel = <&dsi_k8_42_02_0a_dsc_cmd>;*/
 		fts,pwr-reg-name = "avdd";
 		fts,bus-reg-name = "vdd";
 		fts,irq-gpio = <&tlmm 21 0x2008>;
 		fts,irq-gpio-name = "fts_irq";
 		fts,reset-gpio-enable;
-		fts,reset-gpio = <&tlmm 20 0x00>;
+		fts,reset-gpio = <&tlmm 52 0x00>;
 		fts,reset-gpio-name = "fts_rst";
 		fts,irq-flags = <0x2008>;
-		fts,x-max = <1080>;
-		fts,y-max = <2400>;
-		fts,fod-lx = <433>;
-		fts,fod-ly = <2056>;
-		fts,fod-x-size = <214>;
-		fts,fod-y-size = <214>;
+		fts,x-max = <14400>;
+		fts,y-max = <32000>;
+		fts,fod-lx = <5860>;
+		fts,fod-ly = <23460>;
+		fts,fod-x-size = <2680>;
+		fts,fod-y-size = <2660>;
 		fts,support-fod;
+/*		fts,support-thp;*/
+		fts,support-thp-fw;
 		spi-max-frequency = <12000000>;
-		fts,default-fw-name = "st_fts_l3.ftb";
-		fts,htp-fw-name = "st_fts_l3_thp.ftb";
+		fts,support-super-resolution = <1>;
+		fts,default-fw-name = "st_fts_l2.ftb";
+		fts,thp-fw-name = "st_fts_l2_thp.ftb";
 		fts,config-array-size = <1>;
 		fts,touch-follow-performance-def = <3>;
 		fts,touch-tap-sensitivity-def = <4>;
@@ -219,7 +277,7 @@
 								  4 15 1 120 2 15>;
 		fts,cfg_0 {
 			fts,tp-vendor = <0x38>;
-			fts,fw-name = "st_fts_l3.ftb";
+			fts,fw-name = "st_fts_l2.ftb";
 			fts,limit-name = "stm_fts_production_limits.csv";
 		};
 	};
