@@ -29,6 +29,8 @@ Required properties:
 - #size-cells : must be set to 0
 - qcom,ee : indicates the active Execution Environment identifier (0-5)
 - qcom,channel : which of the PMIC Arb provided channels to use for accesses (0-5)
+
+Optional properties:
 - interrupts : interrupt list for the PMIC Arb controller, must contain a
                single interrupt entry for the peripheral interrupt
 - interrupt-names : corresponding interrupt names for the interrupts
@@ -41,10 +43,19 @@ Required properties:
     cell 3: the requested peripheral interrupt (0-7)
     cell 4: interrupt flags indicating level-sense information, as defined in
             dt-bindings/interrupt-controller/irq.h
+- qcom,bus-id : Specifies which SPMI bus instance to use.  This property is only
+		applicable to PMIC arbiter version 7 and beyond.
+		Support values: 0 = primary bus, 1 = secondary bus
+		Assumed to be 0 if unspecified.
+
+Consumer node optional properties:
+- qcom,pmic-arb : phandle for an spmi-pmic-arb device.  This can be used by
+		  consumer devices that are not PMIC devices but which need to
+		  reference an spmi-pmic-arb device.
 
 Example:
 
-	spmi {
+	spmi_bus: spmi {
 		compatible = "qcom,spmi-pmic-arb";
 		reg-names = "core", "intr", "cnfg";
 		reg = <0xfc4cf000 0x1000>,
@@ -62,4 +73,8 @@ Example:
 
 		interrupt-controller;
 		#interrupt-cells = <4>;
+	};
+
+	&display {
+		qcom,pmic-arb = <&spmi_bus>;
 	};
