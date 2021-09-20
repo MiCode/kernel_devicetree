@@ -36,10 +36,17 @@ dtb-$(CONFIG_ARCH_WAIPIO) += \
 	$(call add-overlays, $(WAIPIO_BOARDS) $(NOAPQ_WAIPIO_BOARDS),$(WAIPIO_BASE_DTB))\
 	$(call add-overlays, $(WAIPIO_BOARDS) $(APQ_WAIPIO_BOARDS),$(WAIPIO_APQ_BASE_DTB))
 
-dtb-$(CONFIG_ARCH_KALAMA) += kalama-rumi.dtb \
-	     kalama-mtp.dtb \
-	     kalama-cdp.dtb \
-	     kalama-qrd.dtb
+
+KALAMA_BASE_DTB += kalama.dtb
+
+KALAMA_BOARDS += \
+		 kalama-rumi-overlay.dtbo \
+		 kalama-mtp-overlay.dtbo \
+		 kalama-cdp-overlay.dtbo \
+		 kalama-qrd-overlay.dtbo
+
+dtb-$(CONFIG_ARCH_KALAMA) += \
+	$(call add-overlays, $(KALAMA_BOARDS),$(KALAMA_BASE_DTB))
 
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
