@@ -48,6 +48,18 @@ KALAMA_BOARDS += \
 dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS),$(KALAMA_BASE_DTB))
 
+ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+CINDER_BASE_DTB += cinder.dtb
+CINDER_BOARDS += cinder-rumi-overlay.dtbo \
+	cinder-idp-overlay.dtbo
+
+dtb-$(CONFIG_ARCH_CINDER) += \
+	$(call add-overlays, $(CINDER_BOARDS), $(CINDER_BASE_DTB))
+else
+dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
+	     cinder-idp.dtb
+endif
+
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
 clean-files     := *.dtb *.dtbo
