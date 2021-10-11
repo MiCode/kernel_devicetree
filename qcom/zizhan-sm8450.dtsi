@@ -159,6 +159,26 @@
 	};
 };
 
+&qupv3_se4_spi {
+	status = "ok";
+	fts@0 {
+		status = "ok";
+		compatible = "st,spi-pri";
+		reg = <0x0>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <21 0x2008>;
+		pinctrl-names = "pmx_ts_pri_active", "pmx_ts_pri_suspend";
+		pinctrl-0 = <&mi_ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		avdd-supply = <&L7C>;
+		dvdd-supply = <&L2C>;
+		st,regulator_avdd = "avdd";
+		st,regulator_dvdd = "dvdd";
+		st,irq-gpio = <&tlmm 21 0x2008>;
+		st,reset-gpio = <&tlmm 20 0x00>;
+	};
+};
+
 &qupv3_se19_spi {
 	status = "ok";
 	fts-sec@0 {
@@ -167,7 +187,7 @@
 		reg = <0x0>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <119 0x2008>;
-		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-names = "pmx_ts_sec_active", "pmx_ts_sec_suspend";
 		pinctrl-0 = <&mi_ts_active>;
 		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
 		avdd-supply = <&wl2866d_avdd2>;
@@ -175,25 +195,23 @@
 		/*panel = <&dsi_k8_42_02_0a_dsc_cmd>;*/
 		fts,pwr-reg-name = "avdd";
 		fts,bus-reg-name = "vdd";
-		fts,irq-gpio = <&tlmm 21 0x2008>;
+		fts,irq-gpio = <&tlmm 119 0x2008>;
 		fts,irq-gpio-name = "fts_irq";
 		fts,reset-gpio-enable;
 		fts,reset-gpio = <&tlmm 52 0x00>;
 		fts,reset-gpio-name = "fts_rst";
 		fts,irq-flags = <0x2008>;
-		fts,x-max = <14400>;
-		fts,y-max = <32000>;
+		fts,x-max = <10800>;
+		fts,y-max = <25200>;
 		fts,fod-lx = <5860>;
 		fts,fod-ly = <23460>;
 		fts,fod-x-size = <2680>;
 		fts,fod-y-size = <2660>;
 		fts,support-fod;
-/*		fts,support-thp;*/
 		fts,support-thp-fw;
 		spi-max-frequency = <12000000>;
 		fts,support-super-resolution = <1>;
-		fts,default-fw-name = "st_fts_l2.ftb";
-		fts,thp-fw-name = "st_fts_l2_thp.ftb";
+		fts,default-fw-name = "st_fts_l18_sec.ftb";
 		fts,config-array-size = <1>;
 		fts,touch-follow-performance-def = <3>;
 		fts,touch-tap-sensitivity-def = <4>;
@@ -243,7 +261,7 @@
 								  4 15 1 120 2 15>;
 		fts,cfg_0 {
 			fts,tp-vendor = <0x38>;
-			fts,fw-name = "st_fts_l2.ftb";
+			fts,fw-name = "st_fts_l18_sec.ftb";
 			fts,limit-name = "stm_fts_production_limits.csv";
 		};
 	};
