@@ -24,7 +24,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x0>;
 			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			cpu-release-addr = <0x0 0x80C40000>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -43,7 +43,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x100>;
 			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			cpu-release-addr = <0x0 0x80C40000>;
 			next-level-cache = <&L2_1>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -58,7 +58,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x200>;
 			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			cpu-release-addr = <0x0 0x80C40000>;
 			next-level-cache = <&L2_2>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -72,7 +72,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x300>;
 			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			cpu-release-addr = <0x0 0x80C40000>;
 			next-level-cache = <&L2_3>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -112,14 +112,14 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
-	intc: interrupt-controller@17a00000 {
+	intc: interrupt-controller@17200000 {
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
 		interrupt-controller;
 		#redistributor-regions = <1>;
 		redistributor-stride = <0x0 0x20000>;
-		reg = <0x17a00000 0x10000>,	/* GICD */
-		      <0x17a60000 0x80000>;	/* GICR * 4 */
+		reg = <0x17200000 0x10000>,	/* GICD */
+		      <0x17260000 0x80000>;	/* GICR * 4 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
 	};
 
@@ -133,63 +133,111 @@
 		clock-frequency = <19200000>;
 	};
 
-	memtimer: timer@17c20000 {
+	memtimer: timer@17420000 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
 		compatible = "arm,armv7-timer-mem";
-		reg = <0x17c20000 0x1000>;
+		reg = <0x17420000 0x1000>;
 		clock-frequency = <19200000>;
 
-		frame@17c21000 {
+		frame@17421000 {
 			frame-number = <0>;
 			interrupts = <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c21000 0x1000>,
-			      <0x17c22000 0x1000>;
+			reg = <0x17421000 0x1000>,
+			      <0x17422000 0x1000>;
 		};
 
-		frame@17c23000 {
+		frame@17423000 {
 			frame-number = <1>;
 			interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c23000 0x1000>;
+			reg = <0x17423000 0x1000>;
 			status = "disabled";
 		};
 
-		frame@17c25000 {
+		frame@17425000 {
 			frame-number = <2>;
 			interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c25000 0x1000>,
-			      <0x17c26000 0x1000>;
+			reg = <0x17425000 0x1000>,
+			      <0x17426000 0x1000>;
 			status = "disabled";
 		};
 
-		frame@17c27000 {
+		frame@17427000 {
 			frame-number = <3>;
 			interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c27000 0x1000>;
+			reg = <0x17427000 0x1000>;
 			status = "disabled";
 		};
 
-		frame@17c29000 {
+		frame@17429000 {
 			frame-number = <4>;
 			interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c29000 0x1000>;
+			reg = <0x17429000 0x1000>;
 			status = "disabled";
 		};
 
-		frame@17c2b000 {
+		frame@1742b000 {
 			frame-number = <5>;
 			interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c2b000 0x1000>;
+			reg = <0x1742b000 0x1000>;
 			status = "disabled";
 		};
 
-		frame@17c2d000 {
+		frame@1742d000 {
 			frame-number = <6>;
 			interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
-			reg = <0x17c2d000 0x1000>;
+			reg = <0x1742d000 0x1000>;
 			status = "disabled";
+		};
+	};
+
+	qcom,msm-imem@14680000 {
+		compatible = "qcom,msm-imem";
+		reg = <0x14680000 0x1000>;
+		ranges = <0x0 0x14680000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		mem_dump_table@10  {
+			compatible = "qcom,msm-imem-mem_dump_table";
+			reg = <0x10 0x8>;
+		};
+
+		restart_reason@65c {
+			compatible = "qcom,msm-imem-restart_reason";
+			reg = <0x65c 0x4>;
+		};
+
+		dload_type@1c {
+			compatible = "qcom,msm-imem-dload-type";
+			reg = <0x1c 0x4>;
+		};
+
+		boot_stats@6b0 {
+			compatible = "qcom,msm-imem-boot_stats";
+			reg = <0x6b0 0x20>;
+		};
+
+		kaslr_offset@6d0 {
+			compatible = "qcom,msm-imem-kaslr_offset";
+			reg = <0x6d0 0xc>;
+		};
+
+		pil@94c {
+			compatible = "qcom,pil-reloc-info";
+			reg = <0x94c 0xc8>;
+		};
+
+		pil@6dc {
+			compatible = "qcom,msm-imem-pil-disable-timeout";
+			reg = <0x6dc 0x4>;
+		};
+
+		diag_dload@c8 {
+			compatible = "qcom,msm-imem-diag-dload";
+			reg = <0xc8 0xc8>;
 		};
 	};
 
@@ -202,6 +250,13 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 	};
+
+	qcom,mpm2-sleep-counter@c221000 {
+		compatible = "qcom,mpm2-sleep-counter";
+		reg = <0xc221000 0x1000>;
+		clock-frequency = <32768>;
+	};
+
 };
 
 #include "cinder-pinctrl.dtsi"
