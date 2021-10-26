@@ -194,6 +194,7 @@
 		};
 	};
 
+
 	soc: soc { };
 };
 
@@ -393,8 +394,21 @@
 
 	trust_ui_vm_mem: trust_ui_vm_region@f4400000 {
 		no-map;
-		reg = <0x0 0xf4400000 0x0 0x4400000>;
+		reg = <0x0 0xf4400000 0x0 0x42f3000>;
 	};
+
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@f86fc000 {
+		no-map;
+		reg = <0x0 0xf86fc000 0x0 0x4000>;
+		gunyah-label = <0x11>;
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@f8700000 {
+		no-map;
+		reg = <0x0 0xf8700000 0x0 0x100000>;
+		gunyah-label = <0x12>;
+	};
+
 
 	oem_vm_mem: oem_vm_region@f8800000 {
 		no-map;
@@ -2033,6 +2047,55 @@
 			};
 		};
 	};
+
+	qcom,guestvm_loader@f4400000 {
+		compatible = "qcom,guestvm-loader";
+		qcom,pas-id = <28>;
+		qcom,isolate-cpus;
+		qcom,vmid = <45>;
+		qcom,firmware-name = "trustedvm";
+		qcom,reserved-cpus = <0x5>, <0x6>;
+		qcom,unisolate-timeout-ms = <8000>;
+		memory-region = <&trust_ui_vm_mem>;
+	};
+
+	qcom,guestvm_loader@80800000 {
+		compatible = "qcom,guestvm-loader";
+		qcom,pas-id = <35>;
+		qcom,vmid = <50>;
+		qcom,firmware-name = "cpusys_vm";
+		memory-region = <&cpusys_vm_mem>;
+	};
+
+	qcom,gh_vm_loader_sec@f4400000 {
+		compatible = "qcom,gh-vm-loader-sec";
+		qcom,pas-id = <28>;
+		qcom,vmid = <45>;
+		qcom,firmware-name = "trustedvm";
+		memory-region = <&trust_ui_vm_mem>;
+	};
+
+	qcom,gh_vm_loader_sec@80800000 {
+		compatible = "qcom,gh-vm-loader-sec";
+		qcom,pas-id = <35>;
+		qcom,vmid = <50>;
+		qcom,firmware-name = "cpusys_vm";
+		qcom,no-shutdown;
+		memory-region = <&cpusys_vm_mem>;
+	};
+
+	trust_ui_vm: qcom,trust_ui_vm@f86fc000 {
+		reg = <0xf86fc000 0x104000>;
+		vm_name = "trustedvm";
+		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_swiotlb>;
+	};
+
+	qcom,virtio_backend@0 {
+		compatible = "qcom,virtio_backend";
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x11>;
+	};
+
 };
 
 &firmware {

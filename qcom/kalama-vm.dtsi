@@ -8,16 +8,6 @@
 	qcom,msm-id = <519 0x10000>;
 	interrupt-parent = <&vgic>;
 
-	qcom,mem-buf {
-		compatible = "qcom,mem-buf";
-		qcom,mem-buf-capabilities = "consumer";
-		qcom,vmid = <45>;
-	};
-
-	qcom,mem-buf-msgq {
-		compatible = "qcom,mem-buf-msgq";
-	};
-
 	chosen {
 		bootargs = "nokaslr log_buf_len=256K root=/dev/ram rw init=/init console=hvc0 loglevel=8";
 	};
@@ -30,20 +20,44 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x0>;
 			device_type = "cpu";
-			enable-method = "spin-table";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN
+					   &CLUSTER_PWR_DWN>;
 		};
 
 		CPU1: cpu@100 {
 			compatible = "arm,armv8";
 			reg = <0x0 0x100>;
 			device_type = "cpu";
-			enable-method = "spin-table";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN
+					   &CLUSTER_PWR_DWN>;
+
 		};
 	};
 
-	qrtr-gunyah {
-		compatible = "qcom,qrtr-gunyah";
-		gunyah-label = <3>;
+	idle-states {
+		CPU_PWR_DWN: c4 {  /* Using Gold C4 latencies */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <369>;
+			exit-latency-us = <1502>;
+			min-residency-us = <4488>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+			status = "disabled";
+		};
+
+		CLUSTER_PWR_DWN: d4 { /* C4+D4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "l3-pc";
+			entry-latency-us = <584>;
+			exit-latency-us = <2332>;
+			min-residency-us = <6118>;
+			arm,psci-suspend-param = <0x40000044>;
+			local-timer-stop;
+			status = "disabled";
+		};
 	};
 
 	qcom,vm-config {
@@ -146,7 +160,7 @@
 				qcom,label = <0x0000002>;
 			};
 
-			qrtr-shm {
+/*			qrtr-shm {
 				vdevice-type = "shm-doorbell";
 				generate = "/hypervisor/qrtr-shm";
 				push-compatible = "qcom,qrtr-gunyah-gen";
@@ -168,6 +182,7 @@
 					allocate-base;
 				};
 			};
+*/
 		};
 	};
 
@@ -205,6 +220,11 @@
 		/* Valid pins */
 		gpios = /bits/ 16 <64 65 66 67 0 4 86 87>;
 		status = "disabled";
+	};
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
 	};
 
 
