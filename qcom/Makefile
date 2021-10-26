@@ -8,6 +8,8 @@
 add-overlays = $(foreach o,$1,$(foreach b,$2,$(eval $(basename $b)-$(basename $o)-dtbs = $b $o) $(basename $b)-$(basename $o).dtb))
 
 
+ifneq ($(CONFIG_ARCH_QTI_VM), y)
+
 WAIPIO_BASE_DTB += waipio.dtb waipio-v2.dtb
 WAIPIO_APQ_BASE_DTB += waipiop.dtb waipiop-v2.dtb
 
@@ -62,6 +64,14 @@ dtb-$(CONFIG_ARCH_CINDER) += \
 else
 dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
 	     cinder-idp.dtb
+endif
+
+endif
+
+ifeq ($(CONFIG_ARCH_KALAMA), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb
+endif
 endif
 
 always-y        := $(dtb-y)
