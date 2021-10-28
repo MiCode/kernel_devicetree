@@ -75,6 +75,58 @@
 		};
 	};
 
+	mi_ts_cs_active: mi_ts_cs_active {
+		mux {
+			pins = "gpio19";
+			function = "qup4";
+		};
+
+		config {
+			pins = "gpio19";
+			drive-strength = <16>;
+			bias-pull-up;
+		};
+	};
+
+	mi_ts_cs_suspend: mi_ts_cs_suspend {
+		mux {
+			pins = "gpio19";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio19";
+			drive-strength = <16>;
+			bias-pull-up;
+		};
+	};
+
+	mi_ts_spi_active: mi_ts_spi_active {
+			mux {
+				pins = "gpio16", "gpio17", "gpio18";
+				function = "qup4";
+			};
+
+			config {
+				pins = "gpio16", "gpio17", "gpio18";
+				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+
+		mi_ts_spi_suspend: mi_ts_spi_suspend {
+			mux {
+				pins = "gpio16", "gpio17", "gpio18";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio16", "gpio17", "gpio18";
+				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+
 	/* AW8697_RESET_N */
 	aw8697_gpio_reset: aw8697_gpio_reset {
 		mux {
@@ -126,6 +178,8 @@
 
 &qupv3_se4_spi {
 	status = "ok";
+	pinctrl-0 = <&mi_ts_spi_active &mi_ts_cs_active>;
+	pinctrl-1 = <&mi_ts_spi_suspend &mi_ts_cs_suspend>;
 	fts@0 {
 		status = "ok";
 		compatible = "st,spi";
