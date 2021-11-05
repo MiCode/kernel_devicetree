@@ -74,11 +74,11 @@ endif
 
 ifeq ($(CONFIG_ARCH_KALAMA), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
+kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
                  kalama-vm-mtp.dtb \
                  kalama-vm-cdp.dtb \
                  kalama-vm-qrd.dtb
-
+dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
 
