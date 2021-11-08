@@ -82,6 +82,16 @@ dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
 
+ifeq ($(CONFIG_ARCH_WAIPIO), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+waipio_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += waipio-vm-mtp.dtb \
+        waipio-vm-cdp.dtb \
+        waipio-vm-qrd.dtb \
+        waipio-vm-rumi.dtb
+dtb-y += $(waipio_tuivm-dtb-y)
+endif
+endif
+
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
 clean-files     := *.dtb *.dtbo
