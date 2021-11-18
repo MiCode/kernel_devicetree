@@ -61,15 +61,10 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
-CINDER_BASE_DTB += cinder.dtb
-CINDER_BOARDS += cinder-rumi-overlay.dtbo \
-	cinder-idp-overlay.dtbo
-
-cinder-dtb-$(CONFIG_ARCH_CINDER) += \
-	$(call add-overlays, $(CINDER_BOARDS), $(CINDER_BASE_DTB))
-cinder-overlays-dtb-$(CONFIG_ARCH_CINDER) += $(CINDER_BASE_DTB) $(CINDER_BOARDS)
+cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
+	cinder-ru-idp.dtb \
+	cinder-du-idp.dtb
 dtb-y += $(cinder-dtb-y)
-
 endif
 
 ifeq ($(CONFIG_ARCH_KALAMA), y)
