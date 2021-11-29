@@ -62,7 +62,7 @@
 };
 
 &tlmm {
-	mi_ts_active: mi_ts_active {
+	mi_ts_pri_active: mi_ts_pri_active {
 		mux {
 				pins = "gpio21", "gpio20";
 				function = "gpio";
@@ -72,6 +72,44 @@
 				pins = "gpio21", "gpio20";
 				drive-strength = <8>;
 				bias-pull-up;
+		};
+	};
+	mi_ts_sec_active: mi_ts_sec_active {
+		mux {
+				pins = "gpio52", "gpio119";
+				function = "gpio";
+		};
+
+		config {
+				pins = "gpio52", "gpio119";
+				drive-strength = <8>;
+				bias-pull-up;
+		};
+	};
+
+	ts_reset_sec_suspend: ts_reset_sec_suspend {
+		mux {
+			pins = "gpio52";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio52";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	ts_int_sec_suspend: ts_int_sec_suspend {
+		mux {
+			pins = "gpio119";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio119";
+			drive-strength = <2>;
+			bias-pull-down;
 		};
 	};
 
@@ -190,7 +228,7 @@
 		interrupt-parent = <&tlmm>;
 		interrupts = <21 0x2008>;
 		pinctrl-names = "pmx_ts_pri_active", "pmx_ts_pri_suspend";
-		pinctrl-0 = <&mi_ts_active>;
+		pinctrl-0 = <&mi_ts_pri_active>;
 		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
 		avdd-supply = <&L7C>;
 		dvdd-supply = <&L2C>;
@@ -258,8 +296,8 @@
 		interrupt-parent = <&tlmm>;
 		interrupts = <119 0x2008>;
 		pinctrl-names = "pmx_ts_sec_active", "pmx_ts_sec_suspend";
-		pinctrl-0 = <&mi_ts_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-0 = <&mi_ts_sec_active>;
+		pinctrl-1 = <&ts_int_sec_suspend &ts_reset_sec_suspend>;
 		avdd-supply = <&wl2866d_avdd2>;
 		vdd-supply = <&wl2866d_dvdd2>;
 		/*panel = <&dsi_k8_42_02_0a_dsc_cmd>;*/
