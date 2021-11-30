@@ -25,9 +25,26 @@
 
 		out-ports {
 			port {
-				tpdm_lpass_lpi_out_funnel_lpass_lpi: endpoint {
+				tpdm_lpass_lpi_1_out_funnel_lpass_lpi: endpoint {
 					remote-endpoint =
-					<&funnel_lpass_lpi_in_tpdm_lpass_lpi>;
+					<&funnel_lpass_lpi_in_tpdm_lpass_lpi_1>;
+				};
+			};
+		};
+	};
+
+	lpass_stm: lpass_stm {
+		compatible = "qcom,coresight-dummy";
+		coresight-name = "coresight-lpass-stm";
+		qcom,dummy-source;
+
+		atid = <25>;
+
+		out-ports {
+			port {
+				lpass_stm_out_funnel_lpass_lpi_1: endpoint {
+					remote-endpoint =
+					<&funnel_lpass_lpi_1_in_lpass_stm>;
 				};
 			};
 		};
@@ -1217,9 +1234,46 @@
 		};
 	};
 
-	funnel_lpass_lpi: funnel@10b44000 {
+	funnel_lpass_lpi_1: funnel@10b50000 {
 		compatible = "arm,coresight-static-funnel";
-		coresight-name = "coresight-funnel-lpass_lpi";
+		coresight-name = "coresight-funnel-lpass_lpi_1";
+
+		in-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				funnel_lpass_lpi_1_in_lpass_stm: endpoint {
+					remote-endpoint =
+					<&lpass_stm_out_funnel_lpass_lpi_1>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				funnel_lpass_lpi_in_tpdm_lpass_lpi_1: endpoint {
+					remote-endpoint =
+					<&tpdm_lpass_lpi_1_out_funnel_lpass_lpi>;
+				};
+			};
+
+		};
+
+		out-ports {
+			port {
+				funnel_lpass_lpi_1_out_funnel_lpass_lpi_0: endpoint {
+					remote-endpoint =
+					<&funnel_lpass_lpi_0_in_funnel_lpass_lpi_1>;
+				};
+			};
+
+		};
+	};
+
+	funnel_lpass_lpi_0: funnel@10b44000 {
+		compatible = "arm,coresight-static-funnel";
+		coresight-name = "coresight-funnel-lpass_lpi_0";
 
 		in-ports {
 			#address-cells = <1>;
@@ -1235,9 +1289,9 @@
 
 			port@7 {
 				reg = <7>;
-				funnel_lpass_lpi_in_tpdm_lpass_lpi: endpoint {
+				funnel_lpass_lpi_0_in_funnel_lpass_lpi_1: endpoint {
 					remote-endpoint =
-					<&tpdm_lpass_lpi_out_funnel_lpass_lpi>;
+					<&funnel_lpass_lpi_1_out_funnel_lpass_lpi_0>;
 				};
 			};
 
@@ -1473,6 +1527,63 @@
 		};
 	};
 
+	gladiator: gladiator {
+		compatible = "qcom,coresight-dummy";
+		coresight-name = "coresight-gladiator";
+		qcom,dummy-source;
+
+		atid = <96>;
+
+		out-ports {
+			port {
+				gladiator_out_funnel_ddr_dl1: endpoint {
+					remote-endpoint =
+					<&funnel_ddr_dl1_in_gladiator>;
+				};
+			};
+		};
+	};
+
+	funnel_ddr_dl1: funnel@10d0a000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb908>;
+
+		reg = <0x10d0a000 0x1000>;
+		reg-names = "funnel-base";
+
+		coresight-name = "coresight-funnel-ddr_dl1";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		in-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@3 {
+				reg = <3>;
+				funnel_ddr_dl1_in_gladiator: endpoint {
+					remote-endpoint =
+					<&gladiator_out_funnel_ddr_dl1>;
+				};
+			};
+		};
+
+		out-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				funnel_ddr_dl1_out_funnel_ddr_dl0: endpoint {
+					remote-endpoint =
+					<&funnel_ddr_dl0_in_funnel_ddr_dl1>;
+				};
+			};
+		};
+
+	};
+
 	funnel_ddr_dl0: funnel@10d03000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb908>;
@@ -1521,6 +1632,13 @@
 				};
 			};
 
+			port@4 {
+				reg = <4>;
+				funnel_ddr_dl0_in_funnel_ddr_dl1: endpoint {
+					remote-endpoint =
+					<&funnel_ddr_dl1_out_funnel_ddr_dl0>;
+				};
+			};
 		};
 
 		out-ports {
@@ -1563,6 +1681,13 @@
 				};
 			};
 
+			port@4 {
+				reg = <4>;
+				funnel_ddr_dl0_out_funnel_dl_center: endpoint {
+					remote-endpoint =
+					<&funnel_dl_center_in_funnel_ddr_dl0>;
+				};
+			};
 		};
 	};
 
@@ -1570,8 +1695,8 @@
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb908>;
 
-		reg = <0x10986000 0x1000>,
-			<0x10985000 0x1000>;
+		reg = <0x10984000 0x1000>,
+			<0x10983000 0x1000>;
 		reg-names = "funnel-base-dummy", "funnel-base-real";
 
 		coresight-name = "coresight-funnel-turing_dup";
@@ -1583,8 +1708,8 @@
 		in-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			port@3 {
-				reg = <3>;
+			port@4 {
+				reg = <4>;
 				funnel_turing_dup_in_turing_etm0: endpoint {
 					remote-endpoint =
 					<&turing_etm0_out_funnel_turing_dup>;
@@ -1636,8 +1761,8 @@
 				};
 			};
 
-			port@4 {
-				reg = <4>;
+			port@5 {
+				reg = <5>;
 				funnel_turing_in_funnel_turing_dup: endpoint {
 					remote-endpoint =
 					<&funnel_turing_dup_out_funnel_turing>;
@@ -2651,6 +2776,14 @@
 				funnel_dl_center_in_tpda_dl_center: endpoint {
 					remote-endpoint =
 					<&tpda_dl_center_out_funnel_dl_center>;
+				};
+			};
+
+			port@4 {
+				reg = <4>;
+				funnel_dl_center_in_funnel_ddr_dl0: endpoint {
+					remote-endpoint =
+					<&funnel_ddr_dl0_out_funnel_dl_center>;
 				};
 			};
 
@@ -3741,6 +3874,94 @@
 		clock-names = "apb_pclk";
 	};
 
+	cpu0: cti@12010000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12010000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu0";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu1: cti@12020000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12020000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu1";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu2: cti@12030000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12030000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu2";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu3: cti@12040000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12040000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu3";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu4: cti@12050000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12050000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu4";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu5: cti@112060000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12060000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu5";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu6: cti@12070000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12070000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu6";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	cpu7: cti@12080000 {
+		compatible = "arm,coresight-cti", "arm,primecell";
+		reg = <0x12080000 0x1000>;
+
+		arm,primecell-periphid = <0x000bb922>;
+		coresight-name = "coresight-cti-cpu7";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
 	ipcb_tgu: tgu@10b0e000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb999>;
@@ -3764,6 +3985,7 @@
 		coresight-name = "coresight-ete0";
 		qcom,skip-power-up;
 		atid = <1>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete0_out_funnel_ete: endpoint {
@@ -3780,6 +4002,7 @@
 		coresight-name = "coresight-ete1";
 		qcom,skip-power-up;
 		atid = <2>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete1_out_funnel_ete: endpoint {
@@ -3796,6 +4019,7 @@
 		coresight-name = "coresight-ete2";
 		qcom,skip-power-up;
 		atid = <3>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete2_out_funnel_ete: endpoint {
@@ -3812,6 +4036,7 @@
 		coresight-name = "coresight-ete3";
 		qcom,skip-power-up;
 		atid = <4>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete3_out_funnel_ete: endpoint {
@@ -3828,6 +4053,7 @@
 		coresight-name = "coresight-ete4";
 		qcom,skip-power-up;
 		atid = <5>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete4_out_funnel_ete: endpoint {
@@ -3844,6 +4070,7 @@
 		coresight-name = "coresight-ete5";
 		qcom,skip-power-up;
 		atid = <6>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete5_out_funnel_ete: endpoint {
@@ -3860,6 +4087,7 @@
 		coresight-name = "coresight-ete6";
 		qcom,skip-power-up;
 		atid = <7>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete6_out_funnel_ete: endpoint {
@@ -3876,6 +4104,7 @@
 		coresight-name = "coresight-ete7";
 		qcom,skip-power-up;
 		atid = <8>;
+		arm,coresight-loses-context-with-cpu;
 		out-ports {
 			port {
 				ete7_out_funnel_ete: endpoint {
