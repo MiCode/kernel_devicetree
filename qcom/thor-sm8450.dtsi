@@ -4,6 +4,8 @@
 */
 #include "thor-pinctrl.dtsi"
 #include "xiaomi-sm8450-common.dtsi"
+#include <dt-bindings/clock/qcom,gcc-waipio.h>
+#include <dt-bindings/clock/qcom,camcc-waipio.h>
 
 &tlmm {
 	/* AW8697_RESET_N */
@@ -162,6 +164,103 @@
 	regulator-min-microvolt = <3300000>;
 	regulator-max-microvolt = <3300000>;
 	qcom,init-voltage = <3300000>;
+};
+
+&L12C {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+};
+
+&L10C {
+	regulator-min-microvolt = <1200000>;
+	regulator-max-microvolt = <1200000>;
+};
+
+&soc {
+	ispv3_vdd1_ldo:ispv3_vdd1_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_vdd1_ldo";
+		regulator-min-microvolt = <800000>;
+		regulator-max-microvolt = <800000>;
+		regulator-enable-ramp-delay = <100>;
+		enable-active-high;
+		gpio = <&tlmm 125 0>;
+		vin-supply = <&S11B>;
+	};
+
+	ispv3_vdd2_ldo:ispv3_vdd2_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_vdd2_ldo";
+		regulator-min-microvolt = <800000>;
+		regulator-max-microvolt = <800000>;
+		regulator-enable-ramp-delay = <100>;
+		enable-active-high;
+		gpio = <&tlmm 84 0>;
+		vin-supply = <&S11B>;
+	};
+
+	ispv3_vddr_ldo:ispv3_vddr_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_vddr_ldo";
+		regulator-min-microvolt = <800000>;
+		regulator-max-microvolt = <800000>;
+		regulator-enable-ramp-delay = <100>;
+		enable-active-high;
+		gpio = <&tlmm 93 0>;
+		vin-supply = <&S11B>;
+	};
+};
+
+&qupv3_se5_i2c {
+	status = "ok";
+	ispv3_i2c: ispv3_i2c@60 {
+		compatible = "fcs,fan53526";
+		reg = <0x60>;
+		fcs,suspend-voltage-selector = <1>;
+		regulator-name = "ispv3_vdd_08";
+		regulator-min-microvolt = <600000>;
+		regulator-max-microvolt = <1230000>;
+		regulator-ramp-delay = <1000>;
+		regulator-always-on;
+		regulator-boot-on;
+		status = "ok";
+	};
+};
+
+&qupv3_se18_spi {
+	status = "ok";
+	ispv3_spi@0 {
+		compatible = "xiaomi,ispv3_spi";
+		reg = <0>;
+		qcom,ispv3-rc-index = <1>;
+		spi-max-frequency = <50000000>;
+		ispv3_gpio_14 = <&tlmm 175 0x0>;
+		ispv3_gpio_15 = <&tlmm 176 0x0>;
+		ispv3_gpio_int0 = <&tlmm 177 0x0>;
+		ispv3_gpio_int1 = <&tlmm 118 0x0>;
+		ispv3_gpio_reset = <&tlmm 178 0x0>;
+		ispv3_gpio_fan_en = <&tlmm 109 0x0>;
+		ispv3_vdd1-supply = <&ispv3_vdd1_ldo>;
+		ispv3_l12c-supply = <&L12C>;
+		ispv3_vdd2-supply = <&ispv3_vdd2_ldo>;
+		ispv3_vdd-supply = <&L3I>;
+		ispv3_vddr-supply = <&ispv3_vddr_ldo>;
+		ispv3_l10c-supply = <&L10C>;
+		ispv3_mclk-supply = <&cam_cc_titan_top_gdsc>;
+		regulator-names = "ispv3_vdd1", "ispv3_l12c",
+				  "ispv3_vdd2", "ispv3_vdd",
+				  "ispv3_vddr", "ispv3_l10c",
+				  "ispv3_mclk";
+		rgltr-min-voltage = <800000 1800000 800000 1800000 800000 1200000 0>;
+		rgltr-max-voltage = <800000 1800000 800000 1800000 800000 1200000 0>;
+		pinctrl-names = "ispv3_default", "ispv3_suspend";
+		pinctrl-0 = <&cam_sensor_mclk3_active>;
+		pinctrl-1 = <&cam_sensor_mclk3_suspend>;
+		clocks = <&clock_camcc CAM_CC_MCLK3_CLK>;
+		clock-names = "ispv3_clk";
+		clock-rates = <19200000>;
+		status = "ok";
+       };
 };
 
 &qupv3_se4_spi {
