@@ -261,6 +261,32 @@
 	};
 };
 
+&pcie1 {
+	status = "ok";
+};
+
+&pcie1_rp {
+	#address-cells = <5>;
+	#size-cells = <0>;
+
+	ispv3_pci: ispv3_pci {
+		reg = <0 0 0 0 0>;
+		qcom,iommu-group = <&ispv3_pci_iommu_group>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		ispv3_pci_iommu_group: ispv3_pci_iommu_group {
+			qcom,iommu-msi-size = <0x1000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0xa0000000>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-pagetable = "coherent";
+			qcom,iommu-faults = "stall-disable", "HUPCF", "no-CFRE",
+					    "non-fatal";
+		};
+	};
+};
+
 &qupv3_se5_i2c {
 	status = "ok";
 	ispv3_i2c: ispv3_i2c@60 {
