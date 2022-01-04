@@ -65,6 +65,23 @@ cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
 	cinder-ru-idp.dtb \
 	cinder-du-idp.dtb
 dtb-y += $(cinder-dtb-y)
+
+SA8155_BASE_DTB += sa8155.dtb sa8155-v2.dtb
+SA8155P_BASE_DTB += sa8155p.dtb sa8155p-v2.dtb
+
+SA8155_BOARDS += \
+		 sa8155-adp-star-overlay.dtbo \
+		 sa8155-adp-air-overlay.dtbo
+
+SA8155P_BOARDS += \
+		       sa8155p-adp-star-overlay.dtbo \
+		       sa8155p-adp-air-overlay.dtbo
+
+gen3auto-dtb-$(CONFIG_ARCH_SA8155) += \
+	$(call add-overlays, $(SA8155_BOARDS),$(SA8155_BASE_DTB))\
+	$(call add-overlays, $(SA8155P_BOARDS),$(SA8155P_BASE_DTB))
+gen3auto-overlays-dtb-$(CONFIG_ARCH_SA8155) += $(SA8155_BOARDS) $(SA8155P_BOARDS) $(SA8155_BASE_DTB) $(SA8155P_BASE_DTB)
+dtb-y += $(gen3auto-dtb-y)
 endif
 
 ifeq ($(CONFIG_ARCH_KALAMA), y)
