@@ -1,5 +1,6 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/qcom,gcc-kalama.h>
 
 #include "kalama-pmic-overlay.dtsi"
 
@@ -21,4 +22,41 @@
 			linux,can-disable;
 		};
 	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-kalama";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&pm_v6d_l1>;
+	vdda-phy-max-microamp = <188000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&pm_v6e_l3>;
+	vdda-pll-max-microamp = <18300>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&pm_humu_l17>;
+	vcc-max-microamp = <1300000>;
+
+	vccq-supply = <&pm_v6g_l1>;
+	vccq-max-microamp = <1200000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&pm_v6g_l3>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&pm_v6g_s4>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	reset-gpios = <&tlmm 210 GPIO_ACTIVE_LOW>;
+	resets = <&gcc GCC_UFS_PHY_BCR>;
+	reset-names = "rst";
+
+	status = "ok";
 };
