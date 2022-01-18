@@ -27,6 +27,19 @@
 		};
 	};
 
+	trigout_a: trigout_a {
+		mux {
+			pins = "gpio52";
+			function = "qdss_cti";
+		};
+
+		config {
+			pins = "gpio52";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+
 	sdc2_on: sdc2_on {
 		clk {
 			pins = "sdc2_clk";
@@ -425,14 +438,14 @@
 
 		qupv3_se6_spi_sleep: qupv3_se6_spi_sleep {
 			mux {
-				pins = "gpio20", "gpio21",
-						"gpio22", "gpio23";
+				pins = "gpio24", "gpio25",
+						"gpio26", "gpio27";
 				function = "gpio";
 			};
 
 			config {
-				pins = "gpio20", "gpio21",
-						"gpio22", "gpio23";
+				pins = "gpio24", "gpio25",
+						"gpio26", "gpio27";
 				drive-strength = <6>;
 				bias-disable;
 			};
@@ -482,14 +495,14 @@
 			};
 		};
 
-		qupv3_se7_ctsrx: qupv3_se7_ctsrx {
+		qupv3_se7_cts: qupv3_se7_cts {
 			mux {
-				pins = "gpio28", "gpio31";
+				pins = "gpio28";
 				function = "qup0_se7";
 			};
 
 			config {
-				pins = "gpio28", "gpio31";
+				pins = "gpio28";
 				drive-strength = <2>;
 				bias-disable;
 			};
@@ -518,6 +531,33 @@
 				pins = "gpio30";
 				drive-strength = <2>;
 				bias-pull-up;
+			};
+		};
+
+		/* RX to be in gpio mode for sleep config */
+		qupv3_se7_rx_wake: qupv3_se7_rx_wake {
+			mux {
+				pins = "gpio31";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio31";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		qupv3_se7_rx_active: qupv3_se7_rx_active {
+			mux {
+				pins = "gpio31";
+				function = "qup0_se7";
+			};
+
+			config {
+				pins = "gpio31";
+				drive-strength = <2>;
+				bias-disable;
 			};
 		};
 	};
@@ -937,6 +977,65 @@
 				pins = "gpio56", "gpio57",
 						"gpio58", "gpio59";
 				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+	};
+
+	nfc {
+		nfc_int_active: nfc_int_active {
+			/* active state */
+			mux {
+				/* NFC Read Interrupt */
+				pins = "gpio41";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio41";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+
+		nfc_int_suspend: nfc_int_suspend {
+		/* sleep state */
+			mux {
+				/* NFC Read Interrupt */
+				pins = "gpio41";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio41";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+
+		nfc_enable_active: nfc_enable_active {
+			mux {
+				/* Enable, Firmware and Clock request gpios */
+				pins = "gpio38", "gpio40", "gpio39";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio38", "gpio40", "gpio39";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		nfc_enable_suspend: nfc_enable_suspend {
+			mux {
+				pins = "gpio38", "gpio40", "gpio39";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio38", "gpio40", "gpio39";
+				drive-strength = <2>;
 				bias-disable;
 			};
 		};
@@ -1793,4 +1892,195 @@
 			bias-disable;
 		};
 	};
+
+	/* touchscreen pins */
+	pmx_ts_active {
+		ts_active: ts_active {
+			mux {
+				pins = "gpio17", "gpio51";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio17", "gpio51";
+				drive-strength = <8>;
+				bias-pull-up;
+			};
+		};
+	};
+
+	pmx_ts_reset_suspend {
+		ts_reset_suspend: ts_reset_suspend {
+			mux {
+				pins = "gpio17";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio17";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pmx_ts_int_suspend {
+		ts_int_suspend: ts_int_suspend {
+			mux {
+				pins = "gpio51";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio51";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pmx_ts_release {
+		ts_release: ts_release {
+			mux {
+				pins = "gpio17", "gpio51";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio17", "gpio51";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+
+	usb_phy_ps: usb_phy_ps {
+		usb3phy_portselect_default: usb3phy_portselect_default {
+			mux {
+				pins = "gpio122";
+				function = "usb0_phy";
+			};
+
+			config {
+				pins = "gpio122";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+
+		usb3phy_portselect_gpio: usb3phy_portselect_gpio {
+			mux {
+				pins = "gpio122";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio122";
+				drive-strength = <2>;
+				bias-disable;
+				input-enable;
+			};
+		};
+	};
+
+	bt_en_sleep: bt_en_sleep {
+		mux {
+			pins = "gpio114";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio114";
+			drive-strength = <2>;
+			output-low;
+			bias-pull-down;
+		};
+	};
+
+	cnss_pins {
+		cnss_wlan_en_active: cnss_wlan_en_active {
+			mux {
+				pins = "gpio49";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio49";
+				drive-strength = <16>;
+				output-high;
+				bias-pull-up;
+			};
+		};
+
+		cnss_wlan_en_sleep: cnss_wlan_en_sleep {
+			mux {
+				pins = "gpio49";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio49";
+				drive-strength = <2>;
+				output-low;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pcie0 {
+		pcie0_perst_default: pcie0_perst_default {
+			mux {
+				pins = "gpio117";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio117";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+
+		pcie0_clkreq_default: pcie0_clkreq_default {
+			mux {
+				pins = "gpio118";
+				function = "pcie0_clk";
+			};
+
+			config {
+				pins = "gpio118";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+
+		pcie0_wake_default: pcie0_wake_default {
+			mux {
+				pins = "gpio119";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio119";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+
+		pcie0_clkreq_sleep: pcie0_clkreq_sleep {
+			mux {
+				pins = "gpio118";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio118";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+
+	};
+
+
 };
