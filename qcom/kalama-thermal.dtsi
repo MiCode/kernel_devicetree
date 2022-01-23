@@ -97,6 +97,23 @@
 			< 4262400 >;
 		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
 	};
+
+	qmi_tmd: qmi-tmd-devices {
+		compatible = "qcom,qmi-cooling-devices";
+		cdsp {
+			qcom,instance-id = <QMI_CDSP_INST_ID>;
+
+			cdsp_sw: cdsp_kr {
+				qcom,qmi-dev-name = "cdsp_sw";
+				#cooling-cells = <2>;
+			};
+
+			cdsp_hw: cdsp_hw {
+				qcom,qmi-dev-name = "cdsp_hw";
+				#cooling-cells = <2>;
+			};
+		};
+	};
 };
 
 &thermal_zones {
@@ -565,7 +582,7 @@
 	};
 
 	nspss-0 {
-		polling-delay-passive = <0>;
+		polling-delay-passive = <10>;
 		polling-delay = <0>;
 		thermal-sensors = <&tsens1 4>;
 		trips {
@@ -581,16 +598,30 @@
 				type = "passive";
 			};
 
+			nspss_0_config: junction-config {
+				temperature = <95000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
 			reset-mon-cfg {
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
 			};
 		};
+
+		cooling-maps {
+			nsp_cdev {
+				trip = <&nspss_0_config>;
+				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+							THERMAL_NO_LIMIT>;
+			};
+		};
 	};
 
 	nspss-1 {
-		polling-delay-passive = <0>;
+		polling-delay-passive = <10>;
 		polling-delay = <0>;
 		thermal-sensors = <&tsens1 5>;
 		trips {
@@ -606,16 +637,30 @@
 				type = "passive";
 			};
 
+			nspss_1_config: junction-config {
+				temperature = <95000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
 			reset-mon-cfg {
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
 			};
 		};
+
+		cooling-maps {
+			nsp_cdev {
+				trip = <&nspss_1_config>;
+				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+							THERMAL_NO_LIMIT>;
+			};
+		};
 	};
 
 	nspss-2 {
-		polling-delay-passive = <0>;
+		polling-delay-passive = <10>;
 		polling-delay = <0>;
 		thermal-sensors = <&tsens1 6>;
 		trips {
@@ -631,16 +676,30 @@
 				type = "passive";
 			};
 
+			nspss_2_config: junction-config {
+				temperature = <95000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
 			reset-mon-cfg {
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
 			};
 		};
+
+		cooling-maps {
+			nsp_cdev {
+				trip = <&nspss_2_config>;
+				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+							THERMAL_NO_LIMIT>;
+			};
+		};
 	};
 
 	nspss-3 {
-		polling-delay-passive = <0>;
+		polling-delay-passive = <10>;
 		polling-delay = <0>;
 		thermal-sensors = <&tsens1 7>;
 		trips {
@@ -656,10 +715,24 @@
 				type = "passive";
 			};
 
+			nspss_3_config: junction-config {
+				temperature = <95000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
 			reset-mon-cfg {
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			nsp_cdev {
+				trip = <&nspss_3_config>;
+				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+							THERMAL_NO_LIMIT>;
 			};
 		};
 	};
