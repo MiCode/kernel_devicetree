@@ -965,18 +965,104 @@
 		};
 	};
 
+	apcs: syscon@17c0000c {
+		compatible = "syscon";
+		reg = <0x17c0000c 0x4>;
+	};
+
+	apss_shared: mailbox@17c00000 {
+		compatible = "qcom,sm8150-apss-shared";
+		reg = <0x17c00000 0x1000>;
+		#mbox-cells = <1>;
+	};
+
+	aoss_qmp: power-controller@c300000 {
+		compatible = "qcom,sm8150-aoss-qmp";
+		reg = <0x0c300000 0x100000>;
+		interrupts = <GIC_SPI 389 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apss_shared 0>;
+
+		#clock-cells = <0>;
+		#power-domain-cells = <1>;
+	};
+
 	qmp_aop: qcom,qmp-aop@c300000 {
 		compatible = "qcom,qmp-mbox";
-		reg = <0xc300000 0x1000>, <0x17c0000C 0x4>;
-		reg-names = "msgram", "irq-reg-base";
-		qcom,irq-mask = <0x1>;
-		interrupts = <GIC_SPI 389 IRQ_TYPE_EDGE_RISING>;
-
+		qcom,qmp = <&aoss_qmp>;
 		label = "aop";
-		qcom,early-boot;
-		priority = <0>;
-		mbox-desc-offset = <0x0>;
 		#mbox-cells = <1>;
+	};
+
+	tcsr_mutex_block: syscon@1f40000 {
+		compatible = "syscon";
+		reg = <0x1f40000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock@1f40000 {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+
+	smem: qcom,smem@8600000 {
+		compatible = "qcom,smem";
+		memory-region = <&smem_region>;
+		hwlocks = <&tcsr_mutex 3>;
+	};
+
+	sp_scsr: mailbox@188501c {
+		compatible = "qcom,sm8150-spcs-global";
+		reg = <0x188501c 0x4>;
+
+		#mbox-cells = <1>;
+	};
+
+	sp_scsr_block: syscon@1880000 {
+		compatible = "syscon";
+		reg = <0x1880000 0x10000>;
+	};
+
+	intsp: qcom,qsee_irq {
+		compatible = "qcom,sm8150-qsee-irq";
+
+		syscon = <&sp_scsr_block>;
+		interrupts = <0 348 IRQ_TYPE_LEVEL_HIGH>,
+			     <0 349 IRQ_TYPE_LEVEL_HIGH>;
+
+		interrupt-names = "sp_ipc0",
+				  "sp_ipc1";
+
+		interrupt-controller;
+		#interrupt-cells = <3>;
+	};
+
+	qcom,qsee_irq_bridge {
+		compatible = "qcom,qsee-ipc-irq-bridge";
+
+		qcom,qsee-ipc-irq-spss {
+			qcom,dev-name = "qsee_ipc_irq_spss";
+			label = "spss";
+			interrupt-parent = <&intsp>;
+			interrupts = <1 0 IRQ_TYPE_LEVEL_HIGH>;
+		};
+	};
+
+	qcom,glinkpkt {
+		compatible = "qcom,glinkpkt";
+
+		qcom,glinkpkt-apr-apps2 {
+			qcom,glinkpkt-edge = "adsp";
+			qcom,glinkpkt-ch-name = "apr_apps2";
+			qcom,glinkpkt-dev-name = "apr_apps2";
+		};
+	};
+
+	qcom,smp2p_sleepstate {
+		compatible = "qcom,smp2p-sleepstate";
+		qcom,smem-states = <&sleepstate_smp2p_out 0>;
+		interrupt-parent = <&sleepstate_smp2p_in>;
+		interrupts = <0 0>;
+		interrupt-names = "smp2p-sleepstate-in";
 	};
 
 	qcom,secure-buffer {
@@ -1029,6 +1115,7 @@
 #include "sm8150-dma-heaps.dtsi"
 #include "sm8150-gdsc.dtsi"
 #include "msm-arm-smmu-sm8150.dtsi"
+#include "sm8150-smp2p.dtsi"
 
 &emac_gdsc {
 	status = "ok";
