@@ -98,7 +98,9 @@ dtbo-$(CONFIG_ARCH_WAIPIO) += waipio-rumi-overlay.dtbo \
 	waipio-lemur-cdp-pm8008-overlay.dtbo \
 	waipio-lemur-cdp-pm8010-overlay.dtbo \
 	waipio-kiwi-mtp-pm8008-overlay.dtbo \
-	waipio-kiwi-mtp-pm8010-overlay.dtbo
+	waipio-kiwi-mtp-pm8010-overlay.dtbo \
+	waipio-kiwi-cdp-pm8008-overlay.dtbo \
+	waipio-kiwi-cdp-pm8010-overlay.dtbo
 
 waipio-rumi-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb
 waipio-mtp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb
@@ -123,6 +125,8 @@ waipio-lemur-cdp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dt
 waipio-lemur-cdp-pm8010-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb
 waipio-kiwi-mtp-pm8008-overlay.dtbo-base := waipio.dtb waipio-v2.dtb
 waipio-kiwi-mtp-pm8010-overlay.dtbo-base := waipio.dtb waipio-v2.dtb
+waipio-kiwi-cdp-pm8008-overlay.dtbo-base := waipio.dtb waipio-v2.dtb
+waipio-kiwi-cdp-pm8010-overlay.dtbo-base := waipio.dtb waipio-v2.dtb
 else
 dtb-$(CONFIG_ARCH_WAIPIO) += waipio-rumi.dtb \
 	waipio-mtp-pm8008.dtb \
@@ -175,6 +179,7 @@ dtbo-$(CONFIG_ARCH_DIWALI) += diwali-rumi-overlay.dtbo \
 	diwali-idp-overlay.dtbo \
 	diwali-atp-overlay.dtbo \
 	diwali-qrd-overlay.dtbo \
+	diwali-idp-amoled-overlay.dtbo \
 	diwali-idp-usbc-overlay.dtbo \
 	diwali-idp-hsp-overlay.dtbo \
 	diwali-idp-nopmi-overlay.dtbo \
@@ -184,6 +189,7 @@ diwali-rumi-overlay.dtbo-base := diwali.dtb
 diwali-idp-overlay.dtbo-base := diwali.dtb
 diwali-atp-overlay.dtbo-base := diwali.dtb
 diwali-qrd-overlay.dtbo-base := diwali.dtb
+diwali-idp-amoled-overlay.dtbo-base := diwali.dtb
 diwali-idp-usbc-overlay.dtbo-base := diwali.dtb
 diwali-idp-hsp-overlay.dtbo-base := diwali-hsp.dtb
 diwali-idp-nopmi-overlay.dtbo-base := diwali.dtb
@@ -193,6 +199,7 @@ dtb-$(CONFIG_ARCH_DIWALI) += diwali-rumi.dtb \
 	diwali-idp.dtb \
 	diwali-atp.dtb \
 	diwali-qrd.dtb \
+	diwali-idp-amoled.dtb \
 	diwali-idp-usbc.dtb \
 	diwali-idp-hsp.dtb \
 	diwali-idp-nopmi.dtb \
@@ -200,33 +207,55 @@ dtb-$(CONFIG_ARCH_DIWALI) += diwali-rumi.dtb \
 endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
-dtbo-$(CONFIG_ARCH_CAPE) += cape-mtp-overlay.dtbo \
-        cape-cdp-overlay.dtbo \
-        cape-atp-overlay.dtbo \
-        cape-qrd-overlay.dtbo \
-        cape-v2-mtp-overlay.dtbo \
-        cape-v2-cdp-overlay.dtbo \
-        cape-v2-atp-overlay.dtbo \
-        cape-v2-qrd-overlay.dtbo
+dtbo-$(CONFIG_ARCH_CAPE) += cape-mtp-pm8008-overlay.dtbo \
+        cape-cdp-pm8008-overlay.dtbo \
+        cape-atp-pm8008-overlay.dtbo \
+        cape-qrd-pm8008-overlay.dtbo \
+        cape-mtp-pm8010-overlay.dtbo \
+        cape-cdp-pm8010-overlay.dtbo \
+        cape-atp-pm8010-overlay.dtbo \
+        cape-qrd-pm8010-overlay.dtbo \
+	cape-kiwi-mtp-pm8008-overlay.dtbo \
+	cape-kiwi-mtp-pm8010-overlay.dtbo \
+	cape-kiwi-cdp-pm8008-overlay.dtbo \
+	cape-kiwi-cdp-pm8010-overlay.dtbo
 
-cape-mtp-overlay.dtbo-base := cape.dtb
-cape-cdp-overlay.dtbo-base := cape.dtb
-cape-atp-overlay.dtbo-base := cape.dtb
-cape-qrd-overlay.dtbo-base := cape.dtb
-cape-v2-mtp-overlay.dtbo-base := cape-v2.dtb
-cape-v2-cdp-overlay.dtbo-base := cape-v2.dtb
-cape-v2-atp-overlay.dtbo-base := cape-v2.dtb
-cape-v2-qrd-overlay.dtbo-base := cape-v2.dtb
+cape-mtp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-cdp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-atp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-qrd-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-mtp-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-cdp-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-atp-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-qrd-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-kiwi-mtp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-kiwi-mtp-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-kiwi-cdp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+cape-kiwi-cdp-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 
 else
-dtb-$(CONFIG_ARCH_CAPE) += cape-mtp.dtb \
-        cape-cdp.dtb \
-        cape-atp.dtb \
-        cape-qrd.dtb \
-        cape-v2-mtp.dtb \
-        cape-v2-cdp.dtb \
-        cape-v2-atp.dtb \
-        cape-v2-qrd.dtb
+dtb-$(CONFIG_ARCH_CAPE) += cape-mtp-pm8008.dtb \
+        cape-cdp-pm8008.dtb \
+        cape-atp-pm8008.dtb \
+        cape-qrd-pm8008.dtb \
+        cape-v2-mtp-pm8008.dtb \
+        cape-v2-cdp-pm8008.dtb \
+        cape-v2-atp-pm8008.dtb \
+        cape-v2-qrd-pm8008.dtb \
+	capep-mtp-pm8008.dtb \
+	capep-cdp-pm8008.dtb \
+	capep-atp-pm8008.dtb \
+        cape-mtp-pm8010.dtb \
+        cape-cdp-pm8010.dtb \
+        cape-atp-pm8010.dtb \
+        cape-qrd-pm8010.dtb \
+        cape-v2-mtp-pm8010.dtb \
+        cape-v2-cdp-pm8010.dtb \
+        cape-v2-atp-pm8010.dtb \
+        cape-v2-qrd-pm8010.dtb \
+	capep-mtp-pm8010.dtb \
+	capep-cdp-pm8010.dtb \
+	capep-atp-pm8010.dtb
 endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
@@ -342,7 +371,10 @@ endif
 ifeq ($(CONFIG_ARCH_DIWALI), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 dtb-$(CONFIG_ARCH_QTI_VM) +=  \
-        diwali-vm-rumi.dtb
+	diwali-vm-rumi.dtb \
+	diwali-vm-atp.dtb \
+	diwali-vm-idp.dtb \
+	diwali-vm-qrd.dtb
 endif
 endif
 
