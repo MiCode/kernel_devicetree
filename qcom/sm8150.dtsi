@@ -434,6 +434,15 @@
 		interrupt-parent = <&intc>;
 	};
 
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,sm8150-pdc", "qcom,pdc";
+		reg = <0xb220000 0x30000>, <0x17c000f0 0x64>;
+		qcom,pdc-ranges = <0 480 94>, <94 609 31>, <125 63 1>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+
 	arch_timer: timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <GIC_PPI 1 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
@@ -514,22 +523,50 @@
 		      <0x18210000 0x10000>,
 		      <0x18220000 0x10000>;
 		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
 		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,tcs-offset = <0xd00>;
-		qcom,drv-id = <2>;
-		qcom,tcs-config = <ACTIVE_TCS  2>,
-				  <SLEEP_TCS   1>,
-				  <WAKE_TCS    1>,
-				  <CONTROL_TCS 0>;
 
-		rpmhcc: clock-controller {
-			compatible = "qcom,sm8150-rpmh-clk";
-			#clock-cells = <1>;
-			clock-names = "xo";
-			clocks = <&xo_board>;
-			status = "okay";
+		apps_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0xd00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    2>,
+						  <SLEEP_TCS     3>,
+						  <WAKE_TCS      3>,
+						  <CONTROL_TCS   1>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			rpmhcc: clock-controller {
+				compatible = "qcom,sm8150-rpmh-clk";
+				#clock-cells = <1>;
+				clock-names = "xo";
+				clocks = <&xo_board>;
+				status = "okay";
+			};
+		};
+	};
+
+	disp_rsc: rsc@af20000 {
+		label = "disp_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0xaf20000 0x10000>;
+		reg-names = "drv-0";
+		qcom,drv-count = <1>;
+		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
+
+		disp_rsc_drv0: drv@0 {
+			qcom,drv-id = <0>;
+			qcom,tcs-offset = <0x1c00>;
+			channel@0 {
+				qcom,tcs-config = <SLEEP_TCS     1>,
+						  <WAKE_TCS      1>,
+						  <ACTIVE_TCS    2>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
 		};
 	};
 
