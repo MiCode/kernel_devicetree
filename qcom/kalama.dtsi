@@ -405,6 +405,11 @@
 		reg = <0x0 0x81d00000 0x0 0x200000>;
 	};
 
+	adsp_mhi_mem: adsp_mhi_region@81f00000 {
+		no-map;
+		reg = <0x0 0x81f00000 0x0 0x20000>;
+	};
+
 	global_sync_mem: global_sync_region@82600000 {
 		no-map;
 		reg = <0x0 0x82600000 0x0 0x100000>;
@@ -501,6 +506,11 @@
 
 	/* Linux kernel image is loaded at 0xa8000000 */
 
+	mpss_dsm_mem: mpss_dsm_region@d4d00000 {
+		no-map;
+		reg = <0x0 0xd4d00000 0x0 0x3300000>;
+	};
+
 	cpucp_fw_mem: cpucp_fw_region@d8000000 {
 		no-map;
 		reg = <0x0 0xd8000000 0x0 0x100000>;
@@ -531,9 +541,41 @@
 		reg = <0x0 0xe1200000 0x0 0x2710000>;
 	};
 
-	trust_ui_vm_mem: trust_ui_vm_region@f3e00000 {
+	trust_ui_vm_mem: trust_ui_vm_region@f3c00000 {
 		no-map;
-		reg = <0x0 0xf3e00000 0x0 0x42f3000>;
+		reg = <0x0 0xf3c00000 0x0 0x42f3000>;
+	};
+
+	trust_ui_vm_qrtr: trust_ui_vm_qrtr@f7ef3000 {
+		no-map;
+		reg = <0x0 0xf7ef3000 0x0 0x9000>;
+	};
+
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@f7efc000 {
+		no-map;
+		reg = <0x0 0xf7efc000 0x0 0x4000>;
+		gunyah-label = <0x11>;
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@f7f00000 {
+		no-map;
+		reg = <0x0 0xf7f00000 0x0 0x100000>;
+		gunyah-label = <0x12>;
+	};
+
+	oem_vm_mem: oem_vm_region@f8000000 {
+		no-map;
+		reg = <0x0 0xf8000000 0x0 0x5000000>;
+	};
+
+	hyp_ext_tags_mem: hyp_ext_tags_region@fd000000 {
+		no-map;
+		reg = <0x0 0xfd000000 0x0 0x2800000>;
+	};
+
+	llcc_lpi_mem: llcc_lpi_region@ff800000 {
+		no-map;
+		reg = <0x0 0xff800000 0x0 0x600000>;
 	};
 
 	sp_mem: sp_region {  /* SPSS-HLOS ION shared mem */
@@ -542,39 +584,6 @@
 		reusable;
 		alignment = <0x0 0x400000>;
 		size = <0x0 0x1000000>;
-	};
-
-
-	trust_ui_vm_qrtr: trust_ui_vm_qrtr@f80f3000 {
-		no-map;
-		reg = <0x0 0xf80f3000 0x0 0x9000>;
-	};
-
-	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@f80fc000 {
-		no-map;
-		reg = <0x0 0xf80fc000 0x0 0x4000>;
-		gunyah-label = <0x11>;
-	};
-
-	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@f8100000 {
-		no-map;
-		reg = <0x0 0xf8100000 0x0 0x100000>;
-		gunyah-label = <0x12>;
-	};
-
-	oem_vm_mem: oem_vm_region@f8200000 {
-		no-map;
-		reg = <0x0 0xf8200000 0x0 0x5000000>;
-	};
-
-	hyp_ext_tags_mem: hyp_ext_tags_region@fd200000 {
-		no-map;
-		reg = <0x0 0xfd200000 0x0 0x2800000>;
-	};
-
-	llcc_lpi_mem: llcc_lpi_region@ffa00000 {
-		no-map;
-		reg = <0x0 0xffa00000 0x0 0x600000>;
 	};
 
 	cdsp_eva_mem: cdsp_eva_region {
@@ -2865,7 +2874,7 @@
 		};
 	};
 
-	qcom,guestvm_loader@f3e00000 {
+	qcom,guestvm_loader@f3c00000 {
 		compatible = "qcom,guestvm-loader";
 		qcom,pas-id = <28>;
 		qcom,isolate-cpus;
@@ -2892,7 +2901,7 @@
 					&tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
 	};
 
-	qcom,gh_vm_loader_sec@f3e00000 {
+	qcom,gh_vm_loader_sec@f3c00000 {
 		compatible = "qcom,gh-vm-loader-sec";
 		qcom,pas-id = <28>;
 		qcom,vmid = <45>;
@@ -2909,8 +2918,8 @@
 		memory-region = <&cpusys_vm_mem>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@f80fc000 {
-		reg = <0xf80fc000 0x104000>;
+	trust_ui_vm: qcom,trust_ui_vm@f7efc000 {
+		reg = <0xf7efc000 0x104000>;
 		vm_name = "trustedvm";
 		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_swiotlb>;
 	};
