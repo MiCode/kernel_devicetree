@@ -520,8 +520,12 @@
 	};
 
 	gcc: clock-controller@80000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,cinder-gcc", "syscon";
+		reg = <0x80000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&sleep_clk>;
+		clock-names = "bi_tcxo", "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -535,17 +539,17 @@
 
 	/* GCC GDSCs */
 	gcc_pcie_0_gdsc: qcom,gdsc@11d004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
 		regulator-name = "gcc_pcie_0_gdsc";
 	};
 
 	gcc_pcie_0_phy_gdsc: qcom,gdsc@fc004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
 		regulator-name = "gcc_pcie_0_phy_gdsc";
 	};
 
 	gcc_usb30_prim_gdsc: qcom,gdsc@c9004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
 		regulator-name = "gcc_usb30_prim_gdsc";
 	};
 
