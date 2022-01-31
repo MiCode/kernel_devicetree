@@ -22,13 +22,23 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
+	ddr-regions { };
 
 
 	chosen: chosen {
-			bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance kasan=off mem-offline.bypass_send_msg=1";
+			bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance kasan=off mem-offline.bypass_send_msg=1 disable_dma32=on";
 	 };
 
 	reserved_memory: reserved-memory { };
+
+	mem-offline {
+		compatible = "qcom,mem-offline";
+		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
+				<0x1 0xc0000000 0x0 0x80000000>,
+				<0x2 0xc0000000 0x1 0x40000000>;
+		granule = <512>;
+		mboxes = <&qmp_aop 0>;
+	};
 
 	aliases: aliases {
 		serial0 = &qupv3_se7_2uart;
@@ -68,6 +78,7 @@
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -93,6 +104,7 @@
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_1>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -113,6 +125,7 @@
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_1>;
 		};
 
@@ -128,6 +141,7 @@
 			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1792>;
 			dynamic-power-coefficient = <270>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_3>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -148,6 +162,7 @@
 			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1792>;
 			dynamic-power-coefficient = <270>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_4>;
 			L2_4: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -169,6 +184,7 @@
 			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1792>;
 			dynamic-power-coefficient = <270>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_5>;
 			L2_5: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -189,6 +205,7 @@
 			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1792>;
 			dynamic-power-coefficient = <270>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_6>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -209,6 +226,7 @@
 			qcom,freq-domain = <&cpufreq_hw 2>;
 			capacity-dmips-mhz = <1894>;
 			dynamic-power-coefficient = <588>;
+			#cooling-cells = <2>;
 			next-level-cache = <&L2_7>;
 			L2_7: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -669,7 +687,7 @@
 	slimbam: bamdma@6C04000 {
 		compatible = "qcom,bam-v1.7.0";
 		qcom,controlled-remotely;
-		reg = <0x6C04000 0x20000>, <0x6C8b000 0x1000>;
+		reg = <0x6C04000 0x20000>, <0x6C8F000 0x1000>;
 		reg-names = "bam", "bam_remote_mem";
 		num-channels  = <31>;
 		interrupts = <0 164 IRQ_TYPE_LEVEL_HIGH>;
@@ -680,7 +698,7 @@
 
 	slim_msm: slim@6C40000 {
 		compatible = "qcom,slim-ngd-v1.5.0";
-		reg = <0x6C40000 0x2C000>, <0x6C8a000 0x1000>;
+		reg = <0x6C40000 0x2C000>, <0x6C8E000 0x1000>;
 		reg-names = "ctrl", "slimbus_remote_mem";
 		interrupts = <0 163 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,apps-ch-pipes = <0x0>;
@@ -1155,6 +1173,41 @@
 		hyplog-size-offset = <0x414>;
 	};
 
+	qcom_cedev: qcedev@1de0000 {
+		compatible = "qcom,qcedev";
+		reg = <0x1de0000 0x20000>,
+			<0x1dc4000 0x24000>;
+		reg-names = "crypto-base","crypto-bam-base";
+		interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,bam-pipe-pair = <2>;
+		qcom,ce-hw-instance = <0>;
+		qcom,ce-device = <0>;
+		qcom,ce-hw-shared;
+		qcom,bam-ee = <0>;
+		qcom,smmu-s1-enable;
+		qcom,no-clock-support;
+		interconnect-names = "data_path";
+		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		iommus = <&apps_smmu 0x0480 0x0>;
+		qcom,iommu-dma = "atomic";
+		dma-coherent;
+
+		qcom_cedev_ns_cb {
+			compatible = "qcom,qcedev,context-bank";
+			label = "ns_context";
+			iommus = <&apps_smmu 0x0481 0x0>;
+			dma-coherent;
+		};
+
+		qcom_cedev_s_cb {
+			compatible = "qcom,qcedev,context-bank";
+			label = "secure_context";
+			iommus = <&apps_smmu 0x0483 0x0>;
+			qcom,iommu-vmid = <0x9>;
+			qcom,secure-context-bank;
+		};
+	};
+
 	qcom,msm-imem@146aa000 {
 		compatible = "qcom,msm-imem";
 		reg = <0x146aa000 0x1000>;
@@ -1560,6 +1613,7 @@
 		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
 		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
 		qcom,gds-timeout = <500>;
+		qcom,support-hw-trigger;
 		qcom,retain-regs;
 	};
 
@@ -1604,6 +1658,7 @@
 		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
 		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
 		qcom,gds-timeout = <500>;
+		qcom,support-hw-trigger;
 		qcom,retain-regs;
 	};
 
@@ -1664,6 +1719,7 @@
 		proxy-supply = <&disp_cc_mdss_core_gdsc>;
 		qcom,gds-timeout = <500>;
 		qcom,proxy-consumer-enable;
+		qcom,support-hw-trigger;
 		qcom,retain-regs;
 	};
 
@@ -1675,6 +1731,7 @@
 		clocks = <&gcc GCC_DISP_AHB_CLK>;
 		parent-supply = <&VDD_MM_LEVEL>;
 		qcom,gds-timeout = <500>;
+		qcom,support-hw-trigger;
 		qcom,retain-regs;
 	};
 
@@ -1700,7 +1757,7 @@
 		compatible = "qcom,gdsc";
 		reg = <0x16c000 0x4>;
 		regulator-name = "gcc_pcie_0_phy_gdsc";
-		parent-supply = <&VDD_CX_LEVEL>;
+		parent-supply = <&VDD_MXA_LEVEL>;
 		clocks = <&gcc 0>;
 		qcom,gds-timeout = <500>;
 		qcom,retain-regs;
@@ -1724,7 +1781,7 @@
 		compatible = "qcom,gdsc";
 		reg = <0x18e000 0x4>;
 		regulator-name = "gcc_pcie_1_phy_gdsc";
-		parent-supply = <&VDD_CX_LEVEL>;
+		parent-supply = <&VDD_MXA_LEVEL>;
 		clocks = <&gcc 0>;
 		qcom,gds-timeout = <500>;
 		qcom,retain-regs;
@@ -1738,7 +1795,7 @@
 		regulator-name = "gcc_ufs_mem_phy_gdsc";
 		clocks = <&gcc 0>;
 		qcom,gds-timeout = <500>;
-		parent-supply = <&VDD_CX_LEVEL>;
+		parent-supply = <&VDD_MXA_LEVEL>;
 		qcom,retain-regs;
 	};
 
@@ -1771,7 +1828,8 @@
 		regulator-name = "gcc_usb3_phy_gdsc";
 		clocks = <&gcc 0>;
 		qcom,gds-timeout = <500>;
-		parent-supply = <&VDD_CX_LEVEL>;
+		parent-supply = <&VDD_MXA_LEVEL>;
+		qcom,proxy-consumer-enable;
 		qcom,retain-regs;
 	};
 
@@ -1952,7 +2010,7 @@
 			<&gcc GCC_UFS_PHY_AHB_CLK>,
 			<&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
 			<&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
-			<&rpmhcc RPMH_CXO_CLK>,
+			<&rpmhcc RPMH_LN_BB_CLK3>,
 			<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
 			<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
 			<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
@@ -2876,7 +2934,7 @@
 			< 0x0008 0xFF 0x02 0xFF >,
 			< 0x0011 0xFF 0x01 0xFF >,
 			< 0x0017 0xFF 0xFF 0xFF >,
-			< 0x002A 0xFF 0xFF 0xFF >,
+			< 0x0037 0xFF 0xFF 0xFF >,
 			< 0x1000 0xFF 0xFF 0xFF >;
 	};
 
@@ -3053,7 +3111,7 @@
 			compatible = "qcom,memlat-grp";
 			qcom,target-dev = <&qcom_llcc_dcvs_hw>;
 			qcom,sampling-path = <&llcc_dcvs_fp>;
-			qcom,miss-ev = <0x2A>;
+			qcom,miss-ev = <0x37>;
 
 			silver {
 				compatible = "qcom,memlat-mon";
@@ -3256,6 +3314,7 @@
 		#address-cells = <2>;
 		#size-cells = <0>;
 		depends-on-supply = <&spmi1_bus>;
+		depends-on2-supply = <&smb1394_glink_debug>;
 
 		qcom,pmk8550-debug@0 {
 			compatible = "qcom,spmi-pmic";
@@ -3358,6 +3417,100 @@
 		compatible = "qcom,gh-dbl";
 		qcom,label = <0x4>;
 	};
+
+	qcom,gh-qtimer@17425000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x17425000 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,primary;
+	};
+
+	qcom,test-msgq {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <4>;
+		qcom,primary;
+	};
+
+	qcom,pmic_glink {
+		compatible = "qcom,pmic-glink";
+		qcom,pmic-glink-channel = "PMIC_RTR_ADSP_APPS";
+		qcom,subsys-name = "lpass";
+		qcom,protection-domain = "tms/servreg", "msm/adsp/charger_pd";
+		depends-on-supply = <&ipcc_mproc>;
+
+		battery_charger: qcom,battery_charger {
+			compatible = "qcom,battery-charger";
+		};
+
+		ucsi: qcom,ucsi {
+			compatible = "qcom,ucsi-glink";
+		};
+
+		altmode: qcom,altmode {
+			compatible = "qcom,altmode-glink";
+			#altmode-cells = <1>;
+		};
+	};
+
+	qcom,pmic_glink_log {
+		compatible = "qcom,pmic-glink";
+		qcom,pmic-glink-channel = "PMIC_LOGS_ADSP_APPS";
+
+		qcom,battery_debug {
+			compatible = "qcom,battery-debug";
+		};
+
+		qcom,charger_ulog_glink {
+			compatible = "qcom,charger-ulog-glink";
+		};
+
+		qcom,spmi_glink_debug {
+			compatible = "qcom,spmi-glink-debug";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			depends-on-supply = <&spmi1_bus>;
+
+			/* Primary SPMI bus */
+			spmi@0 {
+				reg = <0>;
+				#address-cells = <2>;
+				#size-cells = <0>;
+
+				qcom,pm8550b-debug@7 {
+					compatible = "qcom,spmi-pmic";
+					reg = <0x7 SPMI_USID>;
+					qcom,can-sleep;
+				};
+			};
+
+			/* Secondary SPMI bus */
+			spmi@1 {
+				reg = <1>;
+				#address-cells = <2>;
+				#size-cells = <0>;
+
+				smb1394_glink_debug: qcom,smb1394-debug@9 {
+					compatible = "qcom,spmi-pmic";
+					reg = <0x9 SPMI_USID>;
+					qcom,can-sleep;
+				};
+
+				qcom,smb1394-debug@b {
+					compatible = "qcom,spmi-pmic";
+					reg = <0xb SPMI_USID>;
+					qcom,can-sleep;
+				};
+
+				qcom,smb1398-debug@d {
+					compatible = "qcom,spmi-pmic";
+					reg = <0xd SPMI_USID>;
+					qcom,can-sleep;
+				};
+			};
+		};
+	};
 };
 
 &firmware {
@@ -3407,6 +3560,7 @@
 #include "kalama-eva.dtsi"
 #include "kalama-pcie.dtsi"
 #include "msm-rdbg.dtsi"
+#include "kalama-thermal.dtsi"
 
 &qupv3_se7_2uart {
 	status = "ok";
