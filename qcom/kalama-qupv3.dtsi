@@ -821,8 +821,14 @@
 		reg = <0x9c0000 0x2000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		clock-names = "s-ahb";
-		clocks = <&gcc GCC_QUPV3_I2C_S_AHB_CLK>;
+		/* Upstream common driver using m-ahb and s-ahb clocks, for i2c-hub HW
+		 * supports only s-ahb clock. To support upstream model we are using both
+		 * the clocks, but for m-ahb clock we defined s-ahb clock node only.
+		 */
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_I2C_S_AHB_CLK>,
+			<&gcc GCC_QUPV3_I2C_S_AHB_CLK>;
+		ranges;
 		status = "ok";
 
 		qupv3_hub_i2c0: i2c@980000 {
