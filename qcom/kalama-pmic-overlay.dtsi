@@ -44,6 +44,31 @@
 	};
 };
 
+&pm8550vs_d_gpios {
+	eusb2_repeater_reset {
+		eusb2_repeater_reset_default: eusb2_repeater_reset_default {
+			pins = "gpio4";
+			function = "normal";
+			input-enable;
+			output-enable;
+			bias-disable;
+			power-source = <1>; /* 1.8V */
+			qcom,drive-strength = <2>;
+		};
+	};
+};
+
+&pm8550b_eusb2_repeater {
+	vdd18-supply = <&pm_humu_l15>;
+	vdd3-supply = <&pm_humu_l5>;
+	reset-gpio = <&pm8550vs_d_gpios 4 GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&eusb2_repeater_reset_default>;
+	interrupt-parent = <&spmi_bus>;
+	interrupts = <0x3 0x8b 0x0 IRQ_TYPE_EDGE_RISING>;
+	interrupt-names = "eusb2_rptr_reset_gpio_irq";
+};
+
 &soc {
 	DBO3: regulator-dbo3 {
 		compatible = "qti-regulator-fixed";
