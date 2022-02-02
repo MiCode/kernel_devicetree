@@ -49,6 +49,7 @@ KALAMA_APQ_BASE_DTB += kalamap.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
+		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
 		 kalama-atp-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo
