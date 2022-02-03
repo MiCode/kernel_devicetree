@@ -25,9 +25,11 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	aliases {
-		serial0 = &uart2;
 		pci-domain0 = &pcie0; /* PCIe0 domain */
 		pci-domain1 = &pcie1; /* PCIe1 domain */
+		serial0 = &qupv3_se12_2uart;
+		hsuart0 = &qupv3_se17_4uart;
+		hsuart1 = &qupv3_se9_2uart;
 	};
 
 	cpus {
@@ -956,27 +958,6 @@
 		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
 	};
 
-	qupv3_id_1: geniqup@ac0000 {
-		compatible = "qcom,geni-se-qup";
-		reg = <0xac0000 0x6000>;
-		clock-names = "m-ahb", "s-ahb";
-		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
-			 <&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
-		ranges;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		status = "ok";
-
-		uart2: serial@a90000 {
-			compatible = "qcom,geni-debug-uart";
-			reg = <0x00a90000 0x4000>;
-			clock-names = "se";
-			clocks = <&gcc GCC_QUPV3_WRAP1_S4_CLK>;
-			interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
-			status = "ok";
-		};
-	};
-
 	apcs: syscon@17c0000c {
 		compatible = "syscon";
 		reg = <0x17c0000c 0x4>;
@@ -1094,6 +1075,11 @@
 		reg = <0x17c10000 0x1000>;
 		reg-names = "wdt-base";
 		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	qcom,sps {
+		compatible = "qcom,msm-sps-4k";
+		qcom,pipe-attr-ee;
 	};
 
 	qcom,mem-buf {
@@ -1381,4 +1367,9 @@
 };
 
 #include "sm8150-pcie.dtsi"
+#include "sm8150-qupv3.dtsi"
+#include "sm8150-ssc-qupv3.dtsi"
 
+&qupv3_se12_2uart {
+	status = "ok";
+};
