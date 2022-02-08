@@ -32,6 +32,41 @@
 	status = "ok";
 };
 
+&spmi_bus {
+	#address-cells = <2>;
+	#size-cells = <0>;
+	interrupt-controller;
+	#interrupt-cells = <4>;
+
+	pm8010_m: qcom,pm8010@c {
+		compatible = "qcom,spmi-pmic";
+		reg = <0xc SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		pm8010m_tz: qcom,temp-alarm@2400 {
+			compatible = "qcom,spmi-temp-alarm";
+			reg = <0x2400>;
+			interrupts = <0xc 0x24 0x0 IRQ_TYPE_EDGE_BOTH>;
+			#thermal-sensor-cells = <0>;
+		};
+	};
+
+	pm8010_n: qcom,pm8010@d {
+		compatible = "qcom,spmi-pmic";
+		reg = <0xd SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		pm8010n_tz: qcom,temp-alarm@2400 {
+			compatible = "qcom,spmi-temp-alarm";
+			reg = <0x2400>;
+			interrupts = <0xd 0x24 0x0 IRQ_TYPE_EDGE_BOTH>;
+			#thermal-sensor-cells = <0>;
+		};
+	};
+};
+
 &pm8550_gpios {
 	key_vol_up {
 		key_vol_up_default: key_vol_up_default {
@@ -191,6 +226,60 @@
 };
 
 &thermal_zones {
+	pm8010m_tz {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8010m_tz>;
+
+		trips {
+			trip0 {
+				temperature = <95000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			trip1 {
+				temperature = <115000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+
+			trip2 {
+				temperature = <145000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+		};
+	};
+
+	pm8010n_tz {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8010n_tz>;
+
+		trips {
+			trip0 {
+				temperature = <95000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			trip1 {
+				temperature = <115000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+
+			trip2 {
+				temperature = <145000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+		};
+	};
+
 	msm-therm {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
