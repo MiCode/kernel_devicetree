@@ -49,6 +49,7 @@
 			dynamic-power-coefficient = <100>;
 			power-domains = <&CPU_PD0>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0 4>;
 			#cooling-cells = <2>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -73,6 +74,7 @@
 			dynamic-power-coefficient = <100>;
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0 4>;
 		};
 
 		CPU2: cpu@200 {
@@ -86,6 +88,7 @@
 			dynamic-power-coefficient = <100>;
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0 4>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -104,6 +107,7 @@
 			dynamic-power-coefficient = <100>;
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0 4>;
 		};
 
 		CPU4: cpu@400 {
@@ -117,6 +121,7 @@
 			dynamic-power-coefficient = <257>;
 			power-domains = <&CPU_PD4>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			#cooling-cells = <2>;
 			L2_4: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -136,6 +141,7 @@
 			dynamic-power-coefficient = <257>;
 			power-domains = <&CPU_PD5>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			L2_5: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -154,6 +160,7 @@
 			dynamic-power-coefficient = <257>;
 			power-domains = <&CPU_PD6>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -172,6 +179,7 @@
 			dynamic-power-coefficient = <509>;
 			power-domains = <&CPU_PD7>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 2 4>;
 			#cooling-cells = <2>;
 			L2_7: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -562,6 +570,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
+		qcom,gpios-reserved = <28 29 30 31 36 37 38 39>;
 	};
 
 	arch_timer: timer {
@@ -1096,27 +1105,27 @@
 		qcom,no-clock-support;
 		interconnect-names = "data_path";
 		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
-		iommus = <&apps_smmu 0x0484 0x0011>;
+		iommus = <&apps_smmu 0x0584 0x0011>;
 		qcom,iommu-dma = "atomic";
 		dma-coherent;
 
 		qcom_cedev_ns_cb {
 			compatible = "qcom,qcedev,context-bank";
 			label = "ns_context";
-			iommus = <&apps_smmu 0x488 0x0>,
-				<&apps_smmu 0x49A 0x0>,
-				<&apps_smmu 0x49F 0x0>,
-				<&apps_smmu 0x498 0x5>;
+			iommus = <&apps_smmu 0x588 0x0>,
+				<&apps_smmu 0x59A 0x0>,
+				<&apps_smmu 0x59F 0x0>,
+				<&apps_smmu 0x598 0x5>;
 			dma-coherent;
 		};
 
 		qcom_cedev_s_cb {
 			compatible = "qcom,qcedev,context-bank";
 			label = "secure_context";
-			iommus = <&apps_smmu 0x492 0x0>,
-				 <&apps_smmu 0x497 0x0>,
-				 <&apps_smmu 0x49B 0x0>,
-				 <&apps_smmu 0x49E 0x0>;
+			iommus = <&apps_smmu 0x592 0x0>,
+				 <&apps_smmu 0x597 0x0>,
+				 <&apps_smmu 0x59B 0x0>,
+				 <&apps_smmu 0x59E 0x0>;
 			qcom,iommu-vmid = <0x9>;
 			qcom,secure-context-bank;
 		};
@@ -1827,6 +1836,9 @@
 		qcom,iommu-dma = "fastmap";
 		dma-coherent;
 
+		/* Multilevel clock scaling support for higher ufs clock freq */
+		multi-level-clk-scaling-support;
+
 		status = "disabled";
 		qos0 {
 			mask = <0xf0>;
@@ -2217,6 +2229,46 @@
 		interrupt-names = "smp2p-sleepstate-in";
 	};
 
+	qcom,glinkpkt {
+		compatible = "qcom,glinkpkt";
+
+		qcom,glinkpkt-at-mdm0 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DS";
+			qcom,glinkpkt-dev-name = "at_mdm0";
+		};
+
+		qcom,glinkpkt-apr-apps2 {
+			qcom,glinkpkt-edge = "adsp";
+			qcom,glinkpkt-ch-name = "apr_apps2";
+			qcom,glinkpkt-dev-name = "apr_apps2";
+		};
+
+		qcom,glinkpkt-data40-cntl {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA40_CNTL";
+			qcom,glinkpkt-dev-name = "smdcntl8";
+		};
+
+		qcom,glinkpkt-data1 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA1";
+			qcom,glinkpkt-dev-name = "smd7";
+		};
+
+		qcom,glinkpkt-data4 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA4";
+			qcom,glinkpkt-dev-name = "smd8";
+		};
+
+		qcom,glinkpkt-data11 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA11";
+			qcom,glinkpkt-dev-name = "smd11";
+		};
+	};
+
 	aoss_qmp: power-controller@c300000 {
 		compatible = "qcom,waipio-aoss-qmp";
 		reg = <0xc300000 0x400>;
@@ -2254,6 +2306,14 @@
 		priority = <0>;
 		mbox-desc-offset = <0x0>;
 		#mbox-cells = <1>;
+	};
+
+	qcom,tmecom-qmp-client {
+		compatible = "qcom,tmecom-qmp-client";
+		mboxes = <&qmp_tme 0>;
+		mbox-names = "tmecom";
+		label = "tmecom";
+		depends-on-supply = <&qmp_tme>;
 	};
 
 	slpi_pas: remoteproc-slpi@02400000 {
@@ -2454,7 +2514,8 @@
 			qcom,additional-mapping =
 				/* modem tables in IMEM */
 				<0x146A8000 0x146A8000 0x2000>;
-			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma = "atomic";
+			dma-coherent;
 			qcom,ipa-q6-smem-size = <36864>;
 		};
 
@@ -2732,7 +2793,6 @@
 	};
 
 	wlan: qcom,cnss-qca6490@b0000000 {
-		status = "disabled";
 		compatible = "qcom,cnss-qca6490";
 		reg = <0xb0000000 0x10000>;
 		reg-names = "smmu_iova_ipa";
@@ -2849,6 +2909,7 @@
 #include "cape-usb.dtsi"
 #include "cape-pcie.dtsi"
 #include "msm-rdbg.dtsi"
+#include "waipio-eva.dtsi"
 
 &qupv3_se7_2uart {
 	status = "ok";
