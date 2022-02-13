@@ -83,6 +83,7 @@ dtbo-$(CONFIG_ARCH_WAIPIO) += waipio-rumi-overlay.dtbo \
 	ingres-sm8450-pm8008-overlay.dtbo \
 	zizhan-sm8450-pm8008-overlay.dtbo \
 	thor-sm8450-pm8008-overlay.dtbo \
+	unicorn-sm8450-pm8008-overlay.dtbo \
 	loki-sm8450-pm8008-overlay.dtbo \
 	waipio-cdp-pm8008-overlay.dtbo \
 	waipio-qrd-pm8008-overlay.dtbo \
@@ -109,6 +110,7 @@ cupid-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb wa
 ingres-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
 zizhan-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
 thor-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
+unicorn-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
 loki-sm8450-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
 waipio-mtp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
 waipio-cdp-pm8008-overlay.dtbo-base := waipio.dtb waipiop.dtb waipio-v2.dtb waipiop-v2.dtb waipio-lte.dtb
