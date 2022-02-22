@@ -4,3 +4,52 @@
 */
 #include "unicorn-pinctrl.dtsi"
 #include "xiaomi-sm8475-common.dtsi"
+
+&qupv3_se15_i2c {
+	status = "ok";
+	cs35l41_0: cs35l41@40 {
+		status = "ok";
+		compatible = "cirrus,cs35l41";
+		reset-gpios = <&tlmm 120 0>;
+		reg = <0x40>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <117 0x2008>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&cirrus_reset_default_0 &cirrus_irq_default_0>;
+		cirrus,temp-warn_threshold = <3>;
+		cirrus,boost-peak-milliamp = <4000>;
+		cirrus,boost-ind-nanohenry = <1000>;
+		cirrus,boost-cap-microfarad = <15>;
+		cirrus,asp-sdout-hiz = <3>;
+		cirrus,right-channel-amp;
+		sound-name-prefix = "B";
+		cirrus,fast-switch = "B-music.txt", "B-handfree.txt";
+		cirrus,gpio-config2 {
+			cirrus,gpio-src-select = <0x4>;
+			cirrus,gpio-output-enable;
+		};
+	};
+	cs35l41_3: cs35l41@43 {
+		status = "ok";
+		compatible = "cirrus,cs35l41";
+		reset-gpios = <&tlmm 1 0>;
+		spk-sw-gpios = <&tlmm 52 0>;
+		reg = <0x43>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <88 0x2008>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&cirrus_reset_default_3 &cirrus_irq_default_3>;
+		cirrus,temp-warn_threshold = <3>;
+		cirrus,boost-peak-milliamp = <4000>;
+		cirrus,boost-ind-nanohenry = <1000>;
+		cirrus,boost-cap-microfarad = <15>;
+		cirrus,asp-sdout-hiz = <3>;
+		sound-name-prefix = "T";
+		cirrus,fast-switch = "T-music.txt", "T-handset.txt", "T-handfree.txt";
+		cirrus,gpio-config2 {
+			cirrus,gpio-src-select = <0x4>;
+			cirrus,gpio-output-enable;
+		};
+	};
+};
+
