@@ -52,6 +52,7 @@ KALAMA_BOARDS += \
 		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
 		 kalama-atp-overlay.dtbo \
+		 kalama-rcm-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo
 
 NOAPQ_KALAMA_BOARDS += \
