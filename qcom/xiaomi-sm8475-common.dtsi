@@ -153,11 +153,40 @@
 		reg = <0x4f>;
 		vdd18-supply = <&S10B>;
 		vdd3-supply = <&L2B>;
-		reset-gpio = <&pm8350c_gpios 7 GPIO_ACTIVE_LOW>;
+		reset-gpio = <&pm8350c_gpios 7 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&eusb2_reset_ctrl_default>;
+		interrupt-parent = <&spmi_bus>;
+		interrupts = <0x2 0x8e 0x0 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "eusb2_rptr_reset_gpio_irq";
 	};
 };
 
 &eusb2_phy0 {
 	dummy-supply = <&nxp_eusb2_repeater>;
 	usb-repeater = <&nxp_eusb2_repeater>;
+};
+
+&usb0 {
+	usb-role-switch;
+
+	dwc3@a600000 {
+		usb-role-switch;
+	};
+
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		port {
+			usb_port0_connector: endpoint {
+				remote-endpoint = <&usb_port0>;
+			};
+		};
+	};
 };
