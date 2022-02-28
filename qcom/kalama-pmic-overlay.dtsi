@@ -42,9 +42,45 @@
 			power-source = <1>;
 		};
 	};
+
+	sd_card_det {
+		sd_card_det_default: sd_card_det_default {
+			pins = "gpio12";
+			function = "normal";
+			input-enable;
+			output-disable;
+			bias-pull-up;
+			power-source = <1>; /* 1.8 V */
+		};
+	};
+};
+
+&pm8550vs_d_gpios {
+	eusb2_repeater_reset {
+		eusb2_repeater_reset_default: eusb2_repeater_reset_default {
+			pins = "gpio4";
+			function = "normal";
+			input-enable;
+			output-enable;
+			bias-disable;
+			power-source = <1>; /* 1.8V */
+			qcom,drive-strength = <2>;
+		};
+	};
+};
+
+&pm8550b_eusb2_repeater {
+	vdd18-supply = <&pm_humu_l15>;
+	vdd3-supply = <&pm_humu_l5>;
 };
 
 &soc {
+	reboot_reason {
+		compatible = "qcom,reboot-reason";
+		nvmem-cells = <&restart_reason>;
+		nvmem-cell-names = "restart_reason";
+	};
+
 	DBO3: regulator-dbo3 {
 		compatible = "qti-regulator-fixed";
 		regulator-name = "dbo3";

@@ -57,6 +57,7 @@
 			dma-coherent;
 
 			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&eusb2_phy0>, <&usb_qmp_dp_phy>;
 			snps,disable-clk-gating;
 			snps,has-lpm-erratum;
 			snps,hird-threshold = /bits/ 8 <0x0>;
@@ -107,7 +108,7 @@
 		reg = <0x88e3000 0x154>,
 			<0x088e2000 0x4>,
 			<0x0C276000 0x4>;
-		reg-names = "hsusb_phy_base",
+		reg-names = "eusb2_phy_base",
 			"eud_enable_reg",
 			"eud_detect_reg";
 
@@ -115,7 +116,7 @@
 		qcom,vdd-voltage-level = <0 880000 880000>;
 		vdda12-supply = <&pm_v6e_l3>;
 
-		clocks = <&rpmhcc RPMH_CXO_CLK>,
+		clocks = <&rpmhcc RPMH_CXO_PAD_CLK>,
 			<&tcsrcc TCSR_USB2_CLKREF_EN>;
 		clock-names = "ref_clk_src", "ref_clk";
 
@@ -134,11 +135,12 @@
 		qcom,vdd-max-load-uA = <47000>;
 		core-supply = <&pm_v6e_l3>;
 
+		usb3_dp_phy_gdsc-supply = <&gcc_usb3_phy_gdsc>;
 		clocks = <&gcc GCC_USB3_PRIM_PHY_AUX_CLK>,
 			<&gcc GCC_USB3_PRIM_PHY_PIPE_CLK>,
 			<&gcc GCC_USB3_PRIM_PHY_PIPE_CLK_SRC>,
 			<&usb3_phy_wrapper_gcc_usb30_pipe_clk>,
-			<&rpmhcc RPMH_CXO_CLK>,
+			<&rpmhcc RPMH_CXO_PAD_CLK>,
 			<&tcsrcc TCSR_USB3_CLKREF_EN>,
 			<&gcc GCC_USB3_PRIM_PHY_COM_AUX_CLK>;
 		clock-names = "aux_clk", "pipe_clk", "pipe_clk_mux",
@@ -164,7 +166,7 @@
 			 USB3_DP_COM_RESET_OVRD_CTRL
 			 USB3_DP_COM_PHY_MODE_CTRL
 			 USB3_DP_COM_TYPEC_CTRL
-			 USB3_DP_PCS_CLAMP_ENABLE>;
+			 USB3_DP_PCS_AON_CLAMP_ENABLE>;
 
 		qcom,qmp-phy-init-seq =
 			/* <reg_offset, value, delay> */
@@ -329,6 +331,7 @@
 			USB3_DP_PCS_USB3_LFPS_DET_HIGH_COUNT_VAL 0xF8 0
 			USB3_DP_PCS_USB3_RXEQTRAINING_DFE_TIME_S2 0x07 0
 			USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_L 0x40 0
-			USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_H 0x00 0>;
+			USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_H 0x00 0
+			0xffffffff 0xffffffff 0x00>;
 	};
 };

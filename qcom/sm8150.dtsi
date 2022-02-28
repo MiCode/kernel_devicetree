@@ -315,8 +315,10 @@
 
 		qseecom_mem: qseecom_region {
 			compatible = "shared-dma-pool";
-			no-map;
-			reg = <0x0 0x9e400000 0x0 0x1400000>;
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1400000>;
 		};
 
 		cdsp_sec_mem: cdsp_sec_regions {
@@ -615,6 +617,29 @@
 		mbox-desc-offset = <0x0>;
 		#mbox-cells = <1>;
 	};
+
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+		qcom,vmid-cp-camera-preview-ro;
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+	};
 };
 
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
+	};
+};
+
+#include "sm8150-regulator.dtsi"
 #include "sm8150-pinctrl.dtsi"
+#include "sm8150-dma-heaps.dtsi"

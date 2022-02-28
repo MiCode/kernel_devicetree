@@ -3,6 +3,8 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
+#include <dt-bindings/soc/qcom,rpmh-rsc.h>
+
 / {
 	interrupt-parent = <&intc>;
 
@@ -20,6 +22,8 @@
 
 	firmware: firmware { };
 
+	reserved_memory: reserved-memory { };
+
 	cpus {
 		#address-cells = <2>;
 		#size-cells = <0>;
@@ -28,8 +32,7 @@
 			device_type = "cpu";
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x0>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80C40000>;
+			enable-method = "psci";
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -47,8 +50,7 @@
 			device_type = "cpu";
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x100>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80C40000>;
+			enable-method = "psci";
 			next-level-cache = <&L2_1>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -62,8 +64,7 @@
 			device_type = "cpu";
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x200>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80C40000>;
+			enable-method = "psci";
 			next-level-cache = <&L2_2>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -76,8 +77,7 @@
 			device_type = "cpu";
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x300>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80C40000>;
+			enable-method = "psci";
 			next-level-cache = <&L2_3>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -111,6 +111,18 @@
 	soc: soc { };
 };
 
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	aop_cmd_db_mem: aop_cmd_db_region@80860000 {
+		compatible = "qcom,cmd-db";
+		no-map;
+		reg = <0x0 0x80860000 0x0 0x20000>;
+	};
+};
+
 #include "cinder-stub-regulator.dtsi"
 
 &soc {
@@ -118,6 +130,11 @@
 	#size-cells = <1>;
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
 
 	intc: interrupt-controller@17200000 {
 		compatible = "arm,gic-v3";
@@ -197,6 +214,31 @@
 			interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x1742d000 0x1000>;
 			status = "disabled";
+		};
+	};
+
+	apps_rsc: rsc@17a00000 {
+		label = "apps_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0x17a00000 0x10000>,
+		      <0x17a10000 0x10000>,
+		      <0x17a20000 0x10000>;
+		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
+		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+
+		apps_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0xd00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    2>,
+						  <SLEEP_TCS     3>,
+						  <WAKE_TCS      3>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
 		};
 	};
 
@@ -365,6 +407,14 @@
 		#mbox-cells = <1>;
 	};
 
+	qcom,tmecom-qmp-client {
+		compatible = "qcom,tmecom-qmp-client";
+		mboxes = <&qmp_tme 0>;
+		mbox-names = "tmecom";
+		label = "tmecom";
+		depends-on-supply = <&qmp_tme>;
+	};
+
 	sdhc_1: sdhci@8804000 {
 		status = "disabled";
 
@@ -500,6 +550,100 @@
 			<GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+	pcie_ep: qcom,pcie@48020000 {
+		compatible = "qcom,pcie-ep";
+			reg = <0x48020000 0x10000>,
+				<0x48000000 0xf20>,
+				<0x48000f40 0xa8>,
+				<0x48010000 0x10000>,
+				<0x48002000 0x1400>,
+				<0x48004000 0x1000>,
+				<0x01c00000 0x4000>,
+				<0x01c10000 0x10000>,
+				<0x01c04000 0x1000>,
+				<0x01fcb000 0x1000>,
+				<0xc2f1000 0x4>;
+			reg-names = "msi", "dm_core", "elbi", "iatu",
+					"msix_table", "msix_pba", "parf",
+					"phy", "mmio", "tcsr_pcie_perst_en",
+					"aoss_cc_reset";
+
+			#address-cells = <0>;
+			interrupt-parent = <&pcie_ep>;
+			interrupts = <0>;
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0xffffffff>;
+			interrupt-map = <0 &intc 0 172 0>;
+			interrupt-names = "int_global";
+
+			pinctrl-names = "default";
+			pinctrl-0 = <&pcie_ep_clkreq_default &pcie_ep_perst_default
+									&pcie_ep_wake_default>;
+			clkreq-gpio = <&tlmm 99 0>;
+			perst-gpio = <&tlmm 98 0>;
+			wake-gpio = <&tlmm 100 0>;
+
+			gdsc-vdd-supply = <&gcc_pcie_0_gdsc>;
+			vreg-1p8-supply = <&pm8150_a_l3>;
+			vreg-0p9-supply = <&pm8150_a_l6>;
+			vreg-mx-supply = <&VDD_MX_LEVEL>;
+			qcom,vreg-1p8-voltage-level = <1200000 1200000 30000>;
+			qcom,vreg-0p9-voltage-level = <912000 912000 132000>;
+			qcom,vreg-mx-voltage-level = <RPMH_REGULATOR_LEVEL_MAX RPMH_REGULATOR_LEVEL_NOM 0>;
+
+			clocks = <&gcc GCC_PCIE_0_PIPE_CLK>,
+				<&gcc GCC_PCIE_0_CFG_AHB_CLK>,
+				<&gcc GCC_PCIE_0_MSTR_AXI_CLK>,
+				<&gcc GCC_PCIE_0_SLV_AXI_CLK>,
+				<&gcc GCC_PCIE_0_AUX_CLK>,
+				<&gcc GCC_PCIE_0_CLKREF_EN>,
+				<&gcc GCC_PCIE_0_SLV_Q2A_AXI_CLK>,
+				<&rpmhcc RPMH_CXO_CLK>;
+
+			clock-names = "pcie_pipe_clk", "pcie_cfg_ahb_clk",
+					"pcie_mstr_axi_clk", "pcie_slv_axi_clk",
+					"pcie_aux_clk", "pcie_ldo",
+					"pcie_slv_q2a_axi_clk",
+					"pcie_0_ref_clk_src";
+
+			resets = <&gcc GCC_PCIE_0_BCR>,
+				<&gcc GCC_PCIE_0_PHY_BCR>;
+
+			reset-names = "pcie_core_reset",
+				"pcie_phy_reset";
+			qcom,pcie-vendor-id = /bits/ 16 <0x17cb>;
+			qcom,pcie-device-id = /bits/ 16 <0x0600>;
+			qcom,pcie-link-speed = <4>;
+			qcom,pcie-phy-ver = <6>;
+			qcom,pcie-active-config;
+			qcom,pcie-aggregated-irq;
+			qcom,pcie-mhi-a7-irq;
+			qcom,phy-status-reg2 = <0x1214>;
+			qcom,mhi-soc-reset-offset = <0xb01b8>;
+			qcom,aux-clk = <0x11>;
+
+			status = "ok";
+	};
+
+	mhi_device: mhi_dev@1c04000 {
+		compatible = "qcom,msm-mhi-dev";
+		reg = <0x1c04000 0x1000>;
+		reg-names = "mhi_mmio_base";
+		qcom,mhi-ep-msi = <0>;
+		qcom,mhi-version = <0x1000000>;
+		qcom,use-mhi-dma-software-channel;
+		interrupts = <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "mhi-device-inta";
+		qcom,mhi-ifc-id = <0x060017cb>;
+		qcom,mhi-interrupt;
+		qcom,no-m0-timeout;
+		status = "ok";
+	};
+
+	mhi_net_device: qcom,mhi_net_dev {
+		compatible = "qcom,msm-mhi-dev-net";
+		status = "ok";
+	};
 };
 
 &firmware {

@@ -44,13 +44,15 @@ waipio-overlays-dtb-$(CONFIG_ARCH_WAIPIO) += $(WAIPIO_BOARDS) $(NOAPQ_WAIPIO_BOA
 dtb-y += $(waipio-dtb-y)
 
 
-KALAMA_BASE_DTB += kalama.dtb
-KALAMA_APQ_BASE_DTB += kalamap.dtb
+KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb
+KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
+		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
 		 kalama-atp-overlay.dtbo \
+		 kalama-rcm-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo
 
 NOAPQ_KALAMA_BOARDS += \
@@ -100,7 +102,11 @@ ifeq ($(CONFIG_ARCH_QTI_VM), y)
 kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
                  kalama-vm-mtp.dtb \
                  kalama-vm-cdp.dtb \
-                 kalama-vm-qrd.dtb
+                 kalama-vm-qrd.dtb \
+                 kalama-oemvm-cdp.dtb \
+                 kalama-oemvm-mtp.dtb \
+                 kalama-oemvm-qrd.dtb \
+                 kalama-oemvm-rumi.dtb
 dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
@@ -110,7 +116,11 @@ ifeq ($(CONFIG_ARCH_QTI_VM), y)
 waipio_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += waipio-vm-mtp.dtb \
         waipio-vm-cdp.dtb \
         waipio-vm-qrd.dtb \
-        waipio-vm-rumi.dtb
+        waipio-vm-rumi.dtb \
+	waipio-oemvm-cdp.dtb \
+	waipio-oemvm-mtp.dtb \
+	waipio-oemvm-qrd.dtb \
+	waipio-oemvm-rumi.dtb
 dtb-y += $(waipio_tuivm-dtb-y)
 endif
 endif
