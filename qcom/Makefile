@@ -242,6 +242,7 @@ dtbo-$(CONFIG_ARCH_CAPE) += cape-mtp-pm8008-overlay.dtbo \
         cape-cdp-qhd-pm8010-overlay.dtbo \
 	diting-sm8475-pm8008-overlay.dtbo \
 	unicorn-sm8475-pm8008-overlay.dtbo \
+	thor-sm8475-pm8008-overlay.dtbo \
 	zizhan-sm8475-pm8008-overlay.dtbo \
 	cape-kiwi-mtp-pm8008-overlay.dtbo \
 	cape-kiwi-mtp-pm8010-overlay.dtbo \
@@ -263,6 +264,7 @@ cape-qrd-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 diting-sm8475-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 unicorn-sm8475-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 zizhan-sm8475-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
+thor-sm8475-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 cape-kiwi-mtp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 cape-kiwi-mtp-pm8010-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
 cape-kiwi-cdp-pm8008-overlay.dtbo-base := cape.dtb cape-v2.dtb capep.dtb
