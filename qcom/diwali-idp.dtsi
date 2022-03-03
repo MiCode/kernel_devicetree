@@ -32,102 +32,7 @@
 };
 
 &qupv3_se0_i2c {
-	#address-cells = <1>;
-	#size-cells = <0>;
-
-	status = "ok";
-	qcom,i2c-touch-active = "novatek,NVT-ts";
-
-	novatek@62 {
-		compatible = "novatek,NVT-ts";
-		reg = <0x62>;
-
-		interrupt-parent = <&tlmm>;
-		interrupts = <51 0x2008>;
-
-		pinctrl-names = "pmx_ts_active","pmx_ts_suspend",
-			"pmx_ts_release";
-
-		pinctrl-0 = <&ts_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		pinctrl-2 = <&ts_release>;
-
-		novatek,reset-gpio = <&tlmm 17 0x00>;
-		novatek,irq-gpio = <&tlmm 51 0x2008>;
-
-		novatek,trusted-touch-mode = "vm_mode";
-		novatek,touch-environment = "pvm";
-		novatek,trusted-touch-spi-irq = <566>;
-		novatek,trusted-touch-io-bases = <0x980000 0x910000>;
-		novatek,trusted-touch-io-sizes = <0x1000 0x4000>;
-		novatek,trusted-touch-vm-gpio-list = <&tlmm 0 0 &tlmm 1 0 &tlmm 2 0
-						&tlmm 3 0 &tlmm 17 0 &tlmm 51 0x2008>;
-	};
-
-	focaltech@38 {
-		compatible = "focaltech,fts_ts";
-		reg = <0x38>;
-		interrupt-parent = <&tlmm>;
-		interrupts = <51 0x2008>;
-		focaltech,reset-gpio = <&tlmm 17 0x00>;
-		focaltech,irq-gpio = <&tlmm 51 0x2008>;
-		focaltech,max-touch-number = <5>;
-		focaltech,display-coords = <0 0 1080 2340>;
-		focaltech,touch-type = "primary";
-
-		vdd-supply = <&L3C>;
-
-		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend","pmx_ts_release";
-		pinctrl-0 = <&ts_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		pinctrl-2 = <&ts_release>;
-	};
-
-	synaptics_dsx@22 {
-		compatible = "synaptics,dsx-i2c";
-		reg = <0x22>;
-		interrupt-parent = <&tlmm>;
-		interrupts = <51 0x2008>;
-		avdd-supply = <&L3C>;
-		vdd-supply = <&L12C>;
-		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend","pmx_ts_release";
-		pinctrl-0 = <&ts_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		pinctrl-2 = <&ts_release>;
-		synaptics,pwr-reg-name = "avdd";
-		synaptics,bus-reg-name = "vdd";
-		synaptics,ub-i2c-addr = <0x22>;
-		synaptics,max-y-for-2d = <1859>;
-		synaptics,irq-gpio = <&tlmm 51 0x2008>;
-		synaptics,reset-gpio = <&tlmm 17 0x00>;
-		synaptics,irq-on-state = <0>;
-		synaptics,power-delay-ms = <200>;
-		synaptics,reset-delay-ms = <200>;
-		synaptics,reset-on-state = <0>;
-		synaptics,reset-active-ms = <20>;
-	};
-
-	atmel_mxt_ts@4a {
-		compatible = "atmel,maxtouch";
-		reg = <0x4a>;
-		interrupt-parent = <&tlmm>;
-		interrupts = <51 0x2008>;
-
-		avdd-supply = <&L3C>;
-		vdd-supply = <&L12C>;
-
-		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
-		pinctrl-0 = <&ts_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-
-		atmel,xy_switch;
-		atmel,inverty;
-		atmel,invertx;
-		reset-gpios = <&tlmm 17 0x00>;
-		irq-gpios = <&tlmm 51 0x2008>;
-		atmel,panel-coords = <0 0 479 799>;
-		atmel,display-coords = <0 0 339 729>;
-	};
+	status = "disabled";
 };
 
 &qupv3_se9_i2c {
@@ -209,6 +114,7 @@
 
 	status = "ok";
 };
+
 &L3C {
        regulator-boot-on;
        regulator-always-on;
@@ -224,5 +130,62 @@
 		reg = <0>;
 		spi-max-frequency = <19200000>;
 		status = "ok";
+		};
+};
+
+&qupv3_se0_spi {
+	status = "ok";
+	qcom,rt;
+	pinctrl-1 = <&qupv3_se0_spi_sleep &qupv3_se0_spi_sleep_cs>;
+	goodix@0 {
+		compatible = "xiaomi,l9-spi";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <51 0x2808>;
+		goodix,avdd-name = "avdd";
+		avdd-supply = <&L11C>;
+		goodix,iovdd-name = "vdd";
+		vdd-supply = <&L2C>;
+		goodix,irq-gpio = <&tlmm 51 0x2808>;
+		goodix,reset-gpio = <&tlmm 126 0x00>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <1080>;
+		goodix,panel-max-y = <2400>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,firmware-name = "goodix_firmware_l9.bin";
+		goodix,config-name = "goodix_cfg_group_l9.bin";
+	};
+};
+
+&tlmm {
+	qupv3_se0_spi_sleep: qupv3_se0_spi_sleep {
+		mux {
+			pins = "gpio0", "gpio1",
+					"gpio2";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio0", "gpio1",
+					"gpio2";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+
+	qupv3_se0_spi_sleep_cs: qupv3_se0_spi_sleep_cs {
+		mux {
+			pins = "gpio3";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio3";
+			drive-strength = <6>;
+			bias-disable;
+			output-high;
+		};
 	};
 };
