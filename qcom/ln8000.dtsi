@@ -1,0 +1,125 @@
+
+&tlmm {
+	ln8000_int_default: ln8000_int_default {
+		mux {
+			pins = "gpio142";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio142";
+			drive-strength = <2>;   /* 2 mA */
+			bias-pull-up;         /* PULL DOWN */
+			input-enable;
+		};
+	};
+
+	ln8000_int2_default: ln8000_int2_default {
+		mux {
+			pins = "gpio143";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio143";
+			drive-strength = <2>;   /* 2 mA */
+			bias-pull-up;         /* PULL DOWN */
+			input-enable;
+		};
+	};
+};
+
+&qupv3_se4_i2c {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	ln8000_master: ln8000-charger@51 {
+		#io-channel-cells = <1>;
+		compatible = "lionsemi,ln8000-master";
+	    	reg = <0x51>;
+
+	    	interrupt-parent = <&tlmm>;
+		interrupts = <142 0>;
+	    	pinctrl-names = "default";
+	    	pinctrl-0 = <&ln8000_int_default>;
+	    	/*ln8000_charger,bat-ovp-disable = <0>;
+	    	ln8000_charger,bat-ocp_disable = <0>;
+	    	ln8000_charger,bat-ovp-alarm-disable = <0>;
+	    	ln8000_charger,bus-ocp-disable = <0>;
+	    	ln8000_charger,bus-ovp-alarm-disable = <0>;
+	    	ln8000_charger,bus-ocp-alarm-disable = <0>;
+	    	ln8000_charger,bat-ucp-alarm-disable = <0>;*/
+	    	ln8000_charger,bat-therm-disable = <0>;
+	    	ln8000_charger,bus-therm-disable = <0>;
+	    	ln8000_charger,bat-ovp-threshold = <4575>;
+	    	ln8000_charger,bat-ovp-alarm-threshold = <4400>;
+	    	ln8000_charger,bat-ocp-threshold = <8000>;
+	    	ln8000_charger,bat-ocp-alarm-threshold = <7500>;
+	    	ln8000_charger,bus-ovp-threshold = <12800>;
+	    	ln8000_charger,bus-ovp-alarm-threshold = <11000>;
+	    	ln8000_charger,bus-ocp-threshold = <3750>;
+	    	ln8000_charger,bus-ocp-alarm-threshold = <3500>;
+	    	ln8000_charger,bat-ucp-alarm-threshold = <2000>;
+	    	ln8000_charger,bat-therm-threshold = <0x15>;
+	    	ln8000_charger,bus-therm-threshold = <0x15>;
+	    	ln8000_charger,die-therm-threshold = <125>;
+	    	ln8000_charger,ac-ovp-threshold = <13>;
+	    	ln8000_charger,sense-resistor-mohm = <5>;
+	    	ln8000_charger,tdie-prot-disable;
+	    	ln8000_charger,tbus-mon-disable;
+	    	ln8000_charger,tbat-mon-disable;
+	    	ln8000_charger,iin-ocp-disable;
+	    	ln8000_charger,iin-reg-disable;
+	    	ln8000_charger,tdie-reg-disable;
+	    	ln8000_charger,vbat-reg-disable;
+	    	ln8000_charger,revcurr-prot-disable;
+	};
+};
+
+&qupv3_se12_i2c {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	ln8000_slave: ln8000-charger@51 {
+		#io-channel-cells = <1>;
+		compatible = "lionsemi,ln8000-slave";
+	    	reg = <0x51>;
+
+	    	interrupt-parent = <&tlmm>;
+		interrupts = <143 0>;
+	    	pinctrl-names = "default";
+	    	inctrl-0 = <&ln8000_int2_default>;
+	    	/*ln8000_charger,bat-ovp-disable = <0>;
+	    	ln8000_charger,bat-ocp_disable = <0>;
+	    	ln8000_charger,bat-ovp-alarm-disable = <0>;
+	    	ln8000_charger,bus-ocp-disable = <0>;
+	    	ln8000_charger,bus-ovp-alarm-disable = <0>;
+	    	ln8000_charger,bus-ocp-alarm-disable = <0>;
+	    	ln8000_charger,bat-ucp-alarm-disable = <0>;*/
+	    	ln8000_charger,bat-therm-disable = <0>;
+	    	ln8000_charger,bus-therm-disable = <0>;
+	    	ln8000_charger,bat-ovp-threshold = <4575>;
+	    	ln8000_charger,bat-ovp-alarm-threshold = <4400>;
+	    	ln8000_charger,bat-ocp-threshold = <8000>;
+	    	ln8000_charger,bat-ocp-alarm-threshold = <7500>;
+	    	ln8000_charger,bus-ovp-threshold = <12800>;
+	    	ln8000_charger,bus-ovp-alarm-threshold = <11000>;
+	    	ln8000_charger,bus-ocp-threshold = <3750>;
+	    	ln8000_charger,bus-ocp-alarm-threshold = <3500>;
+	    	ln8000_charger,bat-ucp-alarm-threshold = <2000>;
+	    	ln8000_charger,bat-therm-threshold = <0x15>;
+	    	ln8000_charger,bus-therm-threshold = <0x15>;
+	    	ln8000_charger,die-therm-threshold = <125>;
+	    	ln8000_charger,ac-ovp-threshold = <13>;
+	    	ln8000_charger,sense-resistor-mohm = <5>;
+	    	ln8000_charger,tdie-prot-disable;
+	    	ln8000_charger,tbus-mon-disable;
+	    	ln8000_charger,tbat-mon-disable;
+	    	ln8000_charger,iin-ocp-disable;
+	    	ln8000_charger,iin-reg-disable;
+	    	ln8000_charger,tdie-reg-disable;
+	    	ln8000_charger,vbat-reg-disable;
+	    	ln8000_charger,revcurr-prot-disable;
+	};
+};
+
