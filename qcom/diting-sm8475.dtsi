@@ -4,6 +4,132 @@
 */
 #include "diting-pinctrl.dtsi"
 #include "xiaomi-sm8475-common.dtsi"
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+&qupv3_se4_spi {
+	status = "ok";
+	xiaomi_touch@0 {
+		status = "ok";
+		compatible = "xiaomi,l12-spi";
+		reg = <0>;
+		spi-max-frequency = <12000000>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <21 0x2008>;
+		//goodix,avdd-name = "avdd";
+		//avdd-supply = <&L7C>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&mi_ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+
+		goodix,avdd-gpio = <&tlmm 71 0x0>;
+		goodix,iovdd-name = "vdd";
+		vdd-supply = <&L2C>;
+		goodix,irq-gpio = <&tlmm 21 0x2008>;
+		goodix,reset-gpio = <&tlmm 20 0x00>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <12200>;
+		goodix,panel-max-y = <27120>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,firmware-name = "goodix_firmware_l12.bin";
+		goodix,config-name = "goodix_cfg_group_l12.bin";
+
+
+		fts,avdd-gpio = <&tlmm 71 0x0>;
+		//avdd-supply = <&L3C>;
+		//vdd-supply = <&L2C>;
+		/*panel = <&dsi_k8_42_02_0a_dsc_cmd>;*/
+		//fts,pwr-reg-name = "avdd";
+		fts,bus-reg-name = "vdd";
+		fts,irq-gpio = <&tlmm 21 0x2008>;
+		fts,irq-gpio-name = "fts_irq";
+		fts,reset-gpio-enable;
+		fts,reset-gpio = <&tlmm 20 0x00>;
+		fts,reset-gpio-name = "fts_rst";
+		fts,irq-flags = <0x2008>;
+		fts,x-max = <12200>;
+		fts,y-max = <27120>;
+		//spi-max-frequency = <12000000>;
+		fts,default-fw-name = "st_fts_l12.ftb";
+		//fts,htp-fw-name = "st_fts_l10_thp.ftb";
+		fts,non-curved-display = <1>;
+		fts,config-array-size = <1>;
+		fts,support-super-resolution = <1>;
+		fts,touch-follow-performance-def = <3>;
+		fts,touch-tap-sensitivity-def = <4>;
+		fts,touch-aim-sensitivity-def = <3>;
+		fts,touch-tap-stability-def = <3>;
+		fts,cornerfilter-area-step1 = <100>;
+		fts,cornerfilter-area-step2 = <170>;
+		fts,cornerfilter-area-step3 = <250>;
+		fts,touch-edgezone-filter-ver = <1 0 0 0 0 0 0 0
+						 1 1 0 0 0 0 0 0
+						 1 2 0 0 40 2399 0 0
+						 1 3 1039 0 1079 2399 0 0>;
+		fts,touch-edgezone-filter-hor = <1 0 0 0 1079 40 0 0
+						 1 1 0 2359 1079 2399 0 0
+						 1 2 0 0 40 2399 0 0
+						 1 3 1039 0 1079 2399 0 0>;
+		fts,touch-cornerzone-filter-ver = <0 0 0 0 0 0 0 0
+						 0 1 0 0 0 0 0 0
+						 0 2 0 2099 150 2399 0 0
+						 0 3 929 2099 1079 2399 0 0>;
+		fts,touch-cornerzone-filter-hor1 = <0 0 0 0 150 150 0 0
+						 0 1 0 0 0 0 0 0
+						 0 2 0 2249 150 2399 0 0
+						 0 3 0 0 0 0 0 0>;
+		fts,touch-cornerzone-filter-hor2 = <0 0 0 0 0 0 0 0
+						 0 1 929 0 1079 150 0 0
+						 0 2 0 0 0 0 0 0
+						 0 3 929 2249 1079 2399 0 0>;
+		fts,touch-normal-edgezone-filter-hor = <1 0 0 0 1079 30 0 0
+						 1 1 0 2369 1079 2399 0 0
+						 1 2 0 0 30 2399 0 0
+						 1 3 1049 0 1079 2399 0 0>;
+		fts,touch-normal-cornerzone-filter-hor1 = <0 0 0 0 170 170 0 0
+						 0 1 0 0 0 0 0 0
+						 0 2 0 2229 170 2399 0 0
+						 0 3 0 0 0 0 0 0>;
+		fts,touch-normal-cornerzone-filter-hor2 = <0 0 0 0 0 0 0 0
+						 0 1 909 0 1079 170 0 0
+						 0 2 0 0 0 0 0 0
+						 0 3 909 2229 1079 2399 0 0>;
+		fts,touch-follow-performance = <13 15 1
+						10 15 1
+						8 15 1
+						5 15 1
+						2 15 1>;
+		fts,touch-tap-sensitivity = <160 150 140 120 100>;
+		fts,touch-aim-sensitivity = <8 6 4 2 1>;
+		fts,touch-tap-stability = <8 12 15 18 25>;
+		fts,touch-expert-array = <6 15 1 120 6 15
+					  2 15 1 120 4 15
+					  4 15 1 120 2 15>;
+		fts,cfg_0 {
+			fts,tp-vendor = <0x38>;
+			fts,fw-name = "st_fts_l10.ftb";
+			fts,limit-name = "stm_fts_production_limits.csv";
+		};
+	};
+};
+&tlmm {
+        mi_ts_active: mi_ts_active {
+                mux {
+                                pins = "gpio21", "gpio20";
+                                function = "gpio";
+                };
+		config {
+                                pins = "gpio21", "gpio20";
+                                drive-strength = <8>;
+                                bias-pull-up;
+                };
+        };
+};
 
 &soc {
 	fingerprint_goodix {
