@@ -4,6 +4,9 @@
 */
 #include "thor-8475-pinctrl.dtsi"
 #include "xiaomi-sm8475-common.dtsi"
+// CHECK ME!
+#include <dt-bindings/clock/qcom,gcc-waipio.h>
+#include <dt-bindings/clock/qcom,camcc-waipio.h>
 
 &tlmm {
 	/* AW8697_RESET_N */
@@ -664,7 +667,6 @@
 	};
 };
 
-
 &qseecom_ta_mem {
 	size = <0x0 0x2000000>;
 };
@@ -672,3 +674,125 @@
 &qseecom_mem {
 	size = <0x0 0x2400000>;
 };
+
+&L12C {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+};
+
+&soc {
+	ispv3_vdd1_ldo:ispv3_vdd1_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_vdd1_ldo";
+		enable-active-high;
+		gpio = <&tlmm 125 0>;
+	};
+
+	ispv3_vdd2_ldo:ispv3_vdd2_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_vdd2_ldo";
+		enable-active-high;
+		gpio = <&tlmm 84 0>;
+	};
+
+	ispv3_vddr_ldo:ispv3_vddr_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_vddr_ldo";
+		enable-active-high;
+		gpio = <&tlmm 93 0>;
+	};
+
+	// At sm8475, l10c is changed to s12b
+	ispv3_l10c_ldo:ispv3_l10c_ldo{
+		compatible = "regulator-fixed";
+		regulator-name = "ispv3_s12b_ldo";
+		enable-active-high;
+		gpio = <&tlmm 186 0>;
+	};
+};
+
+&pcie1 {
+	status = "ok";
+};
+
+&pcie1_rp {
+	#address-cells = <5>;
+	#size-cells = <0>;
+
+	ispv3_pci: ispv3_pci {
+		reg = <0 0 0 0 0>;
+		qcom,iommu-group = <&ispv3_pci_iommu_group>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		ispv3_pci_iommu_group: ispv3_pci_iommu_group {
+			qcom,iommu-msi-size = <0x1000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0xa0000000>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-pagetable = "coherent";
+			qcom,iommu-faults = "stall-disable", "HUPCF", "no-CFRE",
+					    "non-fatal";
+		};
+	};
+};
+
+&qupv3_se5_i2c {
+	status = "ok";
+	ispv3_i2c: ispv3_i2c@60 {
+		compatible = "fcs,fan53526";
+		reg = <0x60>;
+		fcs,suspend-voltage-selector = <1>;
+		regulator-name = "ispv3_vdd_08";
+		regulator-min-microvolt = <600000>;
+		regulator-max-microvolt = <1230000>;
+		regulator-ramp-delay = <1000>;
+		regulator-always-on;
+		regulator-boot-on;
+		status = "ok";
+	};
+};
+
+&qupv3_se18_spi {
+	status = "ok";
+	ispv3_spi@0 {
+		compatible = "xiaomi,ispv3_spi";
+		sm8475;
+		reg = <0>;
+		qcom,ispv3-rc-index = <1>;
+		spi-max-frequency = <50000000>;
+		ispv3_gpio_14 = <&tlmm 175 0x0>;
+		ispv3_gpio_15 = <&tlmm 176 0x0>;
+		ispv3_gpio_int0 = <&tlmm 177 0x0>;
+		ispv3_gpio_int1 = <&tlmm 118 0x0>;
+		ispv3_gpio_reset = <&tlmm 178 0x0>;
+		ispv3_gpio_fan_en = <&tlmm 109 0x0>;
+		ispv3_vdd1-supply = <&ispv3_vdd1_ldo>;
+		ispv3_l12c-supply = <&L12C>;
+		ispv3_vdd2-supply = <&ispv3_vdd2_ldo>;
+		ispv3_vdd-supply = <&L3I>;
+		ispv3_vddr-supply = <&ispv3_vddr_ldo>;
+		/* For sm8450 */
+		// ispv3_l10c-supply = <&L10C>;
+		/* For sm8475 */
+		ispv3_l10c-supply = <&ispv3_l10c_ldo>;
+		ispv3_mclk-supply = <&cam_cc_titan_top_gdsc>;
+		ispv3_s11-supply = <&S11B>;
+		ispv3_s12-supply = <&S12B>;
+		regulator-names = "ispv3_vdd1", "ispv3_l12c",
+				  "ispv3_vdd2", "ispv3_vdd",
+				  "ispv3_vddr", "ispv3_l10c",
+				  "ispv3_mclk", "ispv3_s11",
+				  "ispv3_s12";
+		rgltr-min-voltage = <0 1800000 0 1800000 0 1200000 0 950000  1300000>;
+		rgltr-max-voltage = <0 1800000 0 1800000 0 1200000 0 1100000 1400000>;
+		pinctrl-names = "ispv3_default", "ispv3_suspend";
+		pinctrl-0 = <&cam_sensor_mclk3_active>;
+		pinctrl-1 = <&cam_sensor_mclk3_suspend>;
+		clocks = <&clock_camcc CAM_CC_MCLK3_CLK>;
+		clock-names = "ispv3_clk";
+		clock-rates = <19200000>;
+		status = "ok";
+       };
+};
+
