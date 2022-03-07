@@ -20,10 +20,11 @@ properties:
   compatible:
     enum:
       - qcom,rpmh-sleep-stats
+      - qcom,rpmh-sleep-stats-v2
       - qcom,rpm-sleep-stats
 
   reg:
-    maxItems: 1
+    maxItems: 2
 
   ss-name:
     $ref: /schemas/types.yaml#/definitions/string
@@ -73,5 +74,15 @@ examples:
                 "apss";
       mboxes = <&qmp_aop 0>;
       ddr-freq-update;
+    };
+    # Example of rpmh sleep stats that supports to get AOSS sleep stats
+  - |
+    rpmh-sleep-stats@c3f0000 {
+      compatible = "qcom,rpmh-sleep-stats-v2";
+      reg = <0 0xc3f0000 0 0x400>, <0 0xb261400 0 0x100>;
+      ss-name = "modem", "adsp", "adsp_island",
+                "cdsp", "slpi", "slpi_island",
+                "apss";
+      mboxes = <&qmp_aop 0>;
     };
 ...

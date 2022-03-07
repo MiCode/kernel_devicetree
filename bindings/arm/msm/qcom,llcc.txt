@@ -14,7 +14,7 @@ Properties:
 	Definition: must be "qcom,sdm845-llcc" or "qcom,lahaina-llcc"
 	        or "qcom,shima-llcc" or "qcom,waipio-llcc"
 			or "qcom,sdxlemur-llcc" or "qcom,diwali-llcc"
-			or "qcom,kalama-llcc".
+			or "qcom,kalama-llcc" or "qcom,cinder-llcc".
 		    "qcom,llcc-v2" must be appended for V2 hardware or
 		    "qcom,llcc-v21" for V2.1 or "qcom,llcc-v41" for V4.1.
 
@@ -24,17 +24,32 @@ Properties:
 	Definition: The first element specifies the llcc base start address and
 		    the size of the register region. The second element specifies
 		    the llcc broadcast base address and size of the register region.
+		    The third element is optional and specifies the feature register
+		    used to decide which llcc configuration to use if multiple are
+		    available.
 
 - reg-names:
         Usage: required
         Value Type: <stringlist>
         Definition: Register region names. Must be "llcc_base", "llcc_broadcast_base".
+		    The third element is needed only if multiple llcc configurations
+		    are available and must be "multi_ch_reg".
 
 - interrupts:
 	Usage: required
 	Definition: The interrupt is associated with the llcc edac device.
 			It's used for llcc cache single and double bit error detection
 			and reporting.
+
+- multi-ch-off:
+	Usage: optional
+	Value Type: <prop-encoded-array>
+	Definition: If this exists, then the device has the potential to be configured
+		    with different numbers of ddr channels at runtime. The value here
+		    specifies the offset in bits into the "multi_ch_reg" register and
+		    and the number of bits used to decied which llcc configuration to
+		    use.
+
 Example:
 
 	cache-controller@1100000 {

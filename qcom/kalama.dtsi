@@ -1186,6 +1186,10 @@
 		compatible = "qcom,cpu-vendor-hooks";
 	};
 
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
+	};
+
 	qcom,sps {
 		compatible = "qcom,msm-sps-4k";
 		qcom,pipe-attr-ee;
@@ -1248,6 +1252,13 @@
 			qcom,iommu-vmid = <0x9>;
 			qcom,secure-context-bank;
 		};
+	};
+
+	qcom_rng: qrng@10c3000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x10c3000 0x1000>;
+		qcom,no-qrng-config;
+		qcom,no-clock-support;
 	};
 
 	qcom,msm-imem@146aa000 {
@@ -1398,6 +1409,11 @@
 
 	dload_mode {
 		compatible = "qcom,dload-mode";
+	};
+
+	mini_dump_mode {
+		compatible = "qcom,minidump";
+		status = "ok";
 	};
 
 	qcom,secure-buffer {
@@ -2028,8 +2044,9 @@
 	ufshc_mem: ufshc@1d84000 {
 		compatible = "qcom,ufshc";
 		reg = <0x1d84000 0x3000>,
-		      <0x1d88000 0x8000>;
-		reg-names = "ufs_mem", "ufs_ice";
+		      <0x1d88000 0x8000>,
+		      <0x1d90000 0x9000>;
+		reg-names = "ufs_mem", "ufs_ice", "ufs_ice_hwkm";
 		interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
 		phys = <&ufsphy_mem>;
 		phy-names = "ufsphy";
@@ -2397,8 +2414,8 @@
 	};
 
 	soc-sleep-stats@c3f0000 {
-		compatible = "qcom,rpmh-sleep-stats";
-		reg = <0xc3f0000 0x400>;
+		compatible = "qcom,rpmh-sleep-stats-v2";
+		reg = <0xc3f0000 0x400>, <0xb261400 0x100>;
 		ss-name = "modem", "adsp", "adsp_island",
 			  "cdsp", "slpi", "slpi_island",
 			  "apss";
@@ -2411,8 +2428,8 @@
 	};
 
 	subsystem-sleep-stats@c3f0000 {
-		compatible = "qcom,subsystem-sleep-stats";
-		reg = <0xc3f0000 0x400>;
+		compatible = "qcom,subsystem-sleep-stats-v2";
+		reg = <0xc3f0000 0x400>, <0xb261400 0x100>;
 		ddr-freq-update;
 	};
 
@@ -2744,6 +2761,7 @@
 				qcom,intents = <0x800  5
 						0x2000 3
 						0x4400 2>;
+				qcom,no-wake-svc = <0x190>;
 			};
 
 			qcom,msm_fastrpc_rpmsg {
@@ -2918,55 +2936,6 @@
 		};
 	};
 
-	/* PIL spss node - for loading Secure Processor */
-	spss_pas: remoteproc-spss@1880000 {
-		compatible = "qcom,kalama-spss-pas";
-		ranges;
-		reg = <0x188101c 0x4>,
-		      <0x1881024 0x4>,
-		      <0x1881028 0x4>,
-		      <0x188103c 0x4>,
-		      <0x1881100 0x4>,
-		      <0x1882014 0x4>;
-		reg-names = "sp2soc_irq_status", "sp2soc_irq_clr", "sp2soc_irq_mask",
-			    "rmb_err", "rmb_general_purpose", "rmb_err_spare2";
-		interrupts = <GIC_SPI 352 IRQ_TYPE_EDGE_RISING>;
-
-		cx-supply = <&VDD_CX_LEVEL>;
-		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
-
-		clocks = <&rpmhcc RPMH_CXO_CLK>;
-		clock-names = "xo";
-		qcom,proxy-clock-names = "xo";
-		status = "ok";
-
-		memory-region = <&spss_region_mem>;
-		qcom,spss-scsr-bits = <24 25>;
-		qcom,extra-size = <4096>;
-
-		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
-		interconnect-names = "crypto_ddr";
-
-		glink-edge {
-			qcom,remote-pid = <8>;
-			mboxes = <&ipcc_mproc IPCC_CLIENT_SPSS
-				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
-			mbox-names = "spss_spss";
-			interrupt-parent = <&ipcc_mproc>;
-			interrupts = <IPCC_CLIENT_SPSS
-				      IPCC_MPROC_SIGNAL_GLINK_QMP
-				      IRQ_TYPE_EDGE_RISING>;
-
-			reg = <0x1885008 0x8>,
-			      <0x1885010 0x4>;
-			reg-names = "qcom,spss-addr",
-				    "qcom,spss-size";
-
-			label = "spss";
-			qcom,glink-label = "spss";
-		};
-	};
-
 	qcom,guestvm_loader@f3c00000 {
 		compatible = "qcom,guestvm-loader";
 		qcom,pas-id = <28>;
@@ -3072,13 +3041,13 @@
 		qcom,freq-tbl =
 			<  547000 >,
 			<  768000 >,
-			< 1555200 >,
-			< 1708800 >,
-			< 2092800 >,
+			< 1555000 >,
+			< 1708000 >,
+			< 2092000 >,
 			< 2736000 >,
-			< 3196800 >,
-			< 3744000 >,
-			< 4262400 >;
+			< 3196000 >,
+			< 3724000 >,
+			< 4243000 >;
 	};
 
 	llcc_freq_table: llcc-freq-table {
@@ -3185,9 +3154,9 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU0 &CPU1 &CPU2>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1190400  547000 >,
-					< 1459200  768000 >,
-					< 1785600 1555000 >;
+					< 1113600  547000 >,
+					< 1516800  768000 >,
+					< 1824000 1555000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3195,12 +3164,12 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU3 &CPU4 &CPU5 &CPU6>;
 				qcom,cpufreq-memfreq-tbl =
-					<  844800  547000 >,
-					< 1152000  768000 >,
+					<  883200  547000 >,
+					< 1113600  768000 >,
 					< 1344000 1555000 >,
-					< 1862400 2092000 >,
-					< 2227200 3196800 >,
-					< 2419200 4262400 >;
+					< 1881600 2092000 >,
+					< 2476800 3196000 >,
+					< 2707200 4243000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3208,12 +3177,12 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					<  844800  547000 >,
-					< 1152000  768000 >,
+					<  883200  547000 >,
+					< 1113600  768000 >,
 					< 1344000 1555000 >,
-					< 1862400 2092000 >,
-					< 2227200 3196800 >,
-					< 2419200 4262400 >;
+					< 1881600 2092000 >,
+					< 2476800 3196000 >,
+					< 2707200 4243000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3221,8 +3190,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1862400  547000 >,
-					< 2419200 1555200 >;
+					< 1881600  547000 >,
+					< 2707200 1555000 >;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
 			};
@@ -3231,8 +3200,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 2227200  547000 >,
-					< 2419200 4262400 >;
+					< 2476800  547000 >,
+					< 2707200 4243000 >;
 				qcom,sampling-enabled;
 			};
 		};
@@ -3248,8 +3217,8 @@
 				qcom,cpulist = <&CPU0 &CPU1 &CPU2>;
 				qcom,cpufreq-memfreq-tbl =
 					<  614400  300000 >,
-					< 1459000  466500 >,
-					< 1785600  600000 >;
+					< 1516800  466000 >,
+					< 1824000  600000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3257,12 +3226,12 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					<  633600  300000 >,
-					< 1152000  466500 >,
+					<  652800  300000 >,
+					< 1113600  466000 >,
 					< 1344000  600000 >,
-					< 1862400  806000 >,
-					< 2227200  933000 >,
-					< 2419200 1066000 >;
+					< 1881600  806000 >,
+					< 2476800  933000 >,
+					< 2707200 1066000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3270,8 +3239,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1862400  300000 >,
-					< 2419200  600000 >;
+					< 1881600  300000 >,
+					< 2707200  600000 >;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
 			};
@@ -3289,16 +3258,16 @@
 				qcom,cpufreq-memfreq-tbl =
 					<  307200  307200 >,
 					<  403200  403200 >,
-					<  614400  518400 >,
-					<  710400  614400 >,
-					<  902400  691200 >,
-					<  998400  787200 >,
-					< 1094400  960000 >,
-					< 1190400 1036800 >,
-					< 1363200 1209600 >,
-					< 1536000 1286400 >,
-					< 1632000 1363000 >,
-					< 1785100 1420800 >;
+					<  614400  614400 >,
+					<  729400  710400 >,
+					<  825600  804600 >,
+					<  921600  902400 >,
+					< 1113600  998400 >,
+					< 1228800 1113600 >,
+					< 1324800 1228800 >,
+					< 1516800 1420800 >,
+					< 1632000 1536000 >,
+					< 1824000 1651200 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3307,13 +3276,14 @@
 				qcom,cpulist = <&CPU3 &CPU4 &CPU5 &CPU6>;
 				qcom,cpufreq-memfreq-tbl =
 					<  307200  307200 >,
-					<  633600  518400 >,
-					<  940800  691200 >,
-					< 1152000  864000 >,
-					< 1344000  960000 >,
-					< 1651200 1209600 >,
-					< 2196600 1363200 >,
-					< 2419200 1420800 >;
+					<  537600  614400 >,
+					<  883200  710400 >,
+					< 1136000  902400 >,
+					< 1344000  998400 >,
+					< 1555200 1228800 >,
+					< 1996800 1420800 >,
+					< 2342400 1536000 >,
+					< 2707200 1651200 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3322,13 +3292,14 @@
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
 					<  307200  307200 >,
-					<  633600  518400 >,
-					<  940800  691200 >,
-					< 1152000  864000 >,
-					< 1344000  960000 >,
-					< 1651200 1209600 >,
-					< 2196600 1363200 >,
-					< 2419200 1420800 >;
+					<  537600  614400 >,
+					<  883200  710400 >,
+					< 1136000  902400 >,
+					< 1344000  998400 >,
+					< 1555200 1228800 >,
+					< 1996800 1420800 >,
+					< 2342400 1536000 >,
+					< 2707200 1651200 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3337,7 +3308,7 @@
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
 					< 1996800  307200 >,
-					< 2419200 1420800 >;
+					< 2707200 1651200 >;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
 			};
@@ -3353,8 +3324,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1862400 0 >,
-					< 2419200 1 >;
+					< 1881600 0 >,
+					< 2707200 1 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3363,7 +3334,7 @@
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
 					< 1996800 0 >,
-					< 2419200 1 >;
+					< 2707200 1 >;
 				qcom,sampling-enabled;
 			};
 		};
@@ -3391,6 +3362,13 @@
 	};
 
 	thermal_zones: thermal-zones {
+	};
+
+	qcom,qbt_handler {
+		compatible = "qcom,qbt-handler";
+		qcom,ipc-gpio = <&tlmm 40 0>;
+		qcom,finger-detect-gpio = <&tlmm 41 0>;
+		qcom,intr2-gpio = <&tlmm 42 0>;
 	};
 
 	spmi_bus: spmi0_bus: qcom,spmi@c42d000 {
@@ -3641,6 +3619,8 @@
 			};
 		};
 	};
+
+	msm_gpu: qcom,kgsl-3d0@3d00000 { };
 };
 
 &firmware {
@@ -3697,7 +3677,7 @@
 };
 
 &qupv3_hub_i2c2 {
-	status = "disabled";
+	status = "ok";
 	fsa4480: fsa4480@42 {
 		compatible = "qcom,fsa4480-i2c";
 		reg = <0x42>;

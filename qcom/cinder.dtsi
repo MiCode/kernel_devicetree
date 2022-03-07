@@ -462,6 +462,13 @@
 		};
 	};
 
+	qcom,rmtfs_sharedmem@0 {
+		compatible = "qcom,sharedmem-uio";
+		reg = <0x0 0x280000>;
+		reg-names = "rmtfs";
+		qcom,client-id = <0x00000001>;
+	};
+
 	qcom,chd {
 		compatible = "qcom,core-hang-detect";
 		label = "core";
@@ -513,8 +520,12 @@
 	};
 
 	gcc: clock-controller@80000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,cinder-gcc", "syscon";
+		reg = <0x80000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&sleep_clk>;
+		clock-names = "bi_tcxo", "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -528,17 +539,17 @@
 
 	/* GCC GDSCs */
 	gcc_pcie_0_gdsc: qcom,gdsc@11d004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
 		regulator-name = "gcc_pcie_0_gdsc";
 	};
 
 	gcc_pcie_0_phy_gdsc: qcom,gdsc@fc004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
 		regulator-name = "gcc_pcie_0_phy_gdsc";
 	};
 
 	gcc_usb30_prim_gdsc: qcom,gdsc@c9004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
 		regulator-name = "gcc_usb30_prim_gdsc";
 	};
 
@@ -644,6 +655,16 @@
 		compatible = "qcom,msm-mhi-dev-net";
 		status = "ok";
 	};
+
+	cache-controller@19200000 {
+		compatible = "qcom,cinder-llcc", "qcom,llcc-v21";
+		reg = <0x19200000 0xd80000>, <0x1A200000 0x80000>, <0x221c8128 0x4>;
+		reg-names = "llcc_base", "llcc_broadcast_base", "multi_ch_reg";
+		multi-ch-off = <24 2>;
+		interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
+		cap-based-alloc-and-pwr-collapse;
+	};
+
 };
 
 &firmware {
@@ -656,6 +677,8 @@
 
 #include "cinder-pinctrl.dtsi"
 #include "cinder-qupv3.dtsi"
+#include "cinder-usb.dtsi"
+
 
 &qupv3_se7_2uart {
 	status = "ok";
