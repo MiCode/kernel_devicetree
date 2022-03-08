@@ -1,9 +1,178 @@
 /*
-   this file is for attribution only of unicorn
+   this file is for attribution only of mayfly
    And public attribution of xiaomi platforms(like K2 and so and)
 */
 #include "mayfly-pinctrl.dtsi"
 #include "xiaomi-sm8475-common.dtsi"
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+
+&tlmm {
+	mi_ts_active: mi_ts_active {
+		mux {
+				pins = "gpio21", "gpio20";
+				function = "gpio";
+		};
+
+		config {
+				pins = "gpio21", "gpio20";
+				drive-strength = <8>;
+				bias-pull-up;
+		};
+	};
+
+	mi_ts_cs_active: mi_ts_cs_active {
+		mux {
+			pins = "gpio19";
+			function = "qup4";
+		};
+
+		config {
+			pins = "gpio19";
+			drive-strength = <16>;
+			bias-pull-up;
+		};
+	};
+
+	mi_ts_cs_suspend: mi_ts_cs_suspend {
+		mux {
+			pins = "gpio19";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio19";
+			drive-strength = <16>;
+			bias-pull-up;
+		};
+	};
+
+	mi_ts_spi_active: mi_ts_spi_active {
+			mux {
+				pins = "gpio16", "gpio17", "gpio18";
+				function = "qup4";
+			};
+
+			config {
+				pins = "gpio16", "gpio17", "gpio18";
+				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+
+		mi_ts_spi_suspend: mi_ts_spi_suspend {
+			mux {
+				pins = "gpio16", "gpio17", "gpio18";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio16", "gpio17", "gpio18";
+				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+};
+
+&L7C {
+	regulator-max-microvolt = <3304000>;
+	qcom,init-voltage = <3200000>;
+};
+
+&qupv3_se4_spi {
+	status = "ok";
+	pinctrl-0 = <&mi_ts_spi_active &mi_ts_cs_active>;
+	pinctrl-1 = <&mi_ts_spi_suspend &mi_ts_cs_suspend>;
+	fts@0 {
+		status = "ok";
+		compatible = "st,spi";
+		reg = <0x0>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <21 0x2008>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&mi_ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		avdd-supply = <&L7C>;
+		vdd-supply = <&L2C>;
+		/*panel = <&dsi_k8_42_02_0a_dsc_cmd>;*/
+		fts,pwr-reg-name = "avdd";
+		fts,bus-reg-name = "vdd";
+		fts,irq-gpio = <&tlmm 21 0x2008>;
+		fts,irq-gpio-name = "fts_irq";
+		fts,reset-gpio-enable;
+		fts,reset-gpio = <&tlmm 20 0x00>;
+		fts,reset-gpio-name = "fts_rst";
+		fts,irq-flags = <0x2008>;
+		fts,x-max = <10800>;
+		fts,y-max = <24000>;
+		fts,fod-lx = <4330>;
+		fts,fod-ly = <20560>;
+		fts,fod-x-size = <2140>;
+		fts,fod-y-size = <2140>;
+		fts,support-fod;
+                fts,support-super-resolution = <1>;
+		spi-max-frequency = <12000000>;
+		fts,default-fw-name = "st_fts_l3s.ftb";
+		fts,htp-fw-name = "st_fts_l3s_thp.ftb";
+		fts,config-array-size = <1>;
+		fts,touch-follow-performance-def = <3>;
+		fts,touch-tap-sensitivity-def = <4>;
+		fts,touch-aim-sensitivity-def = <3>;
+		fts,touch-tap-stability-def = <3>;
+		fts,cornerfilter-area-step1 = <100>;
+		fts,cornerfilter-area-step2 = <170>;
+		fts,cornerfilter-area-step3 = <250>;
+		fts,touch-deadzone-filter-ver = <2 0 0 0 0 0 0 0
+										2 1 0 0 0 0 0 0
+										2 2 0 0 0 2399 0 0
+									    2 3 1079 0 1079 2399 0 0>;
+		fts,touch-deadzone-filter-hor = <2 0 0 0 1079 0 0 0
+									    2 1 0 2399 1079 2399 0 0
+									    2 2 0 0 0 2399 0 0
+									    2 3 1079 0 1079 2399 0 0>;
+		fts,touch-edgezone-filter-ver = <1 0 0 0 0 0 0 0
+										1 1 0 0 0 0 0 0
+										1 2 0 0 60 2339 0 0
+										1 3 1019 0 1079 2339 0 0>;
+		fts,touch-edgezone-filter-hor = <1 0 0 0 1079 60 0 0
+										1 1 0 2339 1079 2399 0 0
+										1 2 0 0 60 2399 0 0
+										1 3 1019 0 1079 2399 0 0>;
+		fts,touch-cornerzone-filter-ver = <0 0 0 0 0 0 0 0
+										0 1 0 0 0 0 0 0
+										0 2 0 2099 150 2399 0 0
+										0 3 929 2099 1079 2399 0 0>;
+		fts,touch-cornerzone-filter-hor1 = <0 0 0 0 170 170 0 0
+										0 1 0 0 0 0 0 0
+										0 2 0 2229 170 2399 0 0
+										0 3 0 0 0 0 0 0>;
+		fts,touch-cornerzone-filter-hor2 = <0 0 0 0 0 0 0 0
+										0 1 909 0 1079 170 0 0
+										0 2 0 0 0 0 0 0
+										0 3 909 2229 1079 2399 0 0>;
+		fts,touch-follow-performance = <10 15 1
+										8 15 1
+										6 15 1
+										4 15 1
+										2 15 1>;
+		fts,touch-tap-sensitivity = <160 150 140 120 100>;
+		fts,touch-aim-sensitivity = <10 8 6 5 3>;
+		fts,touch-tap-stability = <8 12 15 18 25>;
+		fts,touch-expert-array = <6 15 1 120 6 15
+								  2 15 1 120 5 15
+								  4 15 1 120 3 15>;
+		fts,cfg_0 {
+			fts,tp-vendor = <0x42>;
+			fts,fw-name = "st_fts_l3s.ftb";
+			fts,limit-name = "stm_fts_production_limits.csv";
+		};
+	};
+};
 
 &qupv3_se15_i2c {
 	status = "ok";
