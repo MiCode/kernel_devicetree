@@ -4,6 +4,8 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 
 / {
 	interrupt-parent = <&intc>;
@@ -152,8 +154,6 @@
 
 	soc: soc { };
 };
-
-#include "cinder-stub-regulator.dtsi"
 
 &soc {
 	#address-cells = <1>;
@@ -838,6 +838,23 @@
 
 	thermal_zones: thermal-zones {
 	};
+
+	spmi_bus: qcom,spmi@c42d000 {
+		compatible = "qcom,spmi-pmic-arb";
+		reg = <0xc42d000 0x26000>,
+		      <0xc400000 0x1100>,
+		      <0xc500000 0x2000000>,
+		      <0xc440000 0x100000>,
+		      <0xc4c0000 0xa0000>;
+		reg-names = "cnfg", "core", "chnls", "obsrvr", "intr";
+		interrupt-controller;
+		#interrupt-cells = <4>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		cell-index = <0>;
+		qcom,channel = <0>;
+		qcom,ee = <0>;
+	};
 };
 
 &firmware {
@@ -848,6 +865,7 @@
 
 };
 
+#include "cinder-regulators.dtsi"
 #include "cinder-pinctrl.dtsi"
 #include "cinder-qupv3.dtsi"
 #include "cinder-usb.dtsi"
