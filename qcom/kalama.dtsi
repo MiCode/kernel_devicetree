@@ -548,23 +548,29 @@
 
 	trust_ui_vm_mem: trust_ui_vm_region@f3c00000 {
 		no-map;
-		reg = <0x0 0xf3c00000 0x0 0x42f3000>;
+		reg = <0x0 0xf3c00000 0x0 0x41ef000>;
 	};
 
-	trust_ui_vm_qrtr: trust_ui_vm_qrtr@f7ef3000 {
+	trust_ui_vm_qrtr: trust_ui_vm_qrtr@f7def000 {
 		no-map;
-		reg = <0x0 0xf7ef3000 0x0 0x9000>;
+		reg = <0x0 0xf7def000 0x0 0x9000>;
 	};
 
-	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@f7efc000 {
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@f7df8000 {
 		no-map;
-		reg = <0x0 0xf7efc000 0x0 0x4000>;
-		gunyah-label = <0x11>;
+		reg = <0x0 0xf7df8000 0x0 0x4000>;
+		gunyah-label = <0x11>;					//for persist.img
 	};
 
-	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@f7f00000 {
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@f7dfc000 {
 		no-map;
-		reg = <0x0 0xf7f00000 0x0 0x100000>;
+		reg = <0x0 0xf7dfc000 0x0 0x4000>;
+		gunyah-label = <0x10>;					//for system.img
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@f7e00000 {
+		no-map;
+		reg = <0x0 0xf7e00000 0x0 0x200000>;
 		gunyah-label = <0x12>;
 	};
 
@@ -3047,10 +3053,10 @@
 		memory-region = <&oem_vm_mem>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@f7efc000 {
-		reg = <0xf7efc000 0x104000>;
+	trust_ui_vm: qcom,trust_ui_vm@f7df8000 {
+		reg = <0xf7df8000 0x208000>;
 		vm_name = "trustedvm";
-		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_swiotlb>;
+		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
 	oem_vm: qcom,oem_vm@fcefc000 {
@@ -3066,6 +3072,12 @@
 	};
 
 	qcom,virtio_backend@1 {
+		compatible = "qcom,virtio_backend";
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x10>;
+	};
+
+	qcom,virtio_backend@2 {
 		compatible = "qcom,virtio_backend";
 		qcom,vm = <&oem_vm>;
 		qcom,label = <0x13>;

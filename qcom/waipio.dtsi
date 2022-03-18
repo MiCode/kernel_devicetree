@@ -535,23 +535,29 @@
 
 	trust_ui_vm_mem: trust_ui_vm_region@e0b00000 {
 		no-map;
-		reg = <0x0 0xe0b00000 0x0 0x4af3000>;
+		reg = <0x0 0xe0b00000 0x0 0x49ef000>;
 	};
 
-	trust_ui_vm_qrtr: trust_ui_vm_qrtr@e55f3000 {
+	trust_ui_vm_qrtr: trust_ui_vm_qrtr@e54ef000 {
 		no-map;
-		reg = <0x0 0xe55f3000 0x0 0x9000>;
+		reg = <0x0 0xe54ef000 0x0 0x9000>;
 	};
 
-	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@e55fc000 {
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@e54f8000 {
 		no-map;
-		reg = <0x0 0xe55fc000 0x0 0x4000>;
-		gunyah-label = <0x11>;
+		reg = <0x0 0xe54f8000 0x0 0x4000>;
+		gunyah-label = <0x11>;					//for persist.img
 	};
 
-	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@e5600000 {
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@e54fc000 {
 		no-map;
-		reg = <0x0 0xe5600000 0x0 0x100000>;
+		reg = <0x0 0xe54fc000 0x0 0x4000>;
+		gunyah-label = <0x10>;					//for system.img
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@e5500000 {
+		no-map;
+		reg = <0x0 0xe5500000 0x0 0x200000>;
 		gunyah-label = <0x12>;
 	};
 
@@ -3362,9 +3368,9 @@
 	};
 
 	trust_ui_vm: qcom,trust_ui_vm@e55fc000 {
-		reg = <0xe55fc000 0x104000>;
+		reg = <0xe54f8000 0x208000>;
 		vm_name = "trustedvm";
-		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_swiotlb>;
+		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
 	oem_vm: qcom,oem_vm@bfefc000 {
@@ -3380,6 +3386,12 @@
 	};
 
 	qcom,virtio_backend@1 {
+		compatible = "qcom,virtio_backend";
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x10>;
+	};
+
+	qcom,virtio_backend@2 {
 		compatible = "qcom,virtio_backend";
 		qcom,vm = <&oem_vm>;
 		qcom,label = <0x13>;
