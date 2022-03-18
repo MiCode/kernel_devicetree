@@ -131,7 +131,7 @@ sdmsteppeauto-overlays-dtb-$(CONFIG_ARCH_SA6155) += $(SA6155_BOARDS) $(SA6155P_B
 
 dtb-y += $(sdmsteppeauto-dtb-y)
 
-sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb
+sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
 endif
