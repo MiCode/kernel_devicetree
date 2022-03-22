@@ -51,6 +51,7 @@ KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
 		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
+		 kalama-cdp-wsa883x-overlay.dtbo \
 		 kalama-atp-overlay.dtbo \
 		 kalama-rcm-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo
