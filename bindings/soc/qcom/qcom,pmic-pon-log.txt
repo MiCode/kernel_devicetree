@@ -12,12 +12,14 @@ PON Log device accesses this log and parses it into a human readable format.
 - nvmem:
 	Usage: required
 	Value type: <phandle-list>
-	Definition: phandle of the PMIC nvmem device containing the PON log
+	Definition: phandle list of the PMIC nvmem devices containing the PON
+		    log.
 
 - nvmem-names:
 	Usage: required
 	Value type: <stringlist>
-	Definition: must be "pon_log"
+	Definition: must be "pon_log" if using a single nvmem device or
+		    "pon_log0", "pon_log1", etc if using multiple nvmem devices.
 
 - qcom,pmic-fault-panic:
 	Usage: optional
@@ -26,10 +28,16 @@ PON Log device accesses this log and parses it into a human readable format.
 		    controlled panic shutdown if the preceding restart was
 		    caused by a PMIC fault.
 
-Example:
+Examples:
 
 pmic-pon-log {
 	compatible = "qcom,pmic-pon-log";
 	nvmem = <&pmk8350_sdam_5>;
 	nvmem-names = "pon_log";
+};
+
+pmic-pon-log {
+	compatible = "qcom,pmic-pon-log";
+	nvmem = <&pmk8550_sdam_5>, <&pmk8550_sdam_6>;
+	nvmem-names = "pon_log0", "pon_log1";
 };
