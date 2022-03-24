@@ -154,11 +154,14 @@ dtb-$(CONFIG_ARCH_WAIPIO) += waipio-lte-mtp-pm8008.dtb \
 endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
-dtbo-$(CONFIG_ARCH_NEO) += neo-rumi-overlay.dtbo
+dtbo-$(CONFIG_ARCH_NEO) += neo-rumi-overlay.dtbo \
+		neo_la-rumi-overlay.dtbo
 
 neo-rumi-overlay.dtbo-base := neo.dtb
+neo_la-rumi-overlay.dtbo-base := neo_la.dtb
 else
 dtb-$(CONFIG_ARCH_NEO) += neo-rumi.dtb
+dtb-$(CONFIG_ARCH_NEO) += neo_la-rumi.dtb
 endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
@@ -169,11 +172,11 @@ dtbo-$(CONFIG_ARCH_DIWALI) += diwali-rumi-overlay.dtbo \
 	caiwei-sm7450-overlay.dtbo \
 	diwali-idp-usbc-overlay.dtbo
 
-diwali-idp-overlay.dtbo-base := diwali.dtb diwalip.dtb
-diwali-qrd-overlay.dtbo-base := diwali.dtb diwalip.dtb
-diwali-idp-amoled-overlay.dtbo-base := diwali.dtb diwalip.dtb
-ziyi-sm7450-overlay.dtbo-base := diwali.dtb diwalip.dtb
-caiwei-sm7450-overlay.dtbo-base := diwali.dtb diwalip.dtb
+diwali-idp-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
+diwali-qrd-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
+diwali-idp-amoled-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
+ziyi-sm7450-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
+caiwei-sm7450-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
 else
 dtb-$(CONFIG_ARCH_DIWALI) += diwali-rumi.dtb \
 	diwali-idp.dtb \
@@ -191,7 +194,15 @@ dtb-$(CONFIG_ARCH_DIWALI) += diwali-rumi.dtb \
 	diwalip-idp-usbc.dtb \
 	diwalip-idp-hsp.dtb \
 	diwalip-idp-nopmi.dtb \
-	diwalip-qrd-nopmi.dtb
+	diwalip-qrd-nopmi.dtb \
+	diwali-lte-idp.dtb \
+	diwali-lte-atp.dtb \
+	diwali-lte-qrd.dtb \
+	diwali-lte-idp-amoled.dtb \
+	diwali-lte-idp-usbc.dtb \
+	diwali-lte-idp-hsp.dtb \
+	diwali-lte-idp-nopmi.dtb \
+	diwali-lte-qrd-nopmi.dtb
 endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
