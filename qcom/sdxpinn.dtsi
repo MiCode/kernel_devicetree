@@ -1,4 +1,6 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,gcc-sdxpinn.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. SDXPINN";
@@ -190,6 +192,149 @@
 			status = "disabled";
 		};
 	};
+
+	clocks {
+		xo_board: xo_board {
+			compatible = "fixed-clock";
+			clock-frequency = <19200000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
+
+		sleep_clk: sleep_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32000>;
+			clock-output-names = "sleep_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie20_phy_aux_clk: pcie20_phy_aux_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie20_phy_aux_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_1_pipe_clk: pcie_1_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_1_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_2_pipe_clk: pcie_2_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_2_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_pipe_clk: pcie_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		usb3_phy_wrapper_gcc_usb30_pipe_clk: usb3_phy_wrapper_gcc_usb30_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <1>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo";
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <1>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo_ao";
+	};
+
+	rpmhcc: clock-controller {
+		compatible = "fixed-clock";
+		clock-output-names = "rpmh_clocks";
+		clock-frequency = <19200000>;
+		#clock-cells = <1>;
+	};
+
+	gcc: clock-controller@80000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	/* GCC GDSCs */
+	gcc_emac0_gdsc: qcom,gdsc@f1004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_emac0_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_emac1_gdsc: qcom,gdsc@f2004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_emac1_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_1_gdsc: qcom,gdsc@e7004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_pcie_1_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_1_phy_gdsc: qcom,gdsc@d6004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_pcie_1_phy_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_2_gdsc: qcom,gdsc@e8004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_pcie_2_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_2_phy_gdsc: qcom,gdsc@ee004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_pcie_2_phy_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_gdsc: qcom,gdsc@d3004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_pcie_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_phy_gdsc: qcom,gdsc@d4004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_pcie_phy_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_usb30_gdsc: qcom,gdsc@a7004 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_usb30_gdsc";
+	};
+
+	gcc_usb3_phy_gdsc: qcom,gdsc@a8008 {
+		compatible = "regulator-fixed";
+		regulator-name = "gcc_usb3_phy_gdsc";
+	};
+
 };
 
 #include "sdxpinn-regulators.dtsi"
