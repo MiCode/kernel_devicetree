@@ -81,13 +81,18 @@
 		qcom,pasid = <0x0 0x1c>;
 
 		iomemory-ranges = <0x0 0xa24000 0x0 0xa24000 0x0 0x4000 0x0
+				0x0 0x828000 0x0 0x828000 0x0 0x4000 0x0
 				0x0 0xc400000 0x0 0xc400000 0x0 0x3000 0x1
 				0x0 0xc42d000 0x0 0xc42d000 0x0 0x4000 0x1
 				0x0 0xc440000 0x0 0xc440000 0x0 0x80000 0x1
 				0x0 0xc4c0000 0x0 0xc4c0000 0x0 0x10000 0x1
 				0x0 0xae8f000 0x0 0xae8f000 0x0 0x1000 0x0>;
 
-		gic-irq-ranges = <316 316>; /* PVM->SVM IRQ transfer */
+		/* For LEVM pored usecases is SE4 and SE8, for SE4 we used gpii5
+		 * and irq no is 316, for SE8 we used gpii6 and irq no is 626.
+		 */
+		gic-irq-ranges = <316 316
+				  626 626>; /* PVM->SVM IRQ transfer */
 
 		memory {
 			#address-cells = <0x2>;
@@ -346,6 +351,7 @@
 		qcom,iommu-group = <&qup_iommu_group>;
 		dma-coherent;
 		ranges;
+		qcom,not-la-vm;
 		status = "ok";
 
 		qupv3_se4_i2c: i2c@a90000 {
@@ -368,6 +374,74 @@
 			#size-cells = <0>;
 			dmas = <&gpi_dma1 0 4 1 64 0>,
 				<&gpi_dma1 1 4 1 64 0>;
+			dma-names = "tx", "rx";
+			spi-max-frequency = <50000000>;
+			qcom,le-vm;
+			status = "disabled";
+		};
+	};
+
+	/* GPI Instance */
+	gpi_dma2: qcom,gpi-dma@800000  {
+		compatible = "qcom,gpi-dma";
+		#dma-cells = <5>;
+		reg = <0x800000  0x60000>;
+		reg-names = "gpi-top";
+		iommus = <&apps_smmu 0x438 0x0>;
+		qcom,iommu-group = <&qup_iommu_group>;
+		dma-coherent;
+		interrupts = <GIC_SPI 588 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 589 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 590 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 591 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 592 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 593 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 594 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 595 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 596 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 597 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 598 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 599 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,max-num-gpii = <12>;
+		qcom,gpii-mask = <0x40>;
+		qcom,ev-factor = <2>;
+		qcom,gpi-ee-offset = <0x10000>;
+		status = "ok";
+	};
+
+	/* QUPv3_2  wrapper  instance */
+	qupv3_2: qcom,qupv3_2_geni_se@8c0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0x8c0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		iommus = <&apps_smmu 0x438 0x0>;
+		qcom,iommu-group = <&qup_iommu_group>;
+		dma-coherent;
+		ranges;
+		qcom,not-la-vm;
+		status = "ok";
+
+		qupv3_se8_i2c: i2c@880000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0x880000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			dmas = <&gpi_dma2 0 0 3 64 0>,
+				<&gpi_dma2 1 0 3 64 0>;
+			dma-names = "tx", "rx";
+			qcom,le-vm;
+			status = "disabled";
+		};
+
+		qupv3_se8_spi: spi@880000 {
+			compatible = "qcom,spi-geni";
+			reg = <0x880000 0x4000>;
+			reg-names = "se_phys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			dmas = <&gpi_dma2 0 0 1 64 0>,
+				<&gpi_dma2 1 0 1 64 0>;
 			dma-names = "tx", "rx";
 			spi-max-frequency = <50000000>;
 			qcom,le-vm;
