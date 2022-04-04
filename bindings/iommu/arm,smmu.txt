@@ -1,0 +1,111 @@
+* ARM System MMU Architecture Implementation
+
+ARM SoCs may contain an implementation of the ARM System Memory
+Management Unit Architecture, which can be used to provide 1 or 2 stages
+of address translation to bus masters external to the CPU.
+
+The SMMU may also raise interrupts in response to various fault
+conditions.
+
+** System MMU required properties:
+
+- compatible    : Should be one of:
+
+                        "arm,smmu-v1"
+                        "arm,smmu-v2"
+                        "arm,mmu-400"
+                        "arm,mmu-401"
+                        "arm,mmu-500"
+                        "cavium,smmu-v2"
+                        "qcom,qsmmu-v500"
+                        "qcom,adreno-smmu"
+                        "qcom,smmu-v2"
+			"qcom,virt-smmu"
+
+                  depending on the particular implementation and/or the
+                  version of the architecture implemented.
+
+                  Qcom SoCs must contain, as below, SoC-specific compatibles
+                  along with "qcom,smmu-v2":
+                  "qcom,msm8996-smmu-v2", "qcom,smmu-v2",
+                  "qcom,sdm845-smmu-v2", "qcom,smmu-v2".
+
+                  Qcom SoCs implementing "arm,mmu-500" must also include,
+                  as below, SoC-specific compatibles:
+                  "qcom,sdm845-smmu-500", "arm,mmu-500"
+
+		  "qcom,virt-smmu" is a subtype of "qcom,qsmmu-v500" which
+		  only supports access to the set of registers required by
+		  the arm specificiation. None of the additional registers
+		  normally present in qcom,qsmmu-v500 are supported
+		  currently.
+
+- reg           : Base address and size of the SMMU.
+
+- #global-interrupts : The number of global interrupts exposed by the
+                       device.
+
+- interrupts    : Interrupt list, with the first #global-irqs entries
+                  corresponding to the global interrupts and any
+                  following entries corresponding to context interrupts,
+                  specified in order of their indexing by the SMMU.
+
+                  For SMMUv2 implementations, there must be exactly one
+                  interrupt per context bank. In the case of a single,
+                  combined interrupt, it must be listed multiple times.
+
+- #iommu-cells  : See Documentation/devicetree/bindings/iommu/iommu.txt
+                  for details. With a value of 1, each IOMMU specifier
+                  represents a distinct stream ID emitted by that device
+                  into the relevant SMMU.
+
+                  SMMUs with stream matching support and complex masters
+                  may use a value of 2, where the second cell of the
+                  IOMMU specifier represents an SMR mask to combine with
+                  the ID in the first cell.  Care must be taken to ensure
+                  the set of matched IDs does not result in conflicts.
+
+** System MMU optional properties:
+
+- dma-coherent  : Present if page table walks made by the SMMU are
+                  cache coherent with the CPU.
+
+                  NOTE: this only applies to the SMMU itself, not
+                  masters connected upstream of the SMMU.
+
+- calxeda,smmu-secure-config-access : Enable proper handling of buggy
+                  implementations that always use secure access to
+                  SMMU configuration registers. In this case non-secure
+                  aliases of secure registers have to be used during
+                  SMMU configuration.
+
+- stream-match-mask : For SMMUs supporting stream matching and using
+                  #iommu-cells = <1>, specifies a mask of bits to ignore
+		  when matching stream IDs (e.g. this may be programmed
+		  into the SMRn.MASK field of every stream match register
+		  used). For cases where it is desirable to ignore some
+                  portion of every Stream ID (e.g. for certain MMU-500
+                  configurations given globally unique input IDs). This
+                  property is not valid for SMMUs using stream indexing,
+                  or using stream matching with #iommu-cells = <2>, and
+                  may be ignored if present in such cases.
+
+- clock-names:    List of the names of clocks input to the device. The
+                  required list depends on particular implementation and
+                  is as follows:
+                  - for "qcom,smmu-v2":
+                    - "bus": clock required for downstream bus access and
+                             for the smmu ptw,
+                    - "iface": clock required to access smmu's registers
+                               through the TCU's programming interface.
+                  - unspecified for other implementations.
+
+- clocks:         Specifiers for all clocks listed in the clock-names property,
+                  as per generic clock bindings.
+
+- power-domains:  Specifiers for power domains required to be powered on for
+                  the SMMU to operate, as per generic power domain bindings.
+
+- attach-impl-defs : global registers to program at device attach
+                  time. This should be a list of 2-tuples of the format:
+                  <offset reg_value>.
