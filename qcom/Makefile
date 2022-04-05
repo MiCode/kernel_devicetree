@@ -95,6 +95,22 @@ gen3auto-overlays-dtb-$(CONFIG_ARCH_SA8195) += $(SA8195P_BOARDS) $(SA8195P_BASE_
 
 dtb-y += $(gen3auto-dtb-y)
 
+SA6155_BASE_DTB += sa6155.dtb
+SA6155P_BASE_DTB += sa6155p.dtb
+
+SA6155_BOARDS += sa6155-adp-star-overlay.dtbo \
+		sa6155-adp-air-overlay.dtbo
+
+SA6155P_BOARDS += sa6155p-adp-star-overlay.dtbo \
+		sa6155p-adp-air-overlay.dtbo
+
+sdmsteppeauto-dtb-$(CONFIG_ARCH_SA6155) += \
+	$(call add-overlays, $(SA6155_BOARDS),$(SA6155_BASE_DTB))\
+	$(call add-overlays, $(SA6155P_BOARDS),$(SA6155P_BASE_DTB))
+sdmsteppeauto-overlays-dtb-$(CONFIG_ARCH_SA6155) += $(SA6155_BOARDS) $(SA6155P_BOARDS) $(SA6155_BASE_DTB) $(SA6155P_BASE_DTB)
+
+dtb-y += $(sdmsteppeauto-dtb-y)
+
 endif
 
 ifeq ($(CONFIG_ARCH_KALAMA), y)
