@@ -32,6 +32,21 @@
 			output-low;
 		};
 	};
+
+	vbus_ntc_ctrl: vbus_ntc_ctrl {
+		mux {
+			pins = "gpio27";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio27";
+			drive-strength = <16>;   /* 16 mA */
+			slew-rate = <1>;
+			bias-disable;
+			output-low;
+		};
+	};
 };
 
 &qupv3_se4_i2c {
@@ -108,12 +123,16 @@
 		#io-channel-cells = <1>;
 		compatible = "xiaomi,battmngr";
 
+		pinctrl-names = "default";
+		pinctrl-0 = <&vbus_ntc_ctrl>;
+		vbus_ctrl_gpio = <&tlmm 27 0>;
+
 		xm,fv-max-uv = <4480000>;
 		xm,fcc-max-ua = <12000000>;
 		xm,fv-max-design-uv = <11000000>;
 		xm,icl-max-ua = <6000000>;
-		xm,step-chg-enable;
-		xm,sw-jeita-enable;
+		xm,step-chg-enable = <1>;
+		xm,sw-jeita-enable = <1>;
 
 		xm,batt-iterm = <300000>;
 
