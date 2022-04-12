@@ -127,15 +127,39 @@
 		pinctrl-0 = <&vbus_ntc_ctrl>;
 		vbus_ctrl_gpio = <&tlmm 27 0>;
 
+		/* charger */
 		xm,fv-max-uv = <4480000>;
-		xm,fcc-max-ua = <12000000>;
+		xm,fcc-max-ua = <12400000>;
 		xm,fv-max-design-uv = <11000000>;
-		xm,icl-max-ua = <6000000>;
+		xm,icl-max-ua = <6200000>;
 		xm,step-chg-enable = <1>;
 		xm,sw-jeita-enable = <1>;
 
+		/* battery */
 		xm,batt-iterm = <300000>;
 
+		/* stepchg_jeita */
+		xm,taper-fcc;
+		xm,step-chg-ranges = <3000000  3349000  1000000
+				      3350000  4250000  12400000
+				      4251000  4300000  7920000
+				      4351000  4480000  6600000
+				      4481000  4530000  5280000>;
+		xm,jeita-fcc-ranges = <(-100) 0  660000
+					1   50   2200000
+					51  100  3080000
+					101 150  5280000
+					151 480  12400000
+					481 580  2200000>;
+		xm,jeita-fv-ranges = <(-100)  0  4480000
+					1   50   4480000
+					51  100  4480000
+					101 150  4480000
+					151 480  4480000
+					481 580  4100000>;
+		xm,step-jeita-hysteresis = <10 10>;
+
+		/* thermal */
 		xm,thermal-mitigation-dcp
 				= <1600000 1600000 1600000 1600000 1600000 1600000 1600000
 				   1600000 1600000 1600000 1600000 1600000 1500000 1400000
@@ -165,6 +189,7 @@
 				   1800000 1600000 1500000 1400000 1300000 1200000 1100000
 				   950000 750000>;
 
+		/* iio */
 		io-channels = <&sc8551_master PSY_IIO_SC_PRESENT>,
 			<&sc8551_master PSY_IIO_SC_CHARGING_ENABLED>,
 			<&sc8551_master PSY_IIO_SC_STATUS>,
