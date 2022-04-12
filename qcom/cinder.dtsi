@@ -317,6 +317,11 @@
 			apps_bcm_voter: bcm_voter {
 				compatible = "qcom,bcm-voter";
 			};
+
+			rpmhcc: clock-controller {
+				compatible = "qcom,cinder-rpmh-clk";
+				#clock-cells = <1>;
+			};
 		};
 	};
 
@@ -676,21 +681,6 @@
 		};
 	};
 
-	bi_tcxo: bi_tcxo {
-		compatible = "fixed-factor-clock";
-		clock-mult = <1>;
-		clock-div = <2>;
-		clocks = <&xo_board>;
-		#clock-cells = <0>;
-	};
-
-	bi_tcxo_ao: bi_tcxo_ao {
-		compatible = "fixed-factor-clock";
-		clock-mult = <1>;
-		clock-div = <2>;
-		clocks = <&xo_board>;
-		#clock-cells = <0>;
-	};
 
 	ecpri_cc_emac_synce_phy0_clk_src: ecpri_cc_emac_synce_phy0_clk_src {
 		compatible = "fixed-clock";
@@ -921,11 +911,19 @@
 		#reset-cells = <1>;
 	};
 
-	rpmhcc: clock-controller@0 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "rpmhcc_clocks";
+	mccc: syscon@190ba000 {
+		compatible = "syscon";
+		reg = <0x190ba000 0x54>;
+	};
+
+	debugcc: qcom,cc-debug {
+		compatible = "qcom,cinder-debugcc";
+		qcom,gcc = <&gcc>;
+		qcom,ecpricc = <&ecpricc>;
+		qcom,mccc = <&mccc>;
+		clock-names = "xo_clk_src";
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		#clock-cells = <1>;
-		#reset-cells = <1>;
 	};
 
 	/* GCC GDSCs */

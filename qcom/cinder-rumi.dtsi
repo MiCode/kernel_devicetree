@@ -45,6 +45,22 @@
 			0x0 0x3c
 			0x0 0x4>;
 	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clock-mult = <1>;
+		clock-div = <2>;
+		clocks = <&xo_board>;
+		#clock-cells = <0>;
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clock-mult = <1>;
+		clock-div = <2>;
+		clocks = <&xo_board>;
+		#clock-cells = <0>;
+	};
 };
 
 &usb0 {
@@ -147,4 +163,14 @@
 		"ecpri_cc_emac_synce_phy17_clk_src",
 		"ecpri_cc_emac_synce_phy18_clk_src",
 		"ecpri_cc_emac_synce_phy19_clk_src";
+};
+
+&rpmhcc {
+	compatible = "qcom,dummycc";
+	clock-output-names = "rpmhcc_clocks";
+};
+
+&debugcc {
+	clocks = <&bi_tcxo>;
+	clock-names = "xo_clk_src";
 };
