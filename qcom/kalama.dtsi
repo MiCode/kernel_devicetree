@@ -1217,10 +1217,14 @@
 	qcom_cedev: qcedev@1de0000 {
 		compatible = "qcom,qcedev";
 		reg = <0x1de0000 0x20000>,
-			<0x1dc4000 0x24000>;
+			<0x1dc4000 0x28000>;
 		reg-names = "crypto-base","crypto-bam-base";
 		interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,bam-pipe-pair = <2>;
+		qcom,offload-ops-support;
+		qcom,bam-pipe-offload-cpb-hlos = <1>;
+		qcom,bam-pipe-offload-hlos-cpb = <3>;
+		qcom,bam-pipe-offload-hlos-hlos = <4>;
 		qcom,ce-hw-instance = <0>;
 		qcom,ce-device = <0>;
 		qcom,ce-hw-shared;
@@ -1229,7 +1233,8 @@
 		qcom,no-clock-support;
 		interconnect-names = "data_path";
 		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
-		iommus = <&apps_smmu 0x0480 0x0>;
+		iommus = <&apps_smmu 0x0480 0x0>,
+			<&apps_smmu 0x0481 0x0>;
 		qcom,iommu-dma = "atomic";
 		dma-coherent;
 
@@ -1246,6 +1251,7 @@
 			iommus = <&apps_smmu 0x0483 0x0>;
 			qcom,iommu-vmid = <0x9>;
 			qcom,secure-context-bank;
+			dma-coherent;
 		};
 	};
 
