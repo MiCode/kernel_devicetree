@@ -24,6 +24,8 @@
 
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
+	ddr-regions { };
+
 	reserved_memory: reserved-memory { };
 
 	aliases: aliases {
@@ -874,9 +876,8 @@
 				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3>;
 				qcom,cpufreq-memfreq-tbl =
 					<  556800  300000 >,
-					< 1440000  466500 >,
-					< 1670400  600000 >,
-					< 1804800  806000 >;
+					< 1440000  466000 >,
+					< 1804800  600000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -885,7 +886,7 @@
 				qcom,cpulist = <&CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
 					<  633600  300000 >,
-					< 1113600  466500 >,
+					< 1113600  466000 >,
 					< 1324800  600000 >,
 					< 1881600  806000 >,
 					< 2572800  933000 >,
@@ -1407,11 +1408,14 @@
 		ss-name = "modem", "adsp", "adsp_island",
 			  "cdsp", "slpi", "slpi_island",
 			  "apss";
+		mboxes = <&qmp_aop 0>;
+		ddr-freq-update;
 	};
 
 	subsystem-sleep-stats@c3f0000 {
 		compatible = "qcom,subsystem-sleep-stats";
 		reg = <0xc3f0000 0x400>;
+		ddr-freq-update;
 	};
 
 	sys-pm-vx@c320000 {
@@ -1889,11 +1893,11 @@
 			<&clock_gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
 			<&clock_gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
 		freq-table-hz =
-			<75000000 300000000>,
+			<75000000 850000000>,
 			<0 0>,
 			<0 0>,
-			<75000000 300000000>,
-			<75000000 300000000>,
+			<75000000 850000000>,
+			<75000000 850000000>,
 			<0 0>,
 			<0 0>,
 			<0 0>,
@@ -1950,7 +1954,7 @@
 		 */
 		<1492582 0>, <204800 409600>, /* HS G3 RB L2 KBPs */
 		<2915200 0>, <409600 409600>, /* HS G4 RB L2 */
-		<7643136 0>, <307200 0>; /* Max. bandwidth */
+		<7643136 12000000>, <409600 409600>; /* Max. bandwidth */
 
 		qcom,bus-vector-names = "MIN",
 		"PWM_G1_L1", "PWM_G2_L1", "PWM_G3_L1", "PWM_G4_L1",
@@ -1968,6 +1972,15 @@
 		iommus = <&apps_smmu 0xE0 0x0>;
 		qcom,iommu-dma = "fastmap";
 		dma-coherent;
+
+		/* Multilevel clock scaling support for higher ufs clock freq */
+		multi-level-clk-scaling-support;
+		axi-turbo-clk-freq = <850000000>;
+		axi-turbo-l1-clk-freq = <850000000>;
+		ice-turbo-clk-freq = <850000000>;
+		ice-turbo-l1-clk-freq = <850000000>;
+		unipro-turbo-clk-freq = <850000000>;
+		unipro-turbo-l1-clk-freq = <850000000>;
 
 		/* CGC bit needs to disable fot target supporting higher ufs clock freq */
 		disable-cgc;
@@ -2392,6 +2405,10 @@
 			qcom,glinkpkt-ch-name = "DATA11";
 			qcom,glinkpkt-dev-name = "smd11";
 		};
+	};
+
+	qcom,glink {
+		compatible = "qcom,glink";
 	};
 
 	aoss_qmp: power-controller@c300000 {
