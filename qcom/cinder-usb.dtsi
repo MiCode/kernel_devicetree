@@ -48,6 +48,7 @@
 			qcom,iommu-dma-addr-pool = <0x90000000 0x60000000>;
 			dma-coherent;
 
+			usb-phy = <&usb2_phy0>, <&usb_nop_phy>;
 			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
 			snps,has-lpm-erratum;
 			snps,hird-threshold = /bits/ 8 <0x0>;
@@ -59,5 +60,25 @@
 			dr_mode = "otg";
 			maximum-speed = "super-speed-plus";
 		};
+	};
+
+	/* USB port related High Speed PHY */
+	usb2_phy0: hsphy@88e3000 {
+		compatible = "qcom,usb-hsphy-snps-femto";
+		reg = <0x88e3000 0x120>,
+			<0x088e2000 0x4>;
+		reg-names = "hsusb_phy_base",
+			    "eud_enable_reg";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&gcc GCC_USB2_CLKREF_EN>;
+		clock-names = "ref_clk_src", "ref_clk";
+
+		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+		reset-names = "phy_reset";
+	};
+
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
 	};
 };
