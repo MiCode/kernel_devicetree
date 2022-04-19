@@ -124,29 +124,38 @@
        qcom,init-voltage = <3200000>;
 };
 
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+
 &qupv3_se0_spi {
 	status = "ok";
 	qcom,rt;
 	pinctrl-1 = <&qupv3_se0_spi_sleep &qupv3_se0_spi_sleep_cs>;
-	goodix@0 {
-		compatible = "xiaomi,l9-spi";
+	synaptics_tcm@0 {
+		compatible = "synaptics,tcm-spi";
 		reg = <0>;
 		spi-max-frequency = <1000000>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <51 0x2808>;
-		goodix,avdd-name = "avdd";
+		synaptics,avdd-name = "avdd";
 		avdd-supply = <&L11C>;
-		goodix,iovdd-name = "vdd";
-		vdd-supply = <&L2C>;
-		goodix,irq-gpio = <&tlmm 51 0x2808>;
-		goodix,reset-gpio = <&tlmm 126 0x00>;
-		goodix,irq-flags = <2>;
-		goodix,panel-max-x = <1080>;
-		goodix,panel-max-y = <2400>;
-		goodix,panel-max-w = <255>;
-		goodix,panel-max-p = <4096>;
-		goodix,firmware-name = "goodix_firmware_l9.bin";
-		goodix,config-name = "goodix_cfg_group_l9.bin";
+		synaptics,iovdd-name = "iovdd";
+		iovdd-supply = <&L2C>;
+		synaptics,irq-gpio = <&tlmm 51 0x2808>;
+		synaptics,reset-gpio = <&tlmm 126 0x00>;
+		synaptics,irq-on-state = <0>;
+		synaptics,spi-mode = <0>;
+		synaptics,byte-delay-us = <0>;
+		synaptics,block-delay-us = <0>;
+		synaptics,power-delay-ms = <200>;
+		synaptics,reset-delay-ms = <200>;
+		synaptics,ubl-max-freq = <5000000>;
+		synaptics,ubl-byte-delay-us = <20>;
 	};
 };
 
@@ -175,8 +184,7 @@
 		config {
 			pins = "gpio3";
 			drive-strength = <6>;
-			bias-disable;
-			output-high;
+			bias-pull-up;
 		};
 	};
 };
