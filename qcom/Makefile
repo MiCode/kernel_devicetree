@@ -67,7 +67,8 @@ dtb-y += $(kalama-dtb-y)
 
 cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
 	cinder-ru-idp.dtb \
-	cinder-du-idp.dtb
+	cinder-du-idp.dtb \
+	cinder-du-x100.dtb
 dtb-y += $(cinder-dtb-y)
 
 SA8155_BASE_DTB += sa8155.dtb sa8155-v2.dtb
