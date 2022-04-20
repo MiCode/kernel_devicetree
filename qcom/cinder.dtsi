@@ -33,6 +33,9 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x0>;
 			enable-method = "psci";
+			power-domain-names = "psci";
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD0>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -51,6 +54,9 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x100>;
 			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD1>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_1>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -65,6 +71,9 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x200>;
 			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD2>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_2>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -78,6 +87,9 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0 0x300>;
 			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD3>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_3>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -108,7 +120,38 @@
 		};
 	};
 
+	idle-states {
+		SILVER_OFF: silver-c4 {  /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <274>;
+			exit-latency-us = <480>;
+			min-residency-us = <3934>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+
+		CLUSTER_PWR_DN: cluster-d4 { /* D4 */
+			compatible = "domain-idle-state";
+			idle-state-name = "l3-off";
+			entry-latency-us = <584>;
+			exit-latency-us = <2332>;
+			min-residency-us = <6118>;
+			arm,psci-suspend-param = <0x41000044>;
+		};
+
+		APSS_OFF: cluster-e3 { /* E3 */
+			compatible = "domain-idle-state";
+			idle-state-name = "llcc-off";
+			entry-latency-us = <2893>;
+			exit-latency-us = <4023>;
+			min-residency-us = <9987>;
+			arm,psci-suspend-param = <0x41003344>;
+		};
+	};
+
 	soc: soc { };
+
 };
 
 &reserved_memory {
@@ -116,10 +159,14 @@
 	#size-cells = <2>;
 	ranges;
 
-	aop_cmd_db_mem: aop_cmd_db_region@80860000 {
-		compatible = "qcom,cmd-db";
-		no-map;
-		reg = <0x0 0x80860000 0x0 0x20000>;
+	/* global autoconfigured region for contiguous allocations */
+	system_cma: linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
 	};
 };
 
@@ -134,6 +181,31 @@
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
+
+		CPU_PD0: cpu-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD1: cpu-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD2: cpu-pd2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD3: cpu-pd3 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CLUSTER_PD: cluster-pd {
+			#power-domain-cells = <0>;
+			domain-idle-states = <&CLUSTER_PWR_DN &APSS_OFF>;
+		};
 	};
 
 	intc: interrupt-controller@17200000 {
@@ -251,8 +323,8 @@
 		compatible = "arm,arm64-kryo-cpu-erp";
 		interrupts = <GIC_PPI 0 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_PPI 1 IRQ_TYPE_LEVEL_HIGH>,
-			<GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
-			<GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
+			<GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "l1-l2-faultirq",
 			"l1-l2-errirq",
 			"l3-scu-errirq",
@@ -328,6 +400,24 @@
 		clock-frequency = <32768>;
 	};
 
+	tcsr_mutex_block: syscon@1f40000 {
+		compatible = "syscon";
+		reg = <0x1f40000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+
+	smem: qcom,smem {
+		compatible = "qcom,smem";
+		memory-region = <&smem_mem>;
+		depends-on-supply = <&tcsr_mutex>;
+		hwlocks = <&tcsr_mutex 3>;
+	};
+
 	tcsr: syscon@1fc0000 {
 		compatible = "syscon";
 		reg = <0x1fc0000 0x30000>;
@@ -340,10 +430,77 @@
 	ipcc_mproc: qcom,ipcc@408000 {
 		compatible = "qcom,ipcc";
 		reg = <0x408000 0x1000>;
-		interrupts = <GIC_SPI 299 IRQ_TYPE_LEVEL_HIGH>;
+		interrupts = <GIC_SPI 229 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-controller;
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
+	};
+
+	modem_pas: remoteproc-mss@04080000 {
+		compatible = "qcom,cinder-modem-pas";
+		reg = <0x4080000 0x10000>,
+			<0x4180000 0x10000>;
+		status = "ok";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MODEM_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx", "mx";
+
+		qcom,qmp = <&aoss_qmp>;
+		memory-region = <&mpss_mem>;
+
+		/* Inputs from mss */
+		interrupts-extended = <&intc GIC_SPI 264 IRQ_TYPE_LEVEL_HIGH>,
+					<&modem_smp2p_in 0 0>,
+					<&modem_smp2p_in 2 0>,
+					<&modem_smp2p_in 1 0>,
+					<&modem_smp2p_in 3 0>,
+					<&modem_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to mss */
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		glink-edge {
+				qcom,remote-pid = <1>;
+				transport = "smem";
+				mboxes = <&ipcc_mproc IPCC_CLIENT_MPSS
+					  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+				mbox-names = "mpss_smem";
+				interrupt-parent = <&ipcc_mproc>;
+				interrupts = <IPCC_CLIENT_MPSS
+					      IPCC_MPROC_SIGNAL_GLINK_QMP
+					      IRQ_TYPE_EDGE_RISING>;
+
+				label = "modem";
+				qcom,glink-label = "mpss";
+
+				qcom,modem_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+				};
+
+				qcom,modem_ds {
+					qcom,glink-channels = "DS";
+					qcom,intents = <0x4000 0x2>;
+				};
+
+		};
 	};
 
 	qcom,smp2p-modem {
@@ -366,6 +523,10 @@
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
+	};
+
+	qcom,glink {
+		compatible = "qcom,glink";
 	};
 
 	aoss_qmp: power-controller@c300000 {
@@ -476,8 +637,17 @@
 		qcom,config-arr = <0x17800060 0x17810060 0x17820060 0x17830060>;
 	};
 
+	cluster-device {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD>;
+	};
+
 	vendor_hooks: qcom,cpu-vendor-hooks {
 		compatible = "qcom,cpu-vendor-hooks";
+	};
+
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
 	};
 
 	clocks {

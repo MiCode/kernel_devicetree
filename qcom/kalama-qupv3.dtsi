@@ -483,7 +483,8 @@
 			<GIC_SPI 597 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 598 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 599 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,gpii-mask = <0x3f>;
+		qcom,static-gpii-mask = <0x1>;
+		qcom,gpii-mask = <0x3e>;
 		qcom,ev-factor = <2>;
 		qcom,iommu-dma-addr-pool = <0x100000 0x100000>;
 		qcom,gpi-ee-offset = <0x10000>;
@@ -524,8 +525,8 @@
 			pinctrl-names = "default", "sleep";
 			pinctrl-0 = <&qupv3_se8_i2c_sda_active>, <&qupv3_se8_i2c_scl_active>;
 			pinctrl-1 = <&qupv3_se8_i2c_sleep>;
-			dmas = <&gpi_dma2 0 0 3 64 0>,
-				<&gpi_dma2 1 0 3 64 0>;
+			dmas = <&gpi_dma2 0 0 3 64 2>,
+				<&gpi_dma2 1 0 3 64 2>;
 			dma-names = "tx", "rx";
 			status = "disabled";
 		};
@@ -573,8 +574,8 @@
 			pinctrl-0 = <&qupv3_se8_spi_mosi_active>, <&qupv3_se8_spi_miso_active>,
 				<&qupv3_se8_spi_clk_active>, <&qupv3_se8_spi_cs_active>;
 			pinctrl-1 = <&qupv3_se8_spi_sleep>;
-			dmas = <&gpi_dma2 0 0 1 64 0>,
-				<&gpi_dma2 1 0 1 64 0>;
+			dmas = <&gpi_dma2 0 0 1 64 2>,
+				<&gpi_dma2 1 0 1 64 2>;
 			dma-names = "tx", "rx";
 			spi-max-frequency = <50000000>;
 			status = "disabled";
@@ -925,10 +926,9 @@
 		 * supports only s-ahb clock. To support upstream model we are using both
 		 * the clocks, but for m-ahb clock we defined s-ahb clock node only.
 		 */
-		clock-names = "m-ahb", "s-ahb", "core-clk";
+		clock-names = "m-ahb", "s-ahb";
 		clocks = <&gcc GCC_QUPV3_I2C_S_AHB_CLK>,
-			<&gcc GCC_QUPV3_I2C_S_AHB_CLK>,
-			<&gcc GCC_QUPV3_I2C_CORE_CLK>;
+			<&gcc GCC_QUPV3_I2C_S_AHB_CLK>;
 		ranges;
 		status = "ok";
 
@@ -938,8 +938,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 464 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S0_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S0_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -957,8 +958,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 465 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S1_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S1_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -976,8 +978,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 466 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S2_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S2_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -995,8 +998,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 467 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S3_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S3_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -1014,8 +1018,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 468 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S4_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S4_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -1033,8 +1038,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 469 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S5_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S5_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -1052,8 +1058,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 470 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S6_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S6_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -1071,8 +1078,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 471 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S7_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S7_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -1090,8 +1098,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 472 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S8_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S8_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
@@ -1109,8 +1118,9 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <GIC_SPI 473 IRQ_TYPE_LEVEL_HIGH>;
-			clock-names = "se-clk";
-			clocks = <&gcc GCC_QUPV3_I2C_S9_CLK>;
+			clock-names = "se-clk", "core-clk";
+			clocks = <&gcc GCC_QUPV3_I2C_S9_CLK>,
+				<&gcc GCC_QUPV3_I2C_CORE_CLK>;
 			interconnect-names = "qup-core", "qup-config";
 			interconnects =
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
