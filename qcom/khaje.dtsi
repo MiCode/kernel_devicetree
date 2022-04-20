@@ -2301,12 +2301,20 @@
 		lanes-per-direction = <2>;
 
 		clock-names = "ref_clk_src",
-			"ref_clk",
-			"ref_aux_clk";
+		"ref_aux_clk", "qref_clk",
+		"rx_sym0_mux_clk", "rx_sym1_mux_clk", "tx_sym0_mux_clk",
+		"rx_sym0_phy_clk", "rx_sym1_phy_clk", "tx_sym0_phy_clk";
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
-			<&gcc GCC_UFS_CLKREF_CLK>,
-			<&gcc GCC_UFS_PHY_PHY_AUX_CLK>;
+		<&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
+		<&gcc GCC_UFS_CLKREF_CLK>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK_SRC>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK_SRC>,
+		<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK_SRC>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>,
+		<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>;
 
+		resets = <&ufshc_mem 0>;
 		status = "disabled";
 	};
 
@@ -2318,9 +2326,11 @@
 		phys = <&ufsphy_mem>;
 		phy-names = "ufsphy";
 
+		limit-rx-hs-gear = <3>;
+		limit-tx-hs-gear = <3>;
 		lanes-per-direction = <2>;
+		limit-phy-submode = <0>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
-		spm-level = <5>;
 		#reset-cells = <1>;
 
 		clock-names =
@@ -2405,20 +2415,23 @@
 		"HS_RB_G1_L2", "HS_RB_G2_L2", "HS_RB_G3_L2",
 		"MAX";
 
-		/* PM QoS */
-		qcom,pm-qos-cpu-groups = <0x0f 0xf0>;
-		qcom,pm-qos-cpu-group-latency-us = <26 26>;
-		qcom,pm-qos-default-cpu = <0>;
-
-		pinctrl-names = "dev-reset-assert", "dev-reset-deassert";
-		pinctrl-0 = <&ufs_dev_reset_assert>;
-		pinctrl-1 = <&ufs_dev_reset_deassert>;
-
-		resets = <&gcc GCC_UFS_PHY_BCR>;
 		reset-names = "core_reset";
 		non-removable;
 
 		status = "disabled";
+		iommus = <&apps_smmu 0x100 0x0>;
+		qcom,iommu-dma = "fastmap";
+
+		qos0 {
+			mask = <0xf0>;
+			vote = <26>;
+			perf;
+		};
+
+		qos1 {
+			mask = <0xf0>;
+			vote = <26>;
+		};
 
 	};
 
@@ -2529,9 +2542,17 @@
 		vdd_mx-supply = <&VDD_MX_LEVEL>;
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
 			<&rpmcc RPM_SMD_XO_A_CLK_SRC>,
-			<&sleep_clk>;
+			<&sleep_clk>,
+			<&ufs_phy_rx_symbol_0_clk>,
+			<&ufs_phy_rx_symbol_1_clk>,
+			<&ufs_phy_tx_symbol_0_clk>,
+			<&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
 		clock-names = "bi_tcxo",
-				"bi_tcxo_ao", "sleep_clk";
+				"bi_tcxo_ao", "sleep_clk",
+				"ufs_phy_rx_symbol_0_clk",
+				"ufs_phy_rx_symbol_1_clk",
+				"ufs_phy_tx_symbol_0_clk",
+				"usb3_phy_wrapper_gcc_usb30_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
