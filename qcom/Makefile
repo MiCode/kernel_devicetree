@@ -169,14 +169,12 @@ dtbo-$(CONFIG_ARCH_DIWALI) += diwali-rumi-overlay.dtbo \
 	diwali-idp-overlay.dtbo \
 	diwali-idp-amoled-overlay.dtbo \
 	ziyi-sm7450-overlay.dtbo \
-	caiwei-sm7450-overlay.dtbo \
 	diwali-idp-usbc-overlay.dtbo
 
 diwali-idp-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
 diwali-qrd-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
 diwali-idp-amoled-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
 ziyi-sm7450-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
-caiwei-sm7450-overlay.dtbo-base := diwali.dtb diwalip.dtb diwali-lte.dtb
 else
 dtb-$(CONFIG_ARCH_DIWALI) += diwali-rumi.dtb \
 	diwali-idp.dtb \
