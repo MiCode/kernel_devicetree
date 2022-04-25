@@ -1,6 +1,8 @@
 #include <dt-bindings/clock/qcom,ecpricc-cinder.h>
 #include <dt-bindings/clock/qcom,gcc-cinder.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,cinder.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
@@ -310,6 +312,10 @@
 						  <WAKE_TCS      3>,
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 0>;
+			};
+
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
 			};
 		};
 	};
@@ -871,6 +877,36 @@
 		cell-index = <0>;
 		qcom,channel = <0>;
 		qcom,ee = <0>;
+	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,cinder-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,cinder-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@1640000 {
+		reg = <0x1640000 0x45080>;
+		compatible = "qcom,cinder-system_noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gem_noc: interconnect@19100000 {
+		reg = <0x19100000 0xB8080>;
+		compatible = "qcom,cinder-gem_noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 };
 
