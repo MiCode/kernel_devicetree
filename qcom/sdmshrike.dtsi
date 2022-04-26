@@ -1,3 +1,10 @@
+#include <dt-bindings/clock/qcom,camcc-sc8180x.h>
+#include <dt-bindings/clock/qcom,dispcc-sm8250.h>
+#include <dt-bindings/clock/qcom,gcc-sc8180x.h>
+#include <dt-bindings/clock/qcom,gpucc-sm8150.h>
+#include <dt-bindings/clock/qcom,npucc-sm8150.h>
+#include <dt-bindings/clock/qcom,scc-sm8150.h>
+#include <dt-bindings/clock/qcom,videocc-sm8150.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
@@ -577,6 +584,22 @@
 		};
 	};
 
+	clocks {
+		xo_board: xo-board {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <38400000>;
+			clock-output-names = "xo_board";
+		};
+
+		sleep_clk: sleep-clk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <32000>;
+			clock-output-names = "sleep_clk";
+		};
+	};
+
 	qcom,msm-rtb {
 		compatible = "qcom,msm-rtb";
 		qcom,rtb-size = <0x100000>;
@@ -610,6 +633,12 @@
 						  <WAKE_TCS      3>,
 						  <CONTROL_TCS   1>,
 						  <FAST_PATH_TCS 0>;
+			};
+
+			rpmhcc: clock-controller {
+				compatible = "qcom,sm8150-rpmh-clk";
+				#clock-cells = <1>;
+				status = "okay";
 			};
 		};
 	};
@@ -647,6 +676,140 @@
 		#interrupt-cells = <2>;
 		interrupt-parent = <&intc>;
 		interrupt-controller;
+	};
+
+	gcc: clock-controller@100000 {
+		compatible = "qcom,gcc-sc8180x", "syscon";
+		reg = <0x100000 0x1f0000>;
+		reg-names = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_cx_ao-supply = <&VDD_CX_LEVEL_AO>;
+		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&rpmhcc RPMH_CXO_CLK_A>,
+			<&sleep_clk>;
+		clock-names =
+			"bi_tcxo",
+			"bi_tcxo_ao",
+			"sleep_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	scc: clock-controller@2b10000 {
+		compatible = "qcom,sa8195-scc";
+		reg = <0x2b10000 0x30000>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "bi_tcxo";
+		#clock-cells = <1>;
+		status = "disabled";
+	};
+
+	gpucc: clock-controller@2c90000 {
+		compatible = "qcom,sc8180x-gpucc", "syscon";
+		reg = <0x2c90000 0x9000>;
+		reg-names = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&gcc GCC_GPU_GPLL0_CLK_SRC>,
+			<&gcc GCC_GPU_GPLL0_DIV_CLK_SRC>;
+		clock-names = "bi_tcxo",
+			"gcc_gpu_gpll0_clk_src",
+			"gcc_gpu_gpll0_div_clk_src";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	npucc: clock-controller@9910000 {
+		compatible = "qcom,sm8150-npucc", "syscon";
+		reg = <0x9910000 0x10000>;
+		reg-names = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_gdsc-supply = <&npu_core_gdsc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&gcc GCC_NPU_GPLL0_DIV_CLK_SRC>,
+			<&gcc GCC_NPU_GPLL0_CLK_SRC>,
+			<&gcc GCC_NPU_AXI_CLK>;
+		clock-names =
+			"bi_tcxo",
+			"gcc_npu_gpll0_div_clk_src",
+			"gcc_npu_gpll0_clk_src",
+			"gcc_npu_axi_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	videocc: clock-controller@ab00000 {
+		compatible = "qcom,sm8150-videocc", "syscon";
+		reg = <0xab00000 0x10000>;
+		reg-names = "cc_base";
+		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
+		clocks = <&gcc GCC_VIDEO_AHB_CLK>,
+			<&rpmhcc RPMH_CXO_CLK>;
+		clock-names =
+			"cfg_ahb_clk",
+			"bi_tcxo";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	camcc: clock-controller@ad00000 {
+		compatible = "qcom,sc8180x-camcc", "syscon";
+		reg = <0xad00000 0x20000>;
+		reg-name = "cc_base";
+		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>,
+			<&rpmhcc RPMH_CXO_CLK>,
+			<&sleep_clk>;
+		clock-names =
+			"cfg_ahb_clk",
+			"bi_tcxo",
+			"sleep_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	dispcc: clock-controller@af00000 {
+		compatible = "qcom,sc8180x-dispcc", "syscon";
+		reg = <0xaf00000 0x20000>;
+		reg-names = "cc_base";
+		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
+		clocks = <&gcc GCC_DISP_AHB_CLK>,
+			<&rpmhcc RPMH_CXO_CLK>,
+			<&sleep_clk>;
+		clock-names =
+			"cfg_ahb_clk",
+			"bi_tcxo",
+			"sleep_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@182a0000 {
+		compatible = "syscon";
+		reg = <0x182a0000 0x1c>;
+	};
+
+	mccc: syscon@90b0000 {
+		compatible = "syscon";
+		reg = <0x90b0000 0x54>;
+	};
+
+	debugcc: debug-clock-controller@0 {
+		compatible = "qcom,sc8180x-debugcc";
+		qcom,gcc = <&gcc>;
+		qcom,videocc = <&videocc>;
+		qcom,camcc = <&camcc>;
+		qcom,dispcc = <&dispcc>;
+		qcom,npucc = <&npucc>;
+		qcom,gpucc = <&gpucc>;
+		qcom,apsscc = <&apsscc>;
+		qcom,mccc = <&mccc>;
+		clock-names = "xo_clk_src";
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		#clock-cells = <1>;
 	};
 
 	qupv3_id_1: geniqup@ac0000 {
@@ -1051,3 +1214,193 @@
 
 #include "sdmshrike-pinctrl.dtsi"
 #include "sa8195-regulator.dtsi"
+#include "sa8195-gdsc.dtsi"
+
+&emac_gdsc {
+	status = "ok";
+};
+
+&pcie_0_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&pcie_1_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&pcie_2_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&pcie_3_gdsc {
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&ufs_card_2_gdsc {
+	status = "ok";
+};
+
+&ufs_card_gdsc {
+	status = "ok";
+};
+
+&ufs_phy_gdsc {
+	status = "ok";
+};
+
+&usb30_mp_gdsc {
+	status = "ok";
+};
+
+&usb30_prim_gdsc {
+	status = "ok";
+};
+
+&usb30_sec_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_aggre_noc_mmu_audio_tbu_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_aggre_noc_mmu_tbu1_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_aggre_noc_mmu_tbu2_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_aggre_noc_mmu_pcie_tbu_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mmnoc_mmu_tbu_hf0_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mmnoc_mmu_tbu_sf_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mmnoc_mmu_tbu_hf1_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu0_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu1_gdsc {
+	status = "ok";
+};
+
+&bps_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&ife_0_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	status = "ok";
+};
+
+&ife_1_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	status = "ok";
+};
+
+&ife_2_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	status = "ok";
+};
+
+&ife_3_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	status = "ok";
+};
+
+&ipe_0_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&ipe_1_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&titan_top_gdsc {
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	status = "ok";
+};
+
+&mdss_core_gdsc {
+	clocks = <&gcc GCC_DISP_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&gpu_cx_gdsc {
+	status = "ok";
+};
+
+&gpu_gx_gdsc {
+	parent-supply = <&VDD_GFX_LEVEL>;
+	status = "ok";
+};
+
+&npu_core_gdsc {
+	clocks = <&gcc GCC_NPU_CFG_AHB_CLK>;
+	clock-names = "ahb_clk";
+	status = "ok";
+};
+
+&mvs0_gdsc {
+	clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&mvs1_gdsc {
+	clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&mvsc_gdsc {
+	clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_MMCX_LEVEL>;
+	status = "ok";
+};
