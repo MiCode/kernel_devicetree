@@ -26,6 +26,30 @@ pineapple-dtb-$(CONFIG_ARCH_PINEAPPLE) += \
 pineapple-overlays-dtb-$(CONFIG_ARCH_PINEAPPLE) += $(PINEAPPLE_BOARDS) $(NOAPQ_PINEAPPLE_BOARDS) $(PINEAPPLE_BASE_DTB) $(PINEAPPLE_APQ_BASE_DTB)
 dtb-y += $(pineapple-dtb-y)
 
+ifeq ($(CONFIG_ARCH_KALAMA), y)
+KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb
+KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb
+
+KALAMA_BOARDS += \
+		 kalama-mtp-overlay.dtbo \
+		 kalama-mtp-nfc-overlay.dtbo \
+		 kalama-cdp-overlay.dtbo \
+		 kalama-cdp-wsa883x-overlay.dtbo \
+		 kalama-cdp-nfc-overlay.dtbo \
+		 kalama-atp-overlay.dtbo \
+		 kalama-rcm-overlay.dtbo \
+		 kalama-qrd-overlay.dtbo
+
+NOAPQ_KALAMA_BOARDS += \
+		 kalama-rumi-overlay.dtbo
+
+kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
+	$(call add-overlays, $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS),$(KALAMA_BASE_DTB))\
+	$(call add-overlays, $(KALAMA_BOARDS) $(APQ_KALAMA_BOARDS),$(KALAMA_APQ_BASE_DTB))
+kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
+dtb-y += $(kalama-dtb-y)
+endif
+
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
 clean-files     := *.dtb *.dtbo
