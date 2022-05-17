@@ -69,6 +69,11 @@
 		};
 	};
 
+	dmesg-dump {
+		compatible = "qcom,dmesg-dump";
+		gunyah-label = <7>;
+	};
+
 	qcom,vm-config {
 		compatible = "qcom,vm-1.0";
 		vm-type = "aarch64-guest";
@@ -79,6 +84,12 @@
 		vendor = "QTI";
 		image-name = "qcom,trustedvm";
 		qcom,pasid = <0x0 0x1c>;
+		qcom,qtee-config-info = "p=7C,8F,97,159,7F1;";
+		qcom,secdomain-ids = <45>;
+		qcom,primary-vm-index = <0>;
+		vm-uri = "vmuid/trusted-ui";
+		vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
+		qcom,sensitive;
 
 		iomemory-ranges = <0x0 0xa24000 0x0 0xa24000 0x0 0x4000 0x0
 				0x0 0x828000 0x0 0x828000 0x0 0x4000 0x0
@@ -99,8 +110,12 @@
 		memory {
 			#address-cells = <0x2>;
 			#size-cells = <0x0>;
-			base-address = <0x0 0xf3c00000>;
-			size-min = <0x0 0x41ee000>;    /* 65 MB - 4 KB */
+			/*
+			 * IPA address linux image is loaded at. Must be within
+			 * first 1GB due to memory hotplug requirement.
+			 */
+			base-address = <0x0 0x28800000 >;
+			size-min = <0x0 0x49ee000>;    /* 73 MB */
 		};
 
 		segments {
@@ -109,7 +124,7 @@
 
 		vcpus {
 			config = "/cpus";
-			affinity = "static";
+			affinity = "proxy";
 			affinity-map = <0x5 0x6>;
 			sched-priority = <0>;       /* relative to PVM */
 			sched-timeslice = <2000>;   /* in ms */
@@ -200,6 +215,15 @@
 				qcom,label =<0x6>;
 			};
 
+			eva-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/eva-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label =<0x7>;
+			};
+
 			qrtr-shm {
 				vdevice-type = "shm-doorbell";
 				generate = "/hypervisor/qrtr-shm";
@@ -207,6 +231,17 @@
 				peer-default;
 				memory {
 					qcom,label = <0x3>;
+					allocate-base;
+				};
+			};
+
+			ddump-shm {
+				vdevice-type = "shm-doorbell";
+				generate = "/hypervisor/ddump-shm";
+				push-compatible = "qcom,ddump-gunyah-gen";
+				peer-default;
+				memory {
+					qcom,label = <0x7>;
 					allocate-base;
 				};
 			};
@@ -221,6 +256,12 @@
 					qcom,mem-info-tag = <0x3>;
 					allocate-base;
 				};
+			};
+
+			vrtc {
+				vdevice-type = "vrtc-pl031";
+				peer-default;
+				allocate-base;
 			};
 
 			test-dbl {
@@ -243,6 +284,24 @@
 				message-size = <0xf0>;
 				queue-depth = <0x8>;
 				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			vsock-msgq {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/gvsock-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				peer = "vm-name:qcom,oemvm";
+				qcom,label = <0x3>;
+			};
+
+			vcpu-sched-test-msgq {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/sched-test-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x8>;
 				peer-default;
 			};
 		};
@@ -483,6 +542,12 @@
 	qrtr-gunyah {
 		compatible = "qcom,qrtr-gunyah";
 		gunyah-label = <3>;
+	};
+
+	vsock-gunyah {
+		compatible = "qcom,gunyah-vsock";
+		qcom,master;
+		msgq-label = <3>;
 	};
 
 	qcom_smcinvoke {

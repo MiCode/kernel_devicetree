@@ -4,10 +4,10 @@ The ADSP Sleep monitor driver tracks ADSP sleep statistics stored in SMEM region
 and establishes an interface with different userspace clients which make use of
 ADSP subsystem. Based on the activity notifications from the userspace clients
 for activity start and stop notifications, the driver detects and logs an error
-message in kernel logs and creates a kernel panic (when enabled) upon detecting
+message in kernel logs and creates a kernel/ADSP panic (when enabled) upon detecting
 a violation in ADSP sleep/LPI state after the configured monitoring duration.
 By default the driver emits out kernel message on detecting these violations,
-optionally a kernel panic can be enabled separately for ADSP sleep or LPI
+optionally a kernel/ADSP panic can be enabled separately for ADSP sleep or LPI
 issues via this config. When enabled, corresponding panics can be
 disabled/re-enabled runtime via debugfs node exposed from the driver.
 
@@ -20,6 +20,18 @@ disabled/re-enabled runtime via debugfs node exposed from the driver.
 "echo 3 > /d/adspsleepmon/panic-state" --> Enables kernel panic for ADSP Sleep and LPI voilations.
 
 "cat /d/adspsleepmon/read_panic_state" --> Displays the current panic enablement status
+
+
+"echo 0 > /d/adspsleepmon/adsp_panic_state" --> Disables ADSP panic for ADSP sleep and LPI voilations.
+
+"echo 1 > /d/adspsleepmon/adsp_panic_state" --> Enables ADSP panic for ADSP sleep voilations.
+
+"echo 2 > /d/adspsleepmon/adsp_panic_state" --> Enables ADSP panic for ADSP LPI voilations.
+
+"echo 3 > /d/adspsleepmon/adsp_panic_state" --> Enables ADSP panic for ADSP Sleep and LPI voilations.
+
+"cat /d/adspsleepmon/read_adsp_panic_state" --> Displays the current ADSP panic enablement status
+
 
 Examples:
 
@@ -50,13 +62,17 @@ properties:
 
 - qcom,enable_panic_lpi: Enables kernel panic on detecting ADSP LPI violations.
 
+- qcom,enable_adsp_panic_lpm: Enables ADSP panic on detecting ADSP sleep violations.
+
+- qcom,enable_adsp_panic_lpi: Enables ADSP panic on detecting ADSP LPI violations.
+
 Example:
 adsp_sleepmon: adsp-sleepmon {
 		compatible = "qcom,adsp-sleepmon";
 		qcom,wait_time_lpm = <5>;
 		qcom,wait_time_lpi = <15>;
-		qcom,enable_panic_lpm;
-		qcom,enable_panic_lpi;
+		qcom,enable_adsp_panic_lpm;
+		qcom,enable_adsp_panic_lpi;
 	};
 
 Required properties:

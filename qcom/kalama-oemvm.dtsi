@@ -81,7 +81,7 @@
 			#address-cells = <0x2>;
 			#size-cells = <0x0>;
 			base-address = <0x0 0xf8200000>;
-			size-min = <0x0 0x4efc000>;    /* 78 MB */
+			size-min = <0x0 0x4afc000>;    /* 74 MB */
 		};
 
 		segments {
@@ -90,7 +90,7 @@
 
 		vcpus {
 			config = "/cpus";
-			affinity = "static";
+			affinity = "proxy";
 			affinity-map = <0x5 0x6>;
 			sched-priority = <0>;       /* relative to PVM */
 			sched-timeslice = <2000>;   /* in ms */
@@ -138,6 +138,26 @@
 					base = <0x0 0xFFF00000>;
 				};
 			};
+
+			qrtr-shm {
+				vdevice-type = "shm-doorbell";
+				generate = "/hypervisor/qrtr-shm";
+				push-compatible = "qcom,qrtr-gunyah-gen";
+				peer-default;
+				memory {
+					qcom,label = <0x8>;
+					allocate-base;
+				};
+			};
+
+			vsock-msgq-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/gvsock-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				peer = "vm-name:qcom,trustedvm";
+				qcom,label = <0x3>;
+			};
 		};
 	};
 
@@ -176,4 +196,27 @@
 		clock-frequency = <19200000>;
 	};
 
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,vmid = <49>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+	};
+
+	qcom,qrtr {
+		compatible = "qcom,qrtr";
+		qcom,node-id = <21>;
+	};
+
+	qrtr-gunyah {
+		compatible = "qcom,qrtr-gunyah";
+		gunyah-label = <8>;
+	};
+
+	vsock-gunyah {
+		compatible = "qcom,gunyah-vsock";
+		msgq-label = <3>;
+	};
 };

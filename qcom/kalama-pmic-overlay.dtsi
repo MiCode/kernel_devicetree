@@ -1,5 +1,6 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-smb139x.h>
 
 #include "pm8550.dtsi"
 #include "pm8550b.dtsi"
@@ -223,6 +224,51 @@
 		qcom,pre-scaling = <1 1>;
 		qcom,adc-tm-type = <1>;
 	};
+
+	pm8550b_chg_temp {
+		reg = <PM8550B_ADC5_GEN3_CHG_TEMP>;
+		label = "pm8550b_chg_temp";
+	};
+
+	pm8550b_iin_fb {
+		reg = <PM8550B_ADC5_GEN3_IIN_FB>;
+		label = "pm8550b_iin_fb";
+	};
+
+	pm8550b_ichg_fb {
+		reg = <PM8550B_ADC5_GEN3_ICHG_FB>;
+		label = "pm8550b_ichg_fb";
+	};
+
+	smb139x_1_smb_temp {
+		reg = <SMB1394_1_ADC5_GEN3_SMB_TEMP>;
+		label = "smb139x_1_smb_temp";
+	};
+
+	smb139x_1_iin_smb {
+		reg = <SMB1394_1_ADC5_GEN3_IIN_SMB>;
+		label = "smb139x_1_iin_smb";
+	};
+
+	smb139x_1_ichg_smb {
+		reg = <SMB1394_1_ADC5_GEN3_ICHG_SMB>;
+		label = "smb139x_1_ichg_smb";
+	};
+
+	smb139x_2_smb_temp {
+		reg = <SMB1394_2_ADC5_GEN3_SMB_TEMP>;
+		label = "smb139x_2_smb_temp";
+	};
+
+	smb139x_2_iin_smb {
+		reg = <SMB1394_2_ADC5_GEN3_IIN_SMB>;
+		label = "smb139x_2_iin_smb";
+	};
+
+	smb139x_2_ichg_smb {
+		reg = <SMB1394_2_ADC5_GEN3_ICHG_SMB>;
+		label = "smb139x_2_ichg_smb";
+	};
 };
 
 &thermal_zones {
@@ -280,7 +326,7 @@
 		};
 	};
 
-	msm-therm {
+	skin-msm-therm {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-sensors = <&pmk8550_vadc PM8550_ADC5_GEN3_AMUX_THM1_100K_PU>;
@@ -474,6 +520,11 @@
 	vdd3-supply = <&pm_humu_l5>;
 };
 
+&pm8550b_haptics {
+	nvmem-names = "hap_cfg_sdam";
+	nvmem = <&pmk8550_sdam_46>;
+};
+
 &soc {
 	reboot_reason {
 		compatible = "qcom,reboot-reason";
@@ -495,5 +546,68 @@
 		compatible = "qcom,pmic-pon-log";
 		nvmem = <&pmk8550_sdam_5>, <&pmk8550_sdam_6>;
 		nvmem-names = "pon_log0", "pon_log1";
+	};
+
+	regulator-ocp-notifier {
+		compatible = "qcom,regulator-ocp-notifier";
+		interrupt-parent = <&spmi_bus>;
+		interrupts = <0x0 0x71 0x1 IRQ_TYPE_EDGE_RISING>;
+		nvmem-cells = <&ocp_log>;
+		nvmem-cell-names = "ocp_log";
+
+		periph-1c1-supply = <&L1B>;
+		periph-1c2-supply = <&L2B>;
+		periph-1c5-supply = <&L5B>;
+		periph-1c6-supply = <&L6B>;
+		periph-1c7-supply = <&L7B>;
+		periph-1c8-supply = <&L8B>;
+		periph-1c9-supply = <&L9B>;
+		periph-1ca-supply = <&L10B>;
+		periph-1cb-supply = <&L11B>;
+		periph-1cc-supply = <&L12B>;
+		periph-1cd-supply = <&L13B>;
+		periph-1ce-supply = <&L14B>;
+		periph-1cf-supply = <&L15B>;
+		periph-1d0-supply = <&L16B>;
+		periph-1d1-supply = <&L17B>;
+		periph-2c1-supply = <&L1C>;
+		periph-2c3-supply = <&L3C>;
+		periph-3c1-supply = <&L1D>;
+		periph-3c2-supply = <&L2D_LEVEL>;
+		periph-4c1-supply = <&L1E>;
+		periph-4c2-supply = <&L2E>;
+		periph-4c3-supply = <&L3E>;
+		periph-5c1-supply = <&L1F>;
+		periph-5c2-supply = <&L2F>;
+		periph-5c3-supply = <&L3F>;
+		periph-6c1-supply = <&L1G>;
+		periph-6c2-supply = <&L2G>;
+		periph-6c3-supply = <&L3G>;
+		periph-ac1-supply = <&L1K>;
+		periph-ac2-supply = <&L2K>;
+		periph-ac3-supply = <&L3K>;
+		periph-ac4-supply = <&L4K>;
+		periph-ac5-supply = <&L5K>;
+		periph-ac6-supply = <&L6K>;
+		periph-ac7-supply = <&L7K>;
+		periph-bc3-supply = <&L3L>;
+		periph-bc4-supply = <&L4L>;
+		periph-bc5-supply = <&L5L>;
+		periph-bc6-supply = <&L6L>;
+		periph-bc7-supply = <&L7L>;
+		periph-c40-supply = <&L1M>;
+		periph-c41-supply = <&L2M>;
+		periph-c42-supply = <&L3M>;
+		periph-c43-supply = <&L4M>;
+		periph-c44-supply = <&L5M>;
+		periph-c45-supply = <&L6M>;
+		periph-c46-supply = <&L7M>;
+		periph-d40-supply = <&L1N>;
+		periph-d41-supply = <&L2N>;
+		periph-d42-supply = <&L3N>;
+		periph-d43-supply = <&L4N>;
+		periph-d44-supply = <&L5N>;
+		periph-d45-supply = <&L6N>;
+		periph-d46-supply = <&L7N>;
 	};
 };
