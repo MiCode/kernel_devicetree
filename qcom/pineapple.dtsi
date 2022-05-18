@@ -356,6 +356,17 @@
 		#interconnect-cells = <1>;
 	};
 
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,pineapple-pdc", "qcom,pdc";
+		reg = <0xb220000 0x30000>, <0x174000f0 0x64>;
+		qcom,pdc-ranges = <0 480 94>, <94 609 31>,
+				  <125 63 1>, <126 716 12>,
+				  <138 251 5>, <143 244 4>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,pineapple-pinctrl";
 		reg = <0x0F000000 0x1000000>;
@@ -364,6 +375,7 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+		wakeup-parent = <&pdc>;
 	};
 
 	dload_mode {
