@@ -548,20 +548,22 @@
 		gunyah-label = <0x12>;
 	};
 
-	oem_vm_mem: oem_vm_region@f8200000 {
-		no-map;
-		reg = <0x0 0xf8200000 0x0 0x4afc000>;
+	oem_vm_mem: oem_vm_region@f8400000 {
+		compatible = "shared-dma-pool";
+		reg = <0x0 0xf8400000 0x0 0x4800000>;
+		reusable;
+		alignment = <0x0 0x400000>;
 	};
 
-	oem_vm_vblk0_ring: oem_vm_vblk0_ring@fccfc000 {
+	oem_vm_vblk0_ring: oem_vm_vblk0_ring@fcc00000 {
 		no-map;
-		reg = <0x0 0xfccfc000 0x0 0x4000>;
+		reg = <0x0 0xfcc00000 0x0 0x4000>;
 		gunyah-label = <0x13>;
 	};
 
-	oem_vm_swiotlb: oem_vm_swiotlb@fcd00000 {
+	oem_vm_swiotlb: oem_vm_swiotlb@fcc04000 {
 		no-map;
-		reg = <0x0 0xfcd00000 0x0 0x100000>;
+		reg = <0x0 0xfcc04000 0x0 0x100000>;
 		gunyah-label = <0x14>;
 	};
 
@@ -3116,7 +3118,7 @@
 		memory-region = <&cpusys_vm_mem>;
 	};
 
-	qcom,guestvm_loader@f8000000 {
+	qcom,guestvm_loader@f8400000 {
 		compatible = "qcom,guestvm-loader";
 		qcom,pas-id = <34>;
 		qcom,vmid = <49>;
@@ -3138,8 +3140,8 @@
 		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
-	oem_vm: qcom,oem_vm@fccfc000 {
-		reg = <0xfccfc000 0x104000>;
+	oem_vm: qcom,oem_vm@fcc00000 {
+		reg = <0xfcc00000 0x104000>;
 		vm_name = "oemvm";
 		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
 	};
