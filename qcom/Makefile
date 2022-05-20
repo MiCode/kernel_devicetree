@@ -65,6 +65,23 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
+KHAJE_BASE_DTB += khaje.dtb
+
+KHAJE_BOARDS += \
+                 khaje-idp-overlay.dtbo \
+                 khaje-qrd-overlay.dtbo \
+		 khaje-qrd-hvdcp3p5-overlay.dtbo \
+		 khaje-qrd-nowcd9375-overlay.dtbo \
+                 khaje-idp-nopmi-overlay.dtbo \
+                 khaje-qrd-nopmi-overlay.dtbo \
+                 khaje-idps-display-90hz-overlay.dtbo \
+                 khaje-atp-overlay.dtbo
+
+khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
+        $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
+khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
+dtb-y += $(khaje-dtb-y)
+
 cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
 	cinder-ru-idp.dtb \
 	cinder-du-idp.dtb \
