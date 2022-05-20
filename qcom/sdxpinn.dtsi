@@ -22,6 +22,8 @@
 
 	aliases {
 		serial0 = &qupv3_se1_2uart;
+		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 	};
 
 	cpus {
@@ -655,6 +657,80 @@
 		clocks = <&rpmhcc RPMH_QPIC_CLK>;
 
 		status = "disabled";
+	};
+
+	sdhc_1: sdhci@8804000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x08804000 0x1000>, <0x08805000 0x1000>;
+		reg-names = "hc", "cqhci";
+
+		interrupts = <GIC_SPI 210 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <8>;
+		non-removable;
+		supports-cqe;
+
+		no-sd;
+		no-sdio;
+		qcom,restore-after-cx-collapse;
+
+		mmc-ddr-1_8v;
+		mmc-hs200-1_8v;
+		mmc-hs400-1_8v;
+		mmc-hs400-enhanced-strobe;
+
+		cap-mmc-hw-reset;
+
+		clocks = <&gcc GCC_SDCC1_AHB_CLK>,
+			<&gcc GCC_SDCC1_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x000F442C 0x0 0x01
+					0x090106C0 0x80040868>;
+
+		/* Add dt entry for gcc hw reset */
+		resets = <&gcc GCC_EMMC_BCR>;
+		reset-names = "core_reset";
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
+	};
+
+	sdhc_2: sdhci@8844000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x08844000 0x1000>;
+		reg-names = "hc";
+
+		interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 411 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <4>;
+		no-sdio;
+		no-mmc;
+		qcom,restore-after-cx-collapse;
+
+		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
+			<&gcc GCC_SDCC2_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
+					0x090106C0 0x80040868>;
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
 	};
 
 	tlmm: pinctrl@f000000 {
