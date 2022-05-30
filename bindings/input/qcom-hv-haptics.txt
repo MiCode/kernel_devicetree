@@ -18,12 +18,15 @@ Properties:
   Value type:	<string>
   Definition: 	It can be one of following:
 		"qcom,hv-haptics",
-		"qcom,pm8350b-haptics".
+		"qcom,pm8350b-haptics",
+		"qcom,pm5100-haptics".
 
 - reg:
   Usage:	required
   Value type:	<prop-encoded-array>
-  Definition:	Register base for HAPTICS_CFG and HAPTICS_PATTERN modules.
+  Definition:	Register base for following haptics modules: HAPTICS_CFG,
+		HAPTICS_PATTERN, HAPTICS_BOOST. HAPTICS_BOOST register base
+		is not applicable for PM5100.
 
 - interrupts:
   Usage:	required
@@ -70,11 +73,58 @@ Properties:
 		or if it's defined as an array with all zeros, then manual
 		brake is disabled.
 
+- qcom,fifo-empty-threshold:
+  Usage:	optional
+  Value type:	<u32>
+  Definition:	Specifies the FIFO empty threshold. The "fifo-empty" IRQ will be
+		triggered when the number of the samples in the FIFO is less
+		than the threshold. For PM8350B v1, allowed value is 0 - 104
+		in multiple of 4 and the default value is 48. For PM8350B v2,
+		allowed value is 0 - 640 in multiple of 40 and the default
+		value is 280. For PM5100, allowed value is 0 - 1024 in multiple
+		of 32 and the default value is 288.
+
 - qcom,use-erm:
   Usage:	optional
   Value type:	<bool>
   Definition:	Specifies if the hardware is driving an ERM actuator. If it's
 		not defined, then LRA actuator is used.
+
+- nvmem-cell-names:
+  Usage:	optional
+  Value type:	<string>
+  Definition:	The nvmem cell name of the SDAM module where the closed-loop
+		brake calibration settings can be stored. It must be
+		"hap_cl_brake". Not applicable for PM5100.
+
+- nvmem-cells:
+  Usage:	optional
+  Value type:	<phandle>
+  Definition:	Phandle of the nvmem cell to store the closed-loop brake
+		calibration settings. Please refer to nvmem bindings as
+		described in bindings/nvmem/nvmem.txt. Not applicable
+		for PM5100.
+
+- nvmem-names:
+  Usage:	optional
+  Value type:	<string>
+  Definition:	The nvmem device name of the SDAM module used for haptics
+		configuration. It must be "hap_cfg_sdam". Not applicable for
+		PM5100.
+
+- nvmem:
+  Usage:	optional
+  Value type:	<phandle>
+  Definition:	Phandle of the nvmem device used for haptics configuration.
+		Please refer to nvmem bindings as described in bindings/nvmem/nvmem.txt.
+		Not applicable for PM5100.
+
+- qcom,pbs-client:
+  Usage:	optional
+  Value type:	<phandle>
+  Definition:	Phandle of the PBS client used for triggering PBS to configure
+		haptics ISC (short circuit current) config during LRA impedance
+		detection. Not applicable for PM5100.
 
 The following properties are only required when LRA actuator is used:
 
@@ -107,6 +157,13 @@ The following properties are only required when LRA actuator is used:
   Definition:	Specifies the brake signal gain when sine brake signal shape
 		is selected. Please refer to:
 		include/dt-bindings/input/qcom,hv-haptics.h.
+
+- qcom,rt-imp-detect:
+  Usage:	optional
+  Value type:	<bool>
+  Definition:	Specifies if HW based realtime impedance measurement is used
+		when detecting LRA impedance. This is only applicable for
+		HAP525_HV haptics module.
 
 A child node named "qcom,hap-swr-slave-reg" can be defined to export a regulator
 device which is used for swr-haptics module to control the online status of SWR
@@ -182,6 +239,19 @@ different vibration effects:
 		in "qcom,wf-fifo-data".
 		See definition at: include/dt-bindings/input/qcom,hv-haptics.h
 
+- qcom,wf-fifo-preload:
+  Usage:	optional
+  Value type:	<bool>
+  Definition:	Specifies if the FIFO effect data should be preloaded into
+		pattern memory during boot up. In HAP525_HV module, there are
+		4 pattern memory partitions with configurable size and each
+		partition can be used for preloading one FIFO effect. The total
+		FIFO memory space is 2K bytes and 640 bytes space is reserved
+		for FIFO streaming mode which needs to load the FIFO data at
+		runtime, the rest can be all used for pattern memory partitions.
+		This feature is only available for HAP525_HV haptics module
+		that is present on PMICs like PM8550B.
+
 - qcom,wf-brake-mode:
   Usage:	optional
   Value type:	<u32>
@@ -219,9 +289,14 @@ different vibration effects:
 Example:
 	qcom,hv-haptics@f000 {
 		compatible = "qcom,hv-haptics";
-		reg = <0xf000>, <0xf100>;
+		reg = <0xf000>, <0xf100>, <0xf200>;
 		interrupts = <0x3 0xf0 0x1 IRQ_TYPE_EDGE_BOTH>;
 		interrupt-names = "fifo-empty";
+		nvmem-cell-names = "hap_cl_brake";
+		nvmem-cells = <&hap_cl_brake>;
+		nvmem-names = "hap_cfg_sdam";
+		nvmem = <&pmk8350_sdam_46>;
+		qcom,pbs-client = <&pm8350b_pbs2>;
 		qcom,vmax-mv = <900>;
 		qcom,brake-mode = <BRAKE_CLOSE_LOOP>;
 		qcom,brake-pattern = /bits/ 8 <0xff 0x3f 0x1f>;
