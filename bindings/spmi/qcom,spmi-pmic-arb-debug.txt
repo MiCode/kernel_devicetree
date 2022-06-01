@@ -35,6 +35,19 @@ Supported Properties:
 		    the corresponding addresses are specified in the reg
 		    property.
 
+- clocks
+	Usage:      optional
+	Value type: <prop-encoded-array>
+	Definition: Clock tuple consisting of a phandle to a clock controller
+		    device and the clock ID number for the SPMI debug controller
+		    clock.
+
+- clock-names
+	Usage:      required if clocks property is specified
+	Value type: <string>
+	Definition: Defines the name of the clock defined in the "clocks"
+		    property.  This must be "core_clk".
+
 - #address-cells
 	Usage:      required
 	Value type: <u32>
@@ -45,11 +58,23 @@ Supported Properties:
 	Value type: <u32>
 	Definition: Must be 0.
 
-- qcom,fuse-disable-bit
-	Usage:      required if "fuse" is listed in reg-names property
+- qcom,fuse-enable-bit
+	Usage:      optional
 	Value type: <u32>
 	Definition: The bit within the fuse register which is set when the debug
-		    bus is not available.  Supported values are 0 to 31.
+		    bus is available.  Only one of qcom,fuse-enable-bit and
+		    qcom,fuse-disable-bit should be specified if "fuse" is
+		    listed in the reg-names property.
+		    Supported values are 0 to 31.
+
+- qcom,fuse-disable-bit
+	Usage:      optional
+	Value type: <u32>
+	Definition: The bit within the fuse register which is set when the debug
+		    bus is not available.  Only one of qcom,fuse-enable-bit and
+		    qcom,fuse-disable-bit should be specified if "fuse" is
+		    listed in the reg-names property.
+		    Supported values are 0 to 31.
 
 Example:
 
@@ -57,6 +82,8 @@ qcom,spmi-debug@6b22000 {
 	compatible = "qcom,spmi-pmic-arb-debug";
 	reg = <0x6b22000 0x60>, <0x7820a8 4>;
 	reg-names = "core", "fuse";
+	clocks = <&clock_aop QDSS_CLK>;
+	clock-names = "core_clk";
 	qcom,fuse-disable-bit = <12>;
 	#address-cells = <2>;
 	#size-cells = <0>;
