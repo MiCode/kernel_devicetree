@@ -433,7 +433,7 @@
 			reg = <0x0 0x98800000 0x0 0x100000>;
 		};
 
-		pil_cdsp_mem: cdsp_regions {
+		rproc_cdsp_mem: rproc_cdsp_region {
 			no-map;
 			reg = <0x0 0x98900000 0x0 0x1400000>;
 		};
@@ -1433,6 +1433,45 @@
 				qcom,glink-channels = "glink_ssr";
 			};
 		};
+	};
+
+	cdsp_pas: remoteproc-cdsp@0x8300000 {
+		compatible = "qcom,sm8150-cdsp-pas";
+		reg = <0x8300000 0x100000>;
+		status = "ok";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		qcom,qmp = <&aoss_qmp>;
+
+		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		interconnect-names = "crypto_ddr";
+
+		memory-region = <&rproc_cdsp_mem>;
+
+		/* Inputs from ssc */
+		interrupts-extended = <&intc GIC_SPI 578 IRQ_TYPE_EDGE_RISING>,
+					<&cdsp_smp2p_in 0 0>,
+					<&cdsp_smp2p_in 2 0>,
+					<&cdsp_smp2p_in 1 0>,
+					<&cdsp_smp2p_in 3 0>,
+					<&cdsp_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to turing */
+		qcom,smem-states = <&cdsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
 	};
 
 	qcom,pmu {
