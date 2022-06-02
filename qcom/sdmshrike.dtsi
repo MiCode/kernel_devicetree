@@ -26,8 +26,8 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	aliases {
-		serial0 = &uart2;
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
+		serial0 = &qupv3_se12_2uart;
 	};
 
 	cpus {
@@ -966,21 +966,6 @@
 		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
 	};
 
-	qupv3_id_1: geniqup@ac0000 {
-		compatible = "qcom,geni-se-qup";
-		reg = <0x00ac0000 0x6000>;
-		ranges;
-		#address-cells = <1>;
-		#size-cells = <1>;
-
-		uart2: serial@a90000 {
-			compatible = "qcom,geni-debug-uart";
-			reg = <0x00a90000 0x4000>;
-			interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
-			status = "disabled";
-		};
-	};
-
 	thermal_zones: thermal-zones {
 	};
 
@@ -1832,3 +1817,9 @@
 	status = "ok";
 };
 #include "sa8195-thermal.dtsi"
+#include "sa8195-qupv3.dtsi"
+#include "sa8195-ssc-qupv3.dtsi"
+
+&qupv3_se12_2uart {
+	status = "ok";
+};
