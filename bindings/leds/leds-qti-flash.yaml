@@ -238,6 +238,49 @@ patternProperties:
       - qcom,id
       - qcom,led-mask
 
+patternProperties:
+  '^qcom,indicator_[0-9]$':
+    type: object
+    properties:
+      label:
+        description: Specifies type of LED that will be used.
+        allOf:
+          - $ref: /schemas/types.yaml#/definitions/string-array
+        items:
+          - const: indicator
+
+      qcom,led-name:
+        description: Specifies the name of indicator LED device.
+        $ref: /schemas/types.yaml#/definitions/string
+
+      qcom,id:
+        description: Specifies the LED channel number for indicator LED device.
+          It depends on hardware and starts with an index 0.
+        allOf:
+          - $ref: /schemas/types.yaml#/definitions/uint32
+          - enum: [ 0, 1, 2, 3 ]
+
+      qcom,max-current-ma:
+        description: Maximum current allowed for indicator LED device.
+          Unit is mA.
+        allOf:
+          - $ref: /schemas/types.yaml#/definitions/uint32
+        minimum: 0
+        maximum: 100
+
+      qcom,ires-ua:
+        description: Current resolution for indicator LED device. Unit is uA.
+        allOf:
+          - $ref: /schemas/types.yaml#/definitions/uint32
+        items:
+          - const: 5000
+
+    required:
+      - label
+      - qcom,led-name
+      - qcom,id
+      - qcom,max-current-ma
+
 required:
   - compatible
   - reg
@@ -357,6 +400,50 @@ examples:
             qcom,led-mask = <6>; /* Channels 2 & 3 */
             qcom,default-led-trigger = "switch1_trigger";
             qcom,symmetry-en;
+        };
+    };
+
+  - |
+    qcom,leds@ee00 {
+        compatible = "qcom,pm8350c-flash-led";
+        reg = <0xee00>;
+        interrupts = <0x2 0xee 0x0 IRQ_TYPE_EDGE_RISING>,
+            <0x2 0xee 0x3 IRQ_TYPE_EDGE_RISING>,
+            <0x2 0xee 0x4 IRQ_TYPE_EDGE_RISING>;
+        interrupt-names = "led-fault-irq",
+            "all-ramp-down-done-irq",
+            "all-ramp-up-done-irq";
+
+        qcom,indicator_0 {
+                label = "indicator";
+                qcom,id = <0>;
+                qcom,led-name = "led:white";
+                qcom,max-current-ma = <20>;
+                qcom,ires-ua = <5000>;
+        };
+
+        qcom,indicator_1 {
+                label = "indicator";
+                qcom,id = <1>;
+                qcom,led-name = "led:red";
+                qcom,max-current-ma = <5>;
+                qcom,ires-ua = <5000>;
+        };
+
+        qcom,indicator_2 {
+                label = "indicator";
+                qcom,id = <2>;
+                qcom,led-name = "led:green";
+                qcom,max-current-ma = <5>;
+                qcom,ires-ua = <5000>;
+        };
+
+        qcom,indicator_3 {
+                label = "indicator";
+                qcom,id = <3>;
+                qcom,led-name = "led:blue";
+                qcom,max-current-ma = <5>;
+                qcom,ires-ua = <5000>;
         };
     };
 ...
