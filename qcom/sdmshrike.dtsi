@@ -409,8 +409,10 @@
 
 		qseecom_mem: qseecom_region {
 			compatible = "shared-dma-pool";
-			no-map;
-			reg = <0x0 0x9e400000 0x0 0x1400000>;
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1400000>;
 		};
 
 
@@ -864,6 +866,21 @@
 		#mbox-cells = <1>;
 	};
 
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+		qcom,vmid-cp-camera-preview-ro;
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+	};
+
 	aoss_qmp: power-controller@c300000 {
 		compatible = "qcom,sm8150-aoss-qmp";
 		reg = <0x0c300000 0x100000>;
@@ -1209,6 +1226,12 @@
 		qcom,hw-timer-hz = <19200000>;
 		qcom,count-unit = <0x10000>;
 		qcom,target-dev = <&qcom_ddr_dcvs_hw>;
+	};
+};
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
 	};
 };
 
