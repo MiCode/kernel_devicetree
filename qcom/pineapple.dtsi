@@ -32,6 +32,8 @@
 
 	reserved_memory: reserved-memory { };
 
+	firmware: firmware { };
+
 	cpus {
 		#address-cells = <2>;
 		#size-cells = <0>;
@@ -1058,6 +1060,11 @@
 		status = "disabled";
 	};
 
+	tcsr: syscon@1fc0000 {
+		compatible = "syscon";
+		reg = <0x1fc0000 0x30000>;
+	};
+
 	qcom,mpm2-sleep-counter@c221000 {
 		compatible = "qcom,mpm2-sleep-counter";
 		reg = <0xc221000 0x1000>;
@@ -1070,6 +1077,13 @@
 		reg-names = "llcc_base", "llcc_broadcast_base";
 		interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
 		cap-based-alloc-and-pwr-collapse;
+	};
+};
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
+		qcom,dload-mode = <&tcsr 0x19000>;
 	};
 };
 
