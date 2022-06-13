@@ -83,7 +83,8 @@ khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
 khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(khaje-dtb-y)
 
-cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
+cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
+	cinder-du-rumi.dtb \
 	cinder-ru-idp.dtb \
 	cinder-du-idp.dtb \
 	cinder-du-x100.dtb
