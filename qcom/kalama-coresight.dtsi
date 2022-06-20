@@ -1160,46 +1160,163 @@
 
 		out-ports {
 			port {
-				tpdm_lpicc_out_tpda_ddr_lpi: endpoint {
+				tpdm_lpicc_out_funnel_ddr_lpi: endpoint {
 					remote-endpoint =
-					<&tpda_ddr_lpi_in_tpdm_lpicc>;
+					<&funnel_ddr_lpi_in_tpdm_lpicc>;
 				};
 			};
 		};
 	};
 
-	tpda_ddr_lpi: tpda@10d09000 {
+	tpdm_llcc_0: tpdm@10d40000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x10d40000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <99>;
+		coresight-name = "coresight-tpdm-llcc-0";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_llcc0_out_tpda_ddr_llcc: endpoint {
+					remote-endpoint =
+					<&tpda_ddr_llcc_in_tpdm_llcc0>;
+				};
+			};
+		};
+	};
+
+	tpdm_llcc_1: tpdm@10d41000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x10d41000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <99>;
+		coresight-name = "coresight-tpdm-llcc-1";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_llcc1_out_tpda_ddr_llcc: endpoint {
+					remote-endpoint =
+					<&tpda_ddr_llcc_in_tpdm_llcc1>;
+				};
+			};
+		};
+	};
+
+	tpdm_llcc_2: tpdm@10d42000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x10d42000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <99>;
+		coresight-name = "coresight-tpdm-llcc-2";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_llcc2_out_tpda_ddr_llcc: endpoint {
+					remote-endpoint =
+					<&tpda_ddr_llcc_in_tpdm_llcc2>;
+				};
+			};
+		};
+	};
+
+	tpdm_llcc_3: tpdm@10d43000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x10d43000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <99>;
+		coresight-name = "coresight-tpdm-llcc-3";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_llcc3_out_tpda_ddr_llcc: endpoint {
+					remote-endpoint =
+					<&tpda_ddr_llcc_in_tpdm_llcc3>;
+				};
+			};
+		};
+	};
+
+	tpda_ddr_llcc: tpda@10d09000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb969>;
 
 		reg = <0x10d09000 0x1000>;
 		reg-names = "tpda-base";
 
-		qcom,tpda-atid = <27>;
+		qcom,tpda-atid = <99>;
 
-		qcom,dsb-elem-size = <4 32>;
-		qcom,cmb-elem-size = <1 32>,
-							 <2 32>;
+		qcom,cmb-elem-size = <0 32>,
+							 <1 32>,
+							 <2 32>,
+							 <3 32>;
 
-		coresight-name = "coresight-tpda-ddr";
+		coresight-name = "coresight-tpda-ddr-llcc";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
 
 		in-ports {
-			port {
-				tpda_ddr_lpi_in_tpdm_lpicc: endpoint {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				tpda_ddr_llcc_in_tpdm_llcc0: endpoint {
 					remote-endpoint =
-					<&tpdm_lpicc_out_tpda_ddr_lpi>;
+					<&tpdm_llcc0_out_tpda_ddr_llcc>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				tpda_ddr_llcc_in_tpdm_llcc1: endpoint {
+					remote-endpoint =
+					<&tpdm_llcc1_out_tpda_ddr_llcc>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+				tpda_ddr_llcc_in_tpdm_llcc2: endpoint {
+					remote-endpoint =
+					<&tpdm_llcc2_out_tpda_ddr_llcc>;
+				};
+			};
+
+			port@3 {
+				reg = <3>;
+				tpda_ddr_llcc_in_tpdm_llcc3: endpoint {
+					remote-endpoint =
+					<&tpdm_llcc3_out_tpda_ddr_llcc>;
 				};
 			};
 		};
 
 		out-ports {
 			port {
-				tpda_ddr_lpi_out_funnel_ddr_lpi: endpoint {
+				tpda_ddr_llcc_out_funnel_ddr_dl1: endpoint {
 					remote-endpoint =
-					<&funnel_ddr_lpi_in_tpda_ddr_lpi>;
+					<&funnel_ddr_dl1_in_tpda_ddr_llcc>;
 				};
 			};
 		};
@@ -1215,9 +1332,9 @@
 
 			port@0 {
 				reg = <0>;
-				funnel_ddr_lpi_in_tpda_ddr_lpi: endpoint {
+				funnel_ddr_lpi_in_tpdm_lpicc: endpoint {
 					remote-endpoint =
-					<&tpda_ddr_lpi_out_funnel_ddr_lpi>;
+					<&tpdm_lpicc_out_funnel_ddr_lpi>;
 				};
 			};
 		};
@@ -1601,6 +1718,14 @@
 		in-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				funnel_ddr_dl1_in_tpda_ddr_llcc: endpoint {
+					remote-endpoint =
+					<&tpda_ddr_llcc_out_funnel_ddr_dl1>;
+				};
+			};
 
 			port@3 {
 				reg = <3>;
