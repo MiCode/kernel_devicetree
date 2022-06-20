@@ -49,6 +49,13 @@
 	};
 };
 
+&usb2_phy0 {
+	qcom,param-override-seq =
+		<0x07 0x6c
+		 0x0D 0x70
+		 0x2F 0x74>;
+};
+
 &qupv3_se4_i2c {
 	status = "ok";
 	#address-cells = <1>;
@@ -69,11 +76,13 @@
 		ti,bq2589x,charge-voltage = <4610>;
 		ti,bq2589x,charge-current = <500>;
 		ti,bq2589x,term-current = <200>;
-		ti,bq2589x,enable-auto-dpdm;
+		//ti,bq2589x,enable-auto-dpdm;
 		ti,bq2589x,enable-termination;
 		ti,bq2589x,use-absolute-vindpm;
 		ti,bq2589x,otg_vol = <5300>;
 		ti,bq2589x,otg_current = <1800>;
+		/* usb */
+		dpdm-supply = <&usb2_phy0>;
 	};
 };
 
@@ -101,14 +110,6 @@
 			95 10
 			99 5>;
 	};
-};
-
-
-&usb2_phy0 {
-	qcom,param-override-seq =
-		<0x07 0x6c
-		 0x0D 0x70
-		 0x2F 0x74>;
 };
 
 &soc {
@@ -162,8 +163,7 @@
 
 		/* battery */
 
-		/* usb */
-		dpdm-supply = <&usb2_phy0>;
+
 
 		/* stepchg_jeita */
 		xm,taper-fcc;
