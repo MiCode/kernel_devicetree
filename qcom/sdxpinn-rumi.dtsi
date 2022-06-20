@@ -64,6 +64,24 @@
 		qcom,no-l1ss-supported;
 		qcom,no-aux-clk-sync;
 	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <4>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo";
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <4>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo_ao";
+	};
 };
 
 &qupv3_se1_2uart {
@@ -146,4 +164,38 @@
 
 &mhi_device {
 	status = "ok";
+};
+
+&rpmhcc {
+	compatible = "fixed-clock";
+	clock-output-names = "rpmh_clocks";
+};
+
+&gcc {
+	clocks = <&bi_tcxo>, <&pcie20_phy_aux_clk>, <&pcie_1_pipe_clk>, <&pcie_2_pipe_clk>,
+		 <&pcie_pipe_clk>, <&sleep_clk>, <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+};
+
+&gcc_emac0_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_emac1_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_pcie_1_phy_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_pcie_2_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_pcie_phy_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_usb3_phy_gdsc {
+	compatible = "regulator-fixed";
 };
