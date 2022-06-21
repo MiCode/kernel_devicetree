@@ -135,9 +135,9 @@ dtb-y += $(sdmsteppeauto-dtb-y)
 sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
-sa410m-dtb-$(CONFIG_ARCH_SA410M) += \
+sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
 				sa410m-rumi.dtb
-dtb-y += $(sa410m-dtb-y)
+dtb-y += $(sa410m_auto-dtb-y)
 
 endif
 
