@@ -3,6 +3,7 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/interconnect/qcom,cinder.h>
+#include <dt-bindings/interconnect/qcom,epss-l3.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
@@ -47,6 +48,9 @@
 			cpu-idle-states = <&SILVER_OFF>;
 			power-domains = <&CPU_PD0>;
 			next-level-cache = <&L2_0>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -69,6 +73,9 @@
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_1>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU1>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -87,6 +94,9 @@
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_2>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU2>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -104,6 +114,9 @@
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_3>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU3>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -161,6 +174,21 @@
 			exit-latency-us = <4023>;
 			min-residency-us = <9987>;
 			arm,psci-suspend-param = <0x41003344>;
+		};
+	};
+
+	cpu0_opp_table: cpu0_opp_table {
+		compatible = "operating-points-v2";
+		opp-shared;
+
+		cpu0_opp1: opp-1516800000 {
+			opp-hz = /bits/ 64 <1516800000>;
+			opp-peak-kBps = < 8371200 1209600000>;
+		};
+
+		cpu0_opp2: opp-1804800000 {
+			opp-hz = /bits/ 64 <1804800000>;
+			opp-peak-kBps = <12787200 1459200000>;
 		};
 	};
 
