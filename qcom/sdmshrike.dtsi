@@ -6,6 +6,8 @@
 #include <dt-bindings/clock/qcom,scc-sm8150.h>
 #include <dt-bindings/clock/qcom,videocc-sm8150.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,sc8180x.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
@@ -650,6 +652,10 @@
 				#clock-cells = <1>;
 				status = "okay";
 			};
+
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+			};
 		};
 	};
 
@@ -675,6 +681,11 @@
 						  <ACTIVE_TCS    2>,
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 0>;
+			};
+
+			disp_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+				qcom,tcs-wait = <QCOM_ICC_TAG_AMC>;
 			};
 		};
 	};
@@ -829,6 +840,98 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GPLL0>;
 		clock-names = "xo", "alternate";
 		#freq-domain-cells = <2>;
+	};
+
+	config_noc: interconnect@1500000 {
+		reg = <0x1500000 0x7400>;
+		compatible = "qcom,sc8180x-config-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@1620000 {
+		reg = <0x1620000 0x21400>;
+		compatible = "qcom,sc8180x-system-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	ipa_virt: interconnect@0 {
+		compatible = "qcom,sc8180x-ipa-virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	camnoc_virt: interconnect@1 {
+		compatible = "qcom,sc8180x-camnoc-virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	aggre1_noc: interconnect@16e0000 {
+		reg = <0x16E0000 0x1A080>;
+		compatible = "qcom,sc8180x-aggre1-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&gcc GCC_AGGRE_UFS_CARD_AXI_CLK>,
+			<&gcc GCC_AGGRE_UFS_CARD_2_AXI_CLK>,
+			<&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_SEC_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_MP_AXI_CLK>;
+	};
+
+	aggre2_noc: interconnect@1700000 {
+		reg = <0x1700000 0x3A080>;
+		compatible = "qcom,sc8180x-aggre2-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	compute_noc: interconnect@1716000 {
+		reg = <0x1716008 0x10>;
+		compatible = "qcom,sc8180x-compute-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mmss_noc: interconnect@1740000 {
+		reg = <0x1740000 0x1C100>;
+		compatible = "qcom,sc8180x-mmss-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos", "disp";
+		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
+	};
+
+	dc_noc: interconnect@9160000 {
+		reg = <0x9160000 0x3200>;
+		compatible = "qcom,sc8180x-dc-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gem_noc: interconnect@9680000 {
+		reg = <0x9680000 0x58200>;
+		compatible = "qcom,sc8180x-gem-noc";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos", "disp";
+		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
+		clocks = <&gcc GCC_DDRSS_GPU_AXI_CLK>;
+	};
+
+	mc_virt: interconnect@2 {
+		compatible = "qcom,sc8180x-mc-virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos", "disp";
+		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
 	};
 
 	qupv3_id_1: geniqup@ac0000 {
