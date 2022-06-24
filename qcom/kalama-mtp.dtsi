@@ -24,7 +24,7 @@
 	resets = <&gcc GCC_SDCC2_BCR>;
 	reset-names = "core_reset";
 
-	qcom,iommu-dma = "bypass";
+	qcom,iommu-dma = "fastmap";
 	qcom,uses_level_shifter;
 };
 
@@ -153,6 +153,17 @@
 		qts,trusted-touch-vm-gpio-list = <&tlmm 44 0 &tlmm 45 0 &tlmm 46 0
 						&tlmm 47 0 &tlmm 24 0 &tlmm 25 0x2008>;
 	};
+};
+
+&pm8550b_eusb2_repeater {
+	qcom,param-override-seq =
+		/* <value reg_offset> */
+		/* Adjust HS trasmit amplitude */
+		<0x8 0x51
+		/* Squelch detection threshold */
+		 0x3 0x54
+		/* Tx pre-emphasis tuning */
+		 0x5 0x57>;
 };
 
 &eusb2_phy0 {

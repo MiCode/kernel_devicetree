@@ -84,7 +84,7 @@
 		vendor = "QTI";
 		image-name = "qcom,trustedvm";
 		qcom,pasid = <0x0 0x1c>;
-		qcom,qtee-config-info = "p=7C,8F,97,159,7F1;";
+		qcom,qtee-config-info = "p=77,78,7C,8F,97,159,199,7F1;";
 		qcom,secdomain-ids = <45>;
 		qcom,primary-vm-index = <0>;
 		vm-uri = "vmuid/trusted-ui";
@@ -115,7 +115,7 @@
 			 * first 1GB due to memory hotplug requirement.
 			 */
 			base-address = <0x0 0x28800000 >;
-			size-min = <0x0 0x49ee000>;    /* 73 MB */
+			size-min = <0x0 0x4aee000>;    /* 74 MB */
 		};
 
 		segments {
@@ -322,6 +322,13 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
+	gcc: clock-controller@100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
 	vm_tlmm_irq: vm-tlmm-irq@0 {
 		compatible = "qcom,tlmm-vm-irq";
 		reg = <0x0 0x0>;
@@ -417,11 +424,13 @@
 		reg = <0xac0000 0x2000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
 		iommus = <&apps_smmu 0xb8 0x0>;
 		qcom,iommu-group = <&qup_iommu_group>;
 		dma-coherent;
 		ranges;
-		qcom,not-la-vm;
 		status = "ok";
 
 		qupv3_se4_i2c: i2c@a90000 {
@@ -485,11 +494,13 @@
 		reg = <0x8c0000 0x2000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_2_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_2_S_AHB_CLK>;
 		iommus = <&apps_smmu 0x438 0x0>;
 		qcom,iommu-group = <&qup_iommu_group>;
 		dma-coherent;
 		ranges;
-		qcom,not-la-vm;
 		status = "ok";
 
 		qupv3_se8_i2c: i2c@880000 {
@@ -537,6 +548,22 @@
 		compatible = "qcom,gh-msgq-test";
 		gunyah-label = <4>;
 		affinity = <0>;
+	};
+
+	msm_fastrpc: qcom,msm_fastrpc {
+		compatible = "qcom,msm-fastrpc-compute";
+		qcom,rpc-latency-us = <235>;
+		qcom,fastrpc-gids = <2908>;
+		qcom,qos-cores = <0 1 2 3>;
+
+		qcom,msm_fastrpc_compute_cb1 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0xC0B 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
 	};
 
 	qrtr-gunyah {

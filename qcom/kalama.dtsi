@@ -28,7 +28,7 @@
 
 
 	chosen: chosen {
-			bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off mem-offline.bypass_send_msg=1 sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2";
+			bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off mem-offline.bypass_send_msg=1 sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc";
 	};
 
 	reserved_memory: reserved-memory { };
@@ -517,51 +517,53 @@
 
 	trust_ui_vm_mem: trust_ui_vm_region@f3600000 {
 		no-map;
-		reg = <0x0 0xf3600000 0x0 0x49ee000>;
+		reg = <0x0 0xf3600000 0x0 0x4aee000>;
 	};
 
-	trust_ui_vm_dump: trust_ui_vm_dump@f7fee000 {
+	trust_ui_vm_dump: trust_ui_vm_dump@0xf80ee000 {
 		no-map;
-		reg = <0x0 0xf7fee000 0x0 0x1000>;
+		reg = <0x0 0xf80ee000 0x0 0x1000>;
 	};
 
-	trust_ui_vm_qrtr: trust_ui_vm_qrtr@f7fef000 {
+	trust_ui_vm_qrtr: trust_ui_vm_qrtr@0xf80ef000 {
 		no-map;
-		reg = <0x0 0xf7fef000 0x0 0x9000>;
+		reg = <0x0 0xf80ef000 0x0 0x9000>;
 	};
 
-	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@f7ff8000 {
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@0xf80f8000 {
 		no-map;
-		reg = <0x0 0xf7ff8000 0x0 0x4000>;
+		reg = <0x0 0xf80f8000 0x0 0x4000>;
 		gunyah-label = <0x11>;					//for persist.img
 	};
 
-	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@f7ffc000 {
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@0xf80fc000 {
 		no-map;
-		reg = <0x0 0xf7ffc000 0x0 0x4000>;
+		reg = <0x0 0xf80fc000 0x0 0x4000>;
 		gunyah-label = <0x10>;					//for system.img
 	};
 
-	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@f8000000 {
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@0xf8100000 {
 		no-map;
-		reg = <0x0 0xf8000000 0x0 0x200000>;
+		reg = <0x0 0xf8100000 0x0 0x100000>;
 		gunyah-label = <0x12>;
 	};
 
-	oem_vm_mem: oem_vm_region@f8200000 {
-		no-map;
-		reg = <0x0 0xf8200000 0x0 0x4afc000>;
+	oem_vm_mem: oem_vm_region@f8400000 {
+		compatible = "shared-dma-pool";
+		reg = <0x0 0xf8400000 0x0 0x4800000>;
+		reusable;
+		alignment = <0x0 0x400000>;
 	};
 
-	oem_vm_vblk0_ring: oem_vm_vblk0_ring@fccfc000 {
+	oem_vm_vblk0_ring: oem_vm_vblk0_ring@fcc00000 {
 		no-map;
-		reg = <0x0 0xfccfc000 0x0 0x4000>;
+		reg = <0x0 0xfcc00000 0x0 0x4000>;
 		gunyah-label = <0x13>;
 	};
 
-	oem_vm_swiotlb: oem_vm_swiotlb@fcd00000 {
+	oem_vm_swiotlb: oem_vm_swiotlb@fcc04000 {
 		no-map;
-		reg = <0x0 0xfcd00000 0x0 0x100000>;
+		reg = <0x0 0xfcc04000 0x0 0x100000>;
 		gunyah-label = <0x14>;
 	};
 
@@ -2091,6 +2093,22 @@
 		qcom,support-cfg-gdscr;
 	};
 
+	sdhc2_opp_table: sdhc2-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-100000000 {
+			opp-hz = /bits/ 64 <100000000>;
+			opp-peak-kBps = <160000 100000>;
+			opp-avg-kBps = <80000 50000>;
+		};
+
+		opp-202000000 {
+			opp-hz = /bits/ 64 <202000000>;
+			opp-peak-kBps = <200000 120000>;
+			opp-avg-kBps = <80000 50000>;
+		};
+	};
+
 	sdhc_2: sdhci@8804000 {
 		status = "disabled";
 
@@ -2117,6 +2135,22 @@
 
 		iommus = <&apps_smmu 0x540 0x0>;
 		dma-coherent;
+
+		interconnects = <&aggre2_noc MASTER_SDCC_2 &mc_virt SLAVE_EBI1>,
+			      <&gem_noc MASTER_APPSS_PROC &config_noc
+			      SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc2_opp_table>;
+
+		qos0 {
+			mask = <0xf0>;
+			vote = <44>;
+		};
+
+		qos1 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
 	};
 
 	ufsphy_mem: ufsphy_mem@1d80000 {
@@ -2172,8 +2206,6 @@
 		phy-names = "ufsphy";
 		#reset-cells = <1>;
 
-		limit-rate = <1>;
-		limit-phy-submode = <2>;
 		lanes-per-direction = <2>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
 		clock-names =
@@ -2567,6 +2599,8 @@
 		reg = <0xc3f0000 0x400>, <0xb261400 0x100>;
 		ss-name = "modem", "adsp", "adsp_island",
 			  "cdsp", "apss";
+		mboxes = <&qmp_aop 0>;
+		mbox-names = "aop";
 		ddr-freq-update;
 	};
 
@@ -2867,6 +2901,7 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo";
 
+		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		interconnects = <&lpass_lpicx_noc MASTER_LPASS_PROC &mc_virt SLAVE_EBI1>,
@@ -2958,6 +2993,7 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo";
 
+		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		interconnects = <&nsp_noc MASTER_CDSP_PROC &mc_virt SLAVE_EBI1>,
@@ -3036,13 +3072,14 @@
 		mx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
 		reg-names = "cx", "mx";
 
+		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>,
 				<&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
 		interconnect-names = "rproc_ddr", "crypto_ddr";
 
-		memory-region = <&mpss_mem &q6_mpss_dtb_mem>;
+		memory-region = <&mpss_mem &q6_mpss_dtb_mem &system_cma>;
 
 		/* Inputs from mss */
 		interrupts-extended = <&intc GIC_SPI 264 IRQ_TYPE_EDGE_RISING>,
@@ -3111,7 +3148,7 @@
 		memory-region = <&cpusys_vm_mem>;
 	};
 
-	qcom,guestvm_loader@f8000000 {
+	qcom,guestvm_loader@f8400000 {
 		compatible = "qcom,guestvm-loader";
 		qcom,pas-id = <34>;
 		qcom,vmid = <49>;
@@ -3127,14 +3164,14 @@
 					&tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@f7ff8000 {
-		reg = <0xf7ff8000 0x208000>;
+	trust_ui_vm: qcom,trust_ui_vm@0xf80f8000 {
+		reg = <0xf80f8000 0x108000>;
 		vm_name = "trustedvm";
 		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
-	oem_vm: qcom,oem_vm@fccfc000 {
-		reg = <0xfccfc000 0x104000>;
+	oem_vm: qcom,oem_vm@fcc00000 {
+		reg = <0xfcc00000 0x104000>;
 		vm_name = "oemvm";
 		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
 	};
@@ -3223,9 +3260,9 @@
 			< 1708000 >,
 			< 2092000 >,
 			< 2736000 >,
-			< 3196000 >,
-			< 3724000 >,
-			< 4243000 >;
+			< 3187000 >,
+			< 3686000 >,
+			< 4224000 >;
 	};
 
 	llcc_freq_table: llcc-freq-table {
@@ -3346,8 +3383,8 @@
 					< 1113600  768000 >,
 					< 1344000 1555000 >,
 					< 1881600 2092000 >,
-					< 2476800 3196000 >,
-					< 2707200 4243000 >;
+					< 2476800 3187000 >,
+					< 2707200 4224000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3359,8 +3396,8 @@
 					< 1113600  768000 >,
 					< 1344000 1555000 >,
 					< 1881600 2092000 >,
-					< 2476800 3196000 >,
-					< 2707200 4243000 >;
+					< 2476800 3187000 >,
+					< 2707200 4224000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3379,7 +3416,7 @@
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
 					< 2476800  547000 >,
-					< 2707200 4243000 >;
+					< 2707200 4224000 >;
 				qcom,sampling-enabled;
 			};
 		};

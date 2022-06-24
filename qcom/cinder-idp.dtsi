@@ -1,6 +1,48 @@
 #include "cinder-pmic-overlay.dtsi"
+#include <dt-bindings/gpio/gpio.h>
 
 &soc {
+	usb_conn_gpio: usb_conn_gpio {
+		compatible = "gpio-usb-b-connector";
+		vbus-gpio =  <&pm8150_gpios 7 GPIO_ACTIVE_HIGH>;
+		id-gpio = <&tlmm 42 GPIO_ACTIVE_HIGH>;
+		vbus-out-gpio = <&tlmm 43 GPIO_ACTIVE_HIGH>;
 
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb_vbus_det_default
+			     &usb_id_det_default
+			     &usb_vbus_boost_default>;
+
+		port {
+			usb_port0_connector: endpoint {
+				remote-endpoint = <&usb_port0>;
+			};
+		};
+	};
 };
 
+&sdhc_1 {
+	status = "ok";
+	vdd-supply = <&L10A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L7A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+};
+
+&usb0 {
+	usb-role-switch;
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};

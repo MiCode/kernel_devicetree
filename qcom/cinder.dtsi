@@ -24,6 +24,8 @@
 	aliases {
 		serial0 = &qupv3_se7_2uart;
 		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
+		hsuart0 = &qupv3_se0_4uart; /* CerebrusX debug HSUART Instance */
+		hsuart1 = &qupv3_se8_4uart; /* IPC HSUART Instance */
 	};
 
 	firmware: firmware { };
@@ -227,6 +229,17 @@
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
 	};
 
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,pdc";
+		reg = <0xb220000 0x30000>, <0x174000f0 0x64>;
+		reg-names = "pdc-interrupt-base", "apss-shared-spi-cfg";
+		qcom,pdc-ranges = <0 480 12>, <14 494 24>, <40 520 54>,
+				  <94 609 31>, <125 63 1>, <126 716 12>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+
 	arch_timer: timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
@@ -401,6 +414,11 @@
 		qcom,rtb-size = <0x100000>;
 	};
 
+	qcom,sps {
+		compatible = "qcom,msm-sps-4k";
+		qcom,pipe-attr-ee;
+	};
+
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,cinder-pinctrl";
 		reg = <0xf000000 0x1000000>;
@@ -455,6 +473,14 @@
 		compatible = "qcom,dload-mode";
 	};
 
+	qcom_tzlog: tz-log@14680720 {
+		compatible = "qcom,tz-log";
+		reg = <0x14680720 0x3000>;
+		qcom,hyplog-enabled;
+		hyplog-address-offset = <0x410>;
+		hyplog-size-offset = <0x414>;
+	};
+
 	ipcc_mproc: qcom,ipcc@408000 {
 		compatible = "qcom,ipcc";
 		reg = <0x408000 0x1000>;
@@ -479,6 +505,7 @@
 		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
 		reg-names = "cx", "mx";
 
+		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 		memory-region = <&mpss_mem>;
 
@@ -604,6 +631,40 @@
 		depends-on-supply = <&qmp_tme>;
 	};
 
+	qcom,glinkpkt {
+		compatible = "qcom,glinkpkt";
+
+		qcom,glinkpkt-at-mdm0 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DS";
+			qcom,glinkpkt-dev-name = "at_mdm0";
+		};
+
+		qcom,glinkpkt-data40-cntl {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA40_CNTL";
+			qcom,glinkpkt-dev-name = "smdcntl8";
+		};
+
+		qcom,glinkpkt-data1 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA1";
+			qcom,glinkpkt-dev-name = "smd7";
+		};
+
+		qcom,glinkpkt-data4 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA4";
+			qcom,glinkpkt-dev-name = "smd8";
+		};
+
+		qcom,glinkpkt-data11 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA11";
+			qcom,glinkpkt-dev-name = "smd11";
+		};
+	};
+
 	sdhc_1: sdhci@8804000 {
 		status = "disabled";
 
@@ -697,7 +758,6 @@
 			#clock-cells = <0>;
 		};
 	};
-
 
 	ecpri_cc_emac_synce_phy0_clk_src: ecpri_cc_emac_synce_phy0_clk_src {
 		compatible = "fixed-clock";
@@ -902,30 +962,47 @@
 		#reset-cells = <1>;
 	};
 
+	pcie_0_pipe_clk: pcie_0_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_0_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_0_phy_aux_clk: pcie_0_phy_aux_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_0_phy_aux_clk";
+		#clock-cells = <0>;
+	};
+
+	usb3_phy_wrapper_gcc_usb30_pipe_clk: usb3_phy_wrapper_gcc_usb30_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+		#clock-cells = <0>;
+	};
+
 	gcc: clock-controller@80000 {
 		compatible = "qcom,cinder-gcc", "syscon";
 		reg = <0x80000 0x1f4200>;
 		reg-name = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
-		clocks = <&rpmhcc RPMH_CXO_CLK>, <&sleep_clk>;
-		clock-names = "bi_tcxo", "sleep_clk";
-		protected-clocks = <GCC_AGGRE_NOC_ECPRI_DMA_CLK>,
-				<GCC_AGGRE_NOC_ECPRI_DMA_CLK_SRC>,
-				<GCC_AGGRE_NOC_ECPRI_GSI_CLK_SRC>,
-				<GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
-				<GCC_DDRSS_ECPRI_DMA_CLK>,
-				<GCC_GEMNOC_PCIE_QX_CLK>,
-				<GCC_QMIP_ANOC_PCIE_CLK>,
-				<GCC_QMIP_ECPRI_DMA0_CLK>,
-				<GCC_QMIP_ECPRI_DMA1_CLK>,
-				<GCC_QMIP_ECPRI_GSI_CLK>,
-				<GCC_SNOC_CNOC_GEMNOC_PCIE_QX_CLK>,
-				<GCC_SNOC_CNOC_GEMNOC_PCIE_SOUTH_QX_CLK>,
-				<GCC_SNOC_CNOC_PCIE_QX_CLK>,
-				<GCC_SNOC_PCIE_SF_CENTER_QX_CLK>,
-				<GCC_SNOC_PCIE_SF_SOUTH_QX_CLK>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&sleep_clk>,
+			 <&pcie_0_pipe_clk>,
+			 <&pcie_0_phy_aux_clk>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+		clock-names = "bi_tcxo", "sleep_clk",
+			      "pcie_0_pipe_clk",
+			      "pcie_0_phy_aux_clk",
+			      "usb3_phy_wrapper_gcc_usb30_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@17aa0000 {
+		compatible = "syscon";
+		reg = <0x17aa0000 0x1c>;
 	};
 
 	mccc: syscon@190ba000 {
@@ -937,6 +1014,7 @@
 		compatible = "qcom,cinder-debugcc";
 		qcom,gcc = <&gcc>;
 		qcom,ecpricc = <&ecpricc>;
+		qcom,apsscc = <&apsscc>;
 		qcom,mccc = <&mccc>;
 		clock-names = "xo_clk_src";
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
@@ -1009,7 +1087,7 @@
 			interrupts = <0>;
 			#interrupt-cells = <1>;
 			interrupt-map-mask = <0xffffffff>;
-			interrupt-map = <0 &intc 0 172 0>;
+			interrupt-map = <0 &intc GIC_SPI 140 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "int_global";
 
 			pinctrl-names = "default";
@@ -1020,6 +1098,7 @@
 			wake-gpio = <&tlmm 100 0>;
 
 			gdsc-vdd-supply = <&gcc_pcie_0_gdsc>;
+			gdsc-phy-vdd-supply = <&gcc_pcie_0_phy_gdsc>;
 			vreg-1p8-supply = <&pm8150_a_l3>;
 			vreg-0p9-supply = <&pm8150_a_l6>;
 			vreg-mx-supply = <&VDD_MX_LEVEL>;
@@ -1071,6 +1150,7 @@
 		interrupts = <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "mhi-device-inta";
 		qcom,mhi-ifc-id = <0x060017cb>;
+		qcom,mhi-chan-hw-base = <104>;
 		qcom,mhi-interrupt;
 		qcom,no-m0-timeout;
 		status = "ok";
@@ -1101,6 +1181,8 @@
 		      <0xc440000 0x100000>,
 		      <0xc4c0000 0xa0000>;
 		reg-names = "cnfg", "core", "chnls", "obsrvr", "intr";
+		interrupts-extended = <&pdc 1 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "periph_irq";
 		interrupt-controller;
 		#interrupt-cells = <4>;
 		#address-cells = <2>;
@@ -1139,6 +1221,15 @@
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
+
+	epss_l3_cpu: l3_cpu@17d90000 {
+		reg = <0x17d90000 0x2000>;
+		compatible = "qcom,cinder-epss-l3-cpu";
+		#interconnect-cells = <1>;
+		clock-names = "xo", "alternate";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+		status = "disabled";
+	};
 };
 
 &firmware {
@@ -1151,6 +1242,7 @@
 
 #include "cinder-regulators.dtsi"
 #include "cinder-coresight.dtsi"
+#include "cinder-debug.dtsi"
 #include "cinder-pinctrl.dtsi"
 #include "msm-arm-smmu-cinder.dtsi"
 #include "cinder-qupv3.dtsi"

@@ -24,7 +24,7 @@
 	resets = <&gcc GCC_SDCC2_BCR>;
 	reset-names = "core_reset";
 
-	qcom,iommu-dma = "bypass";
+	qcom,iommu-dma = "fastmap";
 	qcom,uses_level_shifter;
 };
 
@@ -242,6 +242,17 @@
 
 &usb0 {
 	ssusb_redriver = <&redriver>;
+};
+
+&pm8550b_eusb2_repeater {
+	qcom,param-override-seq =
+		/* <value reg_offset> */
+		/* Adjust HS trasmit amplitude */
+		<0xd 0x51
+		/* Squelch detection threshold */
+		 0x3 0x54
+		/* Tx pre-emphasis tuning */
+		 0x5 0x57>;
 };
 
 &eusb2_phy0 {

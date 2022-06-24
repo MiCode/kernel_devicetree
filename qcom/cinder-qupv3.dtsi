@@ -27,8 +27,7 @@
 		reg-names = "gpi-top";
 		iommus = <&apps_smmu 0xf6 0x0>;
 		qcom,max-num-gpii = <12>;
-		interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
-			<GIC_SPI 244 IRQ_TYPE_LEVEL_HIGH>,
+		interrupts = <GIC_SPI 244 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 245 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 246 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 247 IRQ_TYPE_LEVEL_HIGH>,
@@ -36,10 +35,11 @@
 			<GIC_SPI 249 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 250 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 251 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 252 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 253 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 254 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 255 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,gpii-mask = <0x3e>;
+		qcom,gpii-mask = <0x3f>;
 		qcom,ev-factor = <2>;
 		qcom,iommu-dma-addr-pool = <0x100000 0x100000>;
 		qcom,gpi-ee-offset = <0x10000>;
@@ -56,11 +56,12 @@
 		clock-names = "m-ahb", "s-ahb";
 		clocks = <&gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
 			<&gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
-		iommus = <&apps_smmu 0xa3 0x0>;
+		iommus = <&apps_smmu 0xe3 0x0>;
 		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
 		qcom,iommu-geometry = <0x40000000 0x10000000>;
 		qcom,iommu-dma = "fastmap";
 		dma-coherent;
+		ranges;
 		status = "ok";
 
 		/* Debug UART Instance */
@@ -87,8 +88,7 @@
 			compatible = "qcom,msm-geni-serial-hs";
 			reg = <0x980000 0x4000>;
 			reg-names = "se_phys";
-			interrupts-extended = <&intc GIC_SPI 601 IRQ_TYPE_LEVEL_HIGH>,
-					<&tlmm 79 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 601 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "se-clk";
 			clocks = <&gcc GCC_QUPV3_WRAP0_S0_CLK>;
 			interconnect-names = "qup-core", "qup-config", "qup-memory";
@@ -96,16 +96,11 @@
 			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
 			<&gem_noc MASTER_APPSS_PROC &system_noc SLAVE_QUP_0>,
 			<&system_noc MASTER_QUP_0 &mc_virt  SLAVE_EBI1>;
-			pinctrl-names = "default", "active", "sleep", "shutdown";
+			pinctrl-names = "default", "sleep";
 			pinctrl-0 = <&qupv3_se0_default_cts>, <&qupv3_se0_default_rts>,
 			<&qupv3_se0_default_tx>, <&qupv3_se0_default_rx>;
 			pinctrl-1 = <&qupv3_se0_cts>, <&qupv3_se0_rts>,
 			<&qupv3_se0_tx>, <&qupv3_se0_rx>;
-			pinctrl-2 = <&qupv3_se0_cts>, <&qupv3_se0_rts>,
-			<&qupv3_se0_tx>, <&qupv3_se0_default_rx>;
-			pinctrl-3 = <&qupv3_se0_default_cts>, <&qupv3_se0_default_rts>,
-			<&qupv3_se0_default_tx>, <&qupv3_se0_default_rx>;
-			qcom,wakeup-byte = <0xFD>;
 			status = "disabled";
 		};
 
@@ -398,7 +393,7 @@
 		#dma-cells = <5>;
 		reg = <0xa00000  0x60000>;
 		reg-names = "gpi-top";
-		iommus = <&apps_smmu 0x436 0x0>;
+		iommus = <&apps_smmu 0x116 0x0>;
 		qcom,max-num-gpii = <12>;
 		interrupts = <GIC_SPI 279 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 280 IRQ_TYPE_LEVEL_HIGH>,
@@ -412,7 +407,7 @@
 			<GIC_SPI 296 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 297 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 298 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,gpii-mask = <0x0116>;
+		qcom,gpii-mask = <0x3f>;
 		qcom,ev-factor = <2>;
 		qcom,iommu-dma-addr-pool = <0x100000 0x100000>;
 		qcom,gpi-ee-offset = <0x10000>;
@@ -429,11 +424,12 @@
 		clock-names = "m-ahb", "s-ahb";
 		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
 			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
-		iommus = <&apps_smmu 0x423 0x0>;
+		iommus = <&apps_smmu 0x103 0x0>;
 		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
 		qcom,iommu-geometry = <0x40000000 0x10000000>;
 		qcom,iommu-dma = "fastmap";
 		dma-coherent;
+		ranges;
 		status = "ok";
 
 		/* IPC HSUART Instance */
@@ -441,8 +437,7 @@
 			compatible = "qcom,msm-geni-serial-hs";
 			reg = <0xa80000 0x4000>;
 			reg-names = "se_phys";
-			interrupts-extended = <&intc GIC_SPI 353 IRQ_TYPE_LEVEL_HIGH>,
-					<&tlmm 79 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 353 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "se-clk";
 			clocks = <&gcc GCC_QUPV3_WRAP1_S0_CLK>;
 			interconnect-names = "qup-core", "qup-config", "qup-memory";
@@ -450,16 +445,11 @@
 			<&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
 			<&gem_noc MASTER_APPSS_PROC &system_noc SLAVE_QUP_1>,
 			<&system_noc MASTER_QUP_1 &mc_virt  SLAVE_EBI1>;
-			pinctrl-names = "default", "active", "sleep", "shutdown";
+			pinctrl-names = "default", "sleep";
 			pinctrl-0 = <&qupv3_se8_default_cts>, <&qupv3_se8_default_rts>,
 			<&qupv3_se8_default_tx>, <&qupv3_se8_default_rx>;
 			pinctrl-1 = <&qupv3_se8_cts>, <&qupv3_se8_rts>,
 			<&qupv3_se8_tx>, <&qupv3_se8_rx>;
-			pinctrl-2 = <&qupv3_se8_cts>, <&qupv3_se8_rts>,
-			<&qupv3_se8_tx>, <&qupv3_se8_default_rx>;
-			pinctrl-3 = <&qupv3_se8_default_cts>, <&qupv3_se8_default_rts>,
-			<&qupv3_se8_default_tx>, <&qupv3_se8_default_rx>;
-			qcom,wakeup-byte = <0xFD>;
 			status = "disabled";
 		};
 

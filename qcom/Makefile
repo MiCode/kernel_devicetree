@@ -52,6 +52,7 @@ KALAMA_BOARDS += \
 		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
 		 kalama-cdp-wsa883x-overlay.dtbo \
+		 kalama-cdp-nfc-overlay.dtbo \
 		 kalama-atp-overlay.dtbo \
 		 kalama-rcm-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo
@@ -65,7 +66,25 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
-cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-rumi.dtb \
+KHAJE_BASE_DTB += khaje.dtb
+
+KHAJE_BOARDS += \
+                 khaje-idp-overlay.dtbo \
+                 khaje-qrd-overlay.dtbo \
+		 khaje-qrd-hvdcp3p5-overlay.dtbo \
+		 khaje-qrd-nowcd9375-overlay.dtbo \
+                 khaje-idp-nopmi-overlay.dtbo \
+                 khaje-qrd-nopmi-overlay.dtbo \
+                 khaje-idps-display-90hz-overlay.dtbo \
+                 khaje-atp-overlay.dtbo
+
+khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
+        $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
+khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
+dtb-y += $(khaje-dtb-y)
+
+cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
+	cinder-du-rumi.dtb \
 	cinder-ru-idp.dtb \
 	cinder-du-idp.dtb \
 	cinder-du-x100.dtb
@@ -112,6 +131,13 @@ sdmsteppeauto-dtb-$(CONFIG_ARCH_SA6155) += \
 sdmsteppeauto-overlays-dtb-$(CONFIG_ARCH_SA6155) += $(SA6155_BOARDS) $(SA6155P_BOARDS) $(SA6155_BASE_DTB) $(SA6155P_BASE_DTB)
 
 dtb-y += $(sdmsteppeauto-dtb-y)
+
+sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb
+dtb-y += $(sdxpinn-dtb-y)
+
+sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
+				sa410m-rumi.dtb
+dtb-y += $(sa410m_auto-dtb-y)
 
 endif
 

@@ -76,12 +76,22 @@
 		vendor = "QTI";
 		image-name = "qcom,oemvm";
 		qcom,pasid = <0x0 0x22>;
+		qcom,qtee-config-info = "p=7C,8F,97,159,7F1;";
+		qcom,secdomain-ids = <49>;
+		qcom,primary-vm-index = <0>;
+		vm-uri = "vmuid/oemvm";
+		vm-guid = "847bfe26-0b12-5728-812a-06103f6bdec0";
+		vm-attrs = "crash-fatal";
 
 		memory {
 			#address-cells = <0x2>;
 			#size-cells = <0x0>;
-			base-address = <0x0 0xf8200000>;
-			size-min = <0x0 0x4afc000>;    /* 74 MB */
+			/*
+			 * IPA address linux image is loaded at. Must be within
+			 * first 1GB due to memory hotplug requirement.
+			 */
+			base-address = <0x0 0x28800000>;
+			size-min = <0x0 0x4800000>;    /* 72 MB */
 		};
 
 		segments {
@@ -161,6 +171,11 @@
 		};
 	};
 
+	firmware: firmware {
+		scm {
+			compatible = "qcom,scm";
+		};
+	};
 
 	soc: soc { };
 };
@@ -219,4 +234,11 @@
 		compatible = "qcom,gunyah-vsock";
 		msgq-label = <3>;
 	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+		qcom,custom-bridge-size = <512>;
+		qcom,support-hypervisor;
+	};
+
 };
