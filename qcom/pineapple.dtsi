@@ -1077,13 +1077,6 @@
 		#hwlock-cells = <1>;
 	};
 
-	smem: qcom,smem {
-		compatible = "qcom,smem";
-		memory-region = <&smem_mem>;
-		depends-on-supply = <&tcsr_mutex>;
-		hwlocks = <&tcsr_mutex 3>;
-	};
-
 	tcsr: syscon@1fc0000 {
 		compatible = "syscon";
 		reg = <0x1fc0000 0x30000>;
@@ -1212,8 +1205,10 @@
 	/* secdata region can be reused by apps */
 
 	smem_mem: smem_region@81d00000 {
-		no-map;
+		compatible = "qcom,smem";
 		reg = <0x0 0x81d00000 0x0 0x200000>;
+		hwlocks = <&tcsr_mutex 3>;
+		no-map;
 	};
 
 	adsp_mhi_mem: adsp_mhi_region@81f00000 {
