@@ -8,41 +8,28 @@
 	qcom,pm6125@0 {
 		compatible = "qcom,spmi-pmic";
 		reg = <0x0 0x0>;
-		#address-cells = <2>;
+		#address-cells = <1>;
 		#size-cells = <0>;
 
-		pm6125_revid: qcom,revid@100 {
-			compatible = "qcom,qpnp-revid";
-			reg = <0x100 0x100>;
-		};
-
 		qcom,power-on@800 {
-			compatible = "qcom,qpnp-power-on";
-			reg = <0x800 0x100>;
-			interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>,
-				     <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
-			interrupt-names = "kpdpwr", "resin";
-			qcom,pon-dbc-delay = <15625>;
-			qcom,kpdpwr-sw-debounce;
-			qcom,system-reset;
-			qcom,store-hard-reset-reason;
-
-			qcom,pon_1 {
-				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR>;
-				qcom,pull-up = <1>;
+			compatible = "qcom,pm8998-pon";
+			reg = <0x800>;
+			pwrkey {
+				compatible = "qcom,pmk8350-pwrkey";
+				interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>;
 				linux,code = <KEY_POWER>;
 			};
 
-			qcom,pon_2 {
-				qcom,pon-type = <PON_POWER_ON_TYPE_RESIN>;
-				qcom,pull-up = <1>;
+			resin {
+				compatible = "qcom,pmk8350-resin";
+				interrupts = <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
 				linux,code = <KEY_VOLUMEDOWN>;
 			};
 		};
 
 		pm6125_vadc: vadc@3100 {
 			compatible = "qcom,spmi-adc5";
-			reg = <0x3100 0x100>;
+			reg = <0x3100>;
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <0x0 0x31 0x0 IRQ_TYPE_EDGE_RISING>;
@@ -93,7 +80,7 @@
 
 		pm6125_adc_tm: adc_tm@3500 {
 			compatible = "qcom,adc-tm5";
-			reg = <0x3500 0x100>;
+			reg = <0x3500>;
 			interrupts = <0x0 0x35 0x0 IRQ_TYPE_EDGE_RISING>;
 			interrupt-names = "thr-int-en";
 			#address-cells = <1>;
@@ -103,7 +90,7 @@
 
 		pm6125_tz: qcom,temp-alarm@2400 {
 			compatible = "qcom,spmi-temp-alarm";
-			reg = <0x2400 0x100>;
+			reg = <0x2400>;
 			interrupts = <0x0 0x24 0x0 IRQ_TYPE_EDGE_BOTH>;
 			#thermal-sensor-cells = <0>;
 			qcom,temperature-threshold-set = <1>;
@@ -111,7 +98,7 @@
 
 		pm6125_clkdiv: clock-controller@5b00 {
 			compatible = "qcom,spmi-clkdiv";
-			reg = <0x5b00 0x100>;
+			reg = <0x5b00>;
 			#clock-cells = <1>;
 			qcom,num-clkdivs = <1>;
 			clock-output-names = "pm6125_div_clk1";
@@ -122,24 +109,12 @@
 		};
 
 		pm6125_gpios: pinctrl@c000 {
-			compatible = "qcom,spmi-gpio";
-			reg = <0xc000 0x900>;
-			interrupts = <0x0 0xc0 0 IRQ_TYPE_NONE>,
-					<0x0 0xc1 0 IRQ_TYPE_NONE>,
-					<0x0 0xc2 0 IRQ_TYPE_NONE>,
-					<0x0 0xc3 0 IRQ_TYPE_NONE>,
-					<0x0 0xc4 0 IRQ_TYPE_NONE>,
-					<0x0 0xc5 0 IRQ_TYPE_NONE>,
-					<0x0 0xc6 0 IRQ_TYPE_NONE>,
-					<0x0 0xc7 0 IRQ_TYPE_NONE>,
-					<0x0 0xc8 0 IRQ_TYPE_NONE>;
-			interrupt-names = "pm6125_gpio1", "pm6125_gpio2",
-					"pm6125_gpio3", "pm6125_gpio4",
-					"pm6125_gpio5", "pm6125_gpio6",
-					"pm6125_gpio7", "pm6125_gpio8",
-					"pm6125_gpio9";
+			compatible = "qcom,pm6125-gpio";
+			reg = <0xc000>;
 			gpio-controller;
 			#gpio-cells = <2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
 		};
 
 		pm6125_rtc: qcom,pm6125_rtc {
@@ -151,13 +126,13 @@
 	qcom,pm6125@1 {
 		compatible ="qcom,spmi-pmic";
 		reg = <0x1 0x0>;
-		#address-cells = <2>;
+		#address-cells = <1>;
 		#size-cells = <0>;
 
 		pm6125_pwm: qcom,pwms@b300 {
 			status = "disabled";
 			compatible = "qcom,pwm-lpg";
-			reg = <0xb300 0x100>;
+			reg = <0xb300>;
 			reg-names = "lpg-base";
 			qcom,num-lpg-channels = <1>;
 			#pwm-cells = <2>;
