@@ -83,6 +83,18 @@ khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
 khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(khaje-dtb-y)
 
+MONACO_BASE_DTB += monaco.dtb monacop.dtb
+
+MONACO_BOARDS += \
+        monaco-idp-v1-overlay.dtbo \
+        monaco-idp-v2-overlay.dtbo \
+        monaco-idp-v3-overlay.dtbo
+
+monaco-dtb-$(CONFIG_ARCH_MONACO) += \
+        $(call add-overlays, $(MONACO_BOARDS) ,$(MONACO_BASE_DTB))
+monaco-overlays-dtb-$(CONFIG_ARCH_MONACO) += $(MONACO_BOARDS) $(MONACO_BASE_DTB)
+dtb-y += $(monaco-dtb-y)
+
 cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
 	cinder-du-rumi.dtb \
 	cinder-ru-idp.dtb \
