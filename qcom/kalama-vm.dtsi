@@ -19,7 +19,7 @@
 	};
 
 	chosen {
-		bootargs = "nokaslr log_buf_len=256K root=/dev/ram rw init=/init console=hvc0 loglevel=8";
+		bootargs = "nokaslr log_buf_len=256K root=/dev/ram rw init=/init console=hvc0 loglevel=8 memhp_default_state=online_movable";
 	};
 
 
@@ -628,6 +628,12 @@
 		qcom,support-hypervisor;
 	};
 
+	virtio_mem_device {
+		compatible = "qcom,virtio-mem";
+		/* Must be memory_block_size_bytes() aligned */
+		reg = <0x60000000 0x8000000>;
+		qcom,block-size = <0x400000>;
+	};
 };
 
 #include "msm-arm-smmu-kalama-vm.dtsi"
