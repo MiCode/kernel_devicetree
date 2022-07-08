@@ -1,6 +1,7 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-sdxpinn.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. SDXPINN";
@@ -16,7 +17,9 @@
 
 	chosen: chosen { };
 
-	aliases { };
+	aliases {
+		serial0 = &qupv3_se1_2uart;
+	};
 
 	cpus {
 		#address-cells = <2>;
@@ -361,7 +364,22 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 	};
+
+	ipcc_mproc: qcom,ipcc@408000 {
+		compatible = "qcom,ipcc";
+		reg = <0x408000 0x1000>;
+		interrupts = <GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+	};
 };
 
+#include "ipcc-test-sdxpinn.dtsi"
 #include "sdxpinn-regulators.dtsi"
 #include "sdxpinn-pinctrl.dtsi"
+#include "sdxpinn-qupv3.dtsi"
+
+&qupv3_se1_2uart {
+	status = "ok";
+};

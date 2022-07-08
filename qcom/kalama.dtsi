@@ -221,7 +221,7 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x700>;
 			enable-method = "psci";
-			cpu-idle-states = <&GOLD_OFF>;
+			cpu-idle-states = <&GOLD_PLUS_OFF>;
 			power-domains = <&CPU_PD7>;
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
@@ -284,9 +284,9 @@
 		SILVER_OFF: silver-c4 {  /* C4 */
 			compatible = "arm,idle-state";
 			idle-state-name = "rail-pc";
-			entry-latency-us = <800>;
+			entry-latency-us = <550>;
 			exit-latency-us = <750>;
-			min-residency-us = <4090>;
+			min-residency-us = <6700>;
 			arm,psci-suspend-param = <0x40000004>;
 			local-timer-stop;
 		};
@@ -295,8 +295,18 @@
 			compatible = "arm,idle-state";
 			idle-state-name = "rail-pc";
 			entry-latency-us = <600>;
-			exit-latency-us = <1550>;
-			min-residency-us = <4791>;
+			exit-latency-us = <1300>;
+			min-residency-us = <8136>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+
+		GOLD_PLUS_OFF: gold-plus-c4 {  /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <500>;
+			exit-latency-us = <1350>;
+			min-residency-us = <7480>;
 			arm,psci-suspend-param = <0x40000004>;
 			local-timer-stop;
 		};
@@ -304,18 +314,18 @@
 		CLUSTER_PWR_DN: cluster-d4 { /* D4 */
 			compatible = "domain-idle-state";
 			idle-state-name = "l3-off";
-			entry-latency-us = <1050>;
-			exit-latency-us = <2500>;
-			min-residency-us = <5309>;
+			entry-latency-us = <750>;
+			exit-latency-us = <2350>;
+			min-residency-us = <9144>;
 			arm,psci-suspend-param = <0x41000044>;
 		};
 
 		APSS_OFF: cluster-e3 { /* E3 */
 			compatible = "domain-idle-state";
 			idle-state-name = "llcc-off";
-			entry-latency-us = <2700>;
-			exit-latency-us = <3500>;
-			min-residency-us = <13959>;
+			entry-latency-us = <2800>;
+			exit-latency-us = <4400>;
+			min-residency-us = <10150>;
 			arm,psci-suspend-param = <0x4100c344>;
 		};
 	};
@@ -396,7 +406,7 @@
 
 	mpss_mem: mpss_region@89800000 {
 		no-map;
-		reg = <0x0 0x89800000 0x0 0x11800000>;
+		reg = <0x0 0x8a800000 0x0 0x10800000>;
 	};
 
 	q6_mpss_dtb_mem: q6_mpss_dtb_region@9b000000 {
@@ -502,12 +512,12 @@
 
 	ta_mem: ta_region@d8800000 {
 		no-map;
-		reg = <0x0 0xd8800000 0x0 0x8a00000>;
+		reg = <0x0 0xd8800000 0x0 0x7400000>;
 	};
 
 	tz_tags_mem: tz_tags_region@e1200000 {
 		no-map;
-		reg = <0x0 0xe1200000 0x0 0x2740000>;
+		reg = <0x0 0xdfc00000 0x0 0x2140000>;
 	};
 
 	hwfence_shbuf: hwfence-shmem {
@@ -515,36 +525,36 @@
 		reg = <0x0 0xe6440000 0x0 0x279000>;
 	};
 
-	trust_ui_vm_mem: trust_ui_vm_region@f3600000 {
+	trust_ui_vm_mem: trust_ui_vm_region@f3800000 {
 		no-map;
-		reg = <0x0 0xf3600000 0x0 0x4aee000>;
+		reg = <0x0 0xf3800000 0x0 0x4aee000>;
 	};
 
-	trust_ui_vm_dump: trust_ui_vm_dump@0xf80ee000 {
+	trust_ui_vm_dump: trust_ui_vm_dump@0xf82ee000 {
 		no-map;
-		reg = <0x0 0xf80ee000 0x0 0x1000>;
+		reg = <0x0 0xf82ee000 0x0 0x1000>;
 	};
 
-	trust_ui_vm_qrtr: trust_ui_vm_qrtr@0xf80ef000 {
+	trust_ui_vm_qrtr: trust_ui_vm_qrtr@0xf82ef000 {
 		no-map;
-		reg = <0x0 0xf80ef000 0x0 0x9000>;
+		reg = <0x0 0xf82ef000 0x0 0x9000>;
 	};
 
-	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@0xf80f8000 {
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@0xf82f8000 {
 		no-map;
-		reg = <0x0 0xf80f8000 0x0 0x4000>;
+		reg = <0x0 0xf82f8000 0x0 0x4000>;
 		gunyah-label = <0x11>;					//for persist.img
 	};
 
-	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@0xf80fc000 {
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@0xf82fc000 {
 		no-map;
-		reg = <0x0 0xf80fc000 0x0 0x4000>;
+		reg = <0x0 0xf82fc000 0x0 0x4000>;
 		gunyah-label = <0x10>;					//for system.img
 	};
 
-	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@0xf8100000 {
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@0xf8300000 {
 		no-map;
-		reg = <0x0 0xf8100000 0x0 0x100000>;
+		reg = <0x0 0xf8300000 0x0 0x100000>;
 		gunyah-label = <0x12>;
 	};
 
@@ -627,6 +637,14 @@
 		reusable;
 		alignment = <0x0 0x400000>;
 		size = <0x0 0x1400000>;
+	};
+
+	cdsp_secure_heap: secure_cdsp_region { /* Secure DSP */
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x4800000>;
 	};
 
 	non_secure_display_memory: non_secure_display_region {
@@ -1042,9 +1060,9 @@
 
 	};
 
-	rimps_log: qcom,rimps_log@17d09c00 {
+	rimps_log: qcom,rimps_log@d8140000 {
 		compatible = "qcom,rimps-log";
-		reg = <0x17d09c00 0x200>, <0x17d09e00 0x200>;
+		reg = <0xd8140000 0x10000>, <0xd8150000 0x10000>;
 		mboxes = <&rimps 1>;
 	};
 
@@ -3164,8 +3182,16 @@
 					&tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@0xf80f8000 {
-		reg = <0xf80f8000 0x108000>;
+	tlmm-vm-test {
+		compatible = "qcom,tlmm-vm-test";
+		qcom,master;
+		tlmm-vm-gpio-list = <&tlmm 86 0 &tlmm 87 0 &tlmm 133 0 &tlmm 137 0 &tlmm 44 0 &tlmm 45 0 &tlmm 46 0
+				&tlmm 47 0 &tlmm 24 0 &tlmm 25 0 &tlmm 91 0 &tlmm 56 0
+				&tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
+	};
+
+	trust_ui_vm: qcom,trust_ui_vm@0xf82f8000 {
+		reg = <0xf82f8000 0x108000>;
 		vm_name = "trustedvm";
 		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
@@ -3244,6 +3270,8 @@
 	qcom_pmu: qcom,pmu {
 		compatible = "qcom,pmu";
 		qcom,long-counter;
+		reg = <0x17d09880 0x380>;
+		reg-names = "pmu-base";
 		qcom,pmu-events-tbl =
 			< 0x0008 0xFF 0x02 0x02 >,
 			< 0x0011 0xFF 0x01 0x00 >,

@@ -90,6 +90,10 @@ cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
 	cinder-du-x100.dtb
 dtb-y += $(cinder-dtb-y)
 
+
+kaka-dtb-$(CONFIG_ARCH_KAKA) += kaka-rumi.dtb
+dtb-y += $(kaka-dtb-y)
+
 SA8155_BASE_DTB += sa8155.dtb sa8155-v2.dtb
 SA8155P_BASE_DTB += sa8155p.dtb sa8155p-v2.dtb
 SA8195P_BASE_DTB += sa8195p.dtb
