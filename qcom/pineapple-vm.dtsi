@@ -1,0 +1,271 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,gcc-pineapple.h>
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+	qcom,msm-id = <557 0x10000>;
+	interrupt-parent = <&vgic>;
+
+	chosen {
+		bootargs = "nokaslr log_buf_len=256K root=/dev/ram rw init=/init console=hvc0 loglevel=8";
+	};
+
+	cpus {
+		#address-cells = <0x2>;
+		#size-cells = <0x0>;
+
+		CPU0: cpu@0 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x0>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN
+					   &CLUSTER_PWR_DWN>;
+		};
+
+		CPU1: cpu@100 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x100>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN
+					   &CLUSTER_PWR_DWN>;
+
+		};
+	};
+
+	idle-states {
+		CPU_PWR_DWN: c4 {  /* Using Gold C4 latencies */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <550>;
+			exit-latency-us = <1050>;
+			min-residency-us = <7951>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+			status="nok";
+		};
+
+		CLUSTER_PWR_DWN: d4 { /* C4+D4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "l3-pc";
+			entry-latency-us = <750>;
+			exit-latency-us = <2350>;
+			min-residency-us = <9144>;
+			arm,psci-suspend-param = <0x40000044>;
+			local-timer-stop;
+			status="nok";
+		};
+	};
+
+	qcom,vm-config {
+		compatible = "qcom,vm-1.0";
+		vm-type = "aarch64-guest";
+		boot-config = "fdt,unified";
+		os-type = "linux";
+		kernel-entry-segment = "kernel";
+		kernel-entry-offset = <0x0 0x0>;
+		vendor = "QTI";
+		image-name = "qcom,trustedvm";
+		qcom,pasid = <0x0 0x1c>;
+
+		/* For LEVM pored usecases is SE4 and SE8, for SE4 we used gpii5
+		 * and irq no is 316, for SE8 we used gpii6 and irq no is 626.
+		 */
+		gic-irq-ranges = <316 316
+				  626 626>; /* PVM->SVM IRQ transfer */
+
+		vm-attrs = "crash-fatal";
+
+		memory {
+			#address-cells = <0x2>;
+			#size-cells = <0x0>;
+			/*
+			 * IPA address linux image is loaded at. Must be within
+			 * first 1GB due to memory hotplug requirement.
+			 */
+			base-address = <0x0 0x28800000 >;
+			size-min = <0x0 0x4c00000>;    /* 76 MB */
+		};
+
+		segments {
+			ramdisk = <2>; /* 8MB */
+		};
+
+		vcpus {
+			config = "/cpus";
+			affinity = "static";
+			affinity-map = <0x5 0x6>;
+			sched-priority = <0>;       /* relative to PVM */
+			sched-timeslice = <2000>;   /* in ms */
+		};
+
+		interrupts {
+			config = &vgic;
+		};
+
+		vdevices {
+			generate = "/hypervisor";
+			rm-rpc {
+				vdevice-type = "rm-rpc";
+				generate = "/hypervisor/qcom,resource-mgr";
+				console-dev;
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				qcom,label = <0x1>;
+			};
+
+			virtio-mmio@0 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x0>;
+				memory {
+					qcom,label = <0x11>;			//for persist.img
+					#address-cells = <0x2>;
+					base = <0x0 0xDA6F8000>;
+				};
+			};
+
+			virtio-mmio@1 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x4000>;
+				memory {
+					qcom,label = <0x10>;			//for system.img
+					#address-cells = <0x2>;
+					base = <0x0 0xDA6FC000>;
+				};
+			};
+
+			swiotlb-shm {
+				vdevice-type = "shm";
+				generate = "/swiotlb";
+				push-compatible = "swiotlb";
+				peer-default;
+				dma_base = <0x0 0x8000>;
+				memory {
+					qcom,label = <0x12>;
+					#address-cells = <0x2>;
+					base = <0x0 0xDA700000>;
+				};
+			};
+
+			mem-buf-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/membuf-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label = <0x0000001>;
+			};
+
+			display-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/display-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label = <0x0000002>;
+			};
+
+			eva-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/eva-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label =<0x7>;
+			};
+
+			gpiomem0 {
+				vdevice-type = "iomem";
+				patch = "/soc/tlmm-vm-mem-access";
+				push-compatible = "qcom,tlmm-vm-mem-access";
+				peer-default;
+				memory {
+					qcom,label = <0x8>;
+					qcom,mem-info-tag = <0x3>;
+					allocate-base;
+				};
+			};
+		};
+	};
+
+	firmware: firmware {
+		scm {
+			compatible = "qcom,scm";
+		};
+	};
+
+	soc: soc { };
+};
+
+&soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	ranges = <0 0 0 0xffffffff>;
+	compatible = "simple-bus";
+
+	vm_tlmm_irq: vm-tlmm-irq@0 {
+		compatible = "qcom,tlmm-vm-irq";
+		reg = <0x0 0x0>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		status="nok";
+	};
+
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,pineapple-vm-pinctrl";
+		reg = <0x0F000000 0x1000000>;
+		interrupts-extended = <&vm_tlmm_irq 1 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		/* Valid pins */
+		gpios = /bits/ 16 <86 87 133 137 44 45 46 47 24 25 91 56 57 58 59 13 48>;
+		status="nok";
+	};
+
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		tlmm-vm-gpio-list = <&tlmm 86 0 &tlmm 87 0 &tlmm 133 0 &tlmm 137 0 &tlmm 44 0 &tlmm 45 0
+					&tlmm 46 0 &tlmm 47 0 &tlmm 24 0 &tlmm 25 0 &tlmm 91 0
+					 &tlmm 56 0 &tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
+		status="nok";
+	};
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	vgic: interrupt-controller@17100000 {
+		compatible = "arm,gic-v3";
+		interrupt-controller;
+		#interrupt-cells = <0x3>;
+		#redistributor-regions = <1>;
+		redistributor-stride = <0x0 0x40000>;
+		reg = <0x17100000 0x10000>,     /* GICD */
+		      <0x17180000 0x100000>;    /* GICR * 8 */
+	};
+
+	arch_timer: timer {
+		compatible = "arm,armv8-timer";
+		always-on;
+		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 12 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
+		clock-frequency = <19200000>;
+	};
+};
