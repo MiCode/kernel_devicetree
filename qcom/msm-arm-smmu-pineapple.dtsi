@@ -2,10 +2,11 @@
 
 &soc {
 
-	ubwc_smmu: ubwc-smmu@179a0000 {
+	ubwcp_smmu: ubwcp-smmu@179a0000 {
 		compatible = "qcom,qsmmu-v500";
 		reg = <0x179a0000 0x10000>;
 		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
 		#global-interrupts = <1>;
 		#size-cells = <1>;
 		#address-cells = <1>;
@@ -15,6 +16,10 @@
 		qcom,regulator-names = "vdd";
 		vdd-supply = <&apss_ubwcp_pwr_ctrl>;
 
+		qcom,actlr =
+			/* All CBs of UBWC-P: +15 deep PF */
+			<0x000 0x3ff 0x32B>;
+
 		qcom,ignore-numpagendxb;
 
 		interrupts =	<GIC_SPI 742 IRQ_TYPE_LEVEL_HIGH>,
@@ -22,6 +27,14 @@
 				<GIC_SPI 747 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 748 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 749 IRQ_TYPE_LEVEL_HIGH>;
+
+		ubwcp_qtb: ubwcp_qtb@179e8000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x179e8000 0x1000>;
+			qcom,stream-id-range = <0x0 0x2>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <1>;
+		};
 	};
 
 	apps_smmu: apps-smmu@15000000 {
