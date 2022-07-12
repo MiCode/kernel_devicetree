@@ -144,6 +144,17 @@ sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
 				sa410m-rumi.dtb
 dtb-y += $(sa410m_auto-dtb-y)
 
+SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
+
+SA8155_LA_GVM_BOARDS += \
+		   sa8155-vm-la-overlay.dtbo
+
+autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB))
+autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += $(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB)
+
+dtb-y += $(autogvm-dtb-y)
+
 endif
 
 ifeq ($(CONFIG_ARCH_KALAMA), y)
