@@ -146,16 +146,36 @@
 		memory-region = <&system_cma>;
 	};
 
-	apps_iommu_test_device {
-		compatible = "iommu-debug-test";
-		qcom,iommu-dma = "disabled";
-		iommus = <&apps_smmu 0x1e0 0>;
-	};
+	iommu_test_device {
+		compatible = "qcom,iommu-debug-test";
 
-	apps_iommu_coherent_test_device {
-		compatible = "iommu-debug-test";
-		qcom,iommu-dma = "disabled";
-		iommus = <&apps_smmu 0x1e1 0>;
-		dma-coherent;
+		usecase0_apps {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1e1 0x0>;
+		};
+
+		usecase1_apps_fastmap {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1e1 0x0>;
+			qcom,iommu-dma = "fastmap";
+		};
+
+		usecase2_apps_atomic {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1e1 0x0>;
+			qcom,iommu-dma = "atomic";
+		};
+
+		usecase3_apps_dma {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1e1 0x0>;
+			dma-coherent;
+		};
+
+		usecase4_apps_secure {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1e1 0x0>;
+			qcom,iommu-vmid = <0xa>; /* VMID_CP_PIXEL */
+		};
 	};
 };
