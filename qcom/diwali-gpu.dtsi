@@ -3,7 +3,7 @@
 
 &soc {
 	msm_gpu: qcom,kgsl-3d0@3d00000 {
-		compatible = "qcom,kgsl-3d0";
+		compatible = "qcom,kgsl-3d0", "qcom,adreno-gpu-a662";
 		status = "ok";
 
 		reg = <0x3d00000 0x40000>, <0x3d61000 0x800>,
@@ -34,6 +34,7 @@
 				"apb_pclk";
 
 		qcom,chipid = <0x06060201>;
+		qcom,gpu-model = "Adreno662v2";
 
 		qcom,no-nap;
 
@@ -74,11 +75,45 @@
 			<0>,   /* Off */
 			<100>; /* On */
 
-		nvmem-cells = <&gpu_speed_bin>, <&gpu_gaming_bin>;
-		nvmem-cell-names = "speed_bin", "gaming_bin";
+		nvmem-cells = <&gpu_speed_bin>, <&gpu_gaming_bin>, <&gpu_model_bin>;
+		nvmem-cell-names = "speed_bin", "gaming_bin", "gpu_model";
 
 		zap-shader {
 			memory-region = <&gpu_microcode_mem>;
+		};
+
+		qcom,gpu-models {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible="qcom,gpu-models";
+
+			qcom,gpu-model@0 {
+				compatible="qcom,adreno-gpu-a662";
+				qcom,gpu-model-id = <95>;
+				qcom,gpu-model = "Adreno644v1";
+				qcom,vk-device-id = <0x06060201>;
+			};
+
+			qcom,gpu-model@1 {
+				compatible="qcom,adreno-gpu-a662";
+				qcom,gpu-model-id = <115>;
+				qcom,gpu-model = "Adreno645v1";
+				qcom,vk-device-id = <0x06060202>;
+			};
+
+			qcom,gpu-model@2 {
+				compatible="qcom,adreno-gpu-a662";
+				qcom,gpu-model-id = <159>;
+				qcom,gpu-model = "Adreno649v1";
+				qcom,vk-device-id = <0x06060203>;
+			};
+
+			qcom,gpu-model@3 {
+				compatible="qcom,adreno-gpu-a662";
+				qcom,gpu-model-id = <0>;
+				qcom,gpu-model = "Adreno649v1";
+				qcom,vk-device-id = <0x06060203>;
+			};
 		};
 
 		qcom,gpu-mempools {
