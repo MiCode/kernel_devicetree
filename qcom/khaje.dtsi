@@ -1936,6 +1936,8 @@
 		qcom,fde-key-size;
 		qcom,appsbl-qseecom-support;
 		qcom,commonlib64-loaded-by-uefi;
+		interconnect-names = "data_path";
+		interconnects = <&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI_CH0>;
 		clock-names =
 			"core_clk_src", "core_clk",
 			"iface_clk", "bus_clk";
@@ -1960,8 +1962,10 @@
 		reg = <0x1b53000 0x1000>;
 		qcom,msm-rng-iface-clk;
 		qcom,no-qrng-config;
-		clocks = <&gcc GCC_PRNG_AHB_CLK>;
-		clock-names = "iface_clk";
+		interconnect-names = "data_path";
+		interconnects = <&bimc MASTER_AMPSS_M0 &config_noc SLAVE_HWKM_CORE>;
+		clock-names = "km_clk_src";
+		clocks = <&rpmcc RPM_SMD_HWKM_CLK>;
 	};
 
 	qcom_tzlog: tz-log@c125720 {
@@ -1983,6 +1987,8 @@
 		qcom,ce-device = <0>;
 		qcom,ce-hw-shared;
 		qcom,bam-ee = <0>;
+		interconnect-names = "data_path";
+		interconnects = <&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI_CH0>;
 		clock-names =
 			"core_clk_src", "core_clk",
 			"iface_clk", "bus_clk";
@@ -2030,6 +2036,8 @@
 		qcom,bam-ee = <0>;
 		qcom,ce-hw-shared;
 		qcom,clk-mgmt-sus-res;
+		interconnect-names = "data_path";
+		interconnects = <&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI_CH0>;
 		clock-names =
 			"core_clk_src", "core_clk",
 			"iface_clk", "bus_clk";
@@ -2549,6 +2557,42 @@
 
 		qcom,ice-clk-rates = <300000000 100000000>;
 
+		interconnects = <&system_noc MASTER_SDCC_1 &bimc SLAVE_EBI_CH0>,
+			<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_SDCC_1>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		qcom,msm-bus,name = "sdhc1";
+		qcom,msm-bus,num-cases = <9>;
+		qcom,msm-bus,num-paths = <2>;
+		qcom,msm-bus,vectors-KBps =
+			/* No vote */
+			<0 0>, <0 0>,
+			/* 400 KB/s*/
+			<1046 1600>,
+			<1600 1600>,
+			/* 20 MB/s */
+			<20480 80000>,
+			<80000 80000>,
+			/* 25 MB/s */
+			<25600 250000>,
+			<50000 133320>,
+			/* 50 MB/s */
+			<51200 250000>,
+			<65000 133320>,
+			/* 100 MB/s */
+			<102400 250000>,
+			<65000 133320>,
+			/* 200 MB/s */
+			<204800 800000>,
+			<200000 300000>,
+			/* 400 MB/s */
+			<204800 800000>,
+			<200000 300000>,
+			/* Max. bandwidth */
+			<1338562 4096000>,
+			<1338562 4096000>;
+		qcom,bus-bw-vectors-bps = <0 400000 20000000 25000000 50000000
+			100750000 200000000 400000000 4294967295>;
+
 		/* Add support for gcc hw reset */
 		resets = <&gcc GCC_SDCC1_BCR>;
 		reset-names = "core_reset";
@@ -2586,6 +2630,42 @@
 		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
 			<&gcc GCC_SDCC2_APPS_CLK>;
 		clock-names = "iface", "core";
+
+		interconnects = <&system_noc MASTER_SDCC_2 &bimc SLAVE_EBI_CH0>,
+			<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+
+		qcom,msm-bus,name = "sdhc2";
+		qcom,msm-bus,num-cases = <8>;
+		qcom,msm-bus,num-paths = <2>;
+		qcom,msm-bus,vectors-KBps =
+			/* No vote */
+			<0 0>, <0 0>,
+			/* 400 KB/s*/
+			<1046 3200>,
+			<1600 1600>,
+			/* 20 MB/s */
+			<52286 250000>,
+			<80000 133320>,
+			/* 25 MB/s */
+			<65360 250000>,
+			<100000 133320>,
+			/* 50 MB/s */
+			<130718 250000>,
+			<133320 133320>,
+			/* 100 MB/s */
+			<261438 250000>,
+			<150000 133320>,
+			/* 200 MB/s */
+			<261438 800000>,
+			<300000 300000>,
+			/* Max. bandwidth */
+			<1338562 4096000>,
+			<1338562 4096000>;
+		qcom,bus-bw-vectors-bps = <0 400000 20000000 25000000 50000000
+			100750000 200000000 4294967295>;
+
+		qcom,devfreq,freq-table = <50000000 202000000>;
 
 		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
 		qcom,dll-hsr-list = <0x0007642c 0x0 0x10 0x2C010800 0x80040868>;
@@ -2734,7 +2814,6 @@
 			vote = <26>;
 			perf;
 		};
-
 		qos1 {
 			mask = <0xf0>;
 			vote = <26>;
@@ -3417,6 +3496,7 @@
 			ddr_dcvs_sp: sp {
 				compatible = "qcom,dcvs-path";
 				qcom,dcvs-path-type = <0>;
+				interconnects = <&bimc MASTER_AMPSS_M0 &bimc SLAVE_EBI_CH0>;
 			};
 		};
 	};
@@ -3539,6 +3619,27 @@
 		qcom,max_num_smmu_cb = <3>;
 		clocks = <&rpmcc RPM_SMD_IPA_CLK>;
 		clock-names = "core_clk";
+		qcom,interconnect,num-cases = <5>;
+		qcom,interconnect,num-paths = <3>;
+		interconnects = <&system_noc MASTER_IPA &bimc SLAVE_EBI_CH0>,
+			<&system_noc MASTER_IPA &system_noc SLAVE_OCIMEM>,
+			<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_IPA_CFG>;
+		interconnect-names = "ipa_to_ebi1", "ipa_to_imem", "appss_to_ipa";
+		/* No vote */
+		qcom,no-vote =
+		<0 0 0 0 0 0>;
+		/* SVS2 */
+		qcom,svs2 =
+		<80000 465000 80000 68570 80000 30>;
+		/* SVS */
+		qcom,svs =
+		<80000 2000000 80000 267461 80000 109890>;
+		/* NOMINAL */
+		qcom,nominal =
+		<206000 4000000 206000 712961 206000 491520>;
+		/* TURBO */
+		qcom,turbo =
+		<206000 5598900 206000 1436481 206000 491520>;
 
 		qcom,bus-vector-names =
 				"MIN", "SVS2", "SVS", "NOMINAL", "TURBO";
