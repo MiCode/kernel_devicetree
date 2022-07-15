@@ -201,6 +201,11 @@ dtb-y += $(waipio_tuivm-dtb-y)
 endif
 endif
 
+sdxbaagha-dtb-$(CONFIG_ARCH_SDXBAAGHA) += sdxbaagha-rumi.dtb \
+	sdxbaagha-mtp.dtb \
+	sdxbaagha-cdp.dtb
+dtb-y += $(sdxbaagha-dtb-y)
+
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
 clean-files     := *.dtb *.dtbo
