@@ -169,6 +169,11 @@ autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += $(SA8155_LA_GVM_BOARDS) $(SA8155_
 
 dtb-y += $(autogvm-dtb-y)
 
+scuba_auto-dtb-$(CONFIG_ARCH_SCUBA_AUTO) += \
+				scuba_auto-idp.dtb \
+				scuba_auto-qrd.dtb
+dtb-y += $(scuba_auto-dtb-y)
+
 endif
 
 ifeq ($(CONFIG_ARCH_KALAMA), y)
