@@ -2118,13 +2118,13 @@
 		opp-100000000 {
 			opp-hz = /bits/ 64 <100000000>;
 			opp-peak-kBps = <160000 100000>;
-			opp-avg-kBps = <80000 50000>;
+			opp-avg-kBps = <50000 0>;
 		};
 
 		opp-202000000 {
 			opp-hz = /bits/ 64 <202000000>;
 			opp-peak-kBps = <200000 120000>;
-			opp-avg-kBps = <80000 50000>;
+			opp-avg-kBps = <104000 0>;
 		};
 	};
 
@@ -2143,14 +2143,20 @@
 		no-sdio;
 		no-mmc;
 		qcom,restore-after-cx-collapse;
+		qcom,uses_level_shifter;
+		qcom,dll_lock_bist_fail_wa;
 
 		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
 			<&gcc GCC_SDCC2_APPS_CLK>;
 		clock-names = "iface", "core";
 
-		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
-		qcom,dll-hsr-list = <0x0007642C 0xA800 0x10
-					0x2C010800 0x80040868>;
+		/*
+		 * DLL HSR settings. Refer go/hsr - <Target> DLL settings.
+		 * Note that the DLL_CONFIG_2 value is not passed from the
+		 * device tree, but it is calculated in the driver.
+		 */
+		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
+					0x090106C0 0x80040868>;
 
 		iommus = <&apps_smmu 0x540 0x0>;
 		dma-coherent;
