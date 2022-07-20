@@ -169,10 +169,6 @@ gen4auto-overlays-dtb-$(CONFIG_ARCH_LEMANS) +=  \
 
 dtb-y += $(gen4auto-dtb-y)
 
-sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
-                 sdxpinn-mtp.dtb \
-                 sdxpinn-cdp.dtb
-
 sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
