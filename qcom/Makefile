@@ -56,7 +56,8 @@ KALAMA_BOARDS += \
 		 kalama-atp-overlay.dtbo \
 		 kalama-rcm-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo \
-		 kalamap-hdk-overlay.dtbo
+		 kalamap-hdk-overlay.dtbo \
+		 kalamap-hhg-overlay.dtbo
 
 NOAPQ_KALAMA_BOARDS += \
 		 kalama-rumi-overlay.dtbo
@@ -183,11 +184,13 @@ kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
                  kalama-vm-cdp.dtb \
                  kalama-vm-qrd.dtb \
                  kalamap-vm-hdk.dtb \
+                 kalamap-vm-hhg.dtb \
                  kalama-oemvm-cdp.dtb \
                  kalama-oemvm-mtp.dtb \
                  kalama-oemvm-qrd.dtb \
                  kalama-oemvm-rumi.dtb \
-                 kalamap-oemvm-hdk.dtb
+                 kalamap-oemvm-hdk.dtb \
+                 kalamap-oemvm-hhg.dtb
 dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
