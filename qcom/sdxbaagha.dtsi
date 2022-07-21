@@ -15,16 +15,87 @@
 
 	memory { device_type = "memory"; reg = <0 0>; };
 
-	reserved-memory {
+	reserved_memory: reserved-memory {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
 
-		peripheral2_mem: peripheral2_region@8fd00000 {
+		mpss_mem: mpss_region@82400000 {
 			no-map;
-			reg = <0x8fd00000 0x140000>;
-			label = "peripheral2_mem";
+			reg = <0x82400000 0x4600000>;
 		};
+
+		quickboot_mem: quickboot_region@86a00000 {
+			no-map;
+			reg = <0x86a00000 0x100000>;
+		};
+
+		aop_image_mem: aop_image_region@86b00000 {
+			no-map;
+			reg = <0x86b00000 0x20000>;
+		};
+
+		aop_cmd_db_mem: aop_cmd_db_region@86b20000 {
+			compatible = "qcom,cmd-db";
+			no-map;
+			reg = <0x86b20000 0x20000>;
+		};
+
+		aop_config_mem: aop_config_region@86b40000 {
+			no-map;
+			reg = <0x86b40000 0x40000>;
+		};
+
+		smem_mem: smem_region@86b80000 {
+			no-map;
+			reg = <0x86b80000 0xc0000>;
+		};
+
+		tme_crashdump_mem: tme_crashdump_region@86c40000 {
+			no-map;
+			reg = <0x86c40000 0x40000>;
+		};
+
+		tme_log_mem: tme_log_region@86c80000 {
+			no-map;
+			reg = <0x86c80000 0x4000>;
+		};
+
+		access_control_db_mem: access_control_db_region@86c84000 {
+			no-map;
+			reg = <0x86c84000 0x20000>;
+		};
+
+		secdata_mem: secdata_region@86ca4000 {
+			no-map;
+			reg = <0x86ca4000 0x1000>;
+		};
+
+		xbl_ramdump_mem: xbl_ramdump_region@86d00000 {
+			no-map;
+			reg = <0x86d00000 0x100000>;
+		};
+
+		qtee_tz_mem: qtee_tz_region@86e00000 {
+			no-map;
+			reg = <0x86e00000 0x200000>;
+		};
+
+		trusted_apps_mem: trusted_apps_region@87000000 {
+			no-map;
+			reg = <0x87000000 0x400000>;
+		};
+
+		/* global autoconfigured region for contiguous allocations */
+		system_cma: linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x00000000 0xffffffff>;
+			reusable;
+			alignment = <0x400000>;
+			size = <0xc00000>;
+			linux,cma-default;
+		};
+
 	};
 
 	cpus {
@@ -134,3 +205,4 @@
 };
 
 #include "sdxbaagha-pinctrl.dtsi"
+#include "sdxbaagha-dma-heaps.dtsi"
