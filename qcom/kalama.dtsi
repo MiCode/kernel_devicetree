@@ -1713,17 +1713,30 @@
 		reg = <0x240ba000 0x54>;
 	};
 
-	debugcc: qcom,cc-debug {
+	debugcc: clock-controller@0 {
 		compatible = "qcom,kalama-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,camcc = <&camcc>;
+		qcom,dispcc = <&dispcc>;
 		qcom,gcc = <&gcc>;
 		qcom,gpucc = <&gpucc>;
+		qcom,tcsrcc = <&tcsrcc>;
 		qcom,videocc = <&videocc>;
-		qcom,dispcc = <&dispcc>;
-		qcom,camcc = <&camcc>;
-		qcom,apsscc = <&apsscc>;
 		qcom,mccc = <&mccc>;
-		clock-names = "xo_clk_src";
-		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&camcc 0>,
+			 <&dispcc 0>,
+			 <&gcc 0>,
+			 <&gpucc 0>,
+			 <&tcsrcc 0>,
+			 <&videocc 0>;
+		clock-names = "xo_clk_src",
+			      "camcc",
+			      "dispcc",
+			      "gcc",
+			      "gpucc",
+			      "tcsrcc",
+			      "videocc";
 		#clock-cells = <1>;
 	};
 
