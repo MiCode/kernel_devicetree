@@ -696,6 +696,16 @@
 		};
 	};
 
+	sdhc1_opp_table: sdhc1-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-384000000 {
+			opp-hz = /bits/ 64 <384000000>;
+			opp-peak-kBps = <6528000 1652800>;
+			opp-avg-kBps = <400000 0>;
+		};
+	};
+
 	sdhc_1: sdhci@8804000 {
 		status = "disabled";
 
@@ -740,6 +750,16 @@
 		iommus = <&apps_smmu 0x0080 0x0>;
 		dma-coherent;
 		qcom,iommu-dma = "fastmap";
+
+		/*
+		 * Slave name seems incorrect for CNOC path and this name
+		 * is taken as per ICB team recommendation.
+		 * SDCC_2 here corresponds to eMMC only and not SD card.
+		 */
+		interconnects = <&system_noc MASTER_SDCC_1 &mc_virt SLAVE_EBI1>,
+			      <&gem_noc MASTER_APPSS_PROC &system_noc SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc1_opp_table>;
 
 		qos0 {
 			mask = <0x0f>;
