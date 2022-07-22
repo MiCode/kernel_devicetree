@@ -55,7 +55,8 @@ KALAMA_BOARDS += \
 		 kalama-cdp-nfc-overlay.dtbo \
 		 kalama-atp-overlay.dtbo \
 		 kalama-rcm-overlay.dtbo \
-		 kalama-qrd-overlay.dtbo
+		 kalama-qrd-overlay.dtbo \
+		 kalamap-hdk-overlay.dtbo
 
 NOAPQ_KALAMA_BOARDS += \
 		 kalama-rumi-overlay.dtbo
@@ -82,6 +83,18 @@ khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
         $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
 khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(khaje-dtb-y)
+
+MONACO_BASE_DTB += monaco.dtb monacop.dtb
+
+MONACO_BOARDS += \
+        monaco-idp-v1-overlay.dtbo \
+        monaco-idp-v2-overlay.dtbo \
+        monaco-idp-v3-overlay.dtbo
+
+monaco-dtb-$(CONFIG_ARCH_MONACO) += \
+        $(call add-overlays, $(MONACO_BOARDS) ,$(MONACO_BASE_DTB))
+monaco-overlays-dtb-$(CONFIG_ARCH_MONACO) += $(MONACO_BOARDS) $(MONACO_BASE_DTB)
+dtb-y += $(monaco-dtb-y)
 
 cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
 	cinder-du-rumi.dtb \
@@ -136,12 +149,25 @@ sdmsteppeauto-overlays-dtb-$(CONFIG_ARCH_SA6155) += $(SA6155_BOARDS) $(SA6155P_B
 
 dtb-y += $(sdmsteppeauto-dtb-y)
 
-sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb
+sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
+                 sdxpinn-mtp.dtb \
+                 sdxpinn-cdp.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
 sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
 				sa410m-rumi.dtb
 dtb-y += $(sa410m_auto-dtb-y)
+
+SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
+
+SA8155_LA_GVM_BOARDS += \
+		   sa8155-vm-la-overlay.dtbo
+
+autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB))
+autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += $(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB)
+
+dtb-y += $(autogvm-dtb-y)
 
 endif
 
@@ -151,10 +177,12 @@ kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
                  kalama-vm-mtp.dtb \
                  kalama-vm-cdp.dtb \
                  kalama-vm-qrd.dtb \
+                 kalamap-vm-hdk.dtb \
                  kalama-oemvm-cdp.dtb \
                  kalama-oemvm-mtp.dtb \
                  kalama-oemvm-qrd.dtb \
-                 kalama-oemvm-rumi.dtb
+                 kalama-oemvm-rumi.dtb \
+                 kalamap-oemvm-hdk.dtb
 dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
@@ -172,6 +200,11 @@ waipio_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += waipio-vm-mtp.dtb \
 dtb-y += $(waipio_tuivm-dtb-y)
 endif
 endif
+
+sdxbaagha-dtb-$(CONFIG_ARCH_SDXBAAGHA) += sdxbaagha-rumi.dtb \
+	sdxbaagha-mtp.dtb \
+	sdxbaagha-cdp.dtb
+dtb-y += $(sdxbaagha-dtb-y)
 
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)

@@ -577,16 +577,6 @@
 		gunyah-label = <0x14>;
 	};
 
-	hyp_ext_tags_mem: hyp_ext_tags_region@fce00000 {
-		no-map;
-		reg = <0x0 0xfce00000 0x0 0x2900000>;
-	};
-
-	hyp_ext_reserved_mem: hyp_ext_reserved_region@ff700000 {
-		no-map;
-		reg = <0x0 0xff700000 0x0 0x100000>;
-	};
-
 	llcc_lpi_mem: llcc_lpi_region@ff800000 {
 		no-map;
 		reg = <0x0 0xff800000 0x0 0x600000>;
@@ -677,6 +667,15 @@
 		size = <0x0 0x200000>;
 		pmsg-size = <0x200000>;
 		mem-type = <2>;
+	};
+
+	mem_buf_cma: mem_buf_cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x1 0x00000000 0xfffffffe 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		/* 16 Mb */
+		size = <0x0 0x1000000>;
 	};
 
 	/* global autoconfigured region for contiguous allocations */
@@ -1490,6 +1489,7 @@
 		compatible = "qcom,mem-buf";
 		qcom,mem-buf-capabilities = "supplier";
 		qcom,vmid = <3>;
+		memory-region = <&mem_buf_cma>;
 	};
 
 	qcom,mem-buf-msgq {
@@ -1546,7 +1546,6 @@
 		vdd_mm-supply = <&VDD_MM_LEVEL>;
 		vdd_mxa-supply = <&VDD_MXA_LEVEL>;
 		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
-		titan_top-supply = <&cam_cc_titan_top_gdsc>;
 		clocks = <&rpmhcc RPMH_CXO_CLK>,
 			 <&rpmhcc RPMH_CXO_CLK_A>,
 			 <&sleep_clk>,
@@ -1866,6 +1865,8 @@
 		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
 		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
 		proxy-supply = <&cam_cc_titan_top_gdsc>;
+		interconnects = <&mmss_noc MASTER_CAMNOC_HF &mmss_noc SLAVE_MNOC_HF_MEM_NOC>;
+		interconnect-names = "mmnoc";
 		qcom,gds-timeout = <1500>;
 		qcom,proxy-consumer-enable;
 		qcom,retain-regs;
@@ -2613,8 +2614,8 @@
 	};
 
 	soc-sleep-stats@c3f0000 {
-		compatible = "qcom,rpmh-sleep-stats-v2";
-		reg = <0xc3f0000 0x400>, <0xb261400 0x100>;
+		compatible = "qcom,rpmh-sleep-stats";
+		reg = <0xc3f0000 0x400>;
 		ss-name = "modem", "adsp", "adsp_island",
 			  "cdsp", "apss";
 		mboxes = <&qmp_aop 0>;
@@ -2628,8 +2629,8 @@
 	};
 
 	subsystem-sleep-stats@c3f0000 {
-		compatible = "qcom,subsystem-sleep-stats-v2";
-		reg = <0xc3f0000 0x400>, <0xb261400 0x100>;
+		compatible = "qcom,subsystem-sleep-stats";
+		reg = <0xc3f0000 0x400>;
 		ddr-freq-update;
 	};
 

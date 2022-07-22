@@ -688,6 +688,27 @@
 			status = "disabled";
 		};
 
+		/* Time Sync UART */
+		qupv3_se13_4uart: qcom,qup_uart@a94000 {
+			compatible = "qcom,msm-geni-serial-hs";
+			reg = <0xa94000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 358 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S5_CLK>;
+			interconnect-names = "qup-core", "qup-config", "qup-memory";
+			interconnects =
+			<&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
+			<&gem_noc MASTER_APPSS_PROC &system_noc SLAVE_QUP_1>,
+			<&system_noc MASTER_QUP_1 &mc_virt  SLAVE_EBI1>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se13_default_cts>, <&qupv3_se13_default_rts>,
+			<&qupv3_se13_default_tx>, <&qupv3_se13_default_rx>;
+			pinctrl-1 = <&qupv3_se13_cts>, <&qupv3_se13_rts>,
+			<&qupv3_se13_tx>, <&qupv3_se13_rx>;
+			status = "disabled";
+		};
+
 		qupv3_se14_i2c: i2c@a98000 {
 			compatible = "qcom,i2c-geni";
 			reg = <0xa98000 0x4000>;
@@ -725,8 +746,10 @@
 			<&gem_noc MASTER_APPSS_PROC &system_noc SLAVE_QUP_1>,
 			<&system_noc MASTER_QUP_1 &mc_virt  SLAVE_EBI1>;
 			pinctrl-names = "default", "sleep";
+			/* CS0 for SI5518 and CS1 for LMK01020 */
 			pinctrl-0 = <&qupv3_se14_spi_mosi_active>, <&qupv3_se14_spi_miso_active>,
-				<&qupv3_se14_spi_clk_active>, <&qupv3_se14_spi_cs_active>;
+				<&qupv3_se14_spi_clk_active>, <&qupv3_se14_spi_cs_0_active>,
+				<&qupv3_se14_spi_cs_1_active>;
 			pinctrl-1 = <&qupv3_se14_spi_sleep>;
 			dmas = <&gpi_dma1 0 6 1 64 0>,
 				<&gpi_dma1 1 6 1 64 0>;

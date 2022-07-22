@@ -26,6 +26,8 @@
 		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
 		hsuart0 = &qupv3_se0_4uart; /* CerebrusX debug HSUART Instance */
 		hsuart1 = &qupv3_se8_4uart; /* IPC HSUART Instance */
+		hsuart2 = &qupv3_se13_4uart; /* Time Sync UART */
+		i2c0 = &qupv3_se5_i2c;
 	};
 
 	firmware: firmware { };
@@ -234,7 +236,7 @@
 		reg = <0xb220000 0x30000>, <0x174000f0 0x64>;
 		reg-names = "pdc-interrupt-base", "apss-shared-spi-cfg";
 		qcom,pdc-ranges = <0 480 12>, <14 494 24>, <40 520 54>,
-				  <94 609 31>, <125 63 1>, <126 716 12>;
+				  <94 609 31>, <125 63 1>;
 		#interrupt-cells = <2>;
 		interrupt-parent = <&intc>;
 		interrupt-controller;
@@ -502,7 +504,7 @@
 		cx-supply = <&VDD_CX_LEVEL>;
 		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
 		mx-supply = <&VDD_MODEM_LEVEL>;
-		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
 		reg-names = "cx", "mx";
 
 		qcom,signal-aop;
@@ -741,6 +743,11 @@
 
 	qcom,secure-buffer {
 		compatible = "qcom,secure-buffer";
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,vmid = <3>;
 	};
 
 	clocks {
@@ -1066,8 +1073,9 @@
 
 	pcie_ep: qcom,pcie@48020000 {
 		compatible = "qcom,pcie-ep";
-			reg = <0x48020000 0x10000>,
+			reg = <0x48020000 0x100>,
 				<0x48000000 0xf20>,
+				<0x48001000 0x800>,
 				<0x48000f40 0xa8>,
 				<0x48010000 0x10000>,
 				<0x48002000 0x1400>,
@@ -1076,11 +1084,12 @@
 				<0x01c10000 0x10000>,
 				<0x01c04000 0x1000>,
 				<0x01fcb000 0x1000>,
-				<0xc2f1000 0x4>;
-			reg-names = "msi", "dm_core", "elbi", "iatu",
+				<0xc2f1000 0x4>,
+				<0x48030000 0x100>;
+			reg-names = "msi", "dm_core", "dm_core_vf", "elbi", "iatu",
 					"msix_table", "msix_pba", "parf",
 					"phy", "mmio", "tcsr_pcie_perst_en",
-					"aoss_cc_reset";
+					"aoss_cc_reset", "msi_vf";
 
 			#address-cells = <0>;
 			interrupt-parent = <&pcie_ep>;
@@ -1126,6 +1135,10 @@
 
 			reset-names = "pcie_core_reset",
 				"pcie_phy_reset";
+
+			interconnect-names = "icc_path";
+			interconnects = <&system_noc MASTER_PCIE &mc_virt SLAVE_EBI1>;
+
 			qcom,pcie-vendor-id = /bits/ 16 <0x17cb>;
 			qcom,pcie-device-id = /bits/ 16 <0x0600>;
 			qcom,pcie-link-speed = <4>;
@@ -1133,9 +1146,11 @@
 			qcom,pcie-active-config;
 			qcom,pcie-aggregated-irq;
 			qcom,pcie-mhi-a7-irq;
+			qcom,tcsr-not-supported;
 			qcom,phy-status-reg2 = <0x1214>;
 			qcom,mhi-soc-reset-offset = <0xb01b8>;
 			qcom,aux-clk = <0x11>;
+			qcom,sriov-mask = <0x1E0>;
 
 			qcom,phy-init = <0x9040 0x01 0x0
 				0x80c4 0x00 0x0
@@ -1245,13 +1260,20 @@
 		qcom,mhi-ep-msi = <0>;
 		qcom,mhi-version = <0x1000000>;
 		qcom,use-mhi-dma-software-channel;
-		interrupts = <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "mhi-device-inta";
+		interrupts = <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 611 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 612 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 613 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 614 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "mhi-device-inta", "mhi-virt-device-int-0",
+				"mhi-virt-device-int-1", "mhi-virt-device-int-2",
+				"mhi-virt-device-int-3";
 		qcom,mhi-ifc-id = <0x060017cb>;
 		qcom,mhi-chan-hw-base = <104>;
 		qcom,mhi-interrupt;
 		qcom,no-m0-timeout;
 		qcom,mhi-is-flashless;
+		qcom,mhi-has-smmu;
 
 		status = "ok";
 	};
@@ -1275,11 +1297,11 @@
 
 	spmi_bus: qcom,spmi@c42d000 {
 		compatible = "qcom,spmi-pmic-arb";
-		reg = <0xc42d000 0x26000>,
-		      <0xc400000 0x1100>,
-		      <0xc500000 0x2000000>,
-		      <0xc440000 0x100000>,
-		      <0xc4c0000 0xa0000>;
+		reg = <0xc42d000 0x4000>,
+		      <0xc400000 0x3000>,
+		      <0xc500000 0x400000>,
+		      <0xc440000 0x80000>,
+		      <0xc4c0000 0x10000>;
 		reg-names = "cnfg", "core", "chnls", "obsrvr", "intr";
 		interrupts-extended = <&pdc 1 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "periph_irq";
@@ -1290,6 +1312,7 @@
 		cell-index = <0>;
 		qcom,channel = <0>;
 		qcom,ee = <0>;
+		qcom,bus-id = <0>;
 	};
 
 	clk_virt: interconnect@0 {
@@ -1328,7 +1351,6 @@
 		#interconnect-cells = <1>;
 		clock-names = "xo", "alternate";
 		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
-		status = "disabled";
 	};
 };
 
@@ -1347,10 +1369,28 @@
 #include "msm-arm-smmu-cinder.dtsi"
 #include "cinder-qupv3.dtsi"
 #include "cinder-usb.dtsi"
+#include "cinder-dma-heaps.dtsi"
 
+&qupv3_se5_i2c {
+	status = "ok";
+};
 
 &qupv3_se7_2uart {
 	status = "ok";
+};
+
+&qupv3_se13_4uart {
+	status = "ok";
+};
+
+&qupv3_se14_spi {
+	status = "ok";
+	spidev@0 {
+		compatible = "qcom,si5518-clk";
+		spi-max-frequency = <1000000>;
+		reg = <0>;
+	};
+
 };
 
 #include "cinder-thermal.dtsi"

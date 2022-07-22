@@ -1,5 +1,5 @@
 &chosen {
-	bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=32768 loop.max_part=7";
+	bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 fw_devlink.strict=1";
 };
 
 &arch_timer {
@@ -14,14 +14,16 @@
 	pcie_ep: qcom,pcie@48020000 {
 		compatible = "qcom,pcie-ep";
 			reg = <0x48020000 0x10000>,
+				<0x48030000 0x40000>,
 				<0x48000000 0xf20>,
+				 <0x48001000 0x800>,
 				<0x48000f40 0xa8>,
 				<0x48010000 0x10000>,
 				<0x01c00000 0x4000>,
 				<0x01c10000 0x10000>,
 				<0x01c04000 0x1000>,
 				<0x01c09054 0x4>;
-			reg-names = "msi", "dm_core", "elbi", "iatu",
+			reg-names = "msi", "msi_vf","dm_core", "dm_core_vf","elbi", "iatu",
 				"parf", "phy", "mmio", "rumi";
 
 		qcom,pcie-link-speed = <1>;

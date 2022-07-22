@@ -5,6 +5,7 @@
 #include <dt-bindings/clock/qcom,gpucc-khaje.h>
 #include <dt-bindings/spmi/spmi.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
+#include <dt-bindings/interconnect/qcom,bengal.h>
 #include <dt-bindings/soc/qcom,dcc_v2.h>
 
 / {
@@ -25,8 +26,8 @@
 	};
 
 	aliases {
-		sdhc1 = &sdhc_1; /* SDC1 eMMC slot */
-		sdhc2 = &sdhc_2; /* SDC2 SD Card slot */
+		mmc0 = &sdhc_1; /* SDC1 eMMC slot */
+		mmc1 = &sdhc_2; /* SDC2 SD Card slot */
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
 		serial0 = &qupv3_se4_2uart;
 		hsuart0 = &qupv3_se3_4uart;
@@ -312,39 +313,39 @@
 			reg = <0x0 0x4ab00000 0x0 0x6900000>;
 		};
 
-		video_mem: video_region@51400000 {
+		pil_video_mem: pil_video_region@51400000 {
 			no-map;
-			reg = <0x0 0x51400000 0x0 0x700000>;
+			reg = <0x0 0x51400000 0x0 0x500000>;
 		};
 
 		wlan_msa_mem: wlan_msa_region@51900000 {
 			no-map;
-			reg = <0x0 0x51b00000 0x0 0x100000>;
+			reg = <0x0 0x51900000 0x0 0x100000>;
 		};
 
 		pil_cdsp_mem: cdsp_regions@51a00000 {
 			no-map;
-			reg = <0x0 0x51c00000 0x0 0x1e00000>;
+			reg = <0x0 0x51a00000 0x0 0x1e00000>;
 		};
 
 		pil_adsp_mem: pil_adsp_region@53800000 {
 			no-map;
-			reg = <0x0 0x53a00000 0x0 0x1e00000>;
+			reg = <0x0 0x53800000 0x0 0x1e00000>;
 		};
 
 		pil_ipa_fw_mem: ipa_fw_region@55600000 {
 			no-map;
-			reg = <0x0 0x55800000 0x0 0x10000>;
+			reg = <0x0 0x55600000 0x0 0x10000>;
 		};
 
 		pil_ipa_gsi_mem: ipa_gsi_region@55610000 {
 			no-map;
-			reg = <0x0 0x55810000 0x0 0x5000>;
+			reg = <0x0 0x55610000 0x0 0x5000>;
 		};
 
 		pil_gpu_mem: gpu_region@55615000 {
 			no-map;
-			reg = <0x0 0x55815000 0x0 0x2000>;
+			reg = <0x0 0x55615000 0x0 0x2000>;
 		};
 
 		user_contig_mem: user_contig_region {
@@ -426,7 +427,7 @@
 	};
 
 	chosen {
-		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off export_pmu_events";
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off export_pmu_events movable_node";
 	};
 
 	soc: soc { };
@@ -451,6 +452,67 @@
 		      <0xf300000 0x100000>;    /* GICR * 8 */
 		interrupts = <1 9 4>;
 	};
+
+	clk_virt: interconnect {
+		compatible = "qcom,bengal-clk_virt";
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_QUP_CLK>,
+		<&rpmcc RPM_SMD_QUP_A_CLK>;
+	};
+
+	mmnrt_virt: interconnect@0 {
+		compatible = "qcom,bengal-mmnrt_virt";
+		#interconnect-cells = <1>;
+		qcom,util-factor = <142>;
+		qcom,keepalive;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_MMNRT_CLK>,
+			 <&rpmcc RPM_SMD_MMNRT_A_CLK>;
+	 };
+
+	mmrt_virt: interconnect@1 {
+		compatible = "qcom,bengal-mmrt_virt";
+		#interconnect-cells = <1>;
+		qcom,util-factor = <139>;
+		qcom,keepalive;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_MMRT_CLK>,
+			 <&rpmcc RPM_SMD_MMRT_A_CLK>;
+	 };
+
+	system_noc: interconnect@1880000 {
+		compatible = "qcom,bengal-system_noc";
+		reg = <0x01880000 0x5f080>;
+		#interconnect-cells = <1>;
+		qcom,keepalive;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_SNOC_CLK>,
+			 <&rpmcc RPM_SMD_SNOC_A_CLK>,
+			 <&gcc GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
+			 <&gcc GCC_SYS_NOC_USB3_PRIM_AXI_CLK>;
+	};
+
+	config_noc: interconnect@1900000 {
+		compatible = "qcom,bengal-config_noc";
+		reg = <0x01900000 0x6200>;
+		#interconnect-cells = <1>;
+		qcom,keepalive;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_CNOC_CLK>,
+			 <&rpmcc RPM_SMD_CNOC_A_CLK>;
+	 };
+
+	bimc: interconnect@4480000 {
+		compatible = "qcom,bengal-bimc";
+		reg = <0x04480000 0x80000>;
+		#interconnect-cells = <1>;
+		qcom,util-factor = <153>;
+		qcom,keepalive;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_BIMC_CLK>,
+			 <&rpmcc RPM_SMD_BIMC_A_CLK>;
+	 };
 
 	jtag_mm0: jtagmm@9040000 {
 		compatible = "qcom,jtagv8-mm";
@@ -1901,7 +1963,7 @@
 		qcom,config-reg = <0x0f1d1434>;
 	};
 
-	lpass_pas:remoteproc-lpass@ab00000 {
+	adsp_pas:remoteproc-adsp@ab00000 {
 		compatible = "qcom,khaje-adsp-pas";
 		reg = <0xab00000 0x00100>;
 
@@ -2239,35 +2301,39 @@
 		compatible = "qcom,sdhci-msm-v5";
 		reg = <0x4744000 0x1000>, <0x4745000 0x1000>,
 		      <0x4748000 0x8000>;
-		reg-names = "hc_mem", "cqhci_mem", "cqhci_ice";
+		reg-names = "hc", "cqhci", "cqhci_ice";
 
 		interrupts-extended = <&intc GIC_SPI 348 IRQ_TYPE_LEVEL_HIGH>,
 				<&intc GIC_SPI 352 IRQ_TYPE_LEVEL_HIGH>,
 				<&tlmm 19 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "hc_irq", "pwr_irq", "tb_trig_irq";
 
-		qcom,bus-width = <8>;
-		qcom,large-address-bus;
+		bus-width = <8>;
+		non-removable;
+		supports-cqe;
 
-		qcom,clk-rates = <400000 20000000 25000000 50000000 100000000
-						192000000 384000000>;
-		qcom,bus-speed-mode = "HS400_1p8v", "HS200_1p8v", "DDR_1p8v";
+		no-sd;
+		no-sdio;
+		qcom,restore-after-cx-collapse;
 
-		qcom,devfreq,freq-table = <50000000 200000000>;
+		mmc-ddr-1_8v;
+		mmc-hs200-1_8v;
 
-		qcom,scaling-lower-bus-speed-mode = "DDR52";
+		mmc-hs400-1_8v;
+		mmc-hs400-enhanced-strobe;
 
 		/* PM QoS */
 		qcom,pm-qos-irq-type = "affine_irq";
 		qcom,pm-qos-irq-latency = <26 26>;
 		qcom,pm-qos-cpu-groups = <0x0f 0xf0>;
+
 		qcom,pm-qos-cmdq-latency-us = <26 26>, <26 26>;
 		qcom,pm-qos-legacy-latency-us = <26 26>, <26 26>;
 
 		clocks = <&gcc GCC_SDCC1_AHB_CLK>,
 			<&gcc GCC_SDCC1_APPS_CLK>,
 			<&gcc GCC_SDCC1_ICE_CORE_CLK>;
-		clock-names = "iface_clk", "core_clk", "ice_core_clk";
+		clock-names = "iface", "core", "ice_core";
 
 		qcom,ice-clk-rates = <300000000 100000000>;
 
@@ -2277,44 +2343,44 @@
 
 		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
 		qcom,dll-hsr-list = <0x000f642c 0x0 0x0 0x2C010800 0x80040868>;
-		qcom,nonremovable;
+		iommus = <&apps_smmu 0xC0 0x0>;
+
+		qcom,iommu-dma = "fastmap";
 		status = "disabled";
 	};
 
 	sdhc_2: sdhci@4784000 {
 		compatible = "qcom,sdhci-msm-v5";
 		reg = <0x4784000 0x1000>;
-		reg-names = "hc_mem";
+		reg-names = "hc";
 
 		interrupts = <GIC_SPI 350 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 353 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "hc_irq", "pwr_irq";
 
-		qcom,bus-width = <4>;
-		qcom,large-address-bus;
+		bus-width = <4>;
+		no-sdio;
 
-		qcom,clk-rates = <400000 20000000 25000000
-				50000000 100000000 202000000>;
-		qcom,bus-speed-mode = "SDR12", "SDR25", "SDR50", "DDR50",
-				      "SDR104";
-
-		qcom,devfreq,freq-table = <50000000 202000000>;
-
+		no-mmc;
+		qcom,restore-after-cx-collapse;
 
 		/* PM QoS */
 		qcom,pm-qos-irq-type = "affine_irq";
 		qcom,pm-qos-irq-latency = <26 26>;
+
 		qcom,pm-qos-cpu-groups = <0x0f 0xf0>;
 		qcom,pm-qos-legacy-latency-us = <26 26>, <26 26>;
 
-
 		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
 			<&gcc GCC_SDCC2_APPS_CLK>;
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core";
 
 		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
 		qcom,dll-hsr-list = <0x0007642c 0x0 0x10 0x2C010800 0x80040868>;
 		qcom,vbias-skip-wa;
+
+		iommus = <&apps_smmu 0xA0 0x0>;
+		qcom,iommu-dma = "fastmap";
 
 		status = "disabled";
 	};
@@ -2476,6 +2542,10 @@
 		#thermal-sensor-cells = <1>;
 	};
 
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
 	clocks {
 		xo_board: xo_board {
 			compatible = "fixed-clock";
@@ -2628,6 +2698,10 @@
 		reg = <0x0f521000 0x800>;
 		reg-names = "domain-top";
 		qcom,freq-hw-domain = <&cpufreq_hw 0>, <&cpufreq_hw 1>;
+	};
+
+	dload_mode {
+		compatible = "qcom,dload-mode";
 	};
 
 	tcsr_mutex_block: syscon@00340000 {
@@ -3024,6 +3098,7 @@
 	};
 
 	modem_pas: remoteproc-mss@6080000 {
+		compatible = "qcom,khaje-modem-pas";
 		reg = <0x6080000 0x100>;
 
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
@@ -3052,10 +3127,10 @@
 
 		/* Outputs to mss */
 		qcom,smem-states = <&modem_smp2p_out 0>;
-		qcom,smem-state-names = "qcom,force-stop";
+		qcom,smem-state-names = "qcom,stop";
 
 		glink-edge {
-			qcom,remote-pid = <5>;
+			qcom,remote-pid = <1>;
 			transport = "smem";
 			mboxes = <&apcs_glb 12>;
 			mbox-names = "mpss_smem";

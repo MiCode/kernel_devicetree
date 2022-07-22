@@ -5,7 +5,7 @@
 		reg = <ADC5_XO_THERM_100K_PU>;
 		label = "xo_therm";
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time = <1>;
 		qcom,pre-scaling = <1 1>;
 	};
 
@@ -13,24 +13,24 @@
 		reg = <ADC5_AMUX_THM1_100K_PU>;
 		label = "amux_therm1";
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time = <1>;
 		qcom,pre-scaling = <1 1>;
 	};
 };
 
 &pm8150_adc_tm {
-	io-channels = <&pm8150_vadc ADC5_XO_THERM_100K_PU>,
-		      <&pm8150_vadc ADC5_AMUX_THM1_100K_PU>;
 	xo_therm {
-		reg = <ADC5_XO_THERM_100K_PU>;
+		reg = <0>;
+		io-channels = <&pm8150_vadc ADC5_XO_THERM_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time = <1>;
 	};
 
 	amux_therm1 {
-		reg = <ADC5_AMUX_THM1_100K_PU>;
+		reg = <1>;
+		io-channels = <&pm8150_vadc ADC5_AMUX_THM1_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time = <1>;
 	};
 };
 
@@ -38,7 +38,7 @@
 	sys-therm-0 {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
-		thermal-sensors = <&pm8150_adc_tm ADC5_XO_THERM_100K_PU>;
+		thermal-sensors = <&pm8150_adc_tm 0>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -57,7 +57,7 @@
 	sys_therm-1 {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
-		thermal-sensors = <&pm8150_adc_tm ADC5_AMUX_THM1_100K_PU>;
+		thermal-sensors = <&pm8150_adc_tm 1>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -88,7 +88,7 @@
 			pins = "gpio7";
 			function = "normal";
 			input-enable;
-			bias-disable;
+			bias-pull-up;
 			power-source = <0>;
 		};
 	};

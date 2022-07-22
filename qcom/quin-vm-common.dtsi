@@ -1,0 +1,53 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup.memory=nokmem,nosocket";
+	};
+
+	soc: soc { };
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x0 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x2000000>;
+			linux,cma-default;
+			phandle = <0x4>;
+		};
+
+		pmem_shared: pmem_shared_region {
+			reg = <0x1 0x6a500000 0x0 0x51400000>;
+			label = "pmem_shared_mem";
+		};
+	};
+};
+
+&soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	interrupt-parent = <&intc>;
+	ranges = <0x0 0x0 0x0 0xffffffff>;
+	compatible = "simple-bus";
+
+	intc: vgic@0 {
+		qvm,vdev = "gic";
+		#interrupt-cells = <3>;
+		interrupt-controller;
+	};
+};
