@@ -150,9 +150,30 @@ sdmsteppeauto-overlays-dtb-$(CONFIG_ARCH_SA6155) += $(SA6155_BOARDS) $(SA6155P_B
 
 dtb-y += $(sdmsteppeauto-dtb-y)
 
+LEMANS_BASE_DTB		+= lemans.dtb
+LEMANS_IVI_BASE_DTB	+= lemans-ivi.dtb
+LEMANS_ADAS_HIGH_BASE_DTB += lemans-adas-high.dtb
+
+LEMANS_BOARDS		+= lemans-rumi-overlay.dtbo
+LEMANS_IVI_BOARDS	+= lemans-ivi-adp-air-overlay.dtbo \
+			   lemans-ivi-adp-star-overlay.dtbo
+LEMANS_ADAS_HIGH_BOARDS += lemans-adas-high-adp-air-overlay.dtbo \
+			   lemans-adas-high-adp-star-overlay.dtbo
+
+gen4auto-dtb-$(CONFIG_ARCH_LEMANS) += \
+	$(call add-overlays, $(LEMANS_IVI_BOARDS),$(LEMANS_IVI_BASE_DTB))\
+	$(call add-overlays, $(LEMANS_ADAS_HIGH_BOARDS),$(LEMANS_ADAS_HIGH_BASE_DTB))
+
+gen4auto-overlays-dtb-$(CONFIG_ARCH_LEMANS) +=  \
+	$(LEMANS_IVI_BOARDS) $(LEMANS_ADAS_HIGH_BOARDS) $(LEMANS_IVI_BASE_DTB) $(LEMANS_ADAS_HIGH_BASE_DTB)
+
+dtb-y += $(gen4auto-dtb-y)
+
 sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
                  sdxpinn-mtp.dtb \
                  sdxpinn-cdp.dtb
+
+sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
 sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
