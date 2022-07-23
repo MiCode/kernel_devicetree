@@ -1122,12 +1122,16 @@
 				<&gcc GCC_PCIE_0_AUX_CLK>,
 				<&gcc GCC_PCIE_0_CLKREF_EN>,
 				<&gcc GCC_PCIE_0_SLV_Q2A_AXI_CLK>,
+				<&gcc GCC_PCIE_0_PIPE_CLK_SRC>,
+				<&pcie_0_pipe_clk>,
 				<&rpmhcc RPMH_CXO_CLK>;
 
 			clock-names = "pcie_pipe_clk", "pcie_cfg_ahb_clk",
 					"pcie_mstr_axi_clk", "pcie_slv_axi_clk",
 					"pcie_aux_clk", "pcie_ldo",
 					"pcie_slv_q2a_axi_clk",
+					"pcie_pipe_clk_mux",
+					"pcie_pipe_clk_ext_src",
 					"pcie_0_ref_clk_src";
 
 			resets = <&gcc GCC_PCIE_0_BCR>,
@@ -1253,6 +1257,10 @@
 			status = "disabled";
 	};
 
+	ecpri_iommu_group: ecpri_common_iommu_group {
+		qcom,iommu-dma = "default";
+	};
+
 	mhi_device: mhi_dev@1c04000 {
 		compatible = "qcom,msm-mhi-dev";
 		reg = <0x1c04000 0x1000>;
@@ -1274,6 +1282,19 @@
 		qcom,no-m0-timeout;
 		qcom,mhi-is-flashless;
 		qcom,mhi-has-smmu;
+
+		iommus = <&apps_smmu 0x0400 0x0>,
+			 <&apps_smmu 0x0404 0x0>,
+			 <&apps_smmu 0x0408 0x0>,
+			 <&apps_smmu 0x040C 0x0>,
+			 <&apps_smmu 0x0410 0x0>,
+			 <&apps_smmu 0x0414 0x0>,
+			 <&apps_smmu 0x0418 0x0>,
+			 <&apps_smmu 0x041C 0x0>,
+			 <&apps_smmu 0x0802 0x0>,
+			 <&apps_smmu 0x0C02 0x0>;
+		qcom,iommu-group = <&ecpri_iommu_group>;
+		dma-coherent;
 
 		status = "ok";
 	};
