@@ -546,12 +546,24 @@
 		clock-names = "bus", "bus_a";
 		clocks = <&rpmcc RPM_SMD_BIMC_CLK>,
 			<&rpmcc RPM_SMD_BIMC_A_CLK>;
+
+	tlmm: pinctrl@500000 {
+		compatible = "qcom,scuba_auto-pinctrl";
+		reg = <0x500000 0x300000>;
+		interrupts = <GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		//wakeup-parent = <&wakegic>;
+
 	};
 };
 
 #include "pm2250-rpm-regulator.dtsi"
 #include "scuba-regulator.dtsi"
 #include "monaco-gdsc.dtsi"
+#include "scuba_auto-pinctrl.dtsi"
 
 &gcc_camss_top_gdsc {
 	status = "ok";
