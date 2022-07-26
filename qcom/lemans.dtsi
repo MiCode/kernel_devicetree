@@ -10,6 +10,8 @@
 	#size-cells = <2>;
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
+	reserved_memory: reserved-memory { };
+
 	chosen: chosen { };
 
 	aliases { };
@@ -208,6 +210,160 @@
 	};
 };
 
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	sail_ss_mem: sail_ss_region@80000000 {
+		no-map;
+		reg = <0x0 0x80000000 0x0 0x10000000>;
+	};
+
+	hyp_mem: hyp_region@90000000 {
+		no-map;
+		reg = <0x0 0x90000000 0x0 0x600000>;
+	};
+
+	xbl_boot_mem: xbl_boot_region@90600000 {
+		no-map;
+		reg = <0x0 0x90600000 0x0 0x200000>;
+	};
+
+	aop_image_mem: aop_image_region@90800000 {
+		no-map;
+		reg = <0x0 0x90800000 0x0 0x60000>;
+	};
+
+	aop_cmd_db_mem: aop_cmd_db_region@90860000 {
+		compatible = "qcom,cmd-db";
+		no-map;
+		reg = <0x0 0x90860000 0x0 0x20000>;
+	};
+
+	uefi_log: uefi_log_region@908b0000 {
+		no-map;
+		reg = <0x0 0x908b0000 0x0 0x10000>;
+	};
+
+	reserved_mem: reserved_region@908f0000 {
+		no-map;
+		reg = <0x0 0x908f0000 0x0 0xf000>;
+	};
+
+	secdata_apss_mem: secdata_apss_region@908ff000 {
+		no-map;
+		reg = <0x0 0x908ff000 0x0 0x1000>;
+	};
+
+	smem_mem: smem_region@90900000 {
+		no-map;
+		reg = <0x0 0x90900000 0x0 0x200000>;
+	};
+
+	cpucp_fw_mem: cpucp_fw_region@90b00000 {
+		no-map;
+		reg = <0x0 0x90b00000 0x0 0x100000>;
+	};
+
+	lpass_machine_learning_mem: lpass_machine_learning_region@93b00000 {
+		no-map;
+		reg = <0x0 0x93b00000 0x0 0xf00000>;
+	};
+
+	adsp_rpc_remote_heap_mem: adsp_rpc_remote_heap_region@94a00000 {
+		no-map;
+		reg = <0x0 0x94a00000 0x0 0x800000>;
+	};
+
+	pil_camera_mem: pil_camera_region@95200000 {
+		no-map;
+		reg = <0x0 0x95200000 0x0 0x500000>;
+	};
+
+	pil_adsp_mem: pil_adsp_region@95c00000 {
+		no-map;
+		reg = <0x0 0x95c00000 0x0 0x1e00000>;
+	};
+
+	pil_gdsp0_mem: pil_gdsp0_region@97b00000 {
+		no-map;
+		reg = <0x0 0x97b00000 0x0 0x1e00000>;
+	};
+
+	pil_gdsp1_mem: pil_gdsp1_region@99900000 {
+		no-map;
+		reg = <0x0 0x99900000 0x0 0x1e00000>;
+	};
+
+	pil_cdsp0_mem: pil_cdsp0_region@9b800000 {
+		no-map;
+		reg = <0x0 0x9b800000 0x0 0x1e00000>;
+	};
+
+	pil_gpu_mem: pil_gpu_region@9d600000 {
+		no-map;
+		reg = <0x0 0x9d600000 0x0 0x2000>;
+	};
+
+	pil_cdsp1_mem: pil_cdsp1_region@9d700000 {
+		no-map;
+		reg = <0x0 0x9d700000 0x0 0x1e00000>;
+	};
+
+	pil_cvp_mem: pil_cvp_region@9f500000 {
+		no-map;
+		reg = <0x0 0x9f500000 0x0 0x700000>;
+	};
+
+	pil_video_mem: pil_video_region@9fc00000 {
+		no-map;
+		reg = <0x0 0x9fc00000 0x0 0x700000>;
+	};
+
+	hyptz_reserved_mem: hyptz_reserved_region@beb00000 {
+		no-map;
+		reg = <0x0 0xbeb00000 0x0 0x11500000>;
+	};
+
+	tz_stat_mem: tz_stat_region@d0000000 {
+		no-map;
+		reg = <0x0 0xd0000000 0x0 0x100000>;
+	};
+
+	tags_mem: tags_region@d0100000 {
+		no-map;
+		reg = <0x0 0xd0100000 0x0 0x1200000>;
+	};
+
+	qtee_mem: qtee_region@d1300000 {
+		no-map;
+		reg = <0x0 0xd1300000 0x0 0x500000>;
+	};
+
+	trusted_apps_mem: trusted_apps_region@d1800000 {
+		no-map;
+		reg = <0x0 0xd1800000 0x0 0x3900000>;
+	};
+
+	dump_mem: mem_dump_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x3000000>;
+	};
+
+	/* global autoconfigured region for contiguous allocations */
+	linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xdfffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
+	};
+};
+
 &soc {
 	#address-cells = <1>;
 	#size-cells = <1>;
@@ -298,6 +454,49 @@
 			interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x17c2d000 0x1000>;
 			status = "disabled";
+		};
+	};
+
+	qcom,msm-imem@146d8000 {
+		compatible = "qcom,msm-imem";
+		reg = <0x146d8000 0x1000>;
+		ranges = <0x0 0x146d8000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		mem_dump_table@10 {
+			compatible = "qcom,msm-imem-mem_dump_table";
+			reg = <0x10 0x8>;
+		};
+
+		restart_reason@65c {
+			compatible = "qcom,msm-imem-restart_reason";
+			reg = <0x65c 0x4>;
+		};
+
+		dload_type@1c {
+			compatible = "qcom,msm-imem-dload-type";
+			reg = <0x1c 0x4>;
+		};
+
+		boot_stats@6b0 {
+			compatible = "qcom,msm-imem-boot_stats";
+			reg = <0x6b0 0x20>;
+		};
+
+		kaslr_offset@6d0 {
+			compatible = "qcom,msm-imem-kaslr_offset";
+			reg = <0x6d0 0xc>;
+		};
+
+		pil@94c {
+			compatible = "qcom,msm-imem-pil";
+			reg = <0x94c 0xc8>;
+		};
+
+		diag_dload@c8 {
+			compatible = "qcom,msm-imem-diag-dload";
+			reg = <0xc8 0xc8>;
 		};
 	};
 };
