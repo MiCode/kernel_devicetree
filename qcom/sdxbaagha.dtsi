@@ -1,4 +1,6 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/clock/qcom,gcc-sdxbaagha.h>
 
 / {
 	#address-cells = <1>;
@@ -205,6 +207,79 @@
 
 	qcom,secure-buffer {
 		compatible = "qcom,secure-buffer";
+	};
+
+	clocks {
+		xo_board: xo_board {
+			compatible = "fixed-clock";
+			clock-frequency = <19200000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
+
+		sleep_clk: sleep_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32000>;
+			clock-output-names = "sleep_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_pipe_clk: pcie_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_pipe_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <1>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo";
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <1>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo_ao";
+	};
+
+	rpmhcc: clock-controller {
+		compatible = "fixed-clock";
+		clock-output-names = "rpmh_clocks";
+		clock-frequency = <19200000>;
+		#clock-cells = <1>;
+	};
+
+	gcc: clock-controller@80000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	/* GCC GDSCs */
+	gcc_emac0_gdsc: qcom,gdsc@f1004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_emac0_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_pcie_gdsc: qcom,gdsc@d3004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_pcie_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	gcc_usb20_gdsc: qcom,gdsc@a7004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_usb20_gdsc";
 	};
 };
 
