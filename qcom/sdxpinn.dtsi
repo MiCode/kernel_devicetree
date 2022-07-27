@@ -529,6 +529,28 @@
 		#reset-cells = <1>;
 	};
 
+	apsscc: syscon@17aa0000 {
+		compatible = "syscon";
+		reg = <0x17aa0000 0x1c>;
+	};
+
+	mccc: syscon@190ba000 {
+		compatible = "syscon";
+		reg = <0x190ba000 0x54>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,sdxpinn-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,gcc = <&gcc>;
+		qcom,mccc = <&mccc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&gcc 0>;
+		clock-names = "xo_clk_src",
+			"gcc";
+		#clock-cells = <1>;
+	};
+
 	/* GCC GDSCs */
 	gcc_emac0_gdsc: qcom,gdsc@f1004 {
 		compatible = "qcom,gdsc";
