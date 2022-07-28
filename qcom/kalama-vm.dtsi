@@ -8,6 +8,10 @@
 	qcom,msm-id = <519 0x10000>, <536 0x10000>, <519 0x20000>, <536 0x20000>;
 	interrupt-parent = <&vgic>;
 
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
+	};
+
 	qcom,mem-buf {
 		compatible = "qcom,mem-buf";
 		qcom,mem-buf-capabilities = "consumer";
@@ -136,6 +140,12 @@
 
 		vdevices {
 			generate = "/hypervisor";
+			minidump {
+				vdevice-type = "minidump";
+				push-compatible = "qcom,minidump_rm";
+				minidump_allowed;
+			};
+
 			rm-rpc {
 				vdevice-type = "rm-rpc";
 				generate = "/hypervisor/qcom,resource-mgr";
