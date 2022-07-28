@@ -383,28 +383,47 @@
 	};
 
 	gcc: clock-controller@80000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,sdxbaagha-gcc", "syscon";
+		reg = <0x80000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mxa-supply = <&VDD_MXA_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&pcie_pipe_clk>,
+			 <&sleep_clk>;
+		clock-names = "bi_tcxo",
+			      "pcie_pipe_clk",
+			      "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
 
 	/* GCC GDSCs */
 	gcc_emac0_gdsc: qcom,gdsc@f1004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xf1004 0x4>;
 		regulator-name = "gcc_emac0_gdsc";
+		parent-supply = <&VDD_MXC_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_gdsc: qcom,gdsc@d3004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xd3004 0x4>;
 		regulator-name = "gcc_pcie_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_usb20_gdsc: qcom,gdsc@a7004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xa7004 0x4>;
 		regulator-name = "gcc_usb20_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 	};
 
 	ipcc_mproc: qcom,ipcc@408000 {
