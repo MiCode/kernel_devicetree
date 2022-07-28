@@ -135,6 +135,45 @@
 	};
 };
 
+&qupv3_se8_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+	qcom,touch-active = "goodix,gt9916S2";
+	qcom,la-vm;
+
+	goodix-berlin@0 {
+		compatible = "goodix,gt9916S2";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		goodix,avdd-name = "avdd";
+		goodix,iovdd-name = "iovdd";
+		avdd-supply = <&L14B>;
+		iovdd-supply = <&L12B>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <48 0x2008>;
+		goodix,reset-gpio = <&tlmm 13 0x00>;
+		goodix,irq-gpio = <&tlmm 48 0x2008>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <1080>;
+		goodix,panel-max-y = <2400>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,firmware-name = "goodix_firmware_spi.bin";
+		goodix,config-name = "goodix_cfg_group_spi.bin";
+		goodix,touch-type = "secondary";
+		goodix,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "secondary";
+		qts,trusted-touch-spi-irq = <657>;
+		qts,trusted-touch-io-bases = <0xa90000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 56 0 &tlmm 57 0 &tlmm 58 0
+						&tlmm 59 0 &tlmm 13 0 &tlmm 48 0x2008>;
+	};
+};
+
 &pm8550_switch0 {
 	qcom,led-mask = <9>; /* Channels 1 & 4 */
 	qcom,symmetry-en;
