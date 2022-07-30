@@ -10,6 +10,7 @@
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 #include <dt-bindings/interconnect/qcom,pineapple.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Pineapple";
@@ -1596,6 +1597,65 @@
 			0x17840058 0x17850058 0x17860058 0x17870058>;
 		qcom,config-arr = <0x17800060 0x17810060 0x17820060 0x17830060
 			0x17840060 0x17850060 0x17860060 0x17870060>;
+	};
+
+	adsp_pas: remoteproc-adsp@03000000 {
+		compatible = "qcom,pineapple-adsp-pas";
+		reg = <0x03000000 0x10000>;
+		status = "ok";
+
+		cx-supply = <&VDD_LPI_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		mx-supply = <&VDD_LPI_MX_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "cx", "mx";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		/*
+		 * Uncomment this when aoss_qmp probe is fixed.
+		 *   qcom,signal-aop;
+		 *   qcom,qmp = <&aoss_qmp>;
+		 */
+
+		interconnects = <&lpass_lpicx_noc MASTER_LPASS_PROC &mc_virt SLAVE_EBI1>,
+				<&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		interconnect-names = "rproc_ddr", "crypto_ddr";
+
+		memory-region = <&adsp_slpi_mem &q6_adsp_dtb_mem>;
+
+		/* Inputs from ssc */
+		interrupts-extended = <&pdc 6 IRQ_TYPE_EDGE_RISING>,
+					<&adsp_smp2p_in 0 0>,
+					<&adsp_smp2p_in 2 0>,
+					<&adsp_smp2p_in 1 0>,
+					<&adsp_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack";
+
+		/* Outputs to turing */
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		glink_edge: glink-edge {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_LPASS
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "adsp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_LPASS
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+		};
 	};
 
 	qcom,secure-buffer {
