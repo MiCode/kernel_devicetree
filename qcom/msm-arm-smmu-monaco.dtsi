@@ -10,7 +10,6 @@
 		reg-names = "base", "tcu-base";
 		#iommu-cells = <2>;
 		qcom,skip-init;
-		qcom,no-dynamic-asid;
 		qcom,use-3-lvl-tables;
 		#global-interrupts = <1>;
 		qcom,regulator-names = "vdd";
@@ -24,6 +23,7 @@
 				"gpu_cc_ahb",
 				"gpu_cc_hlos1_vote_gpu_smmu_clk";
 		#size-cells = <1>;
+		#address-cells = <1>;
 		ranges;
 		interrupts = <GIC_SPI 163 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 167 IRQ_TYPE_LEVEL_HIGH>,
@@ -35,9 +35,9 @@
 			<GIC_SPI 173 IRQ_TYPE_LEVEL_HIGH>,
 			<GIC_SPI 174 IRQ_TYPE_LEVEL_HIGH>;
 
-			qcom,actlr =
-				/* ALL CBs of GFX: +15 deep PF */
-				<0x0 0x3ff 0x32B>;
+		qcom,actlr =
+			/* ALL CBs of GFX: +15 deep PF */
+			<0x0 0x3ff 0x32B>;
 
 		gfx_0_tbu: gfx_0_tbu@0x59dd000 {
 				compatible = "qcom,qsmmuv500-tbu";
@@ -46,6 +46,7 @@
 				reg-names = "base", "status-reg";
 				qcom,stream-id-range = <0x0 0x400>;
 				interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
+				qcom,iova-width = <49>;
 		};
 	};
 
@@ -127,14 +128,8 @@
 					<GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>,
 					<GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>,
 					<GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH>;
-				qcom,msm-bus,name = "apps_smmu";
-				qcom,msm-bus,num-cases = <2>;
-				qcom,msm-bus,active-only;
-				qcom,msm-bus,num-paths = <1>;
-				qcom,msm-bus,vectors-KBps =
-					<MASTER_AMPSS_M0 SLAVE_TCU 0 0>,
-					<MASTER_AMPSS_M0 SLAVE_TCU 0 1000>;
 
+				qcom,active-only;
 				qcom,actlr =
 					/* For rt TBU +3 deep PF */
 					<0x400 0x3ff 0x103>,
@@ -147,16 +142,8 @@
 						<0xc7f2200 0x8>;
 					reg-names = "base", "status-reg";
 					qcom,stream-id-range = <0x0 0x400>;
-					interrupts = <GIC_SPI 154 IRQ_TYPE_LEVEL_HIGH>;
-					qcom,msm-bus,name = "apps_smmu";
-					qcom,msm-bus,num-cases = <2>;
-					qcom,msm-bus,active-only;
-					qcom,msm-bus,num-paths = <2>;
-					qcom,msm-bus,vectors-KBps =
-						<MASTER_AMPSS_M0 SLAVE_TCU 0 0>,
-						<MASTER_AMPSS_M0 SLAVE_IMEM_CFG 0 0>,
-						<MASTER_AMPSS_M0 SLAVE_TCU 0 1000>,
-						<MASTER_AMPSS_M0 SLAVE_IMEM_CFG 0 1000>;
+					qcom,active-only;
+					qcom,iova-width = <36>;
 				};
 
 				mm_rt_tbu: mm_rt_tbu@0xc7f9000 {
@@ -165,16 +152,10 @@
 						<0xc7f2208 0x8>;
 					reg-names = "base", "status-reg";
 					qcom,stream-id-range = <0x400 0x400>;
-					interrupts = <GIC_SPI 155 IRQ_TYPE_LEVEL_HIGH>;
-					qcom,msm-bus,name = "apps_smmu";
-					qcom,msm-bus,num-cases = <2>;
-					qcom,msm-bus,active-only;
-					qcom,msm-bus,num-paths = <2>;
-					qcom,msm-bus,vectors-KBps =
-						<MASTER_AMPSS_M0 SLAVE_TCU 0 0>,
-						<MASTER_MDP_PORT0 SLAVE_SNOC_BIMC_RT 0 0>,
-						<MASTER_AMPSS_M0 SLAVE_TCU 0 1000>,
-						<MASTER_MDP_PORT0 SLAVE_SNOC_BIMC_RT 0 1000>;
+					qcom,regulator-names = "vdd";
+					vdd-supply = <&hlos1_vote_mm_snoc_mmu_tbu_rt_gdsc>;
+					qcom,active-only;
+					qcom,iova-width = <36>;
 				};
 
 				mm_nrt_tbu: mm_nrt_tbu@0xc7fd000 {
@@ -183,34 +164,36 @@
 						<0xc7f2210 0x8>;
 					reg-names = "base", "status-reg";
 					qcom,stream-id-range = <0x800 0x400>;
-					interrupts = <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>;
-					qcom,msm-bus,name = "apps_smmu";
-					qcom,msm-bus,num-cases = <2>;
-					qcom,msm-bus,active-only;
-					qcom,msm-bus,num-paths = <2>;
-					qcom,msm-bus,vectors-KBps =
-						<MASTER_AMPSS_M0 SLAVE_TCU 0 0>,
-						<MASTER_CAMNOC_SF SLAVE_SNOC_BIMC_NRT 0 0>,
-						<MASTER_AMPSS_M0 SLAVE_TCU 0 1000>,
-						<MASTER_CAMNOC_SF SLAVE_SNOC_BIMC_NRT 0 1000>;
+					qcom,regulator-names = "vdd";
+					vdd-supply = <&hlos1_vote_mm_snoc_mmu_tbu_nrt_gdsc>;
+					qcom,active-only;
+					qcom,iova-width = <36>;
 				};
 
 	};
 
-	kgsl_iommu_test_device {
-			compatible = "iommu-debug-test";
-			iommus = <&kgsl_smmu 0x7 0x0>;
+	dma_dev {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
 	};
 
-	apps_iommu_test_device {
-			compatible = "iommu-debug-test";
+	iommu_test_device {
+		compatible = "qcom,iommu-debug-test";
+
+		kgsl_iommu_test_device {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&kgsl_smmu 0x7 0>;
+		};
+
+		apps_iommu_test_device {
+			compatible = "qcom,iommu-debug-usecase";
 			iommus = <&apps_smmu 0x1E0 0x0>;
-	};
+		};
 
-	apps_iommu_coherent_test_device {
-			compatible = "iommu-debug-test";
-			qcom,iommu-dma = "disabled";
+		apps_iommu_coherent_test_device {
+			compatible = "qcom,iommu-debug-usecase";
 			iommus = <&apps_smmu 0x1E1 0x0>;
 			dma-coherent;
+		};
 	};
 };
