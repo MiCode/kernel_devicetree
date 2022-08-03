@@ -7,9 +7,6 @@
 		reg = <0x4e00000 0x100000>;
 		reg-names = "core_base";
 
-		iommus = <&apps_smmu 0x120 0x0>;
-		qcom,iommu-dma = "atomic";
-		qcom,iommu-dma-addr-pool = <0x50000000 0x60000000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
@@ -46,16 +43,19 @@
 			 0x144 /* GSI_RING_BASE_ADDR_H */
 			 0x1a4>; /* GSI_IF_STS */
 		qcom,dwc-usb3-msm-tx-fifo-size = <21288>;
-		qcom,gsi-disable-io-coherency;
 
 		dwc3@4e00000 {
 			compatible = "snps,dwc3";
 			reg = <0x4e00000 0xe000>;
+
+			iommus = <&apps_smmu 0x120 0x0>;
+			qcom,iommu-dma = "atomic";
+			qcom,iommu-dma-addr-pool = <0x50000000 0x60000000>;
+
 			interrupt-parent = <&intc>;
 			interrupts = <GIC_SPI 255 IRQ_TYPE_LEVEL_HIGH>;
 			usb-phy = <&usb2_phy0>, <&usb_qmp_dp_phy>;
 			tx-fifo-resize;
-			linux,sysdev_is_parent;
 			snps,disable-clk-gating;
 			snps,has-lpm-erratum;
 			snps,hird-threshold = /bits/ 8 <0x10>;
@@ -64,6 +64,7 @@
 			usb-core-id = <0>;
 			maximum-speed = "super-speed";
 			dr_mode = "otg";
+			usb-role-switch;
 		};
 
 		qcom,usbbam@0x04f04000 {
