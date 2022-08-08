@@ -44,6 +44,9 @@
 			reg = <0x0 0x0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD0>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0 7>;
@@ -69,6 +72,9 @@
 			reg = <0x0 0x1>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD1>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0 7>;
@@ -89,6 +95,9 @@
 			reg = <0x0 0x2>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD2>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0 7>;
@@ -109,6 +118,9 @@
 			reg = <0x0 0x3>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			cpu-idle-states = <&SILVER_OFF>;
+			power-domains = <&CPU_PD3>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0 7>;
@@ -127,6 +139,9 @@
 			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x100>;
+			cpu-idle-states = <&GOLD_OFF>;
+			power-domains = <&CPU_PD4>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			capacity-dmips-mhz = <1638>;
 			dynamic-power-coefficient = <282>;
@@ -154,6 +169,9 @@
 			reg = <0x0 0x101>;
 			capacity-dmips-mhz = <1638>;
 			dynamic-power-coefficient = <282>;
+			cpu-idle-states = <&GOLD_OFF>;
+			power-domains = <&CPU_PD5>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			next-level-cache = <&L2_1>;
 			qcom,freq-domain = <&cpufreq_hw 1 7>;
@@ -175,6 +193,9 @@
 			capacity-dmips-mhz = <1638>;
 			dynamic-power-coefficient = <282>;
 			enable-method = "psci";
+			cpu-idle-states = <&GOLD_OFF>;
+			power-domains = <&CPU_PD6>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_1>;
 			qcom,freq-domain = <&cpufreq_hw 1 7>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
@@ -195,6 +216,9 @@
 			capacity-dmips-mhz = <1638>;
 			dynamic-power-coefficient = <282>;
 			enable-method = "psci";
+			cpu-idle-states = <&GOLD_OFF>;
+			power-domains = <&CPU_PD7>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_1>;
 			qcom,freq-domain = <&cpufreq_hw 1 7>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
@@ -247,9 +271,130 @@
 		};
 	};
 
+	idle-states {
+		SILVER_OFF: silver-c3 {  /* C3 */
+			compatible = "arm,idle-state";
+			idle-state-name = "pc";
+			entry-latency-us = <297>;
+			exit-latency-us = <324>;
+			min-residency-us = <1110>;
+			arm,psci-suspend-param = <0x40000003>;
+			local-timer-stop;
+		};
+
+		GOLD_OFF: gold-c3 {  /* C3 */
+			compatible = "arm,idle-state";
+			idle-state-name = "pc";
+			entry-latency-us = <290>;
+			exit-latency-us = <376>;
+			min-residency-us = <1182>;
+			arm,psci-suspend-param = <0x40000003>;
+			local-timer-stop;
+		};
+
+		SILVER_CLUSTER_D3: silver-cluster-d3 { /* D3 */
+			compatible = "domain-idle-state";
+			idle-state-name = "pwr-l2-pc";
+			entry-latency-us = <640>;
+			exit-latency-us = <1664>;
+			min-residency-us = <8094>;
+			arm,psci-suspend-param = <0x41000043>;
+		};
+
+		GOLD_CLUSTER_D3: gold-cluster-d3 { /* D3 */
+			compatible = "domain-idle-state";
+			idle-state-name = "perf-l2-pc";
+			entry-latency-us = <800>;
+			exit-latency-us = <2118>;
+			min-residency-us = <7376>;
+			arm,psci-suspend-param = <0x41000043>;
+		};
+
+		APSS_WFI: cluster-e1 { /* E1 */
+			compatible = "domain-idle-state";
+			idle-state-name = "cci-ret";
+			entry-latency-us = <108>;
+			exit-latency-us = <450>;
+			min-residency-us = <153>;
+			arm,psci-suspend-param = <0x42000043>;
+		};
+
+		APSS_OFF: cluster-e3 { /* E3 */
+			compatible = "domain-idle-state";
+			idle-state-name = "cci-pc";
+			entry-latency-us = <10831>;
+			exit-latency-us = <4506>;
+			min-residency-us = <15338>;
+			arm,psci-suspend-param = <0x42000343>;
+		};
+	};
+
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
+
+		CPU_PD0: cpu-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD1: cpu-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD2: cpu-pd2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD3: cpu-pd3 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD4: cpu-pd4 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD5: cpu-pd5 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD6: cpu-pd6 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD7: cpu-pd7 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CLUSTER_PD0: cluster-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD2>;
+			domain-idle-states = <&SILVER_CLUSTER_D3>;
+		};
+
+		CLUSTER_PD1: cluster-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD2>;
+			domain-idle-states = <&GOLD_CLUSTER_D3>;
+		};
+
+		CLUSTER_PD2: cluster-pd2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD3>;
+			domain-idle-states = <&APSS_WFI>;
+		};
+
+		CLUSTER_PD3: cluster-pd3 {
+			#power-domain-cells = <0>;
+			domain-idle-states = <&APSS_OFF>;
+		};
 	};
 
 	firmware: firmware {
@@ -1924,6 +2069,7 @@
 		compatible = "qcom,rpm-smd";
 		rpm-channel-name = "rpm_requests";
 		interrupts = <GIC_SPI 194 IRQ_TYPE_EDGE_RISING>;
+		power-domains = <&CLUSTER_PD3>;
 		rpm-channel-type = <15>; /* SMD_APPS_RPM */
 	};
 
@@ -1943,6 +2089,26 @@
 				      0x0f0a80b0 0x0f0b80b0>;
 		qcom,config-arr = <0x0f0880b8 0x0f0980b8
 				   0x0f0a80b8 0x0f0b80b8>;
+	};
+
+	cluster-device0 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD0>;
+	};
+
+	cluster-device1 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD1>;
+	};
+
+	cluster-device2 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD2>;
+	};
+
+	cluster-device3 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD3>;
 	};
 
 	qcom,ghd {
