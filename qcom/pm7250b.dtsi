@@ -11,8 +11,8 @@
 	qcom,pm7250b@2 {
 		compatible = "qcom,spmi-pmic";
 		reg = <0x2 SPMI_USID>;
-		#address-cells = <1>;
-		#size-cells = <1>;
+		#address-cells = <2>;
+		#size-cells = <0>;
 
 		pm7250b_revid: qcom,revid@100 {
 			compatible = "qcom,qpnp-revid";
@@ -34,6 +34,8 @@
 				3500000 3000000 2500000 2000000 1500000
 				1000000 500000>;
 			qcom,pmic-revid = <&pm7250b_revid>;
+			qcom,hvdcp2-max-icl-ua = <2000000>;
+			qcom,hvdcp2-12v-max-icl-ua = <1500000>;
 
 			qcom,chgr@1000 {
 				reg = <0x1000 0x100>;
@@ -177,6 +179,10 @@
 						  "temp-change",
 						  "temp-change-smb";
 			};
+
+			qcom,chg-sdam@b000 {
+				reg = <0xb000 0x100>;
+			};
 		};
 
 		pm7250b_pdphy: qcom,usb-pdphy@1700 {
@@ -209,6 +215,8 @@
 			compatible = "qcom,spmi-temp-alarm";
 			reg = <0x2400 0x100>;
 			interrupts = <0x2 0x24 0x0 IRQ_TYPE_EDGE_BOTH>;
+			io-channels = <&pm7250b_vadc ADC_DIE_TEMP>;
+			io-channel-names = "thermal";
 			#thermal-sensor-cells = <0>;
 			qcom,temperature-threshold-set = <1>;
 		};
@@ -252,7 +260,7 @@
 		pm7250b_clkdiv: clock-controller@5b00 {
 			compatible = "qcom,spmi-clkdiv";
 			reg = <0x5b00 0x100>;
-			#clodk-cells = <1>;
+			#clock-cells = <1>;
 			qcom,num-clkdivs = <1>;
 			clock-output-names = "pm7250b_div_clk1";
 			clocks = <&rpmhcc RPMH_CXO_CLK>;
@@ -384,6 +392,7 @@
 				label = "smb1390_therm";
 				qcom,hw-settle-time = <200>;
 				qcom,pre-scaling = <1 1>;
+				qcom,scale-fn-type = <15>;
 			};
 
 			chg_sbux@99 {
@@ -436,14 +445,15 @@
 		bcl_soc:bcl-soc {
 			compatible = "qcom,msm-bcl-soc";
 			#thermal-sensor-cells = <0>;
+			status = "disable";
 		};
 	};
 
 	qcom,pm7250b@3 {
 		compatible = "qcom,spmi-pmic";
 		reg = <0x3 SPMI_USID>;
-		#address-cells = <1>;
-		#size-cells = <1>;
+		#address-cells = <2>;
+		#size-cells = <0>;
 
 		pm7250b_vib: qcom,vibrator@5300 {
 			compatible = "qcom,qpnp-vibrator-ldo";
