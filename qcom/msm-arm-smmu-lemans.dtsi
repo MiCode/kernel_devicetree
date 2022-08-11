@@ -281,6 +281,107 @@
 		};
 	};
 
+	pcie_smmu: pcie-smmu@0x15200000 {
+		compatible = "qcom,qsmmu-v500";
+		reg = <0x15200000 0x80000>,
+			<0x152F2000 0x28>;
+		reg-names = "base", "tcu-base";
+		#iommu-cells = <2>;
+		qcom,skip-init;
+		qcom,use-3-lvl-tables;
+		qcom,split-tables;
+		#global-interrupts = <2>;
+		#size-cells = <1>;
+		#address-cells = <1>;
+		#tcu-testbus-version = <1>;
+		ranges;
+
+		interrupts =	<GIC_SPI 920 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 921 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 925 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 926 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 927 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 928 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 950 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 951 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 952 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 953 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 954 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 955 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 956 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 957 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 958 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 885 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 886 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 887 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 888 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 820 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 822 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 823 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 310 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 446 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 447 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 452 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 840 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 841 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 842 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 843 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 844 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 845 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 846 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 847 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 848 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 849 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 802 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 803 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 804 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 805 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 806 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 807 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 808 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 809 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 810 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 811 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 812 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 813 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 814 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 836 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 837 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 838 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 839 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 854 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 855 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 856 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 790 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 791 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 792 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 793 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 794 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 795 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 796 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 639 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 640 IRQ_TYPE_LEVEL_HIGH>;
+
+		pcie_0_tbu: pcie_0_tbu@152f9000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x152F9000 0x1000>,
+				<0x152F2200 0x8>;
+			reg-names = "base", "status-reg";
+			qcom,stream-id-range = <0x0 0x400>;
+			qcom,iova-width = <36>;
+		};
+
+		pcie_1_tbu: pcie_1_tbu@152fb000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x152FB000 0x1000>,
+				<0x152F3200 0x8>;
+			reg-names = "base", "status-reg";
+			qcom,stream-id-range = <0x400 0x400>;
+			qcom,iova-width = <36>;
+		};
+	};
+
 	kgsl_smmu: kgsl-smmu@3da0000 {
 		compatible = "qcom,qsmmu-v500";
 		reg = <0x3da0000 0x20000>,
@@ -390,6 +491,29 @@
 		usecase3_apps_dma {
 			compatible = "qcom,iommu-debug-usecase";
 			iommus = <&apps_smmu 0x581 0>;
+			dma-coherent;
+		};
+
+		usecase0_pcie {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&pcie_smmu 0x440 0x0>;
+		};
+
+		usecase1_pcie_fastmap {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&pcie_smmu 0x440 0x0>;
+			qcom,iommu-dma = "fastmap";
+		};
+
+		usecase2_pcie_atomic {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&pcie_smmu 0x440 0x0>;
+			qcom,iommu-dma = "atomic";
+		};
+
+		usecase3_pcie_dma {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&pcie_smmu 0x440 0x0>;
 			dma-coherent;
 		};
 
