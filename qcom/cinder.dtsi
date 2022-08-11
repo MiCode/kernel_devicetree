@@ -18,7 +18,7 @@
 
 
 	chosen: chosen {
-			bootargs = "cpufreq.default_governor=performance";
+			bootargs = "cpufreq.default_governor=performance msm_rtb.filter=0x237";
 	};
 
 	aliases {
@@ -421,6 +421,15 @@
 		qcom,pipe-attr-ee;
 	};
 
+	qcom_tzlog: tz-log@14680720 {
+		compatible = "qcom,tz-log";
+		reg = <0x14680720 0x3000>;
+		qcom,hyplog-enabled;
+		hyplog-address-offset = <0x410>;
+		hyplog-size-offset = <0x414>;
+	};
+
+
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,cinder-pinctrl";
 		reg = <0xf000000 0x1000000>;
@@ -475,6 +484,35 @@
 		compatible = "qcom,dload-mode";
 	};
 
+	qcom_cedev: qcedev@1de0000 {
+		compatible = "qcom,qcedev";
+		reg = <0x1de0000 0x20000>,
+			<0x1dc4000 0x28000>;
+		reg-names = "crypto-base","crypto-bam-base";
+		interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,bam-pipe-pair = <2>;
+		qcom,ce-hw-instance = <0>;
+		qcom,ce-device = <0>;
+		qcom,ce-hw-shared;
+		qcom,bam-ee = <0>;
+		qcom,smmu-s1-enable;
+		qcom,no-clock-support;
+		interconnect-names = "data_path";
+		interconnects = <&system_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		iommus = <&apps_smmu 0x0000 0x0>,
+			<&apps_smmu 0x0001 0x0>;
+		qcom,iommu-dma = "atomic";
+		dma-coherent;
+	};
+
+	qcom_rng: qrng@10c3000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x10c3000 0x1000>;
+		qcom,no-qrng-config;
+		qcom,no-clock-support;
+	};
+
+
 	qcom_tzlog: tz-log@14680720 {
 		compatible = "qcom,tz-log";
 		reg = <0x14680720 0x3000>;
@@ -502,7 +540,7 @@
 		clock-names = "xo";
 
 		cx-supply = <&VDD_CX_LEVEL>;
-		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
 		mx-supply = <&VDD_MODEM_LEVEL>;
 		mx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
 		reg-names = "cx", "mx";
@@ -667,6 +705,16 @@
 		};
 	};
 
+	sdhc1_opp_table: sdhc1-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-384000000 {
+			opp-hz = /bits/ 64 <384000000>;
+			opp-peak-kBps = <6528000 1652800>;
+			opp-avg-kBps = <400000 0>;
+		};
+	};
+
 	sdhc_1: sdhci@8804000 {
 		status = "disabled";
 
@@ -711,6 +759,16 @@
 		iommus = <&apps_smmu 0x0080 0x0>;
 		dma-coherent;
 		qcom,iommu-dma = "fastmap";
+
+		/*
+		 * Slave name seems incorrect for CNOC path and this name
+		 * is taken as per ICB team recommendation.
+		 * SDCC_2 here corresponds to eMMC only and not SD card.
+		 */
+		interconnects = <&system_noc MASTER_SDCC_1 &mc_virt SLAVE_EBI1>,
+			      <&gem_noc MASTER_APPSS_PROC &system_noc SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc1_opp_table>;
 
 		qos0 {
 			mask = <0x0f>;
@@ -1122,12 +1180,16 @@
 				<&gcc GCC_PCIE_0_AUX_CLK>,
 				<&gcc GCC_PCIE_0_CLKREF_EN>,
 				<&gcc GCC_PCIE_0_SLV_Q2A_AXI_CLK>,
+				<&gcc GCC_PCIE_0_PIPE_CLK_SRC>,
+				<&pcie_0_pipe_clk>,
 				<&rpmhcc RPMH_CXO_CLK>;
 
 			clock-names = "pcie_pipe_clk", "pcie_cfg_ahb_clk",
 					"pcie_mstr_axi_clk", "pcie_slv_axi_clk",
 					"pcie_aux_clk", "pcie_ldo",
 					"pcie_slv_q2a_axi_clk",
+					"pcie_pipe_clk_mux",
+					"pcie_pipe_clk_ext_src",
 					"pcie_0_ref_clk_src";
 
 			resets = <&gcc GCC_PCIE_0_BCR>,
@@ -1250,7 +1312,11 @@
 				0x9000 0x00 0x0
 				0x9044 0x03 0x0>;
 
-			status = "ok";
+			status = "disabled";
+	};
+
+	ecpri_iommu_group: ecpri_common_iommu_group {
+		qcom,iommu-dma = "default";
 	};
 
 	mhi_device: mhi_dev@1c04000 {
@@ -1275,6 +1341,19 @@
 		qcom,mhi-is-flashless;
 		qcom,mhi-has-smmu;
 
+		iommus = <&apps_smmu 0x0400 0x0>,
+			 <&apps_smmu 0x0404 0x0>,
+			 <&apps_smmu 0x0408 0x0>,
+			 <&apps_smmu 0x040C 0x0>,
+			 <&apps_smmu 0x0410 0x0>,
+			 <&apps_smmu 0x0414 0x0>,
+			 <&apps_smmu 0x0418 0x0>,
+			 <&apps_smmu 0x041C 0x0>,
+			 <&apps_smmu 0x0802 0x0>,
+			 <&apps_smmu 0x0C02 0x0>;
+		qcom,iommu-group = <&ecpri_iommu_group>;
+		dma-coherent;
+
 		status = "ok";
 	};
 
@@ -1283,7 +1362,7 @@
 		status = "ok";
 	};
 
-	cache-controller@19200000 {
+	llcc_device: cache-controller@19200000 {
 		compatible = "qcom,cinder-llcc", "qcom,llcc-v21";
 		reg = <0x19200000 0xd80000>, <0x1A200000 0x80000>, <0x221c8128 0x4>;
 		reg-names = "llcc_base", "llcc_broadcast_base", "multi_ch_reg";
@@ -1335,6 +1414,8 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&ecpricc ECPRI_CC_ECPRI_DMA_NOC_CLK>,
+			<&ecpricc ECPRI_CC_ECPRI_FAST_DIV2_NOC_CLK>;
 	};
 
 	gem_noc: interconnect@19100000 {
@@ -1360,8 +1441,17 @@
 		qcom,dload-mode = <&tcsr 0x13000>;
 	};
 
+	qcom_smcinvoke {
+		compatible = "qcom,smcinvoke";
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+	};
+
 };
 
+#include "ipcc-test-cinder.dtsi"
 #include "cinder-regulators.dtsi"
 #include "cinder-coresight.dtsi"
 #include "cinder-debug.dtsi"
@@ -1380,6 +1470,7 @@
 };
 
 &qupv3_se13_4uart {
+	qcom,auto-suspend-disable;
 	status = "ok";
 };
 

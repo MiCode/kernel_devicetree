@@ -26,8 +26,8 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	aliases {
-		serial0 = &uart2;
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
+		serial0 = &qupv3_se12_2uart;
 	};
 
 	cpus {
@@ -408,7 +408,7 @@
 			reg = <0x0 0x98710000 0x0 0x5000>;
 		};
 
-		pil_gpu_mem: pil_gpu_region@98715000 {
+		gpu_micro_code_mem: gpu_micro_code_region@98715000 {
 			no-map;
 			reg = <0x0 0x98715000 0x0 0x2000>;
 		};
@@ -966,21 +966,6 @@
 		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
 	};
 
-	qupv3_id_1: geniqup@ac0000 {
-		compatible = "qcom,geni-se-qup";
-		reg = <0x00ac0000 0x6000>;
-		ranges;
-		#address-cells = <1>;
-		#size-cells = <1>;
-
-		uart2: serial@a90000 {
-			compatible = "qcom,geni-debug-uart";
-			reg = <0x00a90000 0x4000>;
-			interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
-			status = "disabled";
-		};
-	};
-
 	thermal_zones: thermal-zones {
 	};
 
@@ -1440,6 +1425,37 @@
 		/* Outputs to turing */
 		qcom,smem-states = <&adsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_edge: glink-edge {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+			mboxes = <&apss_shared 8>;
+			mbox-names = "adsp_smem";
+			interrupts = <GIC_SPI 156 IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+			cpu-affinity = <1 2>;
+
+			qcom,adsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,apr_tal_rpmsg {
+				qcom,glink-channels = "apr_audio_svc";
+				qcom,intents = <0x200 20>;
+			};
+
+			qcom,msm_fastrpc_rpmsg {
+				compatible = "qcom,msm-fastrpc-rpmsg";
+				qcom,glink-channels = "fastrpcglink-apps-dsp";
+				qcom,intents = <0x64 64>;
+			};
+
+		};
 	};
 
 	cdsp_pas: remoteproc-cdsp@0x8300000 {
@@ -1479,6 +1495,25 @@
 		/* Outputs to turing */
 		qcom,smem-states = <&cdsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink-edge {
+			qcom,remote-pid = <5>;
+			transport = "smem";
+			mboxes = <&apss_shared 4>;
+			mbox-names = "cdsp_smem";
+			interrupts = <GIC_SPI 574 IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp";
+			qcom,glink-label = "cdsp";
+
+			qcom,cdsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
+
 	};
 
 	ufsphy_mem: ufsphy_mem@1d87000 {
@@ -1626,6 +1661,11 @@
 		};
 
 	};
+
+	qcom,sps {
+		compatible = "qcom,msm-sps-4k";
+		qcom,pipe-attr-ee;
+	};
 };
 
 &firmware {
@@ -1642,6 +1682,10 @@
 #include "sa8195-gdsc.dtsi"
 #include "msm-arm-smmu-sdmshrike.dtsi"
 #include "sdmshrike-debug.dtsi"
+
+&slpi_tlmm {
+	status = "ok";
+};
 
 &emac_gdsc {
 	status = "ok";
@@ -1832,3 +1876,5 @@
 	status = "ok";
 };
 #include "sa8195-thermal.dtsi"
+#include "sa8195-qupv3.dtsi"
+#include "sa8195-ssc-qupv3.dtsi"

@@ -12,6 +12,7 @@
 	model = "Qualcomm Technologies, Inc. Khaje SoC";
 	compatible = "qcom,khaje";
 	qcom,msm-id = <518 0x10000>;
+	interrupt-parent = <&intc>;
 
 	#address-cells = <2>;
 	#size-cells = <2>;
@@ -313,11 +314,6 @@
 			reg = <0x0 0x4ab00000 0x0 0x6900000>;
 		};
 
-		pil_video_mem: pil_video_region@51400000 {
-			no-map;
-			reg = <0x0 0x51400000 0x0 0x500000>;
-		};
-
 		wlan_msa_mem: wlan_msa_region@51900000 {
 			no-map;
 			reg = <0x0 0x51900000 0x0 0x100000>;
@@ -346,6 +342,11 @@
 		pil_gpu_mem: gpu_region@55615000 {
 			no-map;
 			reg = <0x0 0x55615000 0x0 0x2000>;
+		};
+
+		video_mem: video_region@55617000 {
+			no-map;
+			reg = <0x0 0x55617000 0x0 0x700000>;
 		};
 
 		user_contig_mem: user_contig_region {
@@ -383,21 +384,6 @@
 			reusable;
 			alignment = <0 0x400000>;
 			size = <0 0x5c00000>;
-		};
-
-		cont_splash_memory: cont_splash_region@5c000000 {
-			reg = <0x0 0x5c000000 0x0 0x00f00000>;
-			label = "cont_splash_region";
-		};
-
-		disp_rdump_memory: disp_rdump_region@5c000000 {
-			reg = <0x0 0x5c000000 0x0 0x00f00000>;
-			label = "disp_rdump_region";
-		};
-
-		dfps_data_memory: dfps_data_region@5cf00000 {
-			reg = <0x0 0x5cf00000 0x0 0x0100000>;
-			label = "dfps_data_region";
 		};
 
 		adsp_mem: adsp_region {
@@ -1699,6 +1685,10 @@
 		poll-delay-ms = <5000>;
 	};
 
+	vendor_hooks: qcom,cpu-vendor-hooks {
+		compatible = "qcom,cpu-vendor-hooks";
+	};
+
 	qcom,msm-imem@c125000 {
 		compatible = "qcom,msm-imem";
 		reg = <0xc125000 0x1000>;
@@ -2425,6 +2415,9 @@
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
 		#reset-cells = <1>;
 
+		nvmem-cells = <&boot_config>;
+		nvmem-cell-names = "boot_conf";
+
 		clock-names =
 			"core_clk",
 			"bus_aggr_clk",
@@ -2702,6 +2695,11 @@
 
 	dload_mode {
 		compatible = "qcom,dload-mode";
+	};
+
+	mini_dump_mode {
+		compatible = "qcom,minidump";
+		status = "ok";
 	};
 
 	tcsr_mutex_block: syscon@00340000 {
@@ -3071,6 +3069,10 @@
 			reg = <0x6030 0x1>;
 			bits = <0 8>;
 		};
+
+		boot_config: boot_config@6070 {
+			reg = <0x6070 0x4>;
+		};
 	};
 
 	spmi_bus: qcom,spmi@1c40000 {
@@ -3127,7 +3129,7 @@
 
 		/* Outputs to mss */
 		qcom,smem-states = <&modem_smp2p_out 0>;
-		qcom,smem-state-names = "qcom,stop";
+		qcom,smem-state-names = "stop";
 
 		glink-edge {
 			qcom,remote-pid = <1>;
@@ -3604,6 +3606,8 @@ tpdm_turing_llm: tpdm@8861000 {
 		clocks = <&rpmcc RPM_SMD_QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
+
+	msm_gpu: qcom,kgsl-3d0@5900000 { };
 };
 
 #include "bengal-gdsc.dtsi"

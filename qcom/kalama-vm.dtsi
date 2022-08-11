@@ -8,6 +8,10 @@
 	qcom,msm-id = <519 0x10000>, <536 0x10000>, <519 0x20000>, <536 0x20000>;
 	interrupt-parent = <&vgic>;
 
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
+	};
+
 	qcom,mem-buf {
 		compatible = "qcom,mem-buf";
 		qcom,mem-buf-capabilities = "consumer";
@@ -19,7 +23,7 @@
 	};
 
 	chosen {
-		bootargs = "nokaslr log_buf_len=256K root=/dev/ram rw init=/init console=hvc0 loglevel=8 memhp_default_state=online_movable";
+		bootargs = "nokaslr log_buf_len=256K root=/dev/ram rw init=/init console=hvc0 loglevel=8 memhp_default_state=online_movable memory_hotplug.memmap_on_memory=1";
 	};
 
 
@@ -136,6 +140,12 @@
 
 		vdevices {
 			generate = "/hypervisor";
+			minidump {
+				vdevice-type = "minidump";
+				push-compatible = "qcom,minidump_rm";
+				minidump_allowed;
+			};
+
 			rm-rpc {
 				vdevice-type = "rm-rpc";
 				generate = "/hypervisor/qcom,resource-mgr";
@@ -624,14 +634,14 @@
 
 	 qtee_shmbridge {
 		compatible = "qcom,tee-shared-memory-bridge";
-		qcom,custom-bridge-size = <512>;
+		qcom,custom-bridge-size = <64>;
 		qcom,support-hypervisor;
 	};
 
 	virtio_mem_device {
 		compatible = "qcom,virtio-mem";
 		/* Must be memory_block_size_bytes() aligned */
-		reg = <0x60000000 0x8000000>;
+		reg = <0x60000000 0x10000000>;
 		qcom,block-size = <0x400000>;
 	};
 };

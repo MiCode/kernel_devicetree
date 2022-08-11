@@ -60,6 +60,27 @@ Optional properties:
 					enabled by an entity external to HLOS.
  - qcom,no-config-gdscr: Presence denotes HW only supports a single register
 			per GDSC.
+ - qcom,collapse-vote: If present, GDSC will be controlled by votable register.
+			We need to pass the phandle of the register along with
+			the bit number of respective GDSC.
+ - sw-reset: If present, supports asynchronous resets for GDSC. We need to pass
+			the phandles of reset registers while using the property.
+ - domain-addr: If present, supports reset for voltage rail of GDSC. We pass
+			the phandle of the register while using the property.
+ - hw-ctrl-addr: If present, separate register will be there to poll for GDSC
+			status. While using the property, need to pass the phandle
+			of the register.
+ - qcom,skip-disable: Boolean flag indicating that the gdsc must not be
+			physically disabled upon a software disable request.
+			Instead, the GDSC will be disabled by always-on
+			processor (AOP) upon entering system sleep. The AOP
+			will also perform a special reset sequence for the GDSC
+			upon resuming the system sleep.
+ - qcom,support-cfg-gdscr: If present, the GDSC power on/down polling status is
+			read through GDSC configuration register.
+ - mboxes: Mailbox tuple containing QMP mailbox phandle and channel identifier.
+			If this is specified, then a QMP message should be sent
+			to enable the GDSC instead of setting SW_COLLAPSE=0.
 
 Example:
 	gdsc_oxili_gx: qcom,gdsc@fd8c4024 {
@@ -68,4 +89,6 @@ Example:
 		parent-supply = <&pm8841_s4>;
 		reg = <0xfd8c4024 0x4>;
 		clock-names = "core_clk";
+		mboxes = <&qmp_aop 0>;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 0>;
 	};

@@ -28,16 +28,14 @@
 
 
 	chosen: chosen {
-			bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off mem-offline.bypass_send_msg=1 sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc";
+			bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc";
 	};
 
 	reserved_memory: reserved-memory { };
 
 	mem-offline {
 		compatible = "qcom,mem-offline";
-		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
-				<0x1 0xc0000000 0x0 0x80000000>,
-				<0x2 0xc0000000 0x1 0x40000000>;
+		offline-sizes = <0x2 0xc0000000 0x1 0x40000000>;
 		granule = <512>;
 		mboxes = <&qmp_aop 0>;
 	};
@@ -349,15 +347,11 @@
 		reg = <0x0 0x80a00000 0x0 0x400000>;
 	};
 
-	hyp_tags_mem: hyp_tags_region@80e00000 {
-		no-map;
-		reg = <0x0 0x80e00000 0x0 0x3d0000>;
-	};
-
-	hyp_tags_reserved_mem: hyp_tags_reserved_region@811d0000 {
-		no-map;
-		reg = <0x0 0x811d0000 0x0 0x30000>;
-	};
+	/*
+	 * hyp_tags_mem & hyp_tags_reserved_mem not passed to linux
+	 * as valid memory. Size of these regions varies based on
+	 * bootloader policy.
+	 */
 
 	/* merged xbl_dt_log, xbl_ramdump, aop_image */
 	xbl_dt_log_merged_mem: xbl_dt_log_merged@81a00000 {
@@ -397,11 +391,6 @@
 	tz_stat_mem: tz_stat_region@82700000 {
 		no-map;
 		reg = <0x0 0x82700000 0x0 0x100000>;
-	};
-
-	cdsp_secure_heap_mem: cdsp_secure_heap_region@82800000 {
-		no-map;
-		reg = <0x0 0x82800000 0x0 0x4600000>;
 	};
 
 	mpss_mem: mpss_region@89800000 {
@@ -510,15 +499,10 @@
 		reg = <0x0 0xd8300000 0x0 0x500000>;
 	};
 
-	ta_mem: ta_region@d8800000 {
-		no-map;
-		reg = <0x0 0xd8800000 0x0 0x7400000>;
-	};
-
-	tz_tags_mem: tz_tags_region@e1200000 {
-		no-map;
-		reg = <0x0 0xdfc00000 0x0 0x2140000>;
-	};
+	/*
+	 * ta_mem & tz_tags_mem not passed to linux as valid memory. Size
+	 * varies based on bootloader policy.
+	 */
 
 	hwfence_shbuf: hwfence-shmem {
 		no-map;
@@ -667,15 +651,6 @@
 		size = <0x0 0x200000>;
 		pmsg-size = <0x200000>;
 		mem-type = <2>;
-	};
-
-	mem_buf_cma: mem_buf_cma {
-		compatible = "shared-dma-pool";
-		alloc-ranges = <0x1 0x00000000 0xfffffffe 0xffffffff>;
-		reusable;
-		alignment = <0x0 0x400000>;
-		/* 16 Mb */
-		size = <0x0 0x1000000>;
 	};
 
 	/* global autoconfigured region for contiguous allocations */
@@ -1489,7 +1464,6 @@
 		compatible = "qcom,mem-buf";
 		qcom,mem-buf-capabilities = "supplier";
 		qcom,vmid = <3>;
-		memory-region = <&mem_buf_cma>;
 	};
 
 	qcom,mem-buf-msgq {
@@ -1718,17 +1692,30 @@
 		reg = <0x240ba000 0x54>;
 	};
 
-	debugcc: qcom,cc-debug {
+	debugcc: clock-controller@0 {
 		compatible = "qcom,kalama-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,camcc = <&camcc>;
+		qcom,dispcc = <&dispcc>;
 		qcom,gcc = <&gcc>;
 		qcom,gpucc = <&gpucc>;
+		qcom,tcsrcc = <&tcsrcc>;
 		qcom,videocc = <&videocc>;
-		qcom,dispcc = <&dispcc>;
-		qcom,camcc = <&camcc>;
-		qcom,apsscc = <&apsscc>;
 		qcom,mccc = <&mccc>;
-		clock-names = "xo_clk_src";
-		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&camcc 0>,
+			 <&dispcc 0>,
+			 <&gcc 0>,
+			 <&gpucc 0>,
+			 <&tcsrcc 0>,
+			 <&videocc 0>;
+		clock-names = "xo_clk_src",
+			      "camcc",
+			      "dispcc",
+			      "gcc",
+			      "gpucc",
+			      "tcsrcc",
+			      "videocc";
 		#clock-cells = <1>;
 	};
 
@@ -2118,13 +2105,13 @@
 		opp-100000000 {
 			opp-hz = /bits/ 64 <100000000>;
 			opp-peak-kBps = <160000 100000>;
-			opp-avg-kBps = <80000 50000>;
+			opp-avg-kBps = <50000 0>;
 		};
 
 		opp-202000000 {
 			opp-hz = /bits/ 64 <202000000>;
 			opp-peak-kBps = <200000 120000>;
-			opp-avg-kBps = <80000 50000>;
+			opp-avg-kBps = <104000 0>;
 		};
 	};
 
@@ -2143,14 +2130,20 @@
 		no-sdio;
 		no-mmc;
 		qcom,restore-after-cx-collapse;
+		qcom,uses_level_shifter;
+		qcom,dll_lock_bist_fail_wa;
 
 		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
 			<&gcc GCC_SDCC2_APPS_CLK>;
 		clock-names = "iface", "core";
 
-		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
-		qcom,dll-hsr-list = <0x0007642C 0xA800 0x10
-					0x2C010800 0x80040868>;
+		/*
+		 * DLL HSR settings. Refer go/hsr - <Target> DLL settings.
+		 * Note that the DLL_CONFIG_2 value is not passed from the
+		 * device tree, but it is calculated in the driver.
+		 */
+		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
+					0x090106C0 0x80040868>;
 
 		iommus = <&apps_smmu 0x540 0x0>;
 		dma-coherent;
@@ -2616,6 +2609,7 @@
 	soc-sleep-stats@c3f0000 {
 		compatible = "qcom,rpmh-sleep-stats";
 		reg = <0xc3f0000 0x400>;
+		qcom,drv-max = <0x14>;
 		ss-name = "modem", "adsp", "adsp_island",
 			  "cdsp", "apss";
 		mboxes = <&qmp_aop 0>;
@@ -3099,6 +3093,7 @@
 		interconnect-names = "rproc_ddr", "crypto_ddr";
 
 		memory-region = <&mpss_mem &q6_mpss_dtb_mem &system_cma>;
+		mpss_dsm_mem_reg = <&mpss_dsm_mem>;
 
 		/* Inputs from mss */
 		interrupts-extended = <&intc GIC_SPI 264 IRQ_TYPE_EDGE_RISING>,
@@ -3201,24 +3196,6 @@
 		reg = <0xfcc00000 0x104000>;
 		vm_name = "oemvm";
 		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
-	};
-
-	qcom,virtio_backend@0 {
-		compatible = "qcom,virtio_backend";
-		qcom,vm = <&trust_ui_vm>;
-		qcom,label = <0x11>;
-	};
-
-	qcom,virtio_backend@1 {
-		compatible = "qcom,virtio_backend";
-		qcom,vm = <&trust_ui_vm>;
-		qcom,label = <0x10>;
-	};
-
-	qcom,virtio_backend@2 {
-		compatible = "qcom,virtio_backend";
-		qcom,vm = <&oem_vm>;
-		qcom,label = <0x13>;
 	};
 
 	trust_ui_vm_virt_be0: trust_ui_vm_virt_be0@11 {
