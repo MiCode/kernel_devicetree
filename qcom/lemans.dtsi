@@ -1,4 +1,5 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Lemans";
@@ -387,6 +388,52 @@
 		reg = <0x17a00000 0x10000>,     /* GICD */
 		      <0x17a60000 0x100000>;    /* GICR * 8 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,lemans-pdc", "qcom,pdc";
+		reg = <0xb220000 0x30000>, <0x17c000f0 0x64>;
+		qcom,pdc-ranges = <0 480 40>, <40 140 14>, <54 263 1>,
+				  <55 306 4>, <59 312 3>, <62 374 2>,
+				  <64 434 2>, <66 438 2>, <70 520 1>,
+				  <73 523 1>, <118 568 6>, <124 609 3>,
+				  <159 638 1>, <160 720 3>, <169 728 30>,
+				  <199 416 2>, <201 449 1>, <202 89 1>,
+				  <203 451 1>, <204 462 1>, <205 264 1>,
+				  <206 579 1>, <207 653 1>, <208 656 1>,
+				  <209 659 1>, <210 122 1>, <211 699 1>,
+				  <212 705 1>, <213 450 1>, <214 643 2>,
+				  <216 646 5>, <221 390 5>, <226 700 2>,
+				  <228 440 1>, <229 663 1>, <230 524 2>,
+				  <232 612 3>, <235 723 5>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+
+	apps_rsc: rsc@18200000 {
+		label = "apps_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0x18200000 0x10000>,
+		      <0x18210000 0x10000>,
+		      <0x18220000 0x10000>;
+		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
+		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+
+		apps_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0xd00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    2>,
+						  <SLEEP_TCS     3>,
+						  <WAKE_TCS      3>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
 	};
 
 	arch_timer: timer {
