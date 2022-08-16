@@ -1595,6 +1595,48 @@
 		qcom,config-arr = <0x17800060 0x17810060 0x17820060 0x17830060
 			0x17840060 0x17850060 0x17860060 0x17870060>;
 	};
+
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+		qcom,vmid-cp-camera-preview-ro;
+	};
+
+	trust_ui_vm: qcom,trust_ui_vm@0xf7400000 {
+		reg = <0xf7400000 0x108000>;
+		vm_name = "trustedvm";
+		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
+	};
+
+	qcom,virtio_backend@0 {
+		compatible = "qcom,virtio_backend";
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x11>;
+	};
+
+	qcom,virtio_backend@1 {
+		compatible = "qcom,virtio_backend";
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x10>;
+	};
+
+	trust_ui_vm_virt_be0: trust_ui_vm_virt_be0@11 {
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x11>;
+	};
+
+	trust_ui_vm_virt_be1: trust_ui_vm_virt_be1@10 {
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x10>;
+	};
+
+	gh-secure-vm-loader@0 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <28>;
+		qcom,vmid = <45>;
+		qcom,firmware-name = "trustedvm";
+		memory-region = <&trust_ui_vm_mem>;
+		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
+	};
 };
 
 &firmware {
@@ -1834,9 +1876,27 @@
 		reg = <0x0 0xe1200000 0x0 0x2710000>;
 	};
 
-	tui_vm_mem: tui_vm_region@f3200000 {
+	trust_ui_vm_mem: trust_ui_vm_region@f2800000 {
 		no-map;
-		reg = <0x0 0xf3200000 0x0 0x4c00000>;
+		reg = <0x0 0xf2800000 0x0 0x4c00000>;
+	};
+
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@0xf7400000 {
+		no-map;
+		reg = <0x0 0xf7400000 0x0 0x4000>;
+		gunyah-label = <0x11>;					//for persist.img
+	};
+
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@0xf7404000 {
+		no-map;
+		reg = <0x0 0xf7404000 0x0 0x4000>;
+		gunyah-label = <0x10>;					//for system.img
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@0xf7408000 {
+		no-map;
+		reg = <0x0 0xf7408000 0x0 0x100000>;
+		gunyah-label = <0x12>;
 	};
 
 	oem_vm_mem: oem_vm_region@f7e00000 {
