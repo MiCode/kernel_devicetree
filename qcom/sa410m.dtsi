@@ -10,6 +10,17 @@
 
 	reserved_memory: reserved-memory { };
 
+	mem-offline {
+		compatible = "qcom,mem-offline";
+		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
+				<0x1 0xc0000000 0x0 0x80000000>,
+				<0x2 0xc0000000 0x1 0x40000000>;
+		granule = <512>;
+	};
+
+	aliases {
+	};
+
 	firmware: firmware {};
 
 	cpus {
@@ -20,8 +31,9 @@
 			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x0>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80000000>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
@@ -41,8 +53,9 @@
 			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x1>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80000000>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 
 			L1_I_1: l1-icache {
@@ -58,8 +71,9 @@
 			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x2>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80000000>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 
 			L1_I_2: l1-icache {
@@ -75,8 +89,9 @@
 			device_type = "cpu";
 			compatible = "arm,armv8";
 			reg = <0x0 0x3>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x80000000>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 
 			L1_I_3: l1-icache {
@@ -109,10 +124,134 @@
 		};
 	};
 
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
 	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7";
 	};
 
 	soc: soc { };
+};
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	hyp_region: hyp_region@45600000 {
+		no-map;
+		reg = <0x0 0x45600000 0x0 0x700000>;
+	};
+
+	xbl_aop_mem: xbl_aop_mem@45d00000 {
+		no-map;
+		reg = <0x0 0x45d00000 0x0 0x200000>;
+	};
+
+	sec_apps_mem: sec_apps_region@45fff000 {
+		no-map;
+		reg = <0x0 0x45fff000 0x0 0x1000>;
+	};
+
+	smem_region: smem@46000000 {
+		no-map;
+		reg = <0x0 0x46000000 0x0 0x200000>;
+	};
+
+	pil_modem_mem: modem_region@4ab00000 {
+		no-map;
+		reg = <0x0 0x4ab00000 0x0 0x6900000>;
+	};
+
+	wlan_msa_mem: wlan_msa_region@51400000 {
+		no-map;
+		reg = <0x0 0x51400000 0x0 0x100000>;
+	};
+
+	pil_adsp_mem: adsp_regions@51500000 {
+		no-map;
+		reg = <0x0 0x51500000 0x0 0x1400000>;
+	};
+
+	pil_ipa_fw_mem: ips_fw_region@52900000 {
+		no-map;
+		reg = <0x0 0x52900000 0x0 0x10000>;
+	};
+
+	pil_ipa_gsi_mem: ipa_gsi_region@52910000 {
+		no-map;
+		reg = <0x0 0x52910000 0x0 0x5000>;
+	};
+
+	tz_stat: tz_stat@53200000 {
+		no-map;
+		reg = <0x0 0x53200000 0x0 0x100000>;
+	};
+
+	pimem_vault: pimem_vault@53300000 {
+		no-map;
+		reg = <0x0 0x53300000 0x0 0x1500000>;
+	};
+
+	adsp_mem: adsp_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0 0x00000000 0 0xffffffff>;
+		reusable;
+		alignment = <0 0x400000>;
+		size = <0 0x800000>;
+	};
+
+	dump_mem: mem_dump_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x800000>;
+	};
+
+	user_contig_mem: user_contig_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
+	qseecom_mem: qseecom_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x700000>;
+	};
+
+	qseecom_ta_mem: qseecom_ta_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x400000>;
+	};
+
+	memshare_mem: memshare_region {
+		compatible = "shared-dma-pool";
+		no-map;
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		alignment = <0x0 0x100000>;
+		size = <0x0 0x800000>;
+	};
+
+	/* global autoconfigured region for contiguous allocations */
+	linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
+	};
 };
 
 &soc {
