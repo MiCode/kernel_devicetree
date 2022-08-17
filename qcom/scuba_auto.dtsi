@@ -201,5 +201,30 @@
 	};
 
 
+	rpm_msg_ram: memory@045f0000 {
+		compatible = "qcom,rpm-msg-ram";
+		reg = <0x45f0000 0x7000>;
+	};
+
+	apcs_glb: mailbox@0f111000 {
+		compatible = "qcom,scuba-apcs-hmss-global";
+		reg = <0xF111000 0x1000>;
+
+		#mbox-cells = <1>;
+	};
+
+	rpm-glink {
+		compatible = "qcom,glink-rpm";
+		interrupts = <GIC_SPI 194 IRQ_TYPE_EDGE_RISING>;
+		qcom,rpm-msg-ram = <&rpm_msg_ram>;
+		mboxes = <&apcs_glb 0>;
+
+		qcom,rpm_glink_ssr {
+			qcom,glink-channels = "glink_ssr";
+			// qcom,notify-edges = <&glink_adsp>;
+		};
+	};
+
+
 };
 
