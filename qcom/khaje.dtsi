@@ -3445,13 +3445,22 @@
 		qcom,ipa-napi-enable;
 	};
 
+	qcom,ipa_fws {
+		compatible = "qcom,pil-tz-generic";
+		qcom,pas-id = <0xf>;
+		qcom,firmware-name = "ipa_fws";
+		qcom,pil-force-shutdown;
+		status = "disabled";
+	};
+
+
 	ipa_hw: qcom,ipa@0x5800000 {
 		compatible = "qcom,ipa";
 		reg = <0x5800000 0x34000>,
 			<0x5804000 0x28000>;
-		qcom,pas-id = <0xf>;
-		qcom,firmware-name = "ipa_fws";
-		memory-region = <&pil_ipa_gsi_mem>;
+		pas-ids = <0xf>;
+		firmware-names = "ipa_fws";
+		memory-regions = <&pil_ipa_fw_mem>;
 		reg-names = "ipa-base", "gsi-base";
 		interrupts = <GIC_SPI 257 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 259 IRQ_TYPE_LEVEL_HIGH>;
@@ -3471,6 +3480,7 @@
 		qcom,smmu-fast-map;
 		qcom,use-ipa-pm;
 		qcom,skip-ieob-mask-wa;
+		qcom,max_num_smmu_cb = <3>;
 		clocks = <&rpmcc RPM_SMD_IPA_CLK>;
 		clock-names = "core_clk";
 
