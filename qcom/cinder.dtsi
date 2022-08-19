@@ -1177,6 +1177,24 @@
 		qcom,freq-hw-domain = <&cpufreq_hw 0>;
 	};
 
+	tsc@1da0000 {
+		compatible = "qcom,tsc";
+		reg = <0x1da0000 0x2000>, <0x01db0000 0x10000>;
+		reg-names = "tsc", "etu";
+		clocks = <&gcc GCC_TSC_CFG_AHB_CLK>, <&gcc GCC_TSC_CNTR_CLK >,
+		       <&gcc GCC_TSC_ETU_CLK>;
+		clock-names = "cfg_ahb", "cntr", "etu";
+		assigned-clocks = <&gcc GCC_TSC_CNTR_CLK>, <&gcc GCC_TSC_ETU_CLK>;
+		assigned-clock-rates = <500000000>, <500000000>;
+		interrupts = <GIC_SPI 331 IRQ_TYPE_EDGE_RISING>,
+			     <GIC_SPI 329 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "tod_pps", "gps_pps";
+		qcom,etu-event-sel = <1 3>;
+		qcom,etu-event-names = "gps_pps", "tod_pps";
+		pinctrl-names = "default";
+		pinctrl-0 = <&etu_tod_pps_active>, <&etu_gps_pps_active>;
+	};
+
 	/* GCC GDSCs */
 	gcc_pcie_0_gdsc: qcom,gdsc@11d004 {
 		reg = <0x11d004 0x4>;
