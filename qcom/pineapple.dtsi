@@ -48,6 +48,7 @@
 			cpu-idle-states = <&SILVER_OFF_CL0>;
 			power-domains = <&CPU_PD0>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -69,6 +70,7 @@
 			cpu-idle-states = <&SILVER_OFF_CL0>;
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			next-level-cache = <&L2_0>;
 		};
 
@@ -81,6 +83,7 @@
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_2>;
+			qcom,freq-domain = <&cpufreq_hw 3>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -96,6 +99,7 @@
 			cpu-idle-states = <&GOLD_OFF_CL1>;
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 3>;
 			next-level-cache = <&L2_2>;
 		};
 
@@ -107,6 +111,7 @@
 			cpu-idle-states = <&GOLD_OFF_CL1>;
 			power-domains = <&CPU_PD4>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 3>;
 			next-level-cache = <&L2_4>;
 			L2_4: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -124,6 +129,7 @@
 			cpu-idle-states = <&GOLD_OFF_CL2>;
 			power-domains = <&CPU_PD5>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			next-level-cache = <&L2_5>;
 			L2_5: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -140,6 +146,7 @@
 			cpu-idle-states = <&GOLD_OFF_CL2>;
 			power-domains = <&CPU_PD6>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			next-level-cache = <&L2_6>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -156,6 +163,7 @@
 			cpu-idle-states = <&GOLD_OFF_CL3>;
 			power-domains = <&CPU_PD7>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 2>;
 			next-level-cache = <&L2_7>;
 			L2_7: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -975,6 +983,37 @@
 		clock-names = "xo_clk_src";
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17D91000 0x1000>,
+		      <0x17D92000 0x1000>,
+		      <0x17D93000 0x1000>,
+		      <0x17D94000 0x1000>;
+		reg-names = "freq-domain0",
+			    "freq-domain1",
+			    "freq-domain2",
+			    "freq-domain3";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 738 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int",
+				  "dcvsh1_int",
+				  "dcvsh2_int",
+				  "dcvsh3_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>,
+				      <&cpufreq_hw 1>,
+				      <&cpufreq_hw 2>,
+				      <&cpufreq_hw 3>;
 	};
 
 	/* CAM_CC GDSCs */
