@@ -44,8 +44,8 @@ waipio-overlays-dtb-$(CONFIG_ARCH_WAIPIO) += $(WAIPIO_BOARDS) $(NOAPQ_WAIPIO_BOA
 dtb-y += $(waipio-dtb-y)
 
 
-KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb
-KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb
+KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb kalama-sg.dtb
+KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
@@ -56,6 +56,7 @@ KALAMA_BOARDS += \
 		 kalama-atp-overlay.dtbo \
 		 kalama-rcm-overlay.dtbo \
 		 kalama-qrd-overlay.dtbo \
+		 kalama-sg-hhg-overlay.dtbo \
 		 kalamap-hdk-overlay.dtbo \
 		 kalamap-hhg-overlay.dtbo
 
