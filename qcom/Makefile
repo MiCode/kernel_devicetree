@@ -101,7 +101,10 @@ cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
 	cinder-du-rumi.dtb \
 	cinder-ru-idp.dtb \
 	cinder-du-idp.dtb \
-	cinder-du-x100.dtb
+	cinder-du-x100.dtb \
+	cinder-v2-ru-idp.dtb \
+	cinder-v2-du-idp.dtb \
+	cinder-v2-du-x100.dtb
 dtb-y += $(cinder-dtb-y)
 
 
