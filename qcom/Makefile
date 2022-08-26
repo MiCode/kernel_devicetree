@@ -58,7 +58,7 @@ KALAMA_BOARDS += \
 		 kalama-qrd-overlay.dtbo \
 		 kalama-sg-hhg-overlay.dtbo \
 		 kalamap-hdk-overlay.dtbo \
-		 kalamap-hhg-overlay.dtbo
+		 kalamap-sg-hhg-overlay.dtbo
 
 NOAPQ_KALAMA_BOARDS += \
 		 kalama-rumi-overlay.dtbo
