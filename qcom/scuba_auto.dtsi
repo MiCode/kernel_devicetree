@@ -1,3 +1,5 @@
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,scuba.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/clock/qcom,gcc-scuba.h>
@@ -482,6 +484,68 @@
 		qcom,no-accumulative-counter;
 		qcom,max-lut-entries = <12>;
 		#freq-domain-cells = <1>;
+	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,scuba-clk_virt";
+		qcom,keepalive;
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_QUP_CLK>,
+			<&rpmcc RPM_SMD_QUP_A_CLK>;
+	};
+
+	system_noc: interconnect0@1880000 {
+		reg = <0x1880000 0x5e080>;
+		compatible = "qcom,scuba-sys_noc";
+		qcom,keepalive;
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_SNOC_CLK>,
+			<&rpmcc RPM_SMD_SNOC_A_CLK>;
+	};
+
+	mmnrt_virt: interconnect1@1880000 {
+		reg = <0x1880000 0x5e080>;
+		compatible = "qcom,scuba-mmnrt_virt";
+		qcom,util-factor = <142>;
+		qcom,keepalive;
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_MMNRT_CLK>,
+			<&rpmcc RPM_SMD_MMNRT_A_CLK>;
+	};
+
+	mmrt_virt: interconnect2@1880000 {
+		reg = <0x1880000 0x5e080>;
+		compatible = "qcom,scuba-mmrt_virt";
+		qcom,util-factor = <139>;
+		qcom,keepalive;
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_MMRT_CLK>,
+			<&rpmcc RPM_SMD_MMRT_A_CLK>;
+	};
+
+	config_noc: interconnect@1900000 {
+		reg = <0x01900000 0x9200>;
+		compatible = "qcom,scuba-config_noc";
+		qcom,keepalive;
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_CNOC_CLK>,
+			<&rpmcc RPM_SMD_CNOC_A_CLK>;
+	};
+
+	bimc: interconnect@4480000 {
+		reg = <0x4480000 0x80000>;
+		compatible = "qcom,scuba-bimc";
+		qcom,util-factor = <153>;
+		qcom,keepalive;
+		#interconnect-cells = <1>;
+		clock-names = "bus", "bus_a";
+		clocks = <&rpmcc RPM_SMD_BIMC_CLK>,
+			<&rpmcc RPM_SMD_BIMC_A_CLK>;
 	};
 };
 
