@@ -69,7 +69,7 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
-KHAJE_BASE_DTB += khaje.dtb
+KHAJE_BASE_DTB += khaje.dtb khajep.dtb khajeq.dtb
 
 KHAJE_BOARDS += \
                  khaje-idp-overlay.dtbo \
@@ -79,7 +79,30 @@ KHAJE_BOARDS += \
                  khaje-idp-nopmi-overlay.dtbo \
                  khaje-qrd-nopmi-overlay.dtbo \
                  khaje-idps-display-90hz-overlay.dtbo \
-                 khaje-atp-overlay.dtbo
+                 khaje-atp-overlay.dtbo \
+                 khaje-idp-usbc-overlay.dtbo \
+                 khaje-idp-pm8010-overlay.dtbo \
+                 khajep-atp-overlay.dtbo \
+                 khajep-qrd-overlay.dtb \
+                 khajep-qrd-hvdcp3p5-overlay.dtbo \
+                 khajep-qrd-nowcd9375-overlay.dtbo \
+                 khajep-qrd-nopmi-overlay.dtbo \
+                 khajep-idp-overlay.dtbo \
+                 khajep-idp-nopmi-overlay.dtbo \
+                 khajep-idp-usbc-overlay.dtbo \
+                 khajep-idp-pm8010-overlay.dtbo \
+                 khajep-idps-display-90hz-overlay.dtbo \
+                 khajeq-atp-overlay.dtbo \
+                 khajeq-qrd-overlay.dtbo \
+                 khajeq-qrd-hvdcp3p5-overlay.dtbo \
+                 khajeq-qrd-nowcd9375-overlay.dtbo \
+                 khajeq-qrd-nopmi-overlay.dtbo \
+                 khajeq-idp-overlay.dtbo \
+                 khajeq-idp-nopmi-overlay.dtbo \
+                 khajeq-idp-usbc-overlay.dtbo \
+                 khajeq-idp-pm8010-overlay.dtbo \
+                 khajeq-idps-display-90hz-overlay.dtbo
+
 
 khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
         $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
