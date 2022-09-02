@@ -265,6 +265,11 @@
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 1>;
 			};
+
+			rpmhcc: clock-controller {
+				compatible = "qcom,sdxpinn-rpmh-clk";
+				#clock-cells = <1>;
+			};
 		};
 	};
 
@@ -452,7 +457,7 @@
 	clocks {
 		xo_board: xo_board {
 			compatible = "fixed-clock";
-			clock-frequency = <19200000>;
+			clock-frequency = <76800000>;
 			clock-output-names = "xo_board";
 			#clock-cells = <0>;
 		};
@@ -500,95 +505,139 @@
 		};
 	};
 
-	bi_tcxo: bi_tcxo {
-		compatible = "fixed-factor-clock";
-		clocks = <&xo_board>;
-		clock-mult = <1>;
-		clock-div = <1>;
-		#clock-cells = <0>;
-		clock-output-names = "bi_tcxo";
-	};
-
-	bi_tcxo_ao: bi_tcxo_ao {
-		compatible = "fixed-factor-clock";
-		clocks = <&xo_board>;
-		clock-mult = <1>;
-		clock-div = <1>;
-		#clock-cells = <0>;
-		clock-output-names = "bi_tcxo_ao";
-	};
-
-	rpmhcc: clock-controller {
-		compatible = "fixed-clock";
-		clock-output-names = "rpmh_clocks";
-		clock-frequency = <19200000>;
-		#clock-cells = <1>;
-	};
-
 	gcc: clock-controller@80000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,sdxpinn-gcc", "syscon";
+		reg = <0x80000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MXA_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&pcie20_phy_aux_clk>,
+			 <&pcie_1_pipe_clk>,
+			 <&pcie_2_pipe_clk>,
+			 <&pcie_pipe_clk>,
+			 <&sleep_clk>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+		clock-names = "bi_tcxo",
+			      "pcie20_phy_aux_clk",
+			      "pcie_1_pipe_clk",
+			      "pcie_2_pipe_clk",
+			      "pcie_pipe_clk",
+			      "sleep_clk",
+			      "usb3_phy_wrapper_gcc_usb30_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
 
+	apsscc: syscon@17aa0000 {
+		compatible = "syscon";
+		reg = <0x17aa0000 0x1c>;
+	};
+
+	mccc: syscon@190ba000 {
+		compatible = "syscon";
+		reg = <0x190ba000 0x54>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,sdxpinn-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,gcc = <&gcc>;
+		qcom,mccc = <&mccc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&gcc 0>;
+		clock-names = "xo_clk_src",
+			"gcc";
+		#clock-cells = <1>;
+	};
+
 	/* GCC GDSCs */
 	gcc_emac0_gdsc: qcom,gdsc@f1004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xf1004 0x4>;
 		regulator-name = "gcc_emac0_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_emac1_gdsc: qcom,gdsc@f2004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xf2004 0x4>;
 		regulator-name = "gcc_emac1_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_1_gdsc: qcom,gdsc@e7004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xe7004 0x4>;
 		regulator-name = "gcc_pcie_1_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_1_phy_gdsc: qcom,gdsc@d6004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xd6004 0x4>;
 		regulator-name = "gcc_pcie_1_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_2_gdsc: qcom,gdsc@e8004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xe8004 0x4>;
 		regulator-name = "gcc_pcie_2_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_2_phy_gdsc: qcom,gdsc@ee004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xee004 0x4>;
 		regulator-name = "gcc_pcie_2_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_gdsc: qcom,gdsc@d3004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xd3004 0x4>;
 		regulator-name = "gcc_pcie_gdsc";
+		parent-supply = <&VDD_MXA_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_phy_gdsc: qcom,gdsc@d4004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xd4004 0x4>;
 		regulator-name = "gcc_pcie_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_usb30_gdsc: qcom,gdsc@a7004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xa7004 0x4>;
 		regulator-name = "gcc_usb30_gdsc";
+		parent-supply = <&VDD_MXA_LEVEL>;
+		qcom,retain-regs;
 	};
 
 	gcc_usb3_phy_gdsc: qcom,gdsc@a8008 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0xa8008 0x4>;
 		regulator-name = "gcc_usb3_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 	};
 
 	qnand_1: nand@1c98000 {
