@@ -805,6 +805,107 @@
 		};
 	};
 
+	qcom,smp2p-modem {
+		compatible = "qcom,smp2p";
+		qcom,smem = <435>, <428>;
+		interrupts = <GIC_SPI 70 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apcs_glb 14>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <1>;
+
+		modem_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		modem_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		smp2p_ipa_1_out: qcom,smp2p-ipa-1-out {
+			qcom,entry-name = "ipa";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		/* ipa - inbound entry from mss */
+		smp2p_ipa_1_in: qcom,smp2p-ipa-1-in {
+			qcom,entry-name = "ipa";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	qcom,smp2p-adsp {
+		compatible = "qcom,smp2p";
+		qcom,smem = <443>, <429>;
+		interrupts = <GIC_SPI 279 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apcs_glb 10>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <2>;
+
+		adsp_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		adsp_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		smp2p_rdbg2_out: qcom,smp2p-rdbg2-out {
+			qcom,entry-name = "rdbg";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_rdbg2_in: qcom,smp2p-rdbg2-in {
+			qcom,entry-name = "rdbg";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		sleepstate_smp2p_out_sensor: sleepstate-out-sensor {
+			qcom,entry-name = "sleepstate";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		sleepstate_smp2p_in_sensor: qcom,sleepstate-in-sensor {
+			qcom,entry-name = "sleepstate_see";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		sleepstate_smp2p_out_ult: sleepstate-out-ult {
+			qcom,entry-name = "sleepstate_ult";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		sleepstate_smp2p_in_ult: qcom,sleepstate-in-ult {
+			qcom,entry-name = "sleepstate_ult_in";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	qcom,smp2p_sleepstate_sensor {
+		compatible = "qcom,smp2p-sleepstate";
+		qcom,smem-states = <&sleepstate_smp2p_out_sensor 0>;
+		interrupt-parent = <&sleepstate_smp2p_in_sensor>;
+		interrupts = <0 0>;
+		interrupt-names = "smp2p-sleepstate-in";
+	};
+
+	qcom,smp2p_sleepstate_ult {
+		compatible = "qcom,smp2p-sleepstate";
+		qcom,smem-states = <&sleepstate_smp2p_out_ult 0>;
+		interrupt-parent = <&sleepstate_smp2p_in_ult>;
+		interrupts = <0 0>;
+		interrupt-names = "smp2p-sleepstate-in";
+	};
+
 	clocks {
 		xo_board: xo-board {
 			compatible = "fixed-clock";
