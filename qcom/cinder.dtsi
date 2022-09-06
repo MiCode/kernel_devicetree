@@ -1526,6 +1526,19 @@
 		clock-names = "xo", "alternate";
 		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
 	};
+
+	i2c_slave: i2c_slave@88ca000 {
+		compatible = "qcom,i2c-slave";
+		reg = <0x088ca000 0x64>;
+		interrupt-names = "i2c_s_irq";
+		interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "sm_bus_xo_clk", "sm_bus_ahb_clk";
+		clocks = <&gcc GCC_SM_BUS_XO_CLK>, <&gcc GCC_SM_BUS_AHB_CLK>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&i2c_slave_sda_active>, <&i2c_slave_scl_active>;
+		pinctrl-1 = <&i2c_slave_sleep>;
+		status = "disabled";
+	};
 };
 
 &firmware {
