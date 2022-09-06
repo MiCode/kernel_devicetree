@@ -1870,6 +1870,12 @@
 		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
+	oem_vm: qcom,oem_vm@fc8fc000 {
+		reg = <0xfc8fc000 0x104000>;
+		vm_name = "oemvm";
+		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
+	};
+
 	qcom,virtio_backend@0 {
 		compatible = "qcom,virtio_backend";
 		qcom,vm = <&trust_ui_vm>;
@@ -1880,6 +1886,12 @@
 		compatible = "qcom,virtio_backend";
 		qcom,vm = <&trust_ui_vm>;
 		qcom,label = <0x10>;
+	};
+
+	qcom,virtio_backend@2 {
+		compatible = "qcom,virtio_backend";
+		qcom,vm = <&oem_vm>;
+		qcom,label = <0x13>;
 	};
 
 	trust_ui_vm_virt_be0: trust_ui_vm_virt_be0@11 {
@@ -1901,6 +1913,20 @@
 		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
 	};
 
+	oem_vm_virt_be0: oem_vm_virt_be0@13 {
+		qcom,vm = <&oem_vm>;
+		qcom,label = <0x13>;
+	};
+
+	gh-secure-vm-loader@1 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <34>;
+		qcom,vmid = <49>;
+		qcom,firmware-name = "oemvm";
+		memory-region = <&oem_vm_mem>;
+		virtio-backends = <&oem_vm_virt_be0>;
+	};
+
 	qcom,msm-cdsp-loader {
 		compatible = "qcom,cdsp-loader";
 		qcom,proc-img-to-load = "cdsp";
@@ -1911,7 +1937,6 @@
 		memory-region = <&adsp_mem_heap>;
 		restrict-access;
 	};
-
 };
 
 &firmware {
@@ -2176,7 +2201,19 @@
 
 	oem_vm_mem: oem_vm_region@f7e00000 {
 		no-map;
-		reg = <0x0 0xf7e00000 0x0 0x4c00000>;
+		reg = <0x0 0xf7e00000 0x0 0x4afc000>;
+	};
+
+	oem_vm_vblk0_ring: oem_vm_vblk0_ring@fc8fc000 {
+		no-map;
+		reg = <0x0 0xfc8fc000 0x0 0x4000>;
+		gunyah-label = <0x13>;
+	};
+
+	oem_vm_swiotlb: oem_vm_swiotlb@fc900000 {
+		no-map;
+		reg = <0x0 0xfc900000 0x0 0x100000>;
+		gunyah-label = <0x14>;
 	};
 
 	hyp_ext_tags_mem: tags_region@fca00000 {

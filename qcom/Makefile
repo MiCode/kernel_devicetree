@@ -54,7 +54,8 @@ endif
 
 ifeq ($(CONFIG_ARCH_PINEAPPLE), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
-pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb
+pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
+				pineapple-oemvm-rumi.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif
