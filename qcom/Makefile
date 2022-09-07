@@ -80,10 +80,10 @@ KHAJE_BOARDS += \
                  khaje-idps-display-90hz-overlay.dtbo \
                  khaje-atp-overlay.dtbo
 
-bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
+khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
         $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
-bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
-dtb-y += $(bengal-dtb-y)
+khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
+dtb-y += $(khaje-dtb-y)
 
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
 
