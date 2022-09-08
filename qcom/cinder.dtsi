@@ -3,6 +3,7 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/interconnect/qcom,cinder.h>
+#include <dt-bindings/interconnect/qcom,epss-l3.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
@@ -47,6 +48,9 @@
 			cpu-idle-states = <&SILVER_OFF>;
 			power-domains = <&CPU_PD0>;
 			next-level-cache = <&L2_0>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -69,6 +73,9 @@
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_1>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU1>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -87,6 +94,9 @@
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_2>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU2>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -104,6 +114,9 @@
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
 			next-level-cache = <&L2_3>;
+			operating-points-v2 = <&cpu0_opp_table>;
+			interconnects = <&gem_noc MASTER_APPSS_PROC &mc_virt SLAVE_EBI1>,
+					<&epss_l3_cpu MASTER_EPSS_L3_APPS &epss_l3_cpu SLAVE_EPSS_L3_CPU3>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -164,6 +177,21 @@
 		};
 	};
 
+	cpu0_opp_table: cpu0_opp_table {
+		compatible = "operating-points-v2";
+		opp-shared;
+
+		cpu0_opp1: opp-1516800000 {
+			opp-hz = /bits/ 64 <1516800000>;
+			opp-peak-kBps = < 8371200 1209600000>;
+		};
+
+		cpu0_opp2: opp-1804800000 {
+			opp-hz = /bits/ 64 <1804800000>;
+			opp-peak-kBps = <12787200 1459200000>;
+		};
+	};
+
 	soc: soc { };
 
 };
@@ -189,6 +217,31 @@
 		reusable;
 		size = <0x0 0x1000000>;
 	};
+
+	user_contig_mem: user_contig_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
+	qseecom_mem: qseecom_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1400000>;
+	};
+
+	qseecom_ta_mem: qseecom_ta_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
 };
 
 &soc {
@@ -1122,6 +1175,24 @@
 	qcom,cpufreq-hw-debug {
 		compatible = "qcom,cpufreq-hw-epss-debug";
 		qcom,freq-hw-domain = <&cpufreq_hw 0>;
+	};
+
+	tsc@1da0000 {
+		compatible = "qcom,tsc";
+		reg = <0x1da0000 0x2000>, <0x01db0000 0x10000>;
+		reg-names = "tsc", "etu";
+		clocks = <&gcc GCC_TSC_CFG_AHB_CLK>, <&gcc GCC_TSC_CNTR_CLK >,
+		       <&gcc GCC_TSC_ETU_CLK>;
+		clock-names = "cfg_ahb", "cntr", "etu";
+		assigned-clocks = <&gcc GCC_TSC_CNTR_CLK>, <&gcc GCC_TSC_ETU_CLK>;
+		assigned-clock-rates = <500000000>, <500000000>;
+		interrupts = <GIC_SPI 331 IRQ_TYPE_EDGE_RISING>,
+			     <GIC_SPI 329 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "tod_pps", "gps_pps";
+		qcom,etu-event-sel = <1 3>;
+		qcom,etu-event-names = "gps_pps", "tod_pps";
+		pinctrl-names = "default";
+		pinctrl-0 = <&etu_tod_pps_active>, <&etu_gps_pps_active>;
 	};
 
 	/* GCC GDSCs */
