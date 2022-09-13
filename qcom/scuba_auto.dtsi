@@ -30,7 +30,10 @@
 		granule = <512>;
 	};
 
-	aliases { };
+	aliases {
+		serial0= &qupv3_se4_2uart ;
+		sdhc0 = &sdhc_1; /*SDC1 eMMC slot*/
+	};
 
 	firmware: firmware {};
 
@@ -580,6 +583,249 @@
 		#reset-cells = <1>;
 	};
 
+	tcsr_mutex_block: syscon@00340000 {
+		compatible = "syscon";
+		reg = <0x340000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+
+	smem: qcom,smem {
+		compatible = "qcom,smem";
+		memory-region = <&smem_mem>;
+		hwlocks = <&tcsr_mutex 3>;
+	};
+
+	qcom,glink {
+		compatible = "qcom,glink";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		glink_modem: modem {
+			qcom,remote-pid = <1>;
+			transport = "smem";
+			mboxes = <&apcs_glb 12>;
+			mbox-names = "mpss_smem";
+			interrupts = <GIC_SPI 68 IRQ_TYPE_EDGE_RISING>;
+
+			label = "modem";
+			qcom,glink-label = "mpss";
+
+			qcom,modem_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
+
+		glink_adsp: adsp {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+			mboxes = <&apcs_glb 8>;
+			mbox-names = "adsp_smem";
+			interrupts = <GIC_SPI 277 IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+
+			qcom,adsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,apr_tal_rpmsg {
+				qcom,glink-channels = "apr_audio_svc";
+				qcom,intents = <0x200 20>;
+			};
+		};
+	};
+
+	qcom,glinkpkt {
+		compatible = "qcom,glinkpkt";
+
+		qcom,glinkpkt-at-mdm0 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DS";
+			qcom,glinkpkt-dev-name = "at_mdm0";
+		};
+
+		qcom,glinkpkt-data40-cntl {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA40_CNTL";
+			qcom,glinkpkt-dev-name = "smdcntl8";
+		};
+
+		qcom,glinkpkt-data1 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA1";
+			qcom,glinkpkt-dev-name = "smd7";
+		};
+
+		qcom,glinkpkt-data4 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA4";
+			qcom,glinkpkt-dev-name = "smd8";
+		};
+
+		qcom,glinkpkt-data11 {
+			qcom,glinkpkt-edge = "mpss";
+			qcom,glinkpkt-ch-name = "DATA11";
+			qcom,glinkpkt-dev-name = "smd11";
+		};
+	};
+
+	qcom,smp2p-modem {
+		compatible = "qcom,smp2p";
+		qcom,smem = <435>, <428>;
+		interrupts = <GIC_SPI 70 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apcs_glb 14>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <1>;
+
+		modem_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		modem_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		smp2p_ipa_1_out: qcom,smp2p-ipa-1-out {
+			qcom,entry-name = "ipa";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		/* ipa - inbound entry from mss */
+		smp2p_ipa_1_in: qcom,smp2p-ipa-1-in {
+			qcom,entry-name = "ipa";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	qcom,smp2p-adsp {
+		compatible = "qcom,smp2p";
+		qcom,smem = <443>, <429>;
+		interrupts = <GIC_SPI 279 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apcs_glb 10>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <2>;
+
+		adsp_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		adsp_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	qcom-secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
+	qcom_scm: qcomscm {
+		compatible = "qcom,scm";
+	};
+
+	sdhc_1: sdhci@4744000 {
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x04744000 0x1000>, <0x04745000 0x1000>;
+		reg-names = "hc", "cqhci";
+
+		iommus = <&apps_smmu 0xC0 0x0>;
+		qcom,iommu-dma = "bypass";
+
+		interrupts = <GIC_SPI 348 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 352 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		clocks = <&gcc GCC_SDCC1_APPS_CLK>,
+			<&gcc GCC_SDCC1_AHB_CLK>,
+			<&gcc GCC_SDCC1_ICE_CORE_CLK>;
+		clock-names = "core", "iface", "ice_core";
+
+		qcom,ice-clk-rates = <300000000 100000000>;
+
+		//interconnects = <&system_noc MASTER_SDCC_1 &bimc SLAVE_EBI_CH0>,
+		//	<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_SDCC_1>;
+		//interconnect-names = "sdhc-ddr","cpu-sdhc";
+		//qcom,msm-bus,name = "sdhc1";
+		//qcom,msm-bus,num-cases = <9>;
+		//qcom,msm-bus,num-paths = <2>;
+		//qcom,msm-bus,vectors-KBps =
+			/* No vote */
+		//	<0 0>, <0 0>,
+			/* 400 KB/s*/
+		//	<1046 1600>,
+		//	<1600 1600>,
+			/* 20 MB/s */
+		//	<20480 80000>,
+		//	<80000 80000>,
+			/* 25 MB/s */
+		//	<25600 250000>,
+		//	<50000 133320>,
+			/* 50 MB/s */
+		//	<51200 250000>,
+		//	<65000 133320>,
+			/* 100 MB/s */
+		//	<102400 250000>,
+		//	<65000 133320>,
+		//	/* 200 MB/s */
+		//	<204800 800000>,
+		//	<200000 300000>,
+			/* 400 MB/s */
+		//	<204800 800000>,
+		//	<200000 300000>,
+			/* Max. bandwidth */
+		//	<1338562 4096000>,
+		//	<1338562 4096000>;
+		//qcom,bus-bw-vectors-bps = <0 400000 20000000 25000000 50000000
+		//	100750000 200000000 400000000 4294967295>;
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x000f642c 0x0 0x0 0x00010800 0x80040868>;
+
+		mmc-ddr-1_8v;
+		mmc-hs200-1_8v;
+		mmc-hs400-1_8v;
+		mmc-hs400-enhanced-strobe;
+
+		bus-width = <8>;
+		non-removable;
+		supports-cqe;
+
+		no-sd;
+		no-sdio;
+		max-frequency = <192000000>;
+
+		//qcom,devfreq,freq-table = <50000000 200000000>;
+		//qcom,scaling-lower-bus-speed-mode = "DDR52";
+
+		status = "disabled";
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <43>;
+		};
+	};
+
 	mccc_debug: syscon@447d200 {
 		compatible = "syscon";
 		reg = <0x447d200 0x100>;
@@ -694,6 +940,13 @@
 		compatible = "qcom,scm";
 	};
 
+	qcom,rmtfs_sharedmem@0 {
+		compatible = "qcom,sharedmem-uio";
+		reg = <0x0 0x280000>;
+		reg-names = "rmtfs";
+		qcom,client-id = <0x00000001>;
+		qcom,guard-memory;
+	};
 };
 
 #include "pm2250-rpm-regulator.dtsi"
@@ -768,3 +1021,25 @@
 };
 
 #include "msm-arm-smmu-scuba_auto.dtsi"
+#include "scuba_auto-qupv3.dtsi"
+
+&sdhc_1 {
+	vdd-supply = <&L20A>;
+	qcom,vdd-voltage-level = <2856000 2856000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L14A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+	status = "ok";
+};
+
+&qupv3_se4_2uart {
+	status = "ok";
+};
