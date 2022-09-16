@@ -6,7 +6,7 @@
 #include <dt-bindings/clock/qcom,gpucc-scuba.h>
 #include <dt-bindings/clock/qcom,dispcc-scuba.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
-
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 / {
 
 	model = "Qualcomm Technologies, Inc. SCUBA_AUTO";
@@ -759,6 +759,84 @@
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
+	};
+
+	modem_pas: remoteproc-modem@6080000 {
+		compatible = "qcom,scuba_auto-modem-pas";
+		reg = <0x6080000 0x100>;
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+		status = "ok";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "vdd_cx";
+
+		memory-region = <&pil_modem_mem>;
+
+		/* Inputs from mss */
+		interrupts-extended = <&intc 0 307 1>,
+				<&modem_smp2p_in 0 0>,
+				<&modem_smp2p_in 2 0>,
+				<&modem_smp2p_in 1 0>,
+				<&modem_smp2p_in 3 0>,
+				<&modem_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to mss */
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+
+	remoteproc-lpass@ab00000 {
+		compatible = "qcom,scuba_auto-lpass-pas";
+		reg = <0xab00000 0x00100>;
+		status = "ok";
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+		qcom,proxy-clock-names = "xo";
+
+		x-supply = <&VDD_LPI_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		mx-supply = <&VDD_LPI_MX_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		proxy-reg-names = "vdd_lpi_cx", "vdd_lpi_mx";
+
+		memory-region = <&pil_adsp_mem>;
+
+		/* Inputs from lpass */
+		interrupts-extended = <&intc 0 282 IRQ_TYPE_LEVEL_HIGH>,
+				      <&adsp_smp2p_in 0 0>,
+				      <&adsp_smp2p_in 2 0>,
+				      <&adsp_smp2p_in 1 0>,
+				      <&adsp_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+				  "fatal",
+				  "handover",
+				  "ready",
+				  "stop-ack";
+
+		/* Outputs to lpass */
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+	qcom,ipa_fws {
+		compatible = "qcom,pil-tz-generic";
+		qcom,pas-id = <0xf>;
+		qcom,firmware-name = "scuba_ipa_fws";
+		qcom,pil-force-shutdown;
+		memory-region = <&pil_ipa_fw_mem>;
 	};
 
 	qcom-secure-buffer {
