@@ -906,6 +906,76 @@
 		interrupt-names = "smp2p-sleepstate-in";
 	};
 
+	adsp_pas:remoteproc-adsp@ab00000  {
+		compatible = "qcom,monaco-adsp-pas";
+		reg = <0xab00000 0x00100>;
+
+		cx-supply = <&VDD_LPI_CX_LEVEL>;
+		reg-names = "vdd_lpi_cx", "vdd_lpi_mx";
+		qcom,vdd_lpi_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		mx-supply = <&VDD_LPI_MX_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+
+		memory-region = <&pil_adsp_mem>;
+
+		/* Inputs from lpass */
+		interrupts-extended = <&intc 0 282 IRQ_TYPE_LEVEL_HIGH>,
+				      <&adsp_smp2p_in 0 0>,
+				      <&adsp_smp2p_in 2 0>,
+				      <&adsp_smp2p_in 1 0>,
+				      <&adsp_smp2p_in 3 0>,
+				      <&adsp_smp2p_in 9 0>;
+
+		interrupt-names = "qcom,wdog",
+				  "qcom,err-fatal",
+				  "qcom,proxy-unvote",
+				  "qcom,err-ready",
+				  "qcom,stop-ack",
+				  "qcom,dsentry-ack";
+
+		/* Outputs to lpass */
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+	modem_pas: remoteproc-mss@6080000 {
+		compatible = "qcom,monaco-modem-pas";
+		reg = <0x6080000 0x100>;
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "vdd_cx";
+
+		memory-region = <&pil_modem_mem>;
+
+		/* Inputs from mss */
+		interrupts-extended = <&intc 0 307 1>,
+				<&modem_smp2p_in 0 0>,
+				<&modem_smp2p_in 2 0>,
+				<&modem_smp2p_in 1 0>,
+				<&modem_smp2p_in 3 0>,
+				<&modem_smp2p_in 7 0>,
+				<&modem_smp2p_in 9 0>;
+
+		interrupt-names = "qcom,wdog",
+				  "qcom,err-fatal",
+				  "qcom,proxy-unvote",
+				  "qcom,err-ready",
+				  "qcom,stop-ack",
+				  "qcom,shutdown-ack",
+				  "qcom,dsentry-ack";
+
+		/* Outputs to mss */
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
 	clocks {
 		xo_board: xo-board {
 			compatible = "fixed-clock";
