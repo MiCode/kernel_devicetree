@@ -115,10 +115,10 @@ KHAJE_BOARDS += \
 
 
 
-khaje-dtb-$(CONFIG_ARCH_KHAJE) += \
+bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
         $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
-khaje-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
-dtb-y += $(khaje-dtb-y)
+bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
+dtb-y += $(bengal-dtb-y)
 
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
 
@@ -215,7 +215,10 @@ dtb-y += $(sdxpinn-dtb-y)
 
 sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
 				sa410m-rumi.dtb \
-				sa410m-idp.dtb
+				sa410m-nand-idp.dtb \
+				sa410m-emmc-idp.dtb \
+				sa410m-nand-ccard.dtb \
+				sa410m-emmc-ccard.dtb
 dtb-y += $(sa410m_auto-dtb-y)
 
 SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb

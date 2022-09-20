@@ -1,6 +1,7 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/clock/qcom,gcc-sdxbaagha.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
 
 / {
 	#address-cells = <1>;
@@ -24,70 +25,95 @@
 		#size-cells = <1>;
 		ranges;
 
-		mpss_mem: mpss_region@82400000 {
+		quickboot_mem: quickboot_region@82100000 {
 			no-map;
-			reg = <0x82400000 0x4600000>;
+			reg = <0x82100000 0x100000>;
 		};
 
-		quickboot_mem: quickboot_region@86a00000 {
+		aop_image_mem: aop_image_region@82200000 {
 			no-map;
-			reg = <0x86a00000 0x100000>;
+			reg = <0x82200000 0x20000>;
 		};
 
-		aop_image_mem: aop_image_region@86b00000 {
-			no-map;
-			reg = <0x86b00000 0x20000>;
-		};
-
-		aop_cmd_db_mem: aop_cmd_db_region@86b20000 {
+		aop_cmd_db_mem: aop_cmd_db_region@82220000 {
 			compatible = "qcom,cmd-db";
 			no-map;
-			reg = <0x86b20000 0x20000>;
+			reg = <0x82220000 0x20000>;
 		};
 
-		aop_config_mem: aop_config_region@86b40000 {
+		aop_config_mem: aop_config_region@82240000 {
 			no-map;
-			reg = <0x86b40000 0x40000>;
+			reg = <0x82240000 0x20000>;
 		};
 
-		smem_mem: smem_region@86b80000 {
+		ipa_fw_mem: ipa_fw_region@82270000 {
 			no-map;
-			reg = <0x86b80000 0xc0000>;
+			reg = <0x82270000 0x10000>;
 		};
 
-		tme_crashdump_mem: tme_crashdump_region@86c40000 {
+		smem_mem: smem_region@82280000 {
 			no-map;
-			reg = <0x86c40000 0x40000>;
+			reg = <0x82280000 0xc0000>;
 		};
 
-		tme_log_mem: tme_log_region@86c80000 {
+		tme_crashdump_mem: tme_crashdump_region@82340000 {
 			no-map;
-			reg = <0x86c80000 0x4000>;
+			reg = <0x82340000 0x40000>;
 		};
 
-		access_control_db_mem: access_control_db_region@86c84000 {
+		tme_log_mem: tme_log_region@82380000 {
 			no-map;
-			reg = <0x86c84000 0x20000>;
+			reg = <0x82380000 0x4000>;
 		};
 
-		secdata_mem: secdata_region@86ca4000 {
+		access_control_db_mem: access_control_db_region@82384000 {
 			no-map;
-			reg = <0x86ca4000 0x1000>;
+			reg = <0x82384000 0x20000>;
 		};
 
-		xbl_ramdump_mem: xbl_ramdump_region@86d00000 {
+		secdata_mem: secdata_region@823a4000 {
 			no-map;
-			reg = <0x86d00000 0x100000>;
+			reg = <0x823a4000 0x1000>;
 		};
 
-		qtee_tz_mem: qtee_tz_region@86e00000 {
+		cpucp_fw_mem: cpucp_fw_region@82400000 {
 			no-map;
-			reg = <0x86e00000 0x200000>;
+			reg = <0x82400000 0x80000>;
 		};
 
-		trusted_apps_mem: trusted_apps_region@87000000 {
+		xbl_sc_mem: xbl_sc_region@82480000 {
 			no-map;
-			reg = <0x87000000 0x400000>;
+			reg = <0x82480000 0x40000>;
+		};
+
+		xbl_dt_log_mem: xbl_dt_log_region@824c0000 {
+			no-map;
+			reg = <0x824c0000 0x20000>;
+		};
+
+		qtee_tz_mem: qtee_tz_region@82500000 {
+			no-map;
+			reg = <0x82500000 0x200000>;
+		};
+
+		trusted_apps_mem: trusted_apps_region@82700000 {
+			no-map;
+			reg = <0x82700000 0x400000>;
+		};
+
+		qdss_mem: qdss_region@82b00000 {
+			no-map;
+			reg = <0x82b00000 0x300000>;
+		};
+
+		mpss_audio_mem: mpss_audio_region@82e00000 {
+			no-map;
+			reg = <0x82e00000 0x4600000>;
+		};
+
+		audio_heap_mem: audio_heap_region@88000000 {
+			no-map;
+			reg = <0x88000000 0x400000>;
 		};
 
 		/* global autoconfigured region for contiguous allocations */
@@ -130,6 +156,84 @@
 		#interrupt-cells = <3>;
 		reg = <0x17000000 0x1000>,
 		      <0x17002000 0x1000>;
+	};
+
+	tcsr_mutex_block: syscon@1f40000 {
+		compatible = "syscon";
+		reg = <0x1f40000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+
+	smem: qcom,smem {
+		compatible = "qcom,smem";
+		memory-region = <&smem_mem>;
+		hwlocks = <&tcsr_mutex 3>;
+	};
+
+	qcom,smp2p-modem {
+		compatible = "qcom,smp2p";
+		qcom,smem = <435>, <428>;
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_MPSS IPCC_MPROC_SIGNAL_SMP2P
+				IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&ipcc_mproc IPCC_CLIENT_MPSS IPCC_MPROC_SIGNAL_SMP2P>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <1>;
+
+		modem_smp2p_out: master-kernel {
+			qcom,entry-name = "master-kernel";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		modem_smp2p_in: slave-kernel {
+			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	aoss_qmp: power-controller@c300000 {
+		compatible = "qcom,sdxbaagha-aoss-qmp";
+		reg = <0xc300000 0x400>;
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_AOP
+				IPCC_MPROC_SIGNAL_GLINK_QMP
+				IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&ipcc_mproc IPCC_CLIENT_AOP
+				IPCC_MPROC_SIGNAL_GLINK_QMP>;
+
+		#power-domain-cells = <1>;
+		#clock-cells = <0>;
+	};
+
+	qmp_aop: qcom,qmp-aop {
+		compatible = "qcom,qmp-mbox";
+		qcom,qmp = <&aoss_qmp>;
+		label = "aop";
+		#mbox-cells = <1>;
+	};
+
+	qmp_tme: qcom,qmp-tme {
+		compatible = "qcom,qmp-mbox";
+		qcom,remote-pid = <14>;
+		mboxes = <&ipcc_mproc IPCC_CLIENT_TME
+			  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+		mbox-names = "tme_qmp";
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_TME
+			      IPCC_MPROC_SIGNAL_GLINK_QMP
+			      IRQ_TYPE_EDGE_RISING>;
+
+		label = "tme";
+		qcom,early-boot;
+		priority = <0>;
+		mbox-desc-offset = <0x0>;
+		#mbox-cells = <1>;
 	};
 
 	timer {
@@ -205,6 +309,23 @@
 			reg = <0x17029000 0x1000>;
 			status = "disabled";
 		};
+	};
+
+	qnand_1: nand@1c98000 {
+		compatible = "qcom,msm-nand";
+		reg =   <0x01c98000 0x1000>,
+			<0x01c9c000 0x1c000>;
+		reg-names =     "nand_phys",
+				"bam_phys";
+		qcom,reg-adjustment-offset = <0x4000>;
+
+		interrupts = <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "bam_irq";
+
+		clock-names = "core_clk";
+		clocks = <&rpmhcc RPMH_QPIC_CLK>;
+
+		status = "disabled";
 	};
 
 	qcom,secure-buffer {

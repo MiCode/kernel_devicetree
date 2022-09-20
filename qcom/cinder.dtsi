@@ -790,8 +790,8 @@
 		status = "disabled";
 
 		compatible = "qcom,sdhci-msm-v5";
-		reg = <0x08804000 0x1000>, <0x08805000 0x1000>;
-		reg-names = "hc", "cqhci";
+		reg = <0x08804000 0x1000>, <0x08805000 0x1000>, <0x08808000 0x8000>, <0x08810000 0x9800>;
+		reg-names = "hc", "cqhci", "cqhci_ice", "cqhci_ice_hwkm";
 
 		interrupts = <GIC_SPI 207 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
@@ -1525,6 +1525,19 @@
 		#interconnect-cells = <1>;
 		clock-names = "xo", "alternate";
 		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+	};
+
+	i2c_slave: i2c_slave@88ca000 {
+		compatible = "qcom,i2c-slave";
+		reg = <0x088ca000 0x64>;
+		interrupt-names = "i2c_s_irq";
+		interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "sm_bus_xo_clk", "sm_bus_ahb_clk";
+		clocks = <&gcc GCC_SM_BUS_XO_CLK>, <&gcc GCC_SM_BUS_AHB_CLK>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&i2c_slave_sda_active>, <&i2c_slave_scl_active>;
+		pinctrl-1 = <&i2c_slave_sleep>;
+		status = "disabled";
 	};
 };
 

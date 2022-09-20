@@ -248,7 +248,7 @@
 	};
 
 	/* global autoconfigured region for contiguous allocations */
-	linux,cma {
+	system_cma:linux,cma {
 		compatible = "shared-dma-pool";
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
@@ -343,6 +343,28 @@
 			reg = <0xf128000 0x1000>;
 			status = "disabled";
 		};
+	};
+
+	tlmm: pinctrl@500000 {
+			compatible = "qcom,sa410m-pinctrl";
+			reg = <0x500000 0x7F000>,
+			      <0x598000 0xD000>;
+			reg-names = "normal" , "extended";
+			interrupts = <GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+			gpio-ranges = <&tlmm 0 0 139>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+			//wakeup-parent = <&wakegic>;
+	};
+
+	qcom-secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
+	qcom_scm: qcomscm {
+		compatible = "qcom,scm";
 	};
 
 	thermal_zones: thermal-zones { };
@@ -446,3 +468,6 @@
 		};
 	};
 };
+
+#include "msm-arm-smmu-sa410m.dtsi"
+#include "sa410m-pinctrl.dtsi"

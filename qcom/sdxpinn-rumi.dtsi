@@ -166,6 +166,50 @@
 	status = "ok";
 };
 
+&sdhc_1 {
+	status = "ok";
+	vdd-supply = <&vreg_sdc1_emmc_sd_vdd>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L6B>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 200000>;
+
+	/delete-property/ mmc-ddr-1_8v;
+	/delete-property/ mmc-hs200-1_8v;
+	/delete-property/ mmc-hs400-1_8v;
+	/delete-property/ mmc-hs400-enhanced-strobe;
+
+	max-frequency = <100000000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	vdd-supply = <&vreg_sdc2_sd_vdd>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&vreg_sdc2_sd_ls_vccb>;
+	qcom,vdd-io-voltage-level = <2850000 2850000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	is_rumi;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 103 GPIO_ACTIVE_LOW>;
+};
+
 &rpmhcc {
 	compatible = "fixed-clock";
 	clock-output-names = "rpmh_clocks";

@@ -5,6 +5,7 @@
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
+#include <dt-bindings/spmi/spmi.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. SDXPINN";
@@ -22,6 +23,8 @@
 
 	aliases {
 		serial0 = &qupv3_se1_2uart;
+		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 	};
 
 	cpus {
@@ -38,6 +41,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0x90f00000>;
 			next-level-cache = <&L2_0>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -59,6 +64,8 @@
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0x90f00000>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 
 			L2_1: l2-cache {
 				compatible = "arm,arch-cache";
@@ -76,6 +83,8 @@
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0x90f00000>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 
 			L2_2: l2-cache {
 				compatible = "arm,arch-cache";
@@ -93,6 +102,8 @@
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0x90f00000>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 
 			L2_3: l2-cache {
 				compatible = "arm,arch-cache";
@@ -657,6 +668,80 @@
 		status = "disabled";
 	};
 
+	sdhc_1: sdhci@8804000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x08804000 0x1000>, <0x08805000 0x1000>;
+		reg-names = "hc", "cqhci";
+
+		interrupts = <GIC_SPI 210 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <8>;
+		non-removable;
+		supports-cqe;
+
+		no-sd;
+		no-sdio;
+		qcom,restore-after-cx-collapse;
+
+		mmc-ddr-1_8v;
+		mmc-hs200-1_8v;
+		mmc-hs400-1_8v;
+		mmc-hs400-enhanced-strobe;
+
+		cap-mmc-hw-reset;
+
+		clocks = <&gcc GCC_SDCC1_AHB_CLK>,
+			<&gcc GCC_SDCC1_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x000F442C 0x0 0x01
+					0x090106C0 0x80040868>;
+
+		/* Add dt entry for gcc hw reset */
+		resets = <&gcc GCC_EMMC_BCR>;
+		reset-names = "core_reset";
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
+	};
+
+	sdhc_2: sdhci@8844000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x08844000 0x1000>;
+		reg-names = "hc";
+
+		interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 411 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <4>;
+		no-sdio;
+		no-mmc;
+		qcom,restore-after-cx-collapse;
+
+		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
+			<&gcc GCC_SDCC2_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
+					0x090106C0 0x80040868>;
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
+	};
+
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,sdxpinn-pinctrl";
 		reg = <0x0F000000 0x400000>;
@@ -695,6 +780,42 @@
 		qcom,channel = <0>;
 		qcom,ee = <0>;
 		qcom,bus-id = <0>;
+	};
+
+	spmi_debug_bus: qcom,spmi-debug@24b14000 {
+		compatible = "qcom,spmi-pmic-arb-debug";
+		reg = <0x24b14000 0x60>, <0x221c8784 0x4>;
+		reg-names = "core", "fuse";
+		clocks = <&aoss_qmp>;
+		clock-names = "core_clk";
+		qcom,fuse-enable-bit = <18>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		depends-on-supply = <&spmi_bus>;
+
+		qcom,pmk8550-debug@0 {
+			compatible = "qcom,spmi-pmic";
+			reg = <0x0 SPMI_USID>;
+			#address-cells = <2>;
+			#size-cells = <0>;
+			qcom,can-sleep;
+		};
+
+		qcom,pmx75-debug@1 {
+			compatible = "qcom,spmi-pmic";
+			reg = <0x1 SPMI_USID>;
+			#address-cells = <2>;
+			#size-cells = <0>;
+			qcom,can-sleep;
+		};
+
+		qcom,pm7550ba-debug@7 {
+			compatible = "qcom,spmi-pmic";
+			reg = <0x7 SPMI_USID>;
+			#address-cells = <2>;
+			#size-cells = <0>;
+			qcom,can-sleep;
+		};
 	};
 
 	thermal_zones: thermal-zones {
@@ -806,6 +927,20 @@
 	qcom,sps {
 		compatible = "qcom,msm-sps-4k";
 		qcom,pipe-attr-ee;
+	};
+
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
 	};
 };
 
