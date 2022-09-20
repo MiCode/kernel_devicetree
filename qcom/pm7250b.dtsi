@@ -428,7 +428,9 @@
 	pm7250b_temp_alarm: pm7250b-tz {
 		polling-delay-passive = <100>;
 		polling-delay = <0>;
+		thermal-governor = "step_wise";
 		thermal-sensors = <&pm7250b_tz>;
+		wake-capable-sensor;
 
 		trips {
 			pm7250b_trip0: trip0 {
@@ -454,7 +456,9 @@
 	pm7250b-ibat-lvl0 {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
+		thermal-governor = "step_wise";
 		thermal-sensors = <&pm7250b_bcl 0>;
+		wake-capable-sensor;
 
 		trips {
 			ibat_lvl0:ibat-lvl0 {
@@ -468,7 +472,9 @@
 	pm7250b-ibat-lvl1 {
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
+		thermal-governor = "step_wise";
 		thermal-sensors = <&pm7250b_bcl 1>;
+		wake-capable-sensor;
 
 		trips {
 			ibat_lvl1:ibat-lvl1 {
@@ -479,10 +485,63 @@
 		};
 	};
 
+	pm7250b-vbat-lvl0 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-governor = "low_limits_cap";
+		thermal-sensors = <&pm7250b_bcl 2>;
+		wake-capable-sensor;
+		tracks-low;
+
+		trips {
+			vbat_lvl0: vbat-lvl0 {
+				temperature = <3000>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm7250b-vbat-lvl1 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-governor = "low_limits_cap";
+		thermal-sensors = <&pm7250b_bcl 3>;
+		wake-capable-sensor;
+		tracks-low;
+
+		trips {
+			vbat_lvl1:vbat-lvl1 {
+				temperature = <2800>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm7250b-vbat-lvl2 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-governor = "low_limits_cap";
+		thermal-sensors = <&pm7250b_bcl 4>;
+		wake-capable-sensor;
+		tracks-low;
+
+		trips {
+			vbat_lvl2:vbat-lvl2 {
+				temperature = <2600>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
 	pm7250b-bcl-lvl0 {
 		polling-delay-passive = <100>;
 		polling-delay = <0>;
+		thermal-governor = "step_wise";
 		thermal-sensors = <&pm7250b_bcl 5>;
+		wake-capable-sensor;
 
 		trips {
 			b_bcl_lvl0: b-bcl-lvl0 {
@@ -496,7 +555,9 @@
 	pm7250b-bcl-lvl1 {
 		polling-delay-passive = <100>;
 		polling-delay = <0>;
+		thermal-governor = "step_wise";
 		thermal-sensors = <&pm7250b_bcl 6>;
+		wake-capable-sensor;
 
 		trips {
 			b_bcl_lvl1: b-bcl-lvl1 {
@@ -510,7 +571,9 @@
 	pm7250b-bcl-lvl2 {
 		polling-delay-passive = <100>;
 		polling-delay = <0>;
+		thermal-governor = "step_wise";
 		thermal-sensors = <&pm7250b_bcl 7>;
+		wake-capable-sensor;
 
 		trips {
 			b_bcl_lvl2: b-bcl-lvl2 {
@@ -521,26 +584,17 @@
 		};
 	};
 
-	socd {
+	soc {
 		polling-delay-passive = <100>;
 		polling-delay = <0>;
+		thermal-governor = "low_limits_cap";
 		thermal-sensors = <&bcl_soc>;
+		wake-capable-sensor;
+		tracks-low;
 
 		trips {
-			thermal-engine-trip {
-				temperature = <100>;
-				hysteresis = <0>;
-				type = "passive";
-			};
-
-			thermal-hal-trip {
-				temperature = <100>;
-				hysteresis = <0>;
-				type = "passive";
-			};
-
 			soc_trip:soc-trip {
-				temperature = <90>;
+				temperature = <10>;
 				hysteresis = <0>;
 				type = "passive";
 			};
