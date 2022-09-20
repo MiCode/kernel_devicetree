@@ -1,6 +1,6 @@
 #include <dt-bindings/thermal/thermal_qti.h>
 
-&soc {
+&cpufreq_hw {
 	#address-cells = <1>;
 	#size-cells = <1>;
 	lmh_dcvs0: qcom,limits-dcvs@f521000 {
@@ -9,6 +9,8 @@
 		qcom,affinity = <0>;
 		reg = <0xf550800 0x1000>,
 			<0xf521000 0x1000>;
+		qcom,no-cooling-device-register;
+		#thermal-sensor-cells = <0>;
 	};
 
 	lmh_dcvs1: qcom,limits-dcvs@f523000 {
@@ -17,6 +19,8 @@
 		qcom,affinity = <1>;
 		reg = <0xf550800 0x1000>,
 			<0xf523000 0x1000>;
+		qcom,no-cooling-device-register;
+		#thermal-sensor-cells = <0>;
 	};
 
 	qcom,cpu-pause {
@@ -103,7 +107,9 @@
 			qcom,cdev-alias = "pause-cpu7";
 		};
 	};
+};
 
+&soc {
 	tsens0:tsens@c222000 {
 		compatible = "qcom,tsens24xx";
 		reg = <0x04410000  0x8>,
@@ -191,16 +197,6 @@
 		/* 4th and 5th offsets to bypass VICTIM1 */
 		qcom,bypass-client-list = <0x1004 0x4004 0x6004 0xc004 0xc008>;
 		#cooling-cells = <2>;
-	};
-
-	qcom,devfreq-cdev {
-		compatible = "qcom,devfreq-cdev";
-		qcom,devfreq = <&msm_gpu>;
-	};
-
-	qcom,cpufreq-cdev {
-		compatible = "qcom,cpufreq-cdev";
-		qcom,cpus = <&CPU0 &CPU4>;
 	};
 };
 
