@@ -89,6 +89,40 @@
 	status = "disabled";
 };
 
+&pm8550_gpios {
+	pwr_en_gpio {
+		pwr_en_gpio_default: pwr_en_gpio_default {
+			pins = "gpio9";
+			function = "normal";
+			power-source = <0>;
+			output-low;
+			input-disable;
+		};
+	};
+
+};
+
+&DBO3 {
+	/delete-property/ gpio;
+};
+
+&qupv3_hub_i2c2 {
+	status = "ok";
+
+	fancontroller: max31760@50 {
+		compatible = "maxim,max31760";
+		reg = <0x50>;
+		#cooling-cells = <2>;
+		maxim,vdd-supply = <&L4N>;
+		maxim,vcca-supply = <&L15B>;
+		regulator-name = "maxim,vdd", "maxim,vcca";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pwr_en_gpio_default>;
+		maxim,pwr-en-gpio = <&pm8550_gpios 9 GPIO_ACTIVE_LOW>;
+		status = "ok";
+	};
+};
+
 &thermal_zones {
 	cam-flash-therm {
 		status = "disabled";
