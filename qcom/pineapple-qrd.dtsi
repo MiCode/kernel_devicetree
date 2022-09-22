@@ -3,6 +3,29 @@
 #include <dt-bindings/clock/qcom,gcc-pineapple.h>
 #include "pineapple-pmic-overlay.dtsi"
 
+&sdhc_2 {
+	status = "ok";
+	vdd-supply = <&pm_humu_l9>;
+	qcom,vdd-voltage-level = <2950000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&pm_humu_l8>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 5600>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>, <&sd_card_det_default>;
+	pinctrl-1 = <&sdc2_off>, <&sd_card_det_default>;
+
+	cd-gpios = <&pm8550_gpios 12 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_SDCC2_BCR>;
+	reset-names = "core_reset";
+
+	qcom,iommu-dma = "fastmap";
+	qcom,uses_level_shifter;
+};
+
 &soc {
 	gpio_keys {
 		compatible = "gpio-keys";
