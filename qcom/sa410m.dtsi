@@ -2,6 +2,8 @@
 #include <dt-bindings/interconnect/qcom,sa410m.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,gcc-sa410m.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
 
 / {
 	#address-cells = <2>;
@@ -369,6 +371,66 @@
 		compatible = "qcom,scm";
 	};
 
+	clocks {
+		xo_board: xo-board {
+			compatible = "fixed-clock";
+			clock-frequency = <38400000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
+
+		sleep_clk: sleep-clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32000>;
+			clock-output-names = "chip_sleep_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	rpmcc: clock-controller {
+		compatible = "qcom,rpmcc-scuba";
+		#clock-cells = <1>;
+	};
+
+	gcc: clock-controller@1400000 {
+		compatible = "qcom,sa410m-gcc", "syscon";
+		reg = <0x1400000 0x1f0000>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		clocks = <&rpmcc RPM_CXO_CLK>,
+			<&rpmcc RPM_CXO_A_CLK>,
+			<&pcie_0_pipe_clk>,
+			<&sleep_clk>,
+			<&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+		clock-names = "bi_tcxo",
+			"bi_tcxo_ao",
+			"pcie_0_pipe_clk",
+			"sleep_clk",
+			"usb3_phy_wrapper_gcc_usb30_pipe_clk";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	mccc_debug: syscon@447d200 {
+		compatible = "syscon";
+		reg = <0x0447d200 0x100>;
+	};
+
+	cpucc_debug: syscon@f11101c {
+		compatible = "syscon";
+		reg = <0xf11101c 0x4>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,sa410m-debugcc";
+		qcom,gcc = <&gcc>;
+		qcom,mccc = <&mccc_debug>;
+		qcom,cpucc = <&cpucc_debug>;
+		clock-names = "xo_clk_src";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		#clock-cells = <1>;
+	};
+
 	bimc_noc: interconnect@0 {
 		compatible = "qcom,sa410m-bimc";
 		#interconnect-cells = <1>;
@@ -493,3 +555,32 @@
 
 #include "msm-arm-smmu-sa410m.dtsi"
 #include "sa410m-pinctrl.dtsi"
+#include "monaco-gdsc.dtsi"
+
+&gcc_emac0_gdsc {
+	status = "ok";
+};
+
+&gcc_pcie_0_gdsc {
+	status = "ok";
+};
+
+&gcc_usb30_prim_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mm_snoc_mmu_tbu_rt_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_mm_snoc_mmu_tbu_nrt_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu1_gdsc {
+	status = "ok";
+};
+
+&hlos1_vote_turing_mmu_tbu0_gdsc {
+	status = "ok";
+};

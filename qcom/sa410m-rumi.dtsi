@@ -7,3 +7,33 @@
 &memtimer {
 	clock-frequency = <500000>;
 };
+
+&soc {
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clock-mult = <1>;
+		clock-div = <2>;
+		clocks = <&xo_board>;
+		clock-output-names = "bi_tcxo";
+		#clock-cells = <0>;
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clock-mult = <1>;
+		clock-div = <2>;
+		clocks = <&xo_board>;
+		clock-output-names = "bi_tcxo_ao";
+		#clock-cells = <0>;
+	};
+};
+
+&rpmcc {
+	compatible = "qcom,dummycc";
+	clock-output-names = "rpmcc_clocks";
+};
+
+&gcc {
+	clocks = <&bi_tcxo>, <&bi_tcxo_ao>, <&pcie_0_pipe_clk>,
+		<&sleep_clk>, <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+};
