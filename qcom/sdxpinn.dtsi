@@ -780,6 +780,19 @@
 		clock-names = "core_clk";
 		clocks = <&rpmhcc RPMH_QPIC_CLK>;
 
+		interconnects = <&system_noc MASTER_QPIC &mc_virt SLAVE_EBI1>;
+		interconnect-names = "nand-ddr";
+		qcom,msm-bus,name = "qpic_nand";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+			<0 0>,
+		/* Voting for max b/w on PNOC bus for now */
+			<1057800 725760>;
+
+		iommus = <&apps_smmu 0x100 0x7>;
+		qcom,iommu-dma = "bypass";
+
 		status = "disabled";
 	};
 
