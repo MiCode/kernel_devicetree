@@ -20,7 +20,7 @@
 	reserved_memory: reserved-memory { };
 
 	chosen: chosen {
-		bootargs = "disable_dma32=on swiotlb=noforce kpti=off";
+		bootargs = "disable_dma32=on swiotlb=noforce kpti=off cpufreq.default_governor=performance";
 	};
 
 	aliases {
@@ -46,6 +46,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -70,6 +71,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 
 			L2_1: l2-cache {
 				compatible = "arm,arch-cache";
@@ -90,6 +92,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 
 			L2_2: l2-cache {
 				compatible = "arm,arch-cache";
@@ -110,6 +113,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 
 			L2_3: l2-cache {
 				compatible = "arm,arch-cache";
@@ -566,6 +570,22 @@
 		clock-names = "xo_clk_src",
 			"gcc";
 		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17d91000 0x1000>;
+		reg-names = "freq-domain0";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>;
 	};
 
 	/* GCC GDSCs */
