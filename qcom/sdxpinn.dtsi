@@ -6,6 +6,8 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,sdxpinn.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. SDXPINN";
@@ -295,6 +297,10 @@
 						  <WAKE_TCS      2>,
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 1>;
+			};
+
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
 			};
 
 			rpmhcc: clock-controller {
@@ -1079,6 +1085,53 @@
 	qcom,mem-buf-msgq {
 		compatible = "qcom,mem-buf-msgq";
 	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,sdxpinn-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,sdxpinn-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	dc_noc: interconnect@190E0000 {
+		compatible = "qcom,sdxpinn-dc_noc";
+		reg = <0x190E0000 0x8200>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gem_noc: interconnect@19100000 {
+		compatible = "qcom,sdxpinn-gem_noc";
+		reg = <0x19100000 0x34080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	pcie_anoc: interconnect@16C0000 {
+		compatible = "qcom,sdxpinn-pcie_anoc";
+		reg = <0x16C0000 0x14200>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@1640000 {
+		compatible = "qcom,sdxpinn-system_noc";
+		reg = <0x1640000 0x4B400>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
 };
 
 &firmware {
