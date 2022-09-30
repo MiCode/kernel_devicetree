@@ -898,6 +898,45 @@
 		status = "disabled";
 	};
 
+	modem_pas: remoteproc-mss@04080000 {
+		compatible = "qcom,sdxpinn-modem-pas";
+		reg = <0x4080000 0x10000>,
+			<0x4180000 0x10000>;
+		status = "disabled";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MODEM_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx", "mx";
+
+		qcom,signal-aop;
+		qcom,qmp = <&aoss_qmp>;
+		memory-region = <&mpssadsp_mem>;
+
+		/* Inputs from mss */
+		interrupts-extended = <&intc GIC_SPI 250 IRQ_TYPE_EDGE_RISING>,
+					<&modem_smp2p_in 0 0>,
+					<&modem_smp2p_in 2 0>,
+					<&modem_smp2p_in 1 0>,
+					<&modem_smp2p_in 3 0>,
+					<&modem_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+					"fatal",
+					"handover",
+					"ready",
+					"stop-ack",
+					"shutdown-ack";
+
+		/* Outputs to mss */
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
 	spmi_bus: qcom,spmi@c42d000 {
 		compatible = "qcom,spmi-pmic-arb";
 		reg = <0xc42d000 0x4000>,
