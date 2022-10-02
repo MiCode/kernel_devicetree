@@ -19,13 +19,17 @@
 
 	reserved_memory: reserved-memory { };
 
-	chosen: chosen { };
+	chosen: chosen {
+		bootargs = "disable_dma32=on swiotlb=noforce kpti=off cpufreq.default_governor=performance";
+	};
 
 	aliases {
 		serial0 = &qupv3_se1_2uart;
 		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
 		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 	};
+
+	firmware: firmware { };
 
 	cpus {
 		#address-cells = <2>;
@@ -43,6 +47,8 @@
 			next-level-cache = <&L2_0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -66,6 +72,8 @@
 			cpu-release-addr = <0x0 0x90f00000>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 
 			L2_1: l2-cache {
 				compatible = "arm,arch-cache";
@@ -85,6 +93,8 @@
 			cpu-release-addr = <0x0 0x90f00000>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 
 			L2_2: l2-cache {
 				compatible = "arm,arch-cache";
@@ -104,6 +114,8 @@
 			cpu-release-addr = <0x0 0x90f00000>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			#cooling-cells = <2>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 
 			L2_3: l2-cache {
 				compatible = "arm,arch-cache";
@@ -194,6 +206,14 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 	ranges;
+
+	ramoops_mem: ramoops_region {
+		compatible = "ramoops";
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x200000>;
+		pmsg-size = <0x200000>;
+		mem-type = <2>;
+	};
 
 	/* global autoconfigured region for contiguous allocations */
 	system_cma: linux,cma {
@@ -562,6 +582,22 @@
 		#clock-cells = <1>;
 	};
 
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17d91000 0x1000>;
+		reg-names = "freq-domain0";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>;
+	};
+
 	/* GCC GDSCs */
 	gcc_emac0_gdsc: qcom,gdsc@f1004 {
 		compatible = "qcom,gdsc";
@@ -706,6 +742,10 @@
 		resets = <&gcc GCC_EMMC_BCR>;
 		reset-names = "core_reset";
 
+		iommus = <&apps_smmu 0x00A0 0x0>;
+		dma-coherent;
+		qcom,iommu-dma = "fastmap";
+
 		qos0 {
 			mask = <0x0f>;
 			vote = <44>;
@@ -736,10 +776,69 @@
 		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
 					0x090106C0 0x80040868>;
 
+		iommus = <&apps_smmu 0x00C0 0x0>;
+		dma-coherent;
+		qcom,iommu-dma = "fastmap";
+
 		qos0 {
 			mask = <0x0f>;
 			vote = <44>;
 		};
+	};
+
+	qcom,msm-imem@14680000 {
+		compatible = "qcom,msm-imem";
+		reg = <0x14680000 0x1000>;
+		ranges = <0x0 0x14680000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		status = "disabled";
+
+		mem_dump_table@10  {
+			compatible = "qcom,msm-imem-mem_dump_table";
+			reg = <0x10 0x8>;
+		};
+
+		restart_reason@65c {
+			compatible = "qcom,msm-imem-restart_reason";
+			reg = <0x65c 0x4>;
+		};
+
+		dload_type@1c {
+			compatible = "qcom,msm-imem-dload-type";
+			reg = <0x1c 0x4>;
+		};
+
+		boot_stats@6b0 {
+			compatible = "qcom,msm-imem-boot_stats";
+			reg = <0x6b0 0x20>;
+		};
+
+		kaslr_offset@6d0 {
+			compatible = "qcom,msm-imem-kaslr_offset";
+			reg = <0x6d0 0xc>;
+		};
+
+		pil@94c {
+			compatible = "qcom,pil-reloc-info";
+			reg = <0x94c 0xc8>;
+		};
+
+		pil@6dc {
+			compatible = "qcom,msm-imem-pil-disable-timeout";
+			reg = <0x6dc 0x4>;
+		};
+
+		diag_dload@c8 {
+			compatible = "qcom,msm-imem-diag-dload";
+			reg = <0xc8 0xc8>;
+		};
+	};
+
+	cpu_pmu: cpu-pmu {
+		compatible = "arm,armv8-pmuv3";
+		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
 	};
 
 	tlmm: pinctrl@f000000 {
@@ -753,6 +852,29 @@
 		wakeup-parent = <&pdc>;
 	};
 
+	qcom,mpm2-sleep-counter@c221000 {
+		compatible = "qcom,mpm2-sleep-counter";
+		reg = <0xc221000 0x1000>;
+		clock-frequency = <32768>;
+		status = "disabled";
+	};
+
+	tcsr: syscon@1fc0000 {
+		compatible = "syscon";
+		reg = <0x1fc0000 0x30000>;
+		status = "disabled";
+	};
+
+	qcom,dload-mode {
+		compatible = "qcom,dload-mode";
+		status = "disabled";
+	};
+
+	vendor_hooks: qcom,cpu-vendor-hooks {
+		compatible = "qcom,cpu-vendor-hooks";
+		status = "disabled";
+	};
+
 	ipcc_mproc: qcom,ipcc@408000 {
 		compatible = "qcom,ipcc";
 		reg = <0x408000 0x1000>;
@@ -760,6 +882,14 @@
 		interrupt-controller;
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
+	};
+
+	qcom,chd {
+		compatible = "qcom,core-hang-detect";
+		label = "core";
+		qcom,threshold-arr = <0x17800058 0x17810058 0x17820058 0x17830058>;
+		qcom,config-arr = <0x17800060 0x17810060 0x17820060 0x17830060>;
+		status = "disabled";
 	};
 
 	spmi_bus: qcom,spmi@c42d000 {
@@ -816,6 +946,13 @@
 			#size-cells = <0>;
 			qcom,can-sleep;
 		};
+	};
+
+	qcom,rmtfs_sharedmem@0 {
+		compatible = "qcom,sharedmem-uio";
+		reg = <0x0 0x400000>;
+		reg-names = "rmtfs";
+		qcom,client-id = <0x00000001>;
 	};
 
 	thermal_zones: thermal-zones {
@@ -944,6 +1081,14 @@
 	};
 };
 
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
+		qcom,dload-mode = <&tcsr 0x13000>;
+		status = "disabled";
+	};
+};
+
 #include "ipcc-test-sdxpinn.dtsi"
 #include "sdxpinn-regulators.dtsi"
 #include "sdxpinn-coresight.dtsi"
@@ -954,6 +1099,7 @@
 #include "sdxpinn-qupv3.dtsi"
 #include "msm-arm-smmu-sdxpinn.dtsi"
 #include "sdxpinn-dma-heaps.dtsi"
+#include "sdxpinn-thermal.dtsi"
 
 &qupv3_se1_2uart {
 	status = "ok";

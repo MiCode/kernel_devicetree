@@ -403,6 +403,13 @@
 		reg = <0x17a00000 0x10000>,     /* GICD */
 		      <0x17a60000 0x100000>;    /* GICR * 8 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+
+		gic_its: gic-its@17a40000 {
+			compatible = "arm,gic-v3-its";
+			reg = <0x17a40000 0x20000>;
+			msi-controller;
+			#msi-cells = <1>;
+		};
 	};
 
 	pdc: interrupt-controller@b220000 {
@@ -572,6 +579,16 @@
 			compatible = "qcom,msm-imem-diag-dload";
 			reg = <0xc8 0xc8>;
 		};
+	};
+
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,lemans-pinctrl";
+		reg = <0xf000000 0x1000000>;
+		interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
 	};
 
 	wdog: qcom,wdt@17c10000 {
@@ -934,10 +951,16 @@
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
+
+	vendor_hooks: qcom,cpu-vendor-hooks {
+		compatible = "qcom,cpu-vendor-hooks";
+	};
 };
 
 #include "lemans-4pmic-regulators.dtsi"
 #include "lemans-gdsc.dtsi"
+#include "lemans-pinctrl.dtsi"
+#include "msm-arm-smmu-lemans.dtsi"
 
 &cam_cc_titan_top_gdsc {
 	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
@@ -1093,3 +1116,5 @@
 	parent-supply = <&VDD_MM_LEVEL>;
 	status = "ok";
 };
+
+#include "lemans-debug.dtsi"
