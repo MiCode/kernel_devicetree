@@ -236,9 +236,13 @@ autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += $(SA8155_LA_GVM_BOARDS) $(SA8155_
 
 dtb-y += $(autogvm-dtb-y)
 
+SCUBA_AUTO_BASE_DTB += scuba_auto.dtb
+SCUBA_AUTO_BOARDS += \
+		scuba_auto-idp-overlay.dtbo \
+		scuba_auto-qrd-overlay.dtbo
 scuba_auto-dtb-$(CONFIG_ARCH_SCUBA_AUTO) += \
-				scuba_auto-idp.dtb \
-				scuba_auto-qrd.dtb
+	$(call add-overlays, $(SCUBA_AUTO_BOARDS) ,$(SCUBA_AUTO_BASE_DTB))
+scuba_auto-overlays-dtb-$(CONFIG_ARCH_SCUBA_AUTO) += $(SCUBA_AUTO_BOARDS) $(SCUBA_AUTO_BASE_DTB)
 dtb-y += $(scuba_auto-dtb-y)
 
 endif
