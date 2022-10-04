@@ -12,23 +12,25 @@
 		#size-cells = <0>;
 
 		qcom,power-on@800 {
-			compatible = "qcom,pm8998-pon";
+			compatible = "qcom,qpnp-power-on";
 			reg = <0x800>;
-			mode-bootloader = <0x2>;
-			mode-recovery = <0x1>;
-			pwrkey {
-				compatible = "qcom,pm8941-pwrkey";
-				interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>;
-				debounce = <15625>;
-				bias-pull-up;
+			interrupts = <0x0 0x8 0x0 IRQ_TYPE_EDGE_BOTH>,
+					<0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
+			interrupt-names = "kpdpwr", "resin";
+			qcom,pon-dbc-delay = <15625>;
+			qcom,kpdpwr-sw-debounce;
+			qcom,system-reset;
+			qcom,store-hard-reset-reason;
+
+			qcom,pon_1 {
+				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR>;
+				qcom,pull-up = <1>;
 				linux,code = <KEY_POWER>;
 			};
 
-			resin {
-				compatible = "qcom,pm8941-resin";
-				interrupts = <0x0 0x8 0x1 IRQ_TYPE_EDGE_BOTH>;
-				debounce = <15625>;
-				bias-pull-up;
+			qcom,pon_2 {
+				qcom,pon-type = <PON_POWER_ON_TYPE_RESIN>;
+				qcom,pull-up = <1>;
 				linux,code = <KEY_VOLUMEDOWN>;
 			};
 		};
