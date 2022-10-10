@@ -13,12 +13,13 @@ add-overlays = $(foreach o,$1,$(foreach b,$2,$(eval $(basename $b)-$(basename $o
 
 ifneq ($(CONFIG_ARCH_QTI_VM), y)
 
-PINEAPPLE_BASE_DTB += pineapple.dtb
+PINEAPPLE_BASE_DTB += pineapple.dtb pineapple-v2.dtb
 
 PINEAPPLE_BOARDS += \
 		 pineapple-mtp-overlay.dtbo \
 		 pineapple-cdp-overlay.dtbo \
-		 pineapple-qrd-overlay.dtbo
+		 pineapple-qrd-overlay.dtbo \
+		 pineapple-atp-overlay.dtbo
 
 NOAPQ_PINEAPPLE_BOARDS += \
 		 pineapple-rumi-overlay.dtbo
