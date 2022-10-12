@@ -1,0 +1,50 @@
+
+&soc {
+	/* PWR_CTR2_VDD_1P8 supply */
+	vreg_conn_1p8: vreg_conn_1p8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_conn_1p8";
+		pinctrl-names = "default";
+		pinctrl-0 = <&conn_power_1p8_active>;
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&tlmm 128 0>;
+	};
+
+	/* PWR_CTR1_VDD_PA supply */
+	vreg_conn_pa: vreg_conn_pa {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_conn_pa";
+		pinctrl-names = "default";
+		pinctrl-0 = <&conn_power_pa_active>;
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&tlmm 129 0>;
+	};
+
+	bluetooth: bt-qca-auto-converged {
+		compatible = "qcom,qca-auto-converged";
+		pinctrl-names = "default";
+		pinctrl-0 = <&bt_en_active>;
+		/* BT_EN */
+		qcom,bt-reset-gpio = <&tlmm 126 0>;
+		/* PWR_CTR1_VDD_PA */
+		qcom,bt-vdd-ctrl1-supply = <&vreg_conn_pa>;
+		/* PWR_CTR2_VDD_1P8 */
+		qcom,bt-vdd-ctrl2-supply = <&vreg_conn_1p8>;
+		qcom,bt-vdd-aon-supply = <&pm8540_e0_s4>;
+		qcom,bt-vdd-rfa1-supply = <&pm8540_g0_l6>;
+		qcom,bt-vdd-rfa2-supply = <&pm8540_a0_l15>;
+
+		/* <vol_min, vol_max, load_curr, is_retention_supp> */
+		qcom,bt-vdd-aon-config = <1055000 1055000 0 0>;
+		/* No vol setting for bypass LDOs */
+		qcom,bt-vdd-rfa1-config = <0 0 0 0>;
+		qcom,bt-vdd-rfa2-config = <0 0 0 0>;
+	};
+};
+
+&qupv3_se2_4uart {
+	status = "ok";
+};
+

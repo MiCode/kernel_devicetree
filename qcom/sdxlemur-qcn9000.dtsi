@@ -1,0 +1,299 @@
+
+&reserved_memory {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	ranges;
+
+	qcn9000_0_mem: qcn9000_0_mem {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x00000000 0xffffffff>;
+		reusable;
+		alignment = <0x400000>;
+		size = <0x3400000>;
+		status = "disabled";
+	};
+
+	qcn9000_1_mem: qcn9000_1_mem {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x00000000 0xffffffff>;
+		reusable;
+		alignment = <0x400000>;
+		size = <0x3400000>;
+		status = "disabled";
+	};
+};
+
+&soc {
+	wifi0: qcom,cnss-qcn9000@a0000000 {
+		status = "disabled";
+		compatible = "qcom,cnss-qcn9000";
+		reg = <0xc0000000 0x10000>;
+		reg-names = "smmu_iova_ipa";
+		memory-region = <&qcn9000_0_mem>;
+		qcom,wlan-ramdump-dynamic = <0x400000>;
+		qrtr_node_id = <0x0>;
+		qca,auto-restart;
+		tgt-mem-mode = <0x1>;
+		board_id = <0xa4>;
+
+		mhi,max-channels = <30>;
+		mhi,timeout = <10000>;
+
+		mhi_channels {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mhi_chan@0 {
+				reg = <0>;
+				label = "LOOPBACK";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <1>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@1 {
+				reg = <1>;
+				label = "LOOPBACK";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <2>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@4 {
+				reg = <4>;
+				label = "DIAG";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <1>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@5 {
+				reg = <5>;
+				label = "DIAG";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <2>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@20 {
+				reg = <20>;
+				label = "IPCR";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <1>;
+				mhi,data-type = <1>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+				mhi,auto-start;
+			};
+
+			mhi_chan@21 {
+				reg = <21>;
+				label = "IPCR";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <2>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+				mhi,auto-queue;
+				mhi,auto-start;
+			};
+		};
+
+		mhi_events {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			mhi_event@0 {
+				mhi,num-elements = <32>;
+				mhi,intmod = <0>;
+				mhi,msi = <1>;
+				mhi,priority = <0>;
+				mhi,brstmode = <2>;
+				mhi,data-type = <1>;
+			};
+
+			mhi_event@1 {
+				mhi,num-elements = <256>;
+				mhi,intmod = <0>;
+				mhi,msi = <2>;
+				mhi,priority = <1>;
+				mhi,brstmode = <2>;
+			};
+
+			mhi_event@2 {
+				status = "disabled";
+			};
+		};
+
+		mhi_devices {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			mhi_qrtr {
+				mhi,chan = "IPCR";
+				qcom,net-id = <0>;
+			};
+		};
+	};
+
+	wifi1: qcom,cnss-qcn9000@b0000000 {
+		status = "disabled";
+		compatible = "qcom,cnss-qcn9000";
+		reg = <0xd0000000 0x10000>;
+		reg-names = "smmu_iova_ipa";
+		memory-region = <&qcn9000_1_mem>;
+		qcom,wlan-ramdump-dynamic = <0x400000>;
+		qrtr_node_id = <0x0>;
+		qca,auto-restart;
+		tgt-mem-mode = <0x1>;
+		board_id = <0xa4>;
+
+		mhi,max-channels = <30>;
+		mhi,timeout = <10000>;
+
+		mhi_channels {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mhi_chan@0 {
+				reg = <0>;
+				label = "LOOPBACK";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <1>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@1 {
+				reg = <1>;
+				label = "LOOPBACK";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <2>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@4 {
+				reg = <4>;
+				label = "DIAG";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <1>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@5 {
+				reg = <5>;
+				label = "DIAG";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <2>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+			};
+
+			mhi_chan@20 {
+				reg = <20>;
+				label = "IPCR";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <1>;
+				mhi,data-type = <1>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+				mhi,auto-start;
+			};
+
+			mhi_chan@21 {
+				reg = <21>;
+				label = "IPCR";
+				mhi,num-elements = <32>;
+				mhi,event-ring = <1>;
+				mhi,chan-dir = <2>;
+				mhi,data-type = <0>;
+				mhi,doorbell-mode = <2>;
+				mhi,ee = <0x14>;
+				mhi,auto-queue;
+				mhi,auto-start;
+			};
+		};
+
+		mhi_events {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			mhi_event@0 {
+				mhi,num-elements = <32>;
+				mhi,intmod = <0>;
+				mhi,msi = <1>;
+				mhi,priority = <0>;
+				mhi,brstmode = <2>;
+				mhi,data-type = <1>;
+			};
+
+			mhi_event@1 {
+				mhi,num-elements = <256>;
+				mhi,intmod = <0>;
+				mhi,msi = <2>;
+				mhi,priority = <1>;
+				mhi,brstmode = <2>;
+			};
+
+			mhi_event@2 {
+				status = "disabled";
+			};
+		};
+
+		mhi_devices {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			mhi_qrtr {
+				mhi,chan = "IPCR";
+				qcom,net-id = <0>;
+			};
+		};
+	};
+};
+
+&pcie0_rp {
+	#address-cells = <5>;
+	#size-cells = <0>;
+
+	cnss_pci: cnss_pci {
+		reg = <0 0 0 0 0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		qcn9000_pci_iommu_group_0: qcn9000_pci_iommu_group_0 {
+			qcom,iommu-dma-addr-pool = <0xa0000000 0x10000000>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-faults = "stall-disable", "HUPCF", "no-CFRE",
+					    "non-fatal";
+		};
+
+		qcn9000_pci_iommu_group_1: qcn9000_pci_iommu_group_1 {
+			qcom,iommu-dma-addr-pool = <0xb0000000 0x10000000>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-faults = "stall-disable", "HUPCF", "no-CFRE",
+					    "non-fatal";
+		};
+	};
+};

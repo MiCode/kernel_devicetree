@@ -1,0 +1,69 @@
+Qualcomm Technologies, Inc. QPIC display
+
+QPIC LCDC Controller:
+Mandatory properties:
+- compatible:
+  * "qcom,mdss_qpic"
+- reg: Physical base address and length of registers of controller
+- reg-names: The names of register regions. The following regions are required:
+  * "qpic_base"
+- interrupts: The interrupt signal from the QPIC LCDC block.
+- clocks: It contains list of required clock. List contain core clock.
+- clock-names: Must contain "core" for the core clock and "aon" for the
+		always on clock.
+- qcom,panel-name: The panel peripheral name "string" which is used by QPIC display.
+- qcom.rst-gpio: Specifies the gpio used to reset panel.
+- qcom,cs-gpio: Specifies the gpio used for LCDC chip select signal.
+- qcom,ad8-gpio: Specifies the gpio used for LCDC data pin 8.
+- qcom,panel-te-gpio: Specifies the gpio used for TE.
+
+Optional properties:
+- vdd-supply: phandle to vdd regulator device node
+- vdda-supply: phandle to vdda regulator device node
+- pinctrl-names: the pin control state names; should contain "default"
+- pinctrl-0: the default pinctrl state (active)
+- pinctrl-n: the "sleep" pinctrl state
+- qcom,bl-gpio: Specifies the gpio used to enable backlight.
+- Refer to "Documentation/devicetree/bindings/arm/msm/msm_bus.txt" for
+below optional properties:
+        - qcom,msm-bus,name
+        - qcom,msm-bus,num-cases
+        - qcom,msm-bus,active-only
+        - qcom,msm-bus,num-paths
+        - qcom,msm-bus,vectors-KBps
+
+
+Example:
+        mdss_qpic: qcom,msm_qpic@1b00000 {
+                compatible = "qcom,mdss_qpic";
+                reg = <0x1b00000 0x24000>;
+                reg-names = "qpic_base";
+                interrupts = <0 251 0>;
+
+                qcom,msm-bus,name = "mdss_qpic";
+                qcom,msm-bus,num-cases = <2>;
+                qcom,msm-bus,num-paths = <1>;
+
+                qcom,msm-bus,vectors-KBps =
+                        <91 512 0 0>,
+                        /* Voting for max b/w on PNOC bus for now */
+                        <91 512 400000 800000>;
+
+                panel-name = "ili_qvga";
+                vdd-supply = <&pmxprairie_l6>;
+
+                qcom,rst-gpio = <&tlmm 23 0>;
+                qcom,cs-gpio = <&tlmm 21 0>;
+                qcom,ad8-gpio = <&tlmm 20 0>;
+                qcom,te-gpio = <&tlmm 22 0>;
+                qcom,bl-gpio = <&pmxprairie_gpios 1 0>;
+
+                clocks = <&clock_rpmh RPMH_QPIC_CLK>;
+                clock-names = "core_clk";
+
+                pinctrl-names= "mdss_default", "mdss_sleep";
+                pinctrl-0 = <&mdss_cs_active &mdss_te_active
+                        &mdss_rs_active &mdss_ad_active>;
+                pinctrl-1 = <&mdss_cs_sleep &mdss_te_sleep
+                        &mdss_rs_sleep &mdss_ad_sleep>;
+        };
