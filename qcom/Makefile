@@ -126,10 +126,15 @@ MONACO_BASE_DTB += monaco.dtb monacop.dtb
 
 MONACO_BOARDS += \
         monaco-idp-v1-overlay.dtbo \
+        monaco-standalone-idp-v1-overlay.dtbo \
         monaco-idp-v2-overlay.dtbo \
+        monaco-standalone-idp-v2-overlay.dtbo \
         monaco-idp-v3-overlay.dtbo \
+        monaco-standalone-idp-v3-overlay.dtbo \
 	monaco-wdp-v1-overlay.dtbo \
-	monaco-atp-v1-overlay.dtbo
+	monaco-standalone-wdp-v1-overlay.dtbo \
+	monaco-atp-v1-overlay.dtbo \
+	monaco-standalone-atp-v1-overlay.dtbo
 
 monaco-dtb-$(CONFIG_ARCH_MONACO) += \
         $(call add-overlays, $(MONACO_BOARDS) ,$(MONACO_BASE_DTB))
