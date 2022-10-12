@@ -24,6 +24,7 @@
 
 	aliases {
 		serial0 = &qupv3_se4_2uart;
+		qpic_nand1 = &qnand_1;
 	};
 
 	firmware: firmware {};
@@ -471,6 +472,33 @@
 	qcom,sps {
 		compatible = "qcom,msm-sps-4k";
 		qcom,pipe-attr-ee;
+	};
+
+	qnand_1: nand@0x4840000 {
+		compatible = "qcom,msm-nand";
+		reg =   <0x4840000 0x1000>,
+			<0x4844000 0x1c000>;
+		reg-names =     "nand_phys",
+				"bam_phys";
+		qcom,reg-adjustment-offset = <0x4000>;
+		interrupts = <GIC_SPI 217 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "bam_irq";
+		clock-names = "core_clk";
+		clocks = <&rpmcc RPM_SMD_QPIC_CLK>;
+
+		//interconnects = <&system_noc MASTER_QPIC &mc_virt SLAVE_EBI1>;
+		interconnect-names = "nand-ddr";
+		qcom,msm-bus,name = "qpic_nand";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+			<0 0>,
+		/* Voting for max b/w on PNOC bus for now */
+			<1057800 725760>;
+
+		iommus = <&apps_smmu 0x100 0x7>;
+		qcom,iommu-dma = "bypass";
+		status = "disabled";
 	};
 };
 
