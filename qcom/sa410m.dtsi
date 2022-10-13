@@ -25,6 +25,7 @@
 	aliases {
 		serial0 = &qupv3_se4_2uart;
 		qpic_nand1 = &qnand_1;
+		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
 	};
 
 	firmware: firmware {};
@@ -520,6 +521,53 @@
 		iommus = <&apps_smmu 0x100 0x7>;
 		qcom,iommu-dma = "bypass";
 		status = "disabled";
+	};
+
+	sdhc_1: sdhci@4744000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x04744000 0x1000>, <0x04745000 0x1000>;
+		reg-names = "hc", "cqhci";
+
+		interrupts = <GIC_SPI 348 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 352 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <8>;
+		non-removable;
+		supports-cqe;
+
+		no-sd;
+		no-sdio;
+		qcom,restore-after-cx-collapse;
+
+		mmc-ddr-1_8v;
+		mmc-hs200-1_8v;
+		mmc-hs400-1_8v;
+		mmc-hs400-enhanced-strobe;
+
+		cap-mmc-hw-reset;
+
+		clocks = <&gcc GCC_SDCC1_APPS_CLK>,
+			<&gcc GCC_SDCC1_AHB_CLK>;
+		clock-names = "core", "iface";
+
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x000f642c 0x0 0x0 0x00010800 0x80040868>;
+
+		/* Add dt entry for gcc hw reset */
+		//resets = <&gcc GCC_EMMC_BCR>;
+		//reset-names = "core_reset";
+
+		iommus = <&apps_smmu 0xC0 0x0>;
+		qcom,iommu-dma = "bypass";
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
 	};
 };
 
