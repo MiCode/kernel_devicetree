@@ -1,0 +1,41 @@
+#include "sdxlemur-cnss.dtsi"
+
+&pcie0 {
+	qcom,boot-option = <0x1>;
+};
+
+&pcie0_bus2_dev2_fn0 {
+	cnss_pci0: cnss_pci0 {
+		reg = <0 0 0 0 0>;
+		qcom,iommu-group = <&cnss_pci_iommu_group>;
+		memory-region = <&cnss_wlan_mem>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
+&wlan {
+	mhi_events {
+		mhi_event@0 {
+			mhi,num-elements = <32>;
+			mhi,intmod = <0>;
+			mhi,msi = <1>;
+			mhi,priority = <0>;
+			mhi,brstmode = <2>;
+			mhi,data-type = <1>;
+		};
+
+		mhi_event@1 {
+			mhi,num-elements = <256>;
+			mhi,intmod = <0>;
+			mhi,msi = <2>;
+			mhi,priority = <1>;
+			mhi,brstmode = <2>;
+		};
+
+		mhi_event@2 {
+			status = "disabled";
+		};
+	};
+};

@@ -1,0 +1,37 @@
+#include <dt-bindings/arm/msm/msm_ion_ids.h>
+
+&soc {
+	qcom,ion {
+		compatible = "qcom,msm-ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		system_heap: qcom,ion-heap@25 {
+			reg = <ION_SYSTEM_HEAP_ID>;
+			qcom,ion-heap-type = "MSM_SYSTEM";
+		};
+
+		audio_co_heap: qcom,ion-heap@17 { /* AUDIO CARVEOUT HEAP */
+			reg = <ION_AUDIO_CARVEOUT_HEAP_ID>;
+			qcom,ion-heap-type = "MSM_CARVEOUT";
+			/*
+			 * memory-region must be specified when enabled here or
+			 * when the node is overridden to be enabled elsewhere.
+			 */
+			status = "disabled";
+		};
+
+		qcom,ion-heap@27 { /* QSEECOM HEAP */
+			reg = <ION_QSECOM_HEAP_ID>;
+			memory-region = <&qseecom_mem>;
+			qcom,ion-heap-type = "DMA";
+		};
+
+		qcom,ion-heap@19 { /* QSEECOM TA HEAP */
+			reg = <ION_QSECOM_TA_HEAP_ID>;
+			memory-region = <&qseecom_ta_mem>;
+			qcom,ion-heap-type = "DMA";
+		};
+	};
+};
+

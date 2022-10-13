@@ -1,0 +1,61 @@
+
+#include "sdxlemur-qcn9000.dtsi"
+
+&soc {
+	pine_vreg: pine_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "pine_vreg";
+		gpio = <&tlmm 102 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <200000>;
+	};
+};
+
+&ntn3_vreg {
+	vin-supply = <&pine_vreg>;
+};
+
+&pcie0 {
+	qcom,no-l0s-supported;
+	qcom,no-l1-supported;
+	qcom,no-l1ss-supported;
+	qcom,no-aux-clk-sync;
+};
+
+&pcie0_bus2_dev1_fn0 {
+	cnss_pci1: cnss_pci1 {
+		reg = <0 0 0 0 0>;
+		qcom,iommu-group = <&qcn9000_pci_iommu_group_0>;
+		memory-region = <&qcn9000_0_mem>;
+		qrtr_instance_id = <0x0>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
+&pcie_i2c_ctrl {
+	reg_update = <0x82c030 0x1
+			0x828000 0x3
+			0x82bd00 0x8
+			0x82c030 0x2
+			0x828000 0x3
+			0x82bd00 0x8
+			0x82c030 0x8
+			0x828000 0x1
+			0x82bd00 0x8
+			0x82c01c 0x10
+			0x82c030 0xf
+			0x828000 0xf
+			0x82b268 0x2>;
+};
+
+&wifi0 {
+	status = "ok";
+};
+
+&qcn9000_0_mem {
+	status = "ok";
+};
