@@ -126,8 +126,15 @@ MONACO_BASE_DTB += monaco.dtb monacop.dtb
 
 MONACO_BOARDS += \
         monaco-idp-v1-overlay.dtbo \
+        monaco-standalone-idp-v1-overlay.dtbo \
         monaco-idp-v2-overlay.dtbo \
-        monaco-idp-v3-overlay.dtbo
+        monaco-standalone-idp-v2-overlay.dtbo \
+        monaco-idp-v3-overlay.dtbo \
+        monaco-standalone-idp-v3-overlay.dtbo \
+	monaco-wdp-v1-overlay.dtbo \
+	monaco-standalone-wdp-v1-overlay.dtbo \
+	monaco-atp-v1-overlay.dtbo \
+	monaco-standalone-atp-v1-overlay.dtbo
 
 monaco-dtb-$(CONFIG_ARCH_MONACO) += \
         $(call add-overlays, $(MONACO_BOARDS) ,$(MONACO_BASE_DTB))
@@ -228,15 +235,25 @@ SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
 SA8155_LA_GVM_BOARDS += \
 		   sa8155-vm-la-overlay.dtbo
 
-autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
-	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB))
-autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += $(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB)
+DIREWOLF_LV_GVM_BASE_DTB += direwolf-vm-lv.dtb
 
+DIREWOLF_LV_GVM_BOARDS += \
+                   direwolf-vm-lv-overlay.dtbo
+
+autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB))
+autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB)
 dtb-y += $(autogvm-dtb-y)
 
+SCUBA_AUTO_BASE_DTB += scuba_auto.dtb
+SCUBA_AUTO_BOARDS += \
+		scuba_auto-idp-overlay.dtbo \
+		scuba_auto-qrd-overlay.dtbo
 scuba_auto-dtb-$(CONFIG_ARCH_SCUBA_AUTO) += \
-				scuba_auto-idp.dtb \
-				scuba_auto-qrd.dtb
+	$(call add-overlays, $(SCUBA_AUTO_BOARDS) ,$(SCUBA_AUTO_BASE_DTB))
+scuba_auto-overlays-dtb-$(CONFIG_ARCH_SCUBA_AUTO) += $(SCUBA_AUTO_BOARDS) $(SCUBA_AUTO_BASE_DTB)
 dtb-y += $(scuba_auto-dtb-y)
 
 endif

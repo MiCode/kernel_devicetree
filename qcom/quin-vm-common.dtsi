@@ -22,7 +22,7 @@
 		#size-cells = <2>;
 		ranges;
 
-		linux,cma {
+		system_cma: linux,cma {
 			compatible = "shared-dma-pool";
 			alloc-ranges = <0x0 0x0 0x0 0xffffffff>;
 			reusable;
@@ -61,6 +61,19 @@
 	ranges = <0x0 0x0 0x0 0xffffffff>;
 	compatible = "simple-bus";
 
+	wdog: qcom,wdt@17c10000 {
+		compatible = "qcom,msm-watchdog";
+		reg = <0x17c10000 0x1000>;
+		reg-names = "wdt-base";
+		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	vm_restart: restart {
+		compatible = "qcom,vm-restart";
+		status = "ok";
+	};
+
 	intc: vgic@0 {
 		qvm,vdev = "gic";
 		#interrupt-cells = <3>;
@@ -83,6 +96,95 @@
 		};
 	};
 
+	hab: qcom,hab {
+		compatible = "qcom,hab";
+		vmid = <2>;
+
+		mmidgrp100: mmidgrp100 {
+			grp-start-id = <100>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp200: mmidgrp200 {
+			grp-start-id = <200>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp300: mmidgrp300 {
+			grp-start-id = <300>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp400: mmidgrp400 {
+			grp-start-id = <400>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp500: mmidgrp500 {
+			grp-start-id = <500>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp600: mmidgrp600 {
+			grp-start-id = <600>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp700: mmidgrp700 {
+			grp-start-id = <700>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp800: mmidgrp800 {
+			grp-start-id = <800>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp900: mmidgrp900 {
+			grp-start-id = <900>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1000: mmidgrp1000 {
+			grp-start-id = <1000>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1100: mmidgrp1100 {
+			grp-start-id = <1100>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1200: mmidgrp1200 {
+			grp-start-id = <1200>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1400: mmidgrp1400 {
+			grp-start-id = <1400>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1500: mmidgrp1500 {
+			grp-start-id = <1500>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+	};
+
 	qcom,msm-imem@14680000 {
 		compatible = "qcom,msm-imem";
 		reg = <0x14680000 0x1000>;
@@ -100,6 +202,19 @@
 		compatible = "qcom,mpm2-sleep-counter";
 		reg = <0xc221000 0x1000>;
 		clock-frequency = <32768>;
+	};
+
+	spmi_bus: virtio-spmi@1c800000 {
+		compatible = "virtio,mmio";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x1c800000 0x1100>;
+		interrupt-names = "periph_irq";
+		interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <4>;
+		cell-index = <0>;
+		status = "okay";
 	};
 };
 

@@ -4151,24 +4151,20 @@ tpdm_turing_llm: tpdm@8861000 {
 &spmi_bus {
 	qcom,pm6125@0 {
 		pm6125_adc_tm_iio: adc_tm@3400 {
-			compatible = "qcom,adc-tm5-iio";
-			reg = <0x3400 0x100>;
+			compatible = "qcom,spmi-adc-tm5-iio";
+			reg = <0x3400>;
 			#thermal-sensor-cells = <1>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			io-channels = <&pm6125_vadc ADC5_GPIO1_100K_PU>,
-					<&pm6125_vadc ADC5_GPIO2_100K_PU>;
 
 			camera_flash_therm {
-				reg = <ADC5_GPIO1_100K_PU>;
-				qcom,ratiometric;
-				qcom,hw-settle-time = <200>;
+				reg = <0>;
+				io-channels = <&pm6125_vadc ADC5_GPIO1_100K_PU>;
 			};
 
 			emmc_ufs_therm {
-				reg = <ADC5_GPIO2_100K_PU>;
-				qcom,ratiometric;
-				qcom,hw-settle-time = <200>;
+				reg = <1>;
+				io-channels = <&pm6125_vadc ADC5_GPIO2_100K_PU>;
 			};
 		};
 	};
@@ -4177,27 +4173,27 @@ tpdm_turing_llm: tpdm@8861000 {
 &pm6125_adc_tm {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	io-channels = <&pm6125_vadc ADC5_AMUX_THM1_100K_PU>,
-			<&pm6125_vadc ADC5_AMUX_THM2_100K_PU>,
-			<&pm6125_vadc ADC5_XO_THERM_100K_PU>;
 
 	/* Channel nodes */
 	pa_therm0 {
-		reg = <ADC5_AMUX_THM1_100K_PU>;
+		reg = <0>;
+		io-channels = <&pm6125_vadc ADC5_AMUX_THM1_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time-us = <200>;
 	};
 
 	quiet_therm {
-		reg = <ADC5_AMUX_THM2_100K_PU>;
+		reg = <1>;
+		io-channels = <&pm6125_vadc ADC5_AMUX_THM2_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time-us = <200>;
 	};
 
 	xo_therm {
-		reg = <ADC5_XO_THERM_100K_PU>;
+		reg = <2>;
+		io-channels = <&pm6125_vadc ADC5_XO_THERM_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time-us = <200>;
 	};
 };
 

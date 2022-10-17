@@ -2,6 +2,8 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/clock/qcom,gcc-sdxbaagha.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,sdxbaagha.h>
 
 / {
 	#address-cells = <1>;
@@ -383,28 +385,47 @@
 	};
 
 	gcc: clock-controller@80000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,sdxbaagha-gcc", "syscon";
+		reg = <0x80000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mxa-supply = <&VDD_MXA_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&pcie_pipe_clk>,
+			 <&sleep_clk>;
+		clock-names = "bi_tcxo",
+			      "pcie_pipe_clk",
+			      "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
 
 	/* GCC GDSCs */
 	gcc_emac0_gdsc: qcom,gdsc@f1004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xf1004 0x4>;
 		regulator-name = "gcc_emac0_gdsc";
+		parent-supply = <&VDD_MXC_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_pcie_gdsc: qcom,gdsc@d3004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xd3004 0x4>;
 		regulator-name = "gcc_pcie_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 	};
 
 	gcc_usb20_gdsc: qcom,gdsc@a7004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xa7004 0x4>;
 		regulator-name = "gcc_usb20_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 	};
 
 	ipcc_mproc: qcom,ipcc@408000 {
@@ -415,6 +436,54 @@
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
 	};
+
+	mc_virt: interconnect@0 {
+		compatible = "qcom,sdxbaagha-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,stub;
+		qcom,skip-qos;
+	};
+
+	aggre_noc: interconnect@1640000 {
+		reg = <0x1640000 0x33400>;
+		compatible = "qcom,sdxbaagha-aggre_noc";
+		#interconnect-cells = <1>;
+		qcom,stub;
+		qcom,skip-qos;
+	};
+
+	cnoc_main: interconnect@1580000 {
+		reg = <0x01580000 0x19200>;
+		compatible = "qcom,sdxbaagha-cnoc_main";
+		#interconnect-cells = <1>;
+		qcom,stub;
+		qcom,skip-qos;
+	};
+
+	dc_noc_dch: interconnect@190E0000 {
+		reg = <0x190E0000 0x5080>;
+		compatible = "qcom,sdxbaagha-dc_noc_dch";
+		#interconnect-cells = <1>;
+		qcom,stub;
+		qcom,skip-qos;
+	};
+
+	mem_noc: interconnect@19100000 {
+		reg = <0x19100000 0x2D080>;
+		compatible = "qcom,sdxbaagha-mem_noc";
+		#interconnect-cells = <1>;
+		qcom,stub;
+		qcom,skip-qos;
+	};
+
+	snoc: interconnect@15C0000 {
+		reg = <0x15C0000 0x14080>;
+		compatible = "qcom,sdxbaagha-snoc";
+		#interconnect-cells = <1>;
+		qcom,stub;
+		qcom,skip-qos;
+	};
+
 };
 
 #include "sdxbaagha-pinctrl.dtsi"
@@ -422,6 +491,7 @@
 #include "msm-arm-smmu-sdxbaagha.dtsi"
 #include "sdxbaagha-pcie.dtsi"
 #include "sdxbaagha-qupv3.dtsi"
+#include "sdxbaagha-usb.dtsi"
 
 &qupv3_se3_2uart {
 	status = "ok";

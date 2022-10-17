@@ -20,7 +20,9 @@
 
 	reserved_memory: reserved-memory { };
 
-	chosen: chosen { };
+	chosen: chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7";
+	};
 
 	mem-offline {
 		compatible = "qcom,mem-offline";
@@ -144,9 +146,9 @@
 		reg = <0x0 0x45600000 0x0 0x700000>;
 	};
 
-	xbl_aop_mem: xbl_aop_mem@45e00000 {
+	xbl_aop_mem: xbl_aop_mem@45d00000 {
 		no-map;
-		reg = <0x0 0x45e00000 0x0 0x100000>;
+		reg = <0x0 0x45d00000 0x0 0x200000>;
 	};
 
 	sec_apps_mem: sec_apps_region@45fff000 {
@@ -184,9 +186,14 @@
 		reg = <0x0 0x52910000 0x0 0x5000>;
 	};
 
-	removed_region: removed_region@60000000 {
+	tz_stat: tz_stat@53200000 {
 		no-map;
-		reg = <0x0 0x60000000 0x0 0x3900000>;
+		reg = <0x0 0x53200000 0x0 0x100000>;
+	};
+
+	pimem_vault: pimem_vault@53300000 {
+		no-map;
+		reg = <0x0 0x53300000 0x0 0x1500000>;
 	};
 
 	adsp_mem: adsp_region {
@@ -204,29 +211,6 @@
 		size = <0 0x800000>;
 	};
 
-	secure_display_memory: secure_display_region {
-		compatible = "shared-dma-pool";
-		alloc-ranges = <0 0x00000000 0 0xffffffff>;
-		reusable;
-		alignment = <0 0x400000>;
-		size = <0 0x5c00000>;
-	};
-
-	cont_splash_memory: cont_splash_region@5c000000 {
-		reg = <0x0 0x5c000000 0x0 0x00f00000>;
-		label = "cont_splash_region";
-	};
-
-	dfps_data_memory: dfps_data_region@5cf00000 {
-		reg = <0x0 0x5cf00000 0x0 0x0100000>;
-		label = "dfps_data_region";
-	};
-
-	disp_rdump_memory: disp_rdump_region@5c000000 {
-		reg = <0x0 0x5c000000 0x0 0x00f00000>;
-		label = "disp_rdump_region";
-	};
-
 	user_contig_mem: user_contig_region {
 		compatible = "shared-dma-pool";
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
@@ -240,7 +224,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x1400000>;
+		size = <0x0 0x700000>;
 	};
 
 	qseecom_ta_mem: qseecom_ta_region {
@@ -248,7 +232,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x1000000>;
+		size = <0x0 0x400000>;
 	};
 
 	memshare_mem: memshare_region {
@@ -259,15 +243,8 @@
 		size = <0x0 0x800000>;
 	};
 
-	dump_mem: mem_dump_region {
-		compatible = "shared-dma-pool";
-		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
-		reusable;
-		size = <0 0x800000>;
-	};
-
 	/* global autoconfigured region for contiguous allocations */
-	system_cma: linux,cma {
+	system_cma:linux,cma {
 		compatible = "shared-dma-pool";
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
@@ -276,10 +253,6 @@
 		linux,cma-default;
 	};
 
-	smem_mem: smem@46000000 {
-		no-map;
-		reg = <0x0 0x46000000 0x0 0x200000>;
-	};
 };
 
 &soc {
@@ -315,6 +288,14 @@
 			     <GIC_PPI 3 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
 			     <GIC_PPI 0 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
 		clock-frequency = <19200000>;
+	};
+
+	qcom_tzlog: tz-log@c125720 {
+		compatible = "qcom,tz-log";
+		reg = <0xc125720 0x3000>;
+		qcom,hyplog-enabled;
+		hyplog-address-offset = <0x410>;
+		hyplog-size-offset = <0x414>;
 	};
 
 	memtimer: timer@f120000 {
@@ -626,58 +607,8 @@
 
 	smem: qcom,smem {
 		compatible = "qcom,smem";
-		memory-region = <&smem_mem>;
+		memory-region = <&smem_region>;
 		hwlocks = <&tcsr_mutex 3>;
-	};
-
-	qcom,glink {
-		compatible = "qcom,glink";
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges;
-
-		glink_modem: modem {
-			qcom,remote-pid = <1>;
-			transport = "smem";
-			mboxes = <&apcs_glb 12>;
-			mbox-names = "mpss_smem";
-			interrupts = <GIC_SPI 68 IRQ_TYPE_EDGE_RISING>;
-
-			label = "modem";
-			qcom,glink-label = "mpss";
-
-			qcom,modem_qrtr {
-				qcom,glink-channels = "IPCRTR";
-				qcom,low-latency;
-				qcom,intents = <0x800  5
-						0x2000 3
-						0x4400 2>;
-			};
-		};
-
-		glink_adsp: adsp {
-			qcom,remote-pid = <2>;
-			transport = "smem";
-			mboxes = <&apcs_glb 8>;
-			mbox-names = "adsp_smem";
-			interrupts = <GIC_SPI 277 IRQ_TYPE_EDGE_RISING>;
-
-			label = "adsp";
-			qcom,glink-label = "lpass";
-
-			qcom,adsp_qrtr {
-				qcom,glink-channels = "IPCRTR";
-				qcom,low-latency;
-				qcom,intents = <0x800  5
-						0x2000 3
-						0x4400 2>;
-			};
-
-			qcom,apr_tal_rpmsg {
-				qcom,glink-channels = "apr_audio_svc";
-				qcom,intents = <0x200 20>;
-			};
-		};
 	};
 
 	qcom,glinkpkt {
@@ -798,6 +729,25 @@
 		/* Outputs to mss */
 		qcom,smem-states = <&modem_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_modem: glink-edge {
+			qcom,remote-pid = <1>;
+			transport = "smem";
+			mboxes = <&apcs_glb 12>;
+			mbox-names = "mpss_smem";
+			interrupts = <GIC_SPI 68 IRQ_TYPE_EDGE_RISING>;
+
+			label = "modem";
+			qcom,glink-label = "mpss";
+
+			qcom,modem_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 
@@ -834,6 +784,30 @@
 		/* Outputs to lpass */
 		qcom,smem-states = <&adsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_adsp: glink-edge {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+			mboxes = <&apcs_glb 8>;
+			mbox-names = "adsp_smem";
+			interrupts = <GIC_SPI 277 IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+
+			qcom,adsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,apr_tal_rpmsg {
+				qcom,glink-channels = "apr_audio_svc";
+				qcom,intents = <0x200 20>;
+			};
+		};
 	};
 
 	qcom,ipa_fws {
@@ -1158,6 +1132,7 @@
 
 #include "msm-arm-smmu-scuba_auto.dtsi"
 #include "scuba_auto-qupv3.dtsi"
+#include "scuba_auto-dma-heap.dtsi"
 
 &sdhc_1 {
 	vdd-supply = <&L20A>;

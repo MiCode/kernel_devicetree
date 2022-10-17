@@ -198,29 +198,29 @@
 			reg = <0x0 0x4ab00000 0x0 0x5E00000>;
 		};
 
-		pil_video_mem: pil_video_region@50900000 {
+		video_mem: video_region@50900000 {
 			no-map;
-			reg = <0x0 0x50900000 0x0 0x500000>;
+			reg = <0x0 0x50900000 0x0 0x700000>;
 		};
 
-		pil_adsp_mem: adsp_regions@50E00000 {
+		pil_adsp_mem: adsp_regions@51000000 {
 			no-map;
-			reg = <0x0 0x50E00000 0x0 0x1900000>;
+			reg = <0x0 0x51000000 0x0 0x1900000>;
 		};
 
-		pil_ipa_fw_mem: ips_fw_region@52700000 {
+		pil_ipa_fw_mem: ips_fw_region@52900000 {
 			no-map;
-			reg = <0x0 0x52700000 0x0 0x10000>;
+			reg = <0x0 0x52900000 0x0 0x10000>;
 		};
 
-		pil_ipa_gsi_mem: ipa_gsi_region@52710000 {
+		pil_ipa_gsi_mem: ipa_gsi_region@52910000 {
 			no-map;
-			reg = <0x0 0x52710000 0x0 0x5000>;
+			reg = <0x0 0x52910000 0x0 0x5000>;
 		};
 
-		pil_gpu_mem: gpu_region@52715000 {
+		pil_gpu_mem: gpu_region@52915000 {
 			no-map;
-			reg = <0x0 0x52715000 0x0 0x2000>;
+			reg = <0x0 0x52915000 0x0 0x2000>;
 		};
 
 		stats_region: stats_region@60000000 {
@@ -1876,6 +1876,128 @@
 	#io-channel-cells = <1>;
 	io-channels= <&pm5100_charger PSY_IIO_USB_REAL_TYPE>;
 	io-channel-names = "chg_type";
+};
+
+&qupv3_se1_i2c {
+	status = "ok";
+
+	tsc@24 {
+		compatible = "parade,pt_i2c_adapter";
+		reg = <0x24>;
+		status = "ok";
+		interrupt-parent = <&tlmm>;
+		interrupts = <80 0x2008>;
+		parade,adapter_id = "pt_i2c_adapter";
+		vcc_i2c-supply = <&L21A>;
+		vdd-supply = <&L29A>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend",
+			"pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+
+		parade,core {
+			parade,name = "pt_core";
+
+			parade,irq_gpio = <&tlmm 13 0x2008>;
+			parade,rst_gpio = <&tlmm 12 0x00>;
+			parade,hid_desc_register = <1>;
+			/*
+			 * PT_CORE_FLAG_NONE = 0x00
+			 * PT_CORE_FLAG_POWEROFF_ON_SLEEP = 0x02
+			 * PT_CORE_FLAG_RESTORE_PARAMETERS = 0x04
+			 * PT_CORE_FLAG_DEEP_STANDBY = 0x08
+			 * PT_CORE_FLAG_SKIP_SYS_SLEEP = 0x10
+			 * PT_CORE_FLAG_SKIP_RUNTIME = 0x20
+			 * PT_CORE_FLAG_SKIP_RESUME = 0x40
+			 */
+			parade,flags = <6>;
+			/* PT_CORE_EWG_NONE */
+			parade,easy_wakeup_gesture = <1>;
+			/* 0:AUTO 1:PIP1_ONLY 2:PIP2_CAPABLE*/
+			parade,config_dut_generation = <1>;
+			/* 0:False 1:True*/
+			parade,watchdog_force_stop = <0>;
+			/*
+			 * PT_PANEL_ID_DISABLE = 0x00
+			 * PT_PANEL_ID_BY_BL  = 0x01
+			 * PT_PANEL_ID_BY_SYS_INFO  = 0x02
+			 * PT_PANEL_ID_BY_MFG_DATA  = 0x04
+			 */
+			parade,panel_id_support = <0>;
+			parade,btn_keys = <172 /* KEY_HOMEPAGE */
+				/* previously was KEY_HOME, new Android versions use KEY_HOMEPAGE */
+				139 /* KEY_MENU */
+				158 /* KEY_BACK */
+				217 /* KEY_SEARCH */
+				114 /* KEY_VOLUMEDOWN */
+				115 /* KEY_VOLUMEUP */
+				212 /* KEY_CAMERA */
+				116>; /* KEY_POWER */
+			parade,btn_keys-tag = <0>;
+
+			parade,mt {
+				parade,name = "pt_mt";
+				parade,inp_dev_name = "pt_mt";
+				/*
+				 * PT_MT_FLAG_NONE = 0x00
+				 * PT_MT_FLAG_FLIP = 0x08
+				 * PT_MT_FLAG_INV_X = 0x10
+				 * PT_MT_FLAG_INV_Y = 0x20
+				 * PT_MT_FLAG_VKEYS = 0x40
+				 */
+				parade,flags = <0x08>;
+				parade,abs =
+					/* ABS_MT_POSITION_X, CY_ABS_MIN_X, CY_ABS_MAX_X, 0, 0 */
+					<0x35 0 880 0 0
+					/* ABS_MT_POSITION_Y, CY_ABS_MIN_Y, CY_ABS_MAX_Y, 0, 0 */
+					0x36 0 1280 0 0
+					/* ABS_MT_PRESSURE, CY_ABS_MIN_P, CY_ABS_MAX_P, 0, 0 */
+					0x3a 0 255 0 0
+					/* CY_IGNORE_VALUE, CY_ABS_MIN_W, CY_ABS_MAX_W, 0, 0 */
+					0xffff 0 255 0 0
+					/* ABS_MT_TRACKING_ID, CY_ABS_MIN_T, CY_ABS_MAX_T, 0, 0 */
+					0x39 0 15 0 0
+					/* ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0 */
+					0x30 0 255 0 0
+					/* ABS_MT_TOUCH_MINOR, 0, 255, 0, 0 */
+					0x31 0 255 0 0
+					/* ABS_MT_ORIENTATION, -127, 127, 0, 0 */
+					0x34 0xffffff81 127 0 0
+					/* ABS_MT_TOOL_TYPE, 0, MT_TOOL_MAX, 0, 0 */
+					0x37 0 1 0 0
+					/* ABS_DISTANCE, 0, 255, 0, 0 */
+					0x19 0 255 0 0>;
+
+				parade,vkeys_x = <720>;
+				parade,vkeys_y = <1280>;
+
+				parade,virtual_keys = /* KeyCode CenterX CenterY Width Height */
+					/* KEY_BACK */
+					<158 90 1360 160 180
+					/* KEY_MENU */
+					139 270 1360 160 180
+					/* KEY_HOMEPAGE */
+					172 450 1360 160 180
+					/* KEY SEARCH */
+					217 630 1360 160 180>;
+			};
+
+			parade,btn {
+				parade,name = "pt_btn";
+
+				parade,inp_dev_name = "pt_btn";
+			};
+
+			parade,proximity {
+				parade,name = "pt_proximity";
+
+				parade,inp_dev_name = "pt_proximity";
+				parade,abs =
+					<0x19 0 1 0 0>;
+			};
+		};
+	};
 };
 
 &qupv3_se6_2uart {
