@@ -25,21 +25,20 @@
 };
 
 &pm7250b_adc_tm {
-	status = "ok";
+	io-channels = <&pm7250b_vadc ADC5_AMUX_THM1_100K_PU>,
+			<&pm7250b_vadc ADC5_AMUX_THM3_100K_PU>;
 
 	/* Channel nodes */
 	charger_skin_therm@4d {
-		reg = <0>;
-		io-channels = <&pm7250b_vadc ADC5_AMUX_THM1_100K_PU>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time-us = <200>;
+		qcom,hw-settle-time = <200>;
 	};
 
 	conn_therm@4f {
-		reg = <1>;
-		io-channels = <&pm7250b_vadc ADC5_AMUX_THM3_100K_PU>;
+		reg = <ADC5_AMUX_THM3_100K_PU>;
 		qcom,ratiometric;
-		qcom,hw-settle-time-us = <200>;
+		qcom,hw-settle-time = <200>;
 	};
 };
 
@@ -48,7 +47,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm7250b_adc_tm 0>;
+		thermal-sensors = <&pm7250b_adc_tm ADC5_AMUX_THM1_100K_PU>;
 		wake-capable-sensor;
 		trips {
 			active-config0 {
@@ -63,7 +62,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm7250b_adc_tm 1>;
+		thermal-sensors = <&pm7250b_adc_tm ADC5_AMUX_THM3_100K_PU>;
 		wake-capable-sensor;
 		trips {
 			active-config0 {
