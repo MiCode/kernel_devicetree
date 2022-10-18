@@ -220,12 +220,17 @@ sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
 		sdxpinn-idp-mbb.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
+SA410M_AUTO_BASE_DTB += sa410m.dtb
+SA410M_AUTO_BOARDS += \
+		sa410m-rumi-overlay.dtbo \
+		sa410m-nand-idp-overlay.dtbo \
+		sa410m-emmc-idp-overlay.dtbo \
+		sa410m-nand-ccard-overlay.dtbo \
+		sa410m-emmc-ccard-overlay.dtbo
+
 sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
-				sa410m-rumi.dtb \
-				sa410m-nand-idp.dtb \
-				sa410m-emmc-idp.dtb \
-				sa410m-nand-ccard.dtb \
-				sa410m-emmc-ccard.dtb
+	$(call add-overlays, $(SA410M_AUTO_BOARDS) ,$(SA410M_AUTO_BASE_DTB))
+sa410m_auto-overlays-dtb-$(CONFIG_ARCH_SA410M) += $(SA410M_AUTO_BOARDS) $(SA410M_AUTO_BASE_DTB)
 dtb-y += $(sa410m_auto-dtb-y)
 
 SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
