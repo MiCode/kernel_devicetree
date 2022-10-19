@@ -1,0 +1,87 @@
+#include "cape-sde-display.dtsi"
+
+&dsi_l3s_42_02_0a_dsc_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_L3s>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,mdss-brightness-init-level = <307>;
+	qcom,mdss-dsi-bl-inverted-dbv;
+	qcom,platform-reset-gpio = <&tlmm 0 0>;
+};
+
+&dsi_r66451_amoled_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_L3s>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,mdss-brightness-max-level = <255>;
+	qcom,mdss-dsi-bl-inverted-dbv;
+	qcom,platform-reset-gpio = <&tlmm 0 0>;
+};
+
+&soc {
+	display_panel_vddd: display_panel_vddd {
+		compatible = "regulator-fixed";
+		regulator-name = "display_panel_vddd";
+		regulator-min-microvolt = <1250000>;
+		regulator-max-microvolt = <1250000>;
+		gpio = <&tlmm 6 0>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+};
+
+&sde_dsi {
+	qcom,dsi-default-panel = <&dsi_r66451_amoled_video>;
+	vddd-supply = <&display_panel_vddd>;
+	vci-supply = <&L13C>;
+	vddio-supply = <&L12C>;
+};
+
+&qupv3_se4_spi {
+	fts@0 {
+		panel = <&dsi_l3s_42_02_0a_dsc_cmd
+			&dsi_r66451_amoled_video>;
+	};
+};
+
+&soc {
+	thermal-message {
+		board-sensor = "VIRTUAL-SENSOR0";
+	};
+	thermal_screen: thermal-screen {
+		panel = <&dsi_l3s_42_02_0a_dsc_cmd
+			&dsi_r66451_amoled_video>;
+        };
+	charge_screen: charge-screen {
+		panel = <&dsi_l3s_42_02_0a_dsc_cmd
+			&dsi_r66451_amoled_video>;
+	};
+};
+
+&spmi_bus {
+	qcom,pm8350b@3 {
+		qcom,amoled-ecm@f900 {
+			display-panels = <&dsi_l3s_42_02_0a_dsc_cmd
+					&dsi_r66451_amoled_video>;
+		};
+	};
+};
+
+&sde_dsi1 {
+	status = "disabled";
+};
+
+&sde_dp {
+	status = "disabled";
+};
+
+&pm8350c_rgb {
+	status = "disabled";
+};
+
+&mdss_mdp {
+        connectors = <&sde_dsi &smmu_sde_unsec &smmu_sde_sec &sde_wb &sde_rscc>;
+};
