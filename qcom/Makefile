@@ -63,7 +63,9 @@ KALAMA_BOARDS += \
 NOAPQ_KALAMA_BOARDS += \
 		 kalama-rumi-overlay.dtbo \
 		 kalama-pinn-cdp-overlay.dtbo \
-		 kalama-pinn-mtp-overlay.dtbo
+		 kalama-pinn-mtp-overlay.dtbo \
+		 kalama-baagha-cdp-overlay.dtbo \
+		 kalama-baagha-mtp-overlay.dtbo
 
 kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS),$(KALAMA_BASE_DTB))\
