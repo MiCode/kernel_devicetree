@@ -18,7 +18,9 @@ PINEAPPLE_APQ_BASE_DTB += pineapplep.dtb pineapplep-v2.dtb
 
 PINEAPPLE_BOARDS += \
 		 pineapple-mtp-overlay.dtbo \
+		 pineapple-mtp-nfc-overlay.dtbo \
 		 pineapple-cdp-overlay.dtbo \
+		 pineapple-cdp-nfc-overlay.dtbo \
 		 pineapple-qrd-overlay.dtbo \
 		 pineapple-atp-overlay.dtbo
 
