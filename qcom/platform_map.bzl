@@ -19,6 +19,28 @@ platform_map = {
             "kalama-rumi-overlay.dtbo",
         ],
     },
+    "kalama-tuivm": {
+        "dtb_list": [
+            # keep sorted"
+            "kalama-oemvm-cdp.dtb",
+            "kalama-oemvm-mtp.dtb",
+            "kalama-oemvm-qrd.dtb",
+            "kalama-oemvm-rumi.dtb",
+            "kalama-vm-cdp.dtb",
+            "kalama-vm-mtp.dtb",
+            "kalama-vm-qrd.dtb",
+            "kalama-vm-rumi.dtb",
+        ],
+        "dtbo_list": [],
+    },
+    "pineapple-tuivm": {
+        "dtb_list": [
+            # keep sorted
+            "pineapple-oemvm-rumi.dtb",
+            "pineapple-vm-rumi.dtb",
+        ],
+        "dtbo_list": [],
+    },
     "pineapple": {
         "dtb_list": [
             # keep sorted
