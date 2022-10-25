@@ -1,0 +1,26 @@
+Enable logging of interrupts that could have caused resume
+
+Qualcomm Technologies Inc. SoCs can be interrupted in order to come out
+of low power modes, knowing the wake up source allows debugging of
+unnecessary wake up interrupts that may bring the SoC out of its low power
+mode. Driver reads GIC registers to determine the interrupt which triggered
+just before the resume loop unrolls.
+
+Properties:
+
+- compatible:
+	Usage: required
+	Value type: <string>
+	Definition: should be "qcom,show-resume-irqs"
+
+- reg:
+	Usage: required
+	Value type: <u32>
+	Definition: GICD base addreess and size.
+
+Example:
+
+	show_resume_irqs@17100000 {
+		compatible = "qcom,show-resume-irqs";
+		reg = <0x17100000 0x290000>;
+	};
