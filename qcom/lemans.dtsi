@@ -373,6 +373,62 @@
 		size = <0 0x3000000>;
 	};
 
+	sp_mem: sp_region {  /* SPSS-HLOS ION shared mem */
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
+	qseecom_mem: qseecom_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1400000>;
+	};
+
+	qseecom_ta_mem: qseecom_ta_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
+	adsp_mem: adsp_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
+	cdsp_secure_mem: secure_cdsp_region { /* Secure DSP */
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x4800000>;
+	};
+
+	non_secure_display_memory: non_secure_display_region {
+		compatible = "shared-dma-pool";
+		reusable;
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		size = <0x0 0xa400000>;
+		alignment = <0x0 0x400000>;
+	};
+
+	user_contig_mem: user_contig_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
 	/* global autoconfigured region for contiguous allocations */
 	linux,cma {
 		compatible = "shared-dma-pool";
@@ -1140,6 +1196,11 @@
 #include "lemans-gdsc.dtsi"
 #include "lemans-pinctrl.dtsi"
 #include "msm-arm-smmu-lemans.dtsi"
+#include "lemans-dma-heaps.dtsi"
+#include "lemans-debug.dtsi"
+#include "lemans-qupv3.dtsi"
+#include "lemans-pcie.dtsi"
+#include "lemans-usb.dtsi"
 
 &cam_cc_titan_top_gdsc {
 	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
@@ -1326,9 +1387,6 @@
 
 	status = "ok";
 };
-
-#include "lemans-debug.dtsi"
-#include "lemans-qupv3.dtsi"
 
 &qupv3_se10_2uart {
 	status = "ok";

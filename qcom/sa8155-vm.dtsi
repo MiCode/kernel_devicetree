@@ -1,10 +1,14 @@
+#include <dt-bindings/clock/qcom,gcc-sm8150.h>
 #include "quin-vm-common.dtsi"
 #include "pm8150-vm.dtsi"
-
 / {
 	model = "Qualcomm Technologies, Inc. SA8155 Guest Virtual Machine";
 	qcom,msm-name  = "SA8155 v2";
 	qcom,msm-id = <362 0x20000>;
+	aliases {
+		hsuart0 = &qupv3_se17_4uart;
+		serial0 = &qupv3_se12_2uart;
+	};
 
 	cpus {
 		#address-cells = <2>;
@@ -132,6 +136,44 @@
 };
 
 &soc {
+	/* Rome 3.3V supply */
+	vreg_wlan: vreg_wlan {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "vreg_wlan";
+	};
+
+	/* PWR_CTR2_VDD_1P8 supply */
+	vreg_conn_1p8: vreg_conn_1p8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_conn_1p8";
+		pinctrl-names = "default";
+		pinctrl-0 = <&conn_power_1p8_active>;
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&tlmm 173 0>;
+	};
+
+	/* PWR_CTR1_VDD_PA supply */
+	vreg_conn_pa: vreg_conn_pa {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_conn_pa";
+		pinctrl-names = "default";
+		pinctrl-0 = <&conn_power_pa_active>;
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&tlmm 174 0>;
+	};
+
+	VDD_CX_LEVEL: VDD_MMCX_LEVEL:
+	S9C_LEVEL: pm8150_2_s9_level: regulator-pm8150-2-s9-level {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "pm8150_2_s9_level";
+		regulator-min-microvolt
+			= <RPMH_REGULATOR_LEVEL_RETENTION>;
+		regulator-max-microvolt
+			= <RPMH_REGULATOR_LEVEL_MAX>;
+	};
+
 	apps_smmu: apps-smmu@0x15000000 {
 		compatible = "qcom,qsmmu-v500";
 		reg = <0x15000000 0x100000>,
@@ -232,10 +274,140 @@
 		compatible = "qcom,iommu-dma";
 		memory-region = <&system_cma>;
 	};
+
+	qcom_rng: qrng@793000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x793000 0x1000>;
+		qcom,no-qrng-config;
+		clocks = <&gcc GCC_PRNG_AHB_CLK>;
+		clock-names = "km_clk_src";
+	};
+
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,sm8150-pdc","qcom,pdc";
+		reg = <0xb220000 0x30000>;
+		qcom,pdc-ranges = <6 486 6>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
 };
 
 #include "sm8150-pinctrl.dtsi"
+#include "sa8155-vm-pcie.dtsi"
+#include "sa8155-vm-qupv3.dtsi"
 
 &tlmm {
 	/delete-property/ wakeup-parent;
+};
+
+&regulator {
+	virt_regulator {
+		compatible = "virtio,device31";
+
+		usb30_prim_gdsc: usb30_prim_gdsc {
+			regulator-name = "usb30_prim_gdsc";
+		};
+
+		usb30_sec_gdsc: usb30_sec_gdsc {
+			regulator-name = "usb30_sec_gdsc";
+		};
+
+		pcie_0_gdsc: pcie_0_gdsc {
+			regulator-name = "pcie_0_gdsc";
+		};
+
+		pcie_1_gdsc: pcie_1_gdsc {
+			regulator-name = "pcie_1_gdsc";
+		};
+
+		L2A: pm8150_1_l2: regulator-pm8150-1-l2 {
+			regulator-name = "ldoa2";
+			regulator-min-microvolt = <3072000>;
+			regulator-max-microvolt = <3072000>;
+		};
+
+		L5A: pm8150_1_l5: regulator-pm8150-1-l5 {
+			regulator-name = "ldoa5";
+			regulator-min-microvolt = <880000>;
+			regulator-max-microvolt = <880000>;
+		};
+
+		L12A: pm8150_1_l12: regulator-pm8150-1-l12 {
+			regulator-name = "ldoa12";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+		};
+
+		L17A: pm8150_1_l17: regulator-pm8150-1-l17 {
+			regulator-name = "ldoa17";
+			regulator-min-microvolt = <2704000>;
+			regulator-max-microvolt = <2960000>;
+		};
+
+		L8C: pm8150_2_l8: regulator-pm8150-2-l8 {
+			regulator-name = "ldoc8";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <1200000>;
+			regulator-allow-set-load;
+		};
+
+		L13C: pm8150_2_l13: regulator-pm8150-2-l13 {
+			regulator-name = "ldoc13";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <2960000>;
+		};
+
+		L15C: pm8150_2_l15: regulator-pm8150-2-l15 {
+			regulator-name = "ldoc15";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1904000>;
+		};
+
+		L18C: pm8150_2_l18: regulator-pm8150-2-l18 {
+			regulator-name = "ldoc18";
+			regulator-min-microvolt = <880000>;
+			regulator-max-microvolt = <880000>;
+			regulator-allow-set-load;
+		};
+
+		S6A: pm8150_1_s6: regulator-pm8150-1-s6 {
+			regulator-name = "smpa6";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1352000>;
+		};
+
+		S4C: pm8150_2_s4: regulator-pm8150-2-s4 {
+			regulator-name = "smpc4";
+			regulator-min-microvolt = <800000>;
+			regulator-max-microvolt = <1400000>;
+		};
+
+		S5C: pm8150_2_s5: regulator-pm8150-2-s5 {
+			regulator-name = "smpc5";
+			regulator-min-microvolt = <1824000>;
+			regulator-max-microvolt = <2040000>;
+		};
+	};
+};
+
+&hab {
+	/delete-node/ mmidgrp1400;
+	/delete-node/ mmidgrp1500;
+};
+
+&pcie0_msi {
+	status = "ok";
+};
+
+&pcie0 {
+	status = "ok";
+};
+
+&qupv3_se17_4uart {
+	status = "ok";
+};
+
+&qupv3_se12_2uart {
+	status = "disabled";
 };

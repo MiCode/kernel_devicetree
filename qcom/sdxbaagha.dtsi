@@ -4,6 +4,7 @@
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/interconnect/qcom,sdxbaagha.h>
+#include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
 / {
 	#address-cells = <1>;
@@ -238,6 +239,45 @@
 		priority = <0>;
 		mbox-desc-offset = <0x0>;
 		#mbox-cells = <1>;
+	};
+
+	apps_rsc: rsc@17040000 {
+		label = "apps_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0x17040000 0x10000>,
+		      <0x17050000 0x10000>;
+		reg-names = "drv-0", "drv-1";
+		qcom,drv-count = <2>;
+		interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>;
+
+		apps_rsc_drv1: drv@1 {
+			qcom,drv-id = <1>;
+			qcom,tcs-offset = <0xd00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    2>,
+						  <SLEEP_TCS     1>,
+						  <WAKE_TCS      1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+	};
+
+	pdc: interrupt-controller@b210000 {
+		compatible = "qcom,sdxbaagha-pdc", "qcom,pdc";
+		reg = <0xb210000 0x30000>;
+		qcom,pdc-ranges = <1 148 6>, <9 156 2>, <17 164 7>,
+				  <26 173 1>, <29 176 1>, <40 187 1>,
+				  <46 193 6>, <52 266 32>, <84 249 1>,
+				  <85 256 1>, <86 315 4>, <90 43 1>,
+				  <91 45 1>, <92 154 2>, <94 158 6>,
+				  <100 171 2>, <102 174 1>, <103 23 7>,
+				  <110 147 1>, <111 31 4>, <115 175 1>,
+				  <116 177 10>, <126 188 5>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
 	};
 
 	timer {
@@ -484,6 +524,10 @@
 		qcom,skip-qos;
 	};
 
+	qcom,sps {
+		compatible = "qcom,msm-sps-4k";
+		qcom,pipe-attr-ee;
+	};
 };
 
 #include "sdxbaagha-pinctrl.dtsi"

@@ -63,7 +63,9 @@ KALAMA_BOARDS += \
 NOAPQ_KALAMA_BOARDS += \
 		 kalama-rumi-overlay.dtbo \
 		 kalama-pinn-cdp-overlay.dtbo \
-		 kalama-pinn-mtp-overlay.dtbo
+		 kalama-pinn-mtp-overlay.dtbo \
+		 kalama-baagha-cdp-overlay.dtbo \
+		 kalama-baagha-mtp-overlay.dtbo
 
 kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS),$(KALAMA_BASE_DTB))\
@@ -114,8 +116,6 @@ KHAJE_BOARDS += \
 		 khajeg-idp-usbc-overlay.dtbo \
 		 khajeg-idp-pm8010-overlay.dtbo \
 		 khajeg-idps-display-90hz-overlay.dtbo
-
-
 
 bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
         $(call add-overlays, $(KHAJE_BOARDS) ,$(KHAJE_BASE_DTB))
@@ -222,12 +222,17 @@ sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
 		sdxpinn-idp-mbb.dtb
 dtb-y += $(sdxpinn-dtb-y)
 
+SA410M_AUTO_BASE_DTB += sa410m.dtb
+SA410M_AUTO_BOARDS += \
+		sa410m-rumi-overlay.dtbo \
+		sa410m-nand-idp-overlay.dtbo \
+		sa410m-emmc-idp-overlay.dtbo \
+		sa410m-nand-ccard-overlay.dtbo \
+		sa410m-emmc-ccard-overlay.dtbo
+
 sa410m_auto-dtb-$(CONFIG_ARCH_SA410M) += \
-				sa410m-rumi.dtb \
-				sa410m-nand-idp.dtb \
-				sa410m-emmc-idp.dtb \
-				sa410m-nand-ccard.dtb \
-				sa410m-emmc-ccard.dtb
+	$(call add-overlays, $(SA410M_AUTO_BOARDS) ,$(SA410M_AUTO_BASE_DTB))
+sa410m_auto-overlays-dtb-$(CONFIG_ARCH_SA410M) += $(SA410M_AUTO_BOARDS) $(SA410M_AUTO_BASE_DTB)
 dtb-y += $(sa410m_auto-dtb-y)
 
 SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
@@ -240,11 +245,20 @@ DIREWOLF_LV_GVM_BASE_DTB += direwolf-vm-lv.dtb
 DIREWOLF_LV_GVM_BOARDS += \
                    direwolf-vm-lv-overlay.dtbo
 
+
+SA8195_LA_GVM_BASE_DTB += sa8195-vm-la.dtb
+
+SA8195_LA_GVM_BOARDS += \
+                   sa8195-vm-la-overlay.dtbo
+
 autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
-	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB))
+	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB)) \
+	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB))
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
-	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB)
+	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB) \
+	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB)
+
 dtb-y += $(autogvm-dtb-y)
 
 SCUBA_AUTO_BASE_DTB += scuba_auto.dtb

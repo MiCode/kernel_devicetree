@@ -929,12 +929,12 @@
 				      <&adsp_smp2p_in 3 0>,
 				      <&adsp_smp2p_in 9 0>;
 
-		interrupt-names = "qcom,wdog",
-				  "qcom,err-fatal",
-				  "qcom,proxy-unvote",
-				  "qcom,err-ready",
-				  "qcom,stop-ack",
-				  "qcom,dsentry-ack";
+		interrupt-names = "wdog",
+				  "fatal",
+				  "handover",
+				  "ready",
+				  "stop-ack",
+				  "shutdown-ack";
 
 		/* Outputs to lpass */
 		qcom,smem-states = <&adsp_smp2p_out 0>;
@@ -958,6 +958,12 @@
 				qcom,non-wake-svc = <0x51
 						0x190>;
 			};
+
+			qcom,msm_fastrpc_rpmsg {
+				compatible = "qcom,msm-fastrpc-rpmsg";
+				qcom,glink-channels = "fastrpcglink-apps-dsp";
+				qcom,intents = <0x64 64>;
+			};
 		};
 	};
 
@@ -970,7 +976,7 @@
 
 		cx-supply = <&VDD_CX_LEVEL>;
 		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
-		reg-names = "vdd_cx";
+		reg-names = "cx";
 
 		memory-region = <&pil_modem_mem>;
 
@@ -980,16 +986,14 @@
 				<&modem_smp2p_in 2 0>,
 				<&modem_smp2p_in 1 0>,
 				<&modem_smp2p_in 3 0>,
-				<&modem_smp2p_in 7 0>,
 				<&modem_smp2p_in 9 0>;
 
-		interrupt-names = "qcom,wdog",
-				  "qcom,err-fatal",
-				  "qcom,proxy-unvote",
-				  "qcom,err-ready",
-				  "qcom,stop-ack",
-				  "qcom,shutdown-ack",
-				  "qcom,dsentry-ack";
+		interrupt-names = "wdog",
+				  "fatal",
+				  "handover",
+				  "ready",
+				  "stop-ack",
+				  "shutdown-ack";
 
 		/* Outputs to mss */
 		qcom,smem-states = <&modem_smp2p_out 0>;
@@ -1182,6 +1186,61 @@
 		reg = <0xF111000 0x1000>;
 
 		#mbox-cells = <1>;
+	};
+
+	qcom,msm-adsprpc-mem {
+		compatible = "qcom,msm-adsprpc-mem-region";
+		memory-region = <&adsp_mem>;
+		restrict-access;
+	};
+
+	qcom,msm_fastrpc {
+		compatible = "qcom,msm-fastrpc-compute";
+		qcom,rpc-latency-us = <611>;
+		qcom,adsp-remoteheap-vmid = <22 37>;
+		qcom,fastrpc-adsp-audio-pdr;
+		qcom,fastrpc-adsp-sensors-pdr;
+
+		qcom,msm_fastrpc_compute_cb1 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x01C3 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable";
+		};
+
+		qcom,msm_fastrpc_compute_cb2 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x01C4 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable";
+		};
+
+		qcom,msm_fastrpc_compute_cb3 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x01C5 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable";
+		};
+
+		qcom,msm_fastrpc_compute_cb4 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x01C6 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable";
+		};
+
+		qcom,msm_fastrpc_compute_cb5 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x01C7 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable";
+		};
+
 	};
 
 	rpm-glink {
@@ -1690,6 +1749,103 @@
 		qcom,ipa-platform-type-msm;
 		qcom,ipa-advertise-sg-support;
 		qcom,ipa-napi-enable;
+	};
+
+	ipa_hw: qcom,ipa@0x5800000 {
+		compatible = "qcom,ipa";
+		reg = <0x5800000 0x34000>,
+			<0x5804000 0x28000>;
+		reg-names = "ipa-base", "gsi-base";
+		interrupts = <GIC_SPI 257 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 259 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "ipa-irq", "gsi-irq";
+		pas-ids = <0xf>;
+		firmware-names = "ipa_fws";
+		memory-regions = <&pil_ipa_fw_mem>;
+		qcom,ipa-hw-ver = <16>; /* IPA core version = IPAv4.2 */
+		qcom,ipa-hw-mode = <0>;
+		qcom,platform-type = <1>; /* MSM platform */
+		qcom,ee = <0>;
+		qcom,use-ipa-tethering-bridge;
+		qcom,modem-cfg-emb-pipe-flt;
+		qcom,ipa-wdi2;
+		qcom,ipa-wdi2_over_gsi;
+		qcom,ipa-endp-delay-wa;
+		qcom,use-ipa-pm;
+		qcom,arm-smmu;
+		qcom,ipa-fltrt-not-hashable;
+		qcom,skip-ieob-mask-wa;
+		qcom,msm-bus,name = "ipa";
+		qcom,max_num_smmu_cb = <3>;
+		clocks = <&rpmcc RPM_SMD_IPA_CLK>;
+		clock-names = "core_clk";
+		qcom,interconnect,num-cases = <5>;
+		qcom,interconnect,num-paths = <4>;
+		interconnects = <&system_noc MASTER_IPA &system_noc SNOC_BIMC_SLV>,
+				<&bimc SNOC_BIMC_MAS &bimc SLAVE_EBI_CH0>,
+				<&system_noc MASTER_IPA &system_noc SLAVE_OCIMEM>,
+				<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_IPA_CFG>;
+		interconnect-names = "ipa_to_llcc", "llcc_to_ebi1", "ipa_to_imem", "appss_to_ipa";
+		/* No vote */
+		qcom,no-vote =
+		<0 0 0 0 0 0 0 0>;
+
+		/* SVS2 */
+		qcom,svs2 =
+		<80000 590000 80000 2160000 80000 560000 80000 120000>;
+
+		/* SVS */
+		qcom,svs =
+		<80000 800000 80000 5414000 80000 920000 80000 180000>;
+
+		/* NOMINAL */
+		qcom,nominal =
+		<206000 1500000 206000 7200000 206000 1560000 206000 380000>;
+
+		/* TURBO */
+		qcom,turbo =
+		<206000 1800000 206000 8500000 206000 1880000 206000 520000>;
+		qcom,bus-vector-names =
+		"MIN", "SVS2", "SVS", "NOMINAL", "TURBO";
+		qcom,throughput-threshold = <310 600 1000>;
+		qcom,scaling-exceptions = <>;
+
+		/* smp2p information */
+		qcom,smp2p_map_ipa_1_out {
+			compatible = "qcom,smp2p-map-ipa-1-out";
+			qcom,smem-states = <&smp2p_ipa_1_out 0>;
+			qcom,smem-state-names = "ipa-smp2p-out";
+		};
+
+		qcom,smp2p_map_ipa_1_in {
+			compatible = "qcom,smp2p-map-ipa-1-in";
+			interrupts-extended = <&smp2p_ipa_1_in 0 0>;
+			interrupt-names = "ipa-smp2p-in";
+		};
+
+		ipa_smmu_ap: ipa_smmu_ap {
+			compatible = "qcom,ipa-smmu-ap-cb";
+			iommus = <&apps_smmu 0x0140 0x0>;
+			qcom,iommu-dma-addr-pool = <0x10000000 0x30000000>;
+			/* modem tables in IMEM */
+			qcom,additional-mapping = <0x0c123000 0x0c123000 0x2000>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-geometry = <0 0xB0000000>;
+		};
+
+		ipa_smmu_wlan: ipa_smmu_wlan {
+			compatible = "qcom,ipa-smmu-wlan-cb";
+			iommus = <&apps_smmu 0x141 0x0>;
+			/* ipa-uc ram */
+			qcom,iommu-dma = "atomic";
+		};
+
+		ipa_smmu_uc: ipa_smmu_uc {
+			compatible = "qcom,ipa-smmu-uc-cb";
+			iommus = <&apps_smmu 0x0142 0x0>;
+			qcom,iommu-dma-addr-pool = <0x40400000 0x1fc00000>;
+			qcom,iommu-dma = "atomic";
+		};
 	};
 
 	qcom,power-state {
