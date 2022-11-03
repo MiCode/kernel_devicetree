@@ -2069,6 +2069,23 @@
 		};
 	};
 
+	gladiator: gladiator {
+		compatible = "qcom,coresight-dummy";
+		coresight-name = "coresight-gladiator";
+		qcom,dummy-source;
+
+		atid = <96>;
+
+		out-ports {
+			port {
+				gladiator_out_funnel_ddr_dl1: endpoint {
+					remote-endpoint =
+					<&funnel_ddr_dl1_in_gladiator>;
+				};
+			};
+		};
+	};
+
 	funnel_ddr_dl1: funnel@10d0a000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb908>;
@@ -2093,6 +2110,13 @@
 				};
 			};
 
+			port@3 {
+				reg = <3>;
+				funnel_ddr_dl1_in_gladiator: endpoint {
+					remote-endpoint =
+					<&gladiator_out_funnel_ddr_dl1>;
+				};
+			};
 		};
 
 		out-ports {
