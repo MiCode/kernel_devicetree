@@ -122,6 +122,16 @@ bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
 bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(bengal-dtb-y)
 
+KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb
+
+KONA_BOARDS += \
+                 kona-iot-v2.1-vc-overlay.dtbo
+
+kona-dtb-$(CONFIG_ARCH_KONA) += \
+        $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB))
+kona-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
+dtb-y += $(kona-dtb-y)
+
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
 
 MONACO_BOARDS += \
