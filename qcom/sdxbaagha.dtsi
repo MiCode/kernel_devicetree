@@ -20,7 +20,7 @@
 	};
 
 	chosen {
-		bootargs = "pcie_ports=compat";
+		bootargs = "pcie_ports=compat cpufreq.default_governor=performance";
 	};
 
 	memory { device_type = "memory"; reg = <0 0>; };
@@ -141,6 +141,7 @@
 			device_type = "cpu";
 			compatible = "arm,cortex-a7";
 			reg = <0x0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 	};
 
@@ -439,6 +440,44 @@
 			      "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@17011000 {
+		compatible = "syscon";
+		reg = <0x17011000 0x20>;
+	};
+
+	mccc: syscon@190ba000 {
+		compatible = "syscon";
+		reg = <0x190ba000 0x54>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,sdxbaagha-debugcc";
+		qcom,gcc = <&gcc>;
+		qcom,mccc = <&mccc>;
+		qcom,apsscc = <&apsscc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&gcc 0>;
+		clock-names = "xo_clk_src",
+			      "gcc";
+		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17191000 0x1000>;
+		reg-names = "freq-domain0";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>;
 	};
 
 	/* GCC GDSCs */
