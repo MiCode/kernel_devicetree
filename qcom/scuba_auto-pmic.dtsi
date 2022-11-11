@@ -1,0 +1,152 @@
+#include "pm2250.dtsi"
+
+&pm2250_gpios {
+	skin_therm {
+		skin_therm_default: skin_therm_default {
+			pins = "gpio5";
+			bias-high-impedance;
+		};
+	};
+
+	conn_therm {
+		conn_therm_default: conn_therm_default {
+			pins = "gpio6";
+			bias-high-impedance;
+		};
+	};
+};
+
+&pm2250_vadc {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&conn_therm_default &skin_therm_default>;
+
+	xo_therm {
+		reg = <ADC5_XO_THERM_100K_PU>;
+		label = "xo_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pa_therm {
+		reg = <ADC5_AMUX_THM1_100K_PU>;
+		label = "pa_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	quiet_therm {
+		reg = <ADC5_AMUX_THM2_100K_PU>;
+		label = "quiet_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	msm_therm {
+		reg = <ADC5_AMUX_THM3_100K_PU>;
+		label = "msm_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	skin_therm {
+		reg = <ADC5_GPIO3_100K_PU>;
+		label = "skin_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	conn_therm {
+		reg = <ADC5_GPIO4_100K_PU>;
+		label = "conn_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	/delete-node/ vbat_sns;
+	/delete-node/ usb_in_v_div_16;
+	/delete-node/ chg_temp;
+	/delete-node/ bat_therm;
+	/delete-node/ bat_therm_30k;
+	/delete-node/ bat_therm_400k;
+	/delete-node/ i_parallel;
+	/delete-node/ bat_id;
+	/delete-node/ die_temp_s3;
+};
+
+&spmi_bus {
+	qcom,pm2250@0 {
+		pm2250_adc_tm_iio: adc_tm@3400 {
+			compatible = "qcom,spmi-adc-tm5-iio";
+			reg = <0x3400>;
+			#thermal-sensor-cells = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			xo_therm {
+				reg = <0>;
+				io-channels = <&pm2250_vadc ADC5_XO_THERM_100K_PU>;
+			};
+
+			pa_therm {
+				reg = <1>;
+				io-channels = <&pm2250_vadc ADC5_AMUX_THM1_100K_PU>;
+			};
+
+			quiet_therm {
+				reg = <2>;
+				io-channels = <&pm2250_vadc ADC5_AMUX_THM2_100K_PU>;
+			};
+
+			msm_therm {
+				reg = <3>;
+				io-channels = <&pm2250_vadc ADC5_AMUX_THM3_100K_PU>;
+			};
+
+			skin_therm {
+				reg = <4>;
+				io-channels = <&pm2250_vadc ADC5_GPIO3_100K_PU>;
+			};
+
+			conn_therm {
+				reg = <5>;
+				io-channels = <&pm2250_vadc ADC5_GPIO4_100K_PU>;
+			};
+		};
+
+		/delete-node/ pm2250_qg;
+		/delete-node/ pm2250_charger;
+	};
+
+	qcom,pm2250@1 {
+		/delete-node/ pm2250_vib;
+		/delete-node/ pm2250_pwm1;
+		/delete-node/ pm2250_pwm2;
+		/delete-node/ pm2250_pwm3;
+	};
+};
+
+&thermal_zones {
+	pm2250-tz {
+		trips {
+			trip0 {
+				temperature = <105000>;
+			};
+
+			trip1 {
+				temperature = <125000>;
+			};
+
+			trip2 {
+				temperature = <155000>;
+			};
+		};
+	};
+};
