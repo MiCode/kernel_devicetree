@@ -1,0 +1,62 @@
+===================================================================
+QTI AOP pmic sensor driver
+===================================================================
+
+QTI AOP pmic sensor driver will be used to give external data of pmic rails like temperature, voltage, etc.
+This driver reads the required external data from MSGRAM which is updated by
+communicating to RPMH via QMP.
+
+Properties:
+- compatible:
+	Usage: required
+	Value type: <string>
+	Definition: must be "qcom,aop-pmic-sensor"
+
+	QTI AOP pmic sensor driver properties:
+-qcom,dbu-id:
+	Usage: required
+	Value type: <Integer>
+	Definition: Unique ID for a particular pmic.
+
+-qcom,type:
+	Usage: required
+	Value type: <Integer>
+	Definition: It will be 1 and 0. 1 is identifier for voltage and 0 is for temperature.
+
+Example:
+	aop_pmic_sensor: aop-pmic-sensor@c3f03d8 {
+		compatible = "qcom,aop-pmic-sensor";
+		reg = <0x0c3f03d8 0x28>;
+		mboxes = <&qmp_aop 0>;
+		#thermal-sensor-cells = <1>;
+
+		mss-temp {
+			qcom,dbu-id = <1>;
+			qcom,type = <0>;
+		};
+
+		mx-temp {
+			qcom,dbu-id = <2>;
+			qcom,type = <0>;
+		};
+
+		cx-temp {
+			qcom,dbu-id = <3>;
+			qcom,type = <0>;
+		};
+
+		mss-volt {
+			qcom,dbu-id = <1>;
+			qcom,type = <1>;
+		};
+
+		mx-volt {
+			qcom,dbu-id = <2>;
+			qcom,type = <1>;
+		};
+
+		cx-volt {
+			qcom,dbu-id = <3>;
+			qcom,type = <1>;
+		};
+	};
