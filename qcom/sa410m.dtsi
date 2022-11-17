@@ -29,6 +29,7 @@
 		serial0 = &qupv3_se4_2uart;
 		qpic_nand1 = &qnand_1;
 		mmc0 = &sdhc_1; /*SDC1 eMMC slot*/
+		pci-domain0 = &pcie0;
 	};
 
 	firmware: firmware {};
@@ -203,7 +204,7 @@
 	};
 
 	chosen {
-		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7";
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 pcie_ports=compat";
 	};
 
 	soc: soc { };
@@ -766,7 +767,7 @@
 		/* Voting for max b/w on PNOC bus for now */
 			<1057800 725760>;
 
-		iommus = <&apps_smmu 0x100 0x7>;
+		iommus = <&apps_smmu 0x100 0x3>;
 		qcom,iommu-dma = "bypass";
 		status = "disabled";
 	};
@@ -936,6 +937,7 @@
 #include "monaco-gdsc.dtsi"
 #include "sa410m-qupv3.dtsi"
 #include "sa410m-dma-heap.dtsi"
+#include "sa410m-pcie.dtsi"
 
 &gcc_emac0_gdsc {
 	status = "ok";
