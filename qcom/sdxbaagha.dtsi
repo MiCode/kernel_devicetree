@@ -5,6 +5,7 @@
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/interconnect/qcom,sdxbaagha.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
+#include <dt-bindings/gpio/gpio.h>
 
 / {
 	#address-cells = <1>;
@@ -546,6 +547,107 @@
 	qcom,sps {
 		compatible = "qcom,msm-sps-4k";
 		qcom,pipe-attr-ee;
+	};
+
+	pcie_ep: qcom,pcie@48000000 {
+		compatible = "qcom,pcie-ep";
+
+		reg = <0x48002000 0x1000>,
+		      <0x48000000 0xf1d>,
+		      <0x48000f20 0xa8>,
+		      <0x48001000 0x1000>,
+		      <0x01bf0000 0x4000>,
+		      <0x01bf6000 0x2000>,
+		      <0x01bf4000 0x1000>,
+		      <0x01fcb000 0x1000>,
+		      <0xc2f1000 0x4>;
+		reg-names = "msi", "dm_core", "elbi", "iatu", "parf", "phy",
+				"mmio", "tcsr_pcie_perst_en", "aoss_cc_reset";
+
+		#address-cells = <0>;
+		interrupt-parent = <&pcie_ep>;
+		interrupts = <0>;
+		#interrupt-cells = <1>;
+		interrupt-map-mask = <0xffffffff>;
+		interrupt-map = <0 &intc GIC_SPI 225 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "int_global";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pcie_ep_clkreq_default &pcie_ep_perst_default
+			&pcie_ep_wake_default>;
+
+		clkreq-gpio = <&tlmm 56 GPIO_ACTIVE_HIGH>;
+		perst-gpio = <&tlmm 57 GPIO_ACTIVE_HIGH>;
+		wake-gpio = <&tlmm 53 GPIO_ACTIVE_HIGH>;
+
+		gdsc-vdd-supply = <&gcc_pcie_gdsc>;
+		vreg-1p2-supply = <&L14A>;
+		vreg-0p9-supply = <&L3A>;
+		vreg-mx-supply = <&VDD_MXA_LEVEL>;
+
+		qcom,vreg-1p2-voltage-level = <1200000 1200000 15000>;
+		qcom,vreg-0p9-voltage-level = <912000 880000 48100>;
+		qcom,vreg-mx-voltage-level = <RPMH_REGULATOR_LEVEL_MAX
+					      RPMH_REGULATOR_LEVEL_NOM 0>;
+
+		clocks = <&gcc GCC_PCIE_PIPE_CLK>,
+			<&gcc GCC_PCIE_CFG_AHB_CLK>,
+			<&gcc GCC_PCIE_MSTR_AXI_CLK>,
+			<&gcc GCC_PCIE_SLV_AXI_CLK>,
+			<&gcc GCC_PCIE_AUX_CLK>,
+			<&gcc GCC_PCIE_0_CLKREF_EN>,
+			<&gcc GCC_PCIE_SLEEP_CLK>,
+			<&gcc GCC_PCIE_SLV_Q2A_AXI_CLK>,
+			<&gcc GCC_PCIE_PIPE_CLK_SRC>,
+			<&pcie_pipe_clk>,
+			<&rpmhcc RPMH_CXO_CLK>;
+
+		clock-names = "pcie_pipe_clk", "pcie_cfg_ahb_clk",
+				"pcie_mstr_axi_clk", "pcie_slv_axi_clk",
+				"pcie_aux_clk", "pcie_ldo",
+				"pcie_sleep_clk", "pcie_slv_q2a_axi_clk",
+				"pcie_pipe_clk_mux", "pcie_pipe_clk_ext_src",
+				"pcie_0_ref_clk_src";
+
+		resets = <&gcc GCC_PCIE_BCR>, <&gcc GCC_PCIE_PHY_BCR>;
+		reset-names = "pcie_core_reset", "pcie_phy_reset";
+
+		interconnect-names = "icc_path";
+		interconnects = <&aggre_noc MASTER_PCIE_0 &mc_virt SLAVE_EBI1>;
+
+		qcom,pcie-vendor-id = /bits/ 16 <0x17cb>;
+		qcom,pcie-device-id = /bits/ 16 <0x011a>;
+		qcom,pcie-link-speed = <1>;
+		qcom,pcie-phy-ver = <7>;
+		qcom,pcie-active-config;
+		qcom,pcie-aggregated-irq;
+		qcom,pcie-mhi-a7-irq;
+		qcom,phy-status-reg2 = <0x214>;
+		qcom,mhi-soc-reset-offset = <0xb001b8>;
+		qcom,aoss-rst-clr;
+		qcom,aux-clk = <0x13>;
+
+		status = "disabled";
+	};
+
+	mhi_device: mhi_dev@1bf4000 {
+		compatible = "qcom,msm-mhi-dev";
+		reg = <0x1bf4000 0x1000>;
+		reg-names = "mhi_mmio_base";
+		qcom,mhi-ep-msi = <0>;
+		qcom,mhi-version = <0x1000000>;
+		qcom,use-mhi-dma-software-channel;
+		interrupts = <GIC_SPI 242 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "mhi-device-inta";
+		qcom,mhi-ifc-id = <0x011a17cb>;
+		qcom,mhi-interrupt;
+		qcom,no-m0-timeout;
+		status = "disabled";
+	};
+
+	mhi_net_device: qcom,mhi_net_dev {
+		compatible = "qcom,msm-mhi-dev-net";
+		status = "disabled";
 	};
 };
 
