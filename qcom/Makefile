@@ -260,6 +260,15 @@ gen4auto-overlays-dtb-$(CONFIG_ARCH_LEMANS) +=  \
 	$(LEMANS_IVI_BOARDS) $(LEMANS_ADAS_HIGH_BOARDS) $(LEMANS_IVI_BASE_DTB) $(LEMANS_ADAS_HIGH_BASE_DTB) \
 	$(LEMANS_IVI_ADAS_BOARDS) $(LEMANS_IVI_ADAS_BASE_DTB)
 
+MONACO_AUTO_BASE_DTB	+= monaco_auto-rumi.dtb
+MONACO_AUTO_BOARDS	+= monaco_auto-rumi-overlay.dtbo
+
+gen4auto-dtb-$(CONFIG_ARCH_MONACO_AUTO) += \
+	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))
+
+gen4auto-overlays-dtb-$(CONFIG_ARCH_MONACO_AUTO) +=  \
+	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)
+
 dtb-y += $(gen4auto-dtb-y)
 
 sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
