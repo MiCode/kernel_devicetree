@@ -1,0 +1,51 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	vm-config {
+		vdevices {
+			vsmmu@15000000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15000000>;
+				num-cbs = <0x6>;
+				num-smrs = <0xe>;
+				patch = "/soc/apps-smmu@15000000";
+			};
+		};
+	};
+};
+
+&soc {
+	apps_smmu: apps-smmu@15000000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+		qcom,actlr =
+			/* Camera SBI*/
+			<0x0848 0x0000 0x00000103>,
+
+			/* Camera IFE, SFE, IPE, BPS, CDM IPE, CDM IFE, CDM BPS, ICP */
+			<0x0808 0x1020 0x00000001>,
+			<0x1841 0x0000 0x00000001>,
+			<0x1861 0x0000 0x00000001>,
+			<0x1881 0x0000 0x00000001>,
+			<0x18c2 0x0000 0x00000001>,
+
+			/* Camera CRE */
+			<0x18e8 0x0000 0x00000103>,
+
+			/* Compute */
+			<0x0c0b 0x0000 0x00000303>,
+
+			/* Display */
+			<0x1c03 0x0000 0x00000001>,
+			<0x1c04 0x0002 0x00000001>,
+
+			/* EVA */
+			<0x1920 0x0000 0x00000103>;
+	};
+};
