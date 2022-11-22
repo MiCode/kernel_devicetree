@@ -45,7 +45,7 @@ dtb-y += $(waipio-dtb-y)
 
 
 KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb kalama-sg.dtb
-KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb
+KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb kalamap-qcs.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
