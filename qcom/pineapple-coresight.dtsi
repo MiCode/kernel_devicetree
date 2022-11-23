@@ -393,6 +393,7 @@
 
 		coresight-name = "coresight-tpdm-video";
 
+		status = "disabled";
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
 
@@ -457,7 +458,7 @@
 		reg = <0x10c38000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-rdpm0";
+		coresight-name = "coresight-tpdm-rdpm-cx";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -479,7 +480,7 @@
 		reg = <0x10c39000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-rdpm1";
+		coresight-name = "coresight-tpdm-rdpm-mxc";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -501,7 +502,7 @@
 		reg = <0x10c3a000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-rdpm2";
+		coresight-name = "coresight-tpdm-rdpm-mxa";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -904,7 +905,6 @@
 		arm,primecell-periphid = <0x000bb968>;
 		reg = <0x10cc9000 0x1000>;
 		reg-names = "tpdm-base";
-
 		status = "disabled";
 		coresight-name = "coresight-tpdm-tmess-prng";
 
@@ -1342,12 +1342,12 @@
 		reg = <0x10800000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-modem0";
+		coresight-name = "coresight-tpdm-modem-0";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
 
-		atid = <98>;
+		atid = <67>;
 		out-ports {
 			port {
 				tpdm_modem0_out_tpda_modem: endpoint {
@@ -1359,18 +1359,11 @@
 	};
 
 	tpdm_modem1: tpdm@10801000 {
-		compatible = "arm,primecell";
-		arm,primecell-periphid = <0x000bb968>;
-		reg = <0x10801000 0x1000>;
-		reg-names = "tpdm-base";
+		compatible = "qcom,coresight-dummy";
+		qcom,dummy-source;
+		coresight-name = "coresight-tpdm-modem-1";
 
-		coresight-name = "coresight-tpdm-modem1";
-
-		status = "disabled";
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
-		atid = <98>;
+		atid = <67>;
 		out-ports {
 			port {
 				tpdm_modem1_out_tpda_modem: endpoint {
@@ -1382,23 +1375,15 @@
 	};
 
 	tpdm_modem_rscc: tpdm@1080d000 {
-		compatible = "arm,primecell";
-		arm,primecell-periphid = <0x000bb968>;
-		reg = <0x1080d000 0x1000>;
-		reg-names = "tpdm-base";
-
-		coresight-name = "coresight-tpdm-modem_rscc";
-
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
-		status = "disabled";
+		compatible = "qcom,coresight-dummy";
+		qcom,dummy-source;
+		coresight-name = "coresight-tpdm-modem-rscc";
 		atid = <98>;
 		out-ports {
 			port {
-				tpdm_modem_rscc_out_tpda_modem_crm: endpoint {
+				tpdm_modem_rscc_out_funnel_modem_q6: endpoint {
 					remote-endpoint =
-					<&tpda_modem_crm_in_tpdm_modem_rscc>;
+					<&funnel_modem_q6_in_tpdm_modem_rscc>;
 				};
 			};
 		};
@@ -1705,7 +1690,7 @@
 		qcom,tpda-atid = <100>;
 		qcom,cmb-elem-size = <0 32>,
 				     <1 32>,
-				     <2 32>;
+				     <2 64>;
 		coresight-name = "coresight-tpda-tmess";
 
 		clocks = <&aoss_qmp>;
@@ -2447,7 +2432,7 @@
 			};
 
 			port@1 {
-				reg = <1>;
+				reg = <2>;
 				funnel_dl_west_in_tpdm_rdpm0: endpoint {
 					remote-endpoint =
 					<&tpdm_rdpm0_out_funnel_dl_west>;
@@ -2455,7 +2440,7 @@
 			};
 
 			port@2 {
-				reg = <2>;
+				reg = <3>;
 				funnel_dl_west_in_tpdm_rdpm1: endpoint {
 					remote-endpoint =
 					<&tpdm_rdpm1_out_funnel_dl_west>;
@@ -2463,7 +2448,7 @@
 			};
 
 			port@3 {
-				reg = <3>;
+				reg = <4>;
 				funnel_dl_west_in_tpdm_rdpm2: endpoint {
 					remote-endpoint =
 					<&tpdm_rdpm2_out_funnel_dl_west>;
@@ -2471,7 +2456,7 @@
 			};
 
 			port@4 {
-				reg = <4>;
+				reg = <5>;
 				funnel_dl_west_in_tpdm_spare: endpoint {
 					remote-endpoint =
 					<&tpdm_spare_out_funnel_dl_west>;
@@ -2658,49 +2643,6 @@
 		};
 	};
 
-	tpda_modem_crm: tpda@1080e000 {
-		compatible = "arm,primecell";
-		arm,primecell-periphid = <0x000bb969>;
-
-		reg = <0x1080e000 0x1000>;
-		reg-names = "tpda-base";
-
-		qcom,tpda-atid = <87>;
-		qcom,cmb-elem-size = <0 64>;
-		coresight-name = "coresight-tpda-modem_crm";
-
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
-		in-ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				tpda_modem_crm_in_tpdm_modem_rscc: endpoint {
-					remote-endpoint =
-					<&tpdm_modem_rscc_out_tpda_modem_crm>;
-				};
-			};
-
-		};
-
-		out-ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				tpda_modem_crm_out_funnel_modem_q6: endpoint {
-					remote-endpoint =
-					<&funnel_modem_q6_in_tpda_modem_crm>;
-				};
-			};
-
-		};
-	};
-
 	modem_etm0 {
 		compatible = "qcom,coresight-remote-etm";
 
@@ -2758,7 +2700,7 @@
 		reg = <0x10803000 0x1000>;
 		reg-names = "tpda-base";
 
-		qcom,tpda-atid = <98>;
+		qcom,tpda-atid = <67>;
 		qcom,dsb-elem-size = <0 32>;
 		qcom,cmb-elem-size = <0 64>;
 		coresight-name = "coresight-tpda-modem";
@@ -2873,9 +2815,9 @@
 			};
 
 			port@3 {
-				funnel_modem_q6_in_tpda_modem_crm: endpoint {
+				funnel_modem_q6_in_tpdm_modem_rscc: endpoint {
 					remote-endpoint =
-					<&tpda_modem_crm_out_funnel_modem_q6>;
+					<&tpdm_modem_rscc_out_funnel_modem_q6>;
 				};
 			};
 
@@ -3122,6 +3064,7 @@
 				<13 64>,
 				<14 64>,
 				<15 64>,
+				<16 64>,
 				<21 32>,
 				<24 32>,
 				<26 64>,
@@ -4236,7 +4179,7 @@
 		reg = <0x10010000 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-cti-qc_cti";
+		coresight-name = "coresight-cti-qdss_cti";
 		qcom,extended_cti;
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -4338,6 +4281,7 @@
 		compatible = "arm,coresight-cti", "arm,primecell";
 		reg = <0x10d11000 0x1000>;
 
+		status = "disabled";
 		arm,primecell-periphid = <0x000bb922>;
 		coresight-name = "coresight-cti-ddrss_shrm2";
 
@@ -4693,6 +4637,7 @@
 		arm,primecell-periphid = <0x000bb922>;
 		coresight-name = "coresight-cti-aop_rvss";
 
+		status = "disabled";
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
 	};
