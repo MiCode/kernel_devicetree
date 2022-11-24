@@ -705,6 +705,65 @@
 			status = "disabled";
 		};
 
+		i3c3: i3c-master@888000 { /* QUPV3_2, SE2: NAON */
+			compatible = "qcom,geni-i3c";
+			reg = <0x888000 0x4000>,
+				<0xb00000 0x10000>;
+			clock-names = "se-clk",
+				"ibic-core-clk", "ibic-ahb-clk", "ibic-src-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S2_CLK>,
+				<&gcc GCC_QUPV3_WRAP2_IBI_CTRL_2_CLK>,
+				<&gcc GCC_QUPV3_WRAP_2_IBI_2_AHB_CLK>,
+				<&gcc GCC_QUPV3_WRAP2_IBI_CTRL_0_CLK_SRC>;
+			qcom,ibic-naon;
+			interconnect-names = "qup-core", "qup-config", "qup-memory";
+			interconnects =
+				<&clk_virt MASTER_QUP_CORE_2 &clk_virt SLAVE_QUP_CORE_2>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_2>,
+				<&aggre2_noc MASTER_QUP_2 &mc_virt  SLAVE_EBI1>;
+			pinctrl-names = "default", "sleep", "disable";
+			pinctrl-0 = <&qupv3_se10_i3c_sda_active>, <&qupv3_se10_i3c_scl_active>;
+			pinctrl-1 = <&qupv3_se10_i3c_sda_sleep>, <&qupv3_se10_i3c_scl_sleep>;
+			pinctrl-2 = <&qupv3_se10_i3c_disable>;
+			interrupts = <GIC_SPI 584 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 239 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 238 IRQ_TYPE_LEVEL_HIGH>;
+			#address-cells = <3>;
+			#size-cells = <0>;
+			qcom,ibi-ctrl-id = <7>;
+			status = "disabled";
+		};
+
+		i3c4: i3c-master@88c000 { /* QUPV3_2, SE3: NAON */
+			compatible = "qcom,geni-i3c";
+			reg = <0x888c00 0x4000>,
+				<0xb10000 0x10000>;
+			clock-names = "se-clk",
+				"ibic-core-clk", "ibic-ahb-clk", "ibic-src-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S3_CLK>,
+				<&gcc GCC_QUPV3_WRAP2_IBI_CTRL_3_CLK>,
+				<&gcc GCC_QUPV3_WRAP_2_IBI_3_AHB_CLK>,
+				<&gcc GCC_QUPV3_WRAP2_IBI_CTRL_0_CLK_SRC>;
+			qcom,ibic-naon;
+			interconnect-names = "qup-core", "qup-config", "qup-memory";
+			interconnects =
+				<&clk_virt MASTER_QUP_CORE_2 &clk_virt SLAVE_QUP_CORE_2>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_2>,
+				<&aggre2_noc MASTER_QUP_2 &mc_virt  SLAVE_EBI1>;
+			pinctrl-names = "default", "sleep", "disable";
+			pinctrl-0 = <&qupv3_se11_i3c_sda_active>, <&qupv3_se11_i3c_scl_active>;
+			pinctrl-1 = <&qupv3_se11_i3c_sda_sleep>, <&qupv3_se11_i3c_scl_sleep>;
+			pinctrl-2 = <&qupv3_se11_i3c_disable>;
+			interrupts = <GIC_SPI 585 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>;
+
+			#address-cells = <3>;
+			#size-cells = <0>;
+			qcom,ibi-ctrl-id = <8>;
+			status = "disabled";
+		};
+
 		qupv3_se11_i2c: i2c@88c000 {
 			compatible = "qcom,i2c-geni";
 			reg = <0x88c000 0x4000>;
