@@ -5,6 +5,7 @@
 #include <dt-bindings/clock/qcom,gpucc-sm8250.h>
 #include <dt-bindings/clock/qcom,npucc-sm8250.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
@@ -431,22 +432,22 @@
 		reg = <0x0 0x87300000 0x0 0x500000>;
 	};
 
-	pil_cdsp_mem: pil_cdsp_region@87800000 {
+	rproc_cdsp_mem: rproc_cdsp_region@87800000 {
 		no-map;
 		reg = <0x0 0x87800000 0x0 0x1400000>;
 	};
 
-	pil_slpi_mem: pil_slpi_region@88c00000 {
+	rproc_slpi_mem: rproc_slpi_region@88c00000 {
 		no-map;
 		reg = <0x0 0x88c00000 0x0 0x1500000>;
 	};
 
-	pil_adsp_mem: pil_adsp_region@8a100000 {
+	rproc_adsp_mem: rproc_adsp_region@8a100000 {
 		no-map;
 		reg = <0x0 0x8a100000 0x0 0x1d00000>;
 	};
 
-	pil_spss_mem: pil_spss_region@8be00000 {
+	rproc_spss_mem: rproc_spss_region@8be00000 {
 		no-map;
 		reg = <0x0 0x8be00000 0x0 0x100000>;
 	};
@@ -1796,6 +1797,36 @@
 		};
 	};
 
+	ipcc_mproc: qcom,ipcc@408000 {
+		compatible = "qcom,ipcc";
+		reg = <0x408000 0x1000>;
+		interrupts = <GIC_SPI 229 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+	};
+
+	aoss_qmp: power-controller@c300000 {
+		compatible = "qcom,kona-aoss-qmp";
+		reg = <0xc300000 0x400>;
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_AOP
+			      IPCC_MPROC_SIGNAL_GLINK_QMP
+			      IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&ipcc_mproc IPCC_CLIENT_AOP
+			  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+
+		#power-domain-cells = <1>;
+		#clock-cells = <0>;
+	};
+
+	qmp_aop: qcom,qmp-aop {
+		compatible = "qcom,qmp-mbox";
+		qcom,qmp = <&aoss_qmp>;
+		label = "aop";
+		#mbox-cells = <1>;
+	};
+
 	wdog: qcom,wdt@17c10000 {
 		compatible = "qcom,msm-watchdog";
 		reg = <0x17c10000 0x1000>;
@@ -2244,6 +2275,359 @@
 		qcom,eud-clock-vote-req;
 		clocks = <&gcc GCC_USB_PHY_CFG_AHB2PHY_BCR>;
 		clock-names = "eud_ahb2phy_clk";
+	};
+
+	adsp_pas: remoteproc-adsp@17300000 {
+		compatible = "qcom,kona-adsp-pas";
+		reg = <0x17300000 0x00100>;
+		status = "ok";
+
+		cx-supply = <&L11A_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		mx-supply = <&L4A_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "cx", "mx";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		qcom,signal-aop;
+		qcom,qmp = <&aoss_qmp>;
+
+		memory-region = <&rproc_adsp_mem>;
+
+		/* Inputs from ssc */
+		interrupts-extended = <&pdc 6 IRQ_TYPE_EDGE_RISING>,
+					<&adsp_smp2p_in 0 0>,
+					<&adsp_smp2p_in 2 0>,
+					<&adsp_smp2p_in 1 0>,
+					<&adsp_smp2p_in 3 0>,
+					<&adsp_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to turing */
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+	cdsp_pas: remoteproc-cdsp@8300000 {
+		compatible = "qcom,kona-cdsp-pas";
+		reg = <0x8300000 0x100000>;
+		status = "ok";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx";
+
+		memory-region = <&rproc_cdsp_mem>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		qcom,signal-aop;
+		qcom,qmp = <&aoss_qmp>;
+
+		interconnects = <&compute_noc MASTER_NPU &compute_noc SLAVE_CDSP_MEM_NOC>;
+		interconnect-names = "rproc_ddr";
+
+		/* Inputs from turing */
+		interrupts-extended = <&intc GIC_SPI 578 IRQ_TYPE_EDGE_RISING>,
+					<&cdsp_smp2p_in 0 0>,
+					<&cdsp_smp2p_in 2 0>,
+					<&cdsp_smp2p_in 1 0>,
+					<&cdsp_smp2p_in 3 0>,
+					<&cdsp_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to turing */
+		qcom,smem-states = <&cdsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+	slpi_pas: remoteproc-slpi@5c00000 {
+		compatible = "qcom,kona-slpi-pas";
+		reg = <0x5c00000 0x4000>;
+		status = "disabled";
+
+		cx-supply = <&L11A_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		mx-supply = <&L4A_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "cx", "mx";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		qcom,qmp = <&aoss_qmp>;
+
+
+		memory-region = <&rproc_slpi_mem>;
+
+		qcom,signal-aop;
+
+		/* Inputs from ssc */
+		interrupts-extended = <&pdc 9 IRQ_TYPE_EDGE_RISING>,
+					<&dsps_smp2p_in 0 0>,
+					<&dsps_smp2p_in 2 0>,
+					<&dsps_smp2p_in 1 0>,
+					<&dsps_smp2p_in 3 0>,
+					<&dsps_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to turing */
+		qcom,smem-states = <&dsps_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+	spss_pas: remoteproc-spss@1880000 {
+		compatible = "qcom,kona-spss-pas";
+		ranges;
+		reg = <0x188101c 0x4>,
+		      <0x1881024 0x4>,
+		      <0x1881028 0x4>,
+		      <0x188103c 0x4>,
+		      <0x1881100 0x4>,
+		      <0x1882014 0x4>;
+		reg-names = "sp2soc_irq_status", "sp2soc_irq_clr", "sp2soc_irq_mask",
+			    "rmb_err", "rmb_general_purpose", "rmb_err_spare2";
+		interrupts = <0 352 1>;
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MX_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+		qcom,proxy-clock-names = "xo";
+		status = "ok";
+
+		memory-region = <&rproc_spss_mem>;
+		qcom,spss-scsr-bits = <24 25>;
+		qcom,extra-size = <4096>;
+		qcom,signal-aop;
+	};
+
+	qcom,smp2p_sleepstate {
+		compatible = "qcom,smp2p-sleepstate";
+		qcom,smem-states = <&sleepstate_smp2p_out 0>;
+		interrupt-parent = <&sleepstate_smp2p_in>;
+		interrupts = <0 0>;
+		interrupt-names = "smp2p-sleepstate-in";
+	};
+
+	qcom,msm-cdsp-loader {
+		compatible = "qcom,cdsp-loader";
+		qcom,proc-img-to-load = "cdsp";
+		qcom,rproc-handle = <&cdsp_pas>;
+	};
+
+	qcom,msm-adsprpc-mem {
+		compatible = "qcom,msm-adsprpc-mem-region";
+		memory-region = <&adsp_mem>;
+		restrict-access;
+	};
+
+	msm_fastrpc: qcom,msm_fastrpc {
+		compatible = "qcom,msm-fastrpc-compute";
+		qcom,adsp-remoteheap-vmid = <22 37>;
+		qcom,fastrpc-adsp-audio-pdr;
+		qcom,fastrpc-adsp-sensors-pdr;
+		qcom,rpc-latency-us = <235>;
+		qcom,qos-cores = <0 1 2 3>;
+
+		qcom,msm_fastrpc_compute_cb1 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1001 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb2 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1002 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb3 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1003 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb4 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1004 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb5 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1005 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb6 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1006 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb7 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1007 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb8 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x1008 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb9 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			qcom,secure-context-bank;
+			iommus = <&apps_smmu 0x1009 0x0460>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			qcom,iommu-vmid = <0xA>;	/* VMID_CP_PIXEL */
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb10 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x1803 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb11 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x1804 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb12 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x1805 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb13 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "sdsprpc-smd";
+			iommus = <&apps_smmu 0x0541 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb14 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "sdsprpc-smd";
+			iommus = <&apps_smmu 0x0542 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb15 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "sdsprpc-smd";
+			iommus = <&apps_smmu 0x0543 0x0>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			shared-cb = <4>;
+			dma-coherent;
+		};
+	};
+
+	qcom,spcom {
+		compatible = "qcom,spcom";
+
+		qcom,rproc-handle = <&spss_pas>;
+		qcom,boot-enabled;
+		/* predefined channels, remote side is server */
+		qcom,spcom-ch-names = "sp_kernel", "sp_ssr";
+		/* sp2soc rmb shared register physical address and bmsk */
+		qcom,spcom-sp2soc-rmb-reg-addr = <0x01881020>;
+		qcom,spcom-sp2soc-rmb-initdone-bit = <24>;
+		qcom,spcom-sp2soc-rmb-pbldone-bit = <25>;
+		/* soc2sp rmb shared register physical address */
+		qcom,spcom-soc2sp-rmb-reg-addr = <0x01881030>;
+		qcom,spcom-soc2sp-rmb-sp-ssr-bit = <0>;
+		status = "ok";
+	};
+
+	spss_utils: qcom,spss_utils {
+		compatible = "qcom,spss-utils";
+		/* spss fuses physical address */
+		qcom,rproc-handle = <&spss_pas>;
+		qcom,spss-fuse1-addr = <0x00780234>;
+		qcom,spss-fuse1-bit = <27>;
+		qcom,spss-fuse2-addr = <0x00780234>;
+		qcom,spss-fuse2-bit = <26>;
+		qcom,spss-dev-firmware-name  = "spss1d.mdt";  /* 8 chars max */
+		qcom,spss-test-firmware-name = "spss1t.mdt";  /* 8 chars max */
+		qcom,spss-prod-firmware-name = "spss1p.mdt";  /* 8 chars max */
+		qcom,spss-debug-reg-addr = <0x01886020>;
+		qcom,spss-debug-reg-addr1 = <0x01888020>;
+		qcom,spss-debug-reg-addr3 = <0x0188C020>;
+		qcom,spss-emul-type-reg-addr = <0x01fc8004>;
+		pil-mem = <&rproc_spss_mem>;
+		qcom,pil-addr = <0x8BE00000>; // backward compatible
+		qcom,pil-size = <0x0F0000>; // padding to 960KB
 		status = "ok";
 	};
 };
@@ -2257,3 +2641,4 @@
 #include "kona-dma-heaps.dtsi"
 #include "kona-qupv3.dtsi"
 #include "kona-pcie.dtsi"
+#include "kona-smp2p.dtsi"
