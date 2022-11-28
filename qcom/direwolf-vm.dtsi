@@ -6,6 +6,12 @@
 	qcom,msm-id = <460 0x10000>;
 };
 
+&firmware {
+	scm {
+		compatible = "qcom,scm";
+	};
+};
+
 &soc {
 	apps_smmu: apps-smmu@15000000 {
 		compatible = "qcom,qsmmu-v500";
@@ -156,6 +162,26 @@
 	dma_dev@0x0 {
 		compatible = "qcom,iommu-dma";
 		memory-region = <&system_cma>;
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+		/*Boolean property to disable shmbridge*/
+		qcom,disable-shmbridge-support;
+	};
+
+	qcom_qseecom: qseecom@c1800000 {
+		compatible = "qcom,qseecom";
+		reg = <0xc1800000 0x3900000>;
+		reg-names = "secapp-region";
+		memory-region = <&qseecom_mem>;
+		qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		qcom,disk-encrypt-pipe-pair = <2>;
+		qcom,no-clock-support;
+		qcom,commonlib-loaded-by-hostvm;
+		qcom,qsee-reentrancy-support = <2>;
 	};
 
 	qcom_rng_ee3: qrng@10d3000 {
