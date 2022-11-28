@@ -312,12 +312,12 @@
 		reg = <0x0 0x95c00000 0x0 0x1e00000>;
 	};
 
-	pil_gdsp0_mem: pil_gdsp0_region@97b00000 {
+	rproc_gpdsp0_mem: rproc_gpdsp0_region@97b00000 {
 		no-map;
 		reg = <0x0 0x97b00000 0x0 0x1e00000>;
 	};
 
-	pil_gdsp1_mem: pil_gdsp1_region@99900000 {
+	rproc_gpdsp1_mem: rproc_gpdsp1_region@99900000 {
 		no-map;
 		reg = <0x0 0x99900000 0x0 0x1e00000>;
 	};
@@ -1198,6 +1198,80 @@
 				qcom,intents = <0x64 64>;
 			};
 		};
+	};
+
+	gpdsp0_pas: remoteproc-gpdsp0@20c00000 {
+		compatible = "qcom,lemans-gpdsp0-pas";
+		reg = <0x20c00000 0x10000>;
+		status = "ok";
+
+		memory-region = <&rproc_gpdsp0_mem>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MXC_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		qcom,proxy-reg-names = "cx","mx";
+
+		interconnects = <&gpdsp_anoc MASTER_DSP0 &config_noc SLAVE_CLK_CTL>;
+		interconnect-names = "gpdsp0_anoc";
+
+		interrupts-extended = <&intc GIC_SPI 769 IRQ_TYPE_LEVEL_HIGH>,
+			<&gpdsp0_smp2p_in 0 0>,
+			<&gpdsp0_smp2p_in 2 0>,
+			<&gpdsp0_smp2p_in 1 0>,
+			<&gpdsp0_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+			"fatal",
+			"handover",
+			"ready",
+			"stop-ack";
+
+		qcom,qmp = <&aoss_qmp>;
+
+		qcom,smem-states = <&gpdsp0_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
+	gpdsp1_pas: remoteproc-gpdsp1@21c00000 {
+		compatible = "qcom,lemans-gpdsp1-pas";
+		reg = <0x21c00000 0x10000>;
+		status = "ok";
+
+		memory-region = <&rproc_gpdsp1_mem>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MXC_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		qcom,proxy-reg-names = "cx","mx";
+
+		interconnects = <&gpdsp_anoc MASTER_DSP1 &config_noc SLAVE_CLK_CTL>;
+		interconnect-names = "gpdsp1_anoc";
+
+		interrupts-extended = <&intc GIC_SPI 624 IRQ_TYPE_LEVEL_HIGH>,
+			<&gpdsp1_smp2p_in 0 0>,
+			<&gpdsp1_smp2p_in 2 0>,
+			<&gpdsp1_smp2p_in 1 0>,
+			<&gpdsp1_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+			"fatal",
+			"handover",
+			"ready",
+			"stop-ack";
+
+		qcom,qmp = <&aoss_qmp>;
+
+		qcom,smem-states = <&gpdsp1_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
 	};
 
 	spmi_bus: qcom,spmi@c440000 {
