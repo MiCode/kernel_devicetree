@@ -22,6 +22,7 @@ PINEAPPLE_BOARDS += \
 		 pineapple-cdp-overlay.dtbo \
 		 pineapple-cdp-nfc-overlay.dtbo \
 		 pineapple-qrd-overlay.dtbo \
+		 pineapple-rcm-overlay.dtbo \
 		 pineapple-atp-overlay.dtbo
 
 NOAPQ_PINEAPPLE_BOARDS += \
