@@ -33,11 +33,17 @@ platform_map = {
         ],
         "dtbo_list": [],
     },
-    "pineapple-tuivm": {
+    "kalama-oemvm": {
         "dtb_list": [
-            # keep sorted
-            "pineapple-oemvm-rumi.dtb",
-            "pineapple-vm-rumi.dtb",
+            # keep sorted"
+            "kalama-oemvm-cdp.dtb",
+            "kalama-oemvm-mtp.dtb",
+            "kalama-oemvm-qrd.dtb",
+            "kalama-oemvm-rumi.dtb",
+            "kalama-vm-cdp.dtb",
+            "kalama-vm-mtp.dtb",
+            "kalama-vm-qrd.dtb",
+            "kalama-vm-rumi.dtb",
         ],
         "dtbo_list": [],
     },
@@ -57,5 +63,21 @@ platform_map = {
             "pineapple-qrd-overlay.dtbo",
             "pineapple-rumi-overlay.dtbo",
         ],
+    },
+    "pineapple-tuivm": {
+        "dtb_list": [
+            # keep sorted
+            "pineapple-oemvm-rumi.dtb",
+            "pineapple-vm-rumi.dtb",
+        ],
+        "dtbo_list": [],
+    },
+    "pineapple-oemvm": {
+        "dtb_list": [
+            # keep sorted
+            "pineapple-oemvm-rumi.dtb",
+            "pineapple-vm-rumi.dtb",
+        ],
+        "dtbo_list": [],
     },
 }
