@@ -71,6 +71,7 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS),$(KALAMA_BASE_DTB))\
 	$(call add-overlays, $(KALAMA_BOARDS) $(APQ_KALAMA_BOARDS),$(KALAMA_APQ_BASE_DTB))
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
+kalama_le-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
 KHAJE_BASE_DTB += khaje.dtb khajep.dtb khajeq.dtb khajeg.dtb
@@ -215,9 +216,11 @@ LEMANS_ADAS_HIGH_BASE_DTB += lemans-adas-high.dtb
 
 LEMANS_BOARDS		+= lemans-rumi-overlay.dtbo
 LEMANS_IVI_BOARDS	+= lemans-ivi-adp-air-overlay.dtbo \
-			   lemans-ivi-adp-star-overlay.dtbo
+			   lemans-ivi-adp-star-overlay.dtbo \
+			   lemans-ivi-qam-star-overlay.dtbo
 LEMANS_ADAS_HIGH_BOARDS += lemans-adas-high-adp-air-overlay.dtbo \
-			   lemans-adas-high-adp-star-overlay.dtbo
+			   lemans-adas-high-adp-star-overlay.dtbo \
+			   lemans-adas-high-qam-star-overlay.dtbo
 
 gen4auto-dtb-$(CONFIG_ARCH_LEMANS) += \
 	$(call add-overlays, $(LEMANS_IVI_BOARDS),$(LEMANS_IVI_BASE_DTB))\
@@ -255,6 +258,10 @@ DIREWOLF_LV_GVM_BASE_DTB += direwolf-vm-lv.dtb
 DIREWOLF_LV_GVM_BOARDS += \
                    direwolf-vm-lv-overlay.dtbo
 
+DIREWOLF_LA_GVM_BASE_DTB += direwolf-vm-la.dtb
+
+DIREWOLF_LA_GVM_BOARDS += \
+                   direwolf-vm-la-overlay.dtbo
 
 SA8195_LA_GVM_BASE_DTB += sa8195-vm-la.dtb
 
@@ -264,10 +271,12 @@ SA8195_LA_GVM_BOARDS += \
 autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB)) \
-	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB))
+	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB))
+
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB) \
-	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB)
+	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) $(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 

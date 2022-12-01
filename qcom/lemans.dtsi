@@ -4,9 +4,11 @@
 #include <dt-bindings/clock/qcom,gcc-lemans.h>
 #include <dt-bindings/clock/qcom,gpucc-lemans.h>
 #include <dt-bindings/clock/qcom,videocc-lemans.h>
+#include <dt-bindings/clock/qcom,aop-qmp.h>
 #include <dt-bindings/interconnect/qcom,lemans.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 
@@ -27,6 +29,8 @@
 	aliases {
 		serial0 = &qupv3_se10_2uart;
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
+		i2c4 = &qupv3_se11_i2c;
+		spi16 = &qupv3_se16_spi;
 	};
 
 	soc: soc { };
@@ -302,7 +306,7 @@
 		reg = <0x0 0x95200000 0x0 0x500000>;
 	};
 
-	pil_adsp_mem: pil_adsp_region@95c00000 {
+	rproc_adsp_mem: rproc_adsp_region@95c00000 {
 		no-map;
 		reg = <0x0 0x95c00000 0x0 0x1e00000>;
 	};
@@ -317,7 +321,7 @@
 		reg = <0x0 0x99900000 0x0 0x1e00000>;
 	};
 
-	pil_cdsp0_mem: pil_cdsp0_region@9b800000 {
+	rproc_cdsp_mem: rproc_cdsp_region@9b800000 {
 		no-map;
 		reg = <0x0 0x9b800000 0x0 0x1e00000>;
 	};
@@ -420,6 +424,14 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		size = <0x0 0xa400000>;
 		alignment = <0x0 0x400000>;
+	};
+
+	secure_display_memory: secure_display_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0xA000000>;
 	};
 
 	user_contig_mem: user_contig_region {
@@ -652,6 +664,11 @@
 		#interrupt-cells = <2>;
 	};
 
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+		qcom,vmid-cp-camera-preview-ro;
+	};
+
 	wdog: qcom,wdt@17c10000 {
 		compatible = "qcom,msm-watchdog";
 		reg = <0x17c10000 0x1000>;
@@ -666,6 +683,20 @@
 		interrupt-controller;
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
+	};
+
+	cache-controller@9200000 {
+		compatible = "qcom,lemans-llcc", "qcom,llcc-v31";
+		reg = <0x9200000 0x580000> , <0x9a00000 0x80000>;
+		reg-names = "llcc_base", "llcc_broadcast_base";
+		interrupts = <GIC_SPI 582 IRQ_TYPE_LEVEL_HIGH>;
+		cap-based-alloc-and-pwr-collapse;
+
+		llcc-perfmon {
+			compatible = "qcom,llcc-perfmon";
+			clocks = <&aoss_qmp QDSS_CLK>;
+			clock-names = "qdss_clk";
+		};
 	};
 
 	clocks {
@@ -909,7 +940,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	mc_virt: interconnect@1 {
@@ -917,7 +947,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	config_noc: interconnect@014C0000 {
@@ -926,7 +955,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	system_noc: interconnect@01680000 {
@@ -935,7 +963,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	aggre1_noc:interconnect@016C0000 {
@@ -944,7 +971,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 		clocks = <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
 			<&gcc GCC_AGGRE_NOC_QUPV3_AXI_CLK>,
 			<&gcc GCC_AGGRE_USB2_PRIM_AXI_CLK>,
@@ -958,7 +984,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 		clocks = <&gcc GCC_AGGRE_UFS_CARD_AXI_CLK>,
 			<&rpmhcc RPMH_IPA_CLK>;
 	};
@@ -969,7 +994,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	gpdsp_anoc: interconnect@01780000 {
@@ -978,7 +1002,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	mmss_noc: interconnect@017A0000 {
@@ -987,7 +1010,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	lpass_ag_noc: interconnect@03C40000 {
@@ -996,7 +1018,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	dc_noc: interconnect@090E0000 {
@@ -1005,7 +1026,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	gem_noc: interconnect@09100000 {
@@ -1015,7 +1035,6 @@
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 		clocks = <&gcc GCC_DDRSS_GPU_AXI_CLK>;
-		qcom,skip-qos;
 	};
 
 	nspa_noc: interconnect@260C0000 {
@@ -1024,7 +1043,6 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	nspb_noc: interconnect@2A0C0000 {
@@ -1033,11 +1051,143 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	vendor_hooks: qcom,cpu-vendor-hooks {
 		compatible = "qcom,cpu-vendor-hooks";
+	};
+
+	adsp_pas: remoteproc-adsp@3000000 {
+		compatible = "qcom,lemans-adsp-pas";
+		reg = <0x3000000 0x00100>;
+		status = "ok";
+
+		memory-region = <&rproc_adsp_mem>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		vdd_cx-supply = <&VDD_LPI_CX_LEVEL>;
+		qcom,vdd_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		vdd_mx-supply = <&VDD_LPI_MX_LEVEL>;
+		qcom,vdd_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "cx","mx";
+
+		/* Inputs from lpass */
+		interrupts-extended = <&intc GIC_SPI 162 IRQ_TYPE_LEVEL_HIGH>,
+				<&adsp_smp2p_in 0 0>,
+				<&adsp_smp2p_in 2 0>,
+				<&adsp_smp2p_in 1 0>,
+				<&adsp_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack";
+
+		qcom,qmp = <&aoss_qmp>;
+
+		/* Outputs to lpass */
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		glink_adsp: glink-edge {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_LPASS
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "adsp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_LPASS
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+			cpu-affinity = <1 2>;
+
+			qcom,adsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,apr_tal_rpmsg {
+				qcom,glink-channels = "apr_audio_svc";
+				qcom,intents = <0x200 20>;
+			};
+		};
+	};
+
+	cdsp_pas: remoteproc-cdsp@26300000 {
+		compatible = "qcom,lemans-cdsp-pas";
+		reg = <0x26300000 0x10000>;
+		status = "ok";
+
+		memory-region = <&rproc_cdsp_mem>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MXC_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		nsp0-supply = <&VDD_NSP_0_LEVEL>;
+		nsp0-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx","mx","nsp0";
+
+		interconnects = <&nspa_noc MASTER_CDSP_PROC &mc_virt SLAVE_EBI1>;
+		interconnect-names = "crypto_ddr";
+
+		/* Inputs from turing */
+		interrupts-extended = <&intc GIC_SPI 578 IRQ_TYPE_LEVEL_HIGH>,
+			<&cdsp_smp2p_in 0 0>,
+			<&cdsp_smp2p_in 2 0>,
+			<&cdsp_smp2p_in 1 0>,
+			<&cdsp_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+			"fatal",
+			"handover",
+			"ready",
+			"stop-ack";
+
+		qcom,qmp = <&aoss_qmp>;
+
+		/* Outputs to turing */
+		qcom,smem-states = <&cdsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		glink_cdsp0: glink-edge {
+			qcom,remote-pid = <5>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_CDSP
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "cdsp0_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_CDSP
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp0";
+			qcom,glink-label = "cdsp0";
+
+			qcom,cdsp0_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,msm_fastrpc_rpmsg {
+				compatible = "qcom,msm-fastrpc-rpmsg";
+				qcom,glink-channels = "fastrpcglink-apps-dsp";
+				qcom,intents = <0x64 64>;
+			};
+		};
 	};
 
 	spmi_bus: qcom,spmi@c440000 {
@@ -1244,6 +1394,35 @@
 		qcom,qmp = <&aoss_qmp>;
 		label = "aop";
 		#mbox-cells = <1>;
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+	};
+
+	qcom_qseecom: qseecom@d1800000 {
+		compatible = "qcom,qseecom";
+		reg = <0xd1800000 0x3900000>;
+		reg-names = "secapp-region";
+		memory-region = <&qseecom_mem>;
+		#qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		#qcom,disk-encrypt-pipe-pair = <2>;
+		#qcom,support-fde;
+		qcom,no-clock-support;
+		#qcom,fde-key-size;
+		qcom,appsbl-qseecom-support;
+		qcom,commonlib64-loaded-by-uefi;
+		qcom,qsee-reentrancy-support = <2>;
+	};
+
+	qcom_tzlog: tz-log@146d8720 {
+		compatible = "qcom,tz-log";
+		reg = <0x146d8720 0x3000>;
+		qcom,hyplog-enabled;
+		hyplog-address-offset = <0x410>;
+		hyplog-size-offset = <0x414>;
 	};
 
 	qcom,glinkpkt {
