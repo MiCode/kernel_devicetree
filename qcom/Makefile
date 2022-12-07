@@ -74,6 +74,16 @@ kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOA
 kalama_le-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
+CROW_BASE_DTB += crow.dtb
+
+CROW_BOARDS += \
+		crow-rumi-overlay.dtbo
+
+kalama-dtb-$(CONFIG_ARCH_CROW) += \
+	$(call add-overlays, $(CROW_BOARDS) ,$(CROW_BASE_DTB))
+kalama-overlays-dtb-$(CONFIG_ARCH_CROW) += $(CROW_BOARDS) $(CROW_BASE_DTB)
+dtb-y += $(kalama-dtb-y)
+
 KHAJE_BASE_DTB += khaje.dtb khajep.dtb khajeq.dtb khajeg.dtb
 
 KHAJE_BOARDS += \
