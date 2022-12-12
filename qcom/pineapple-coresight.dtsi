@@ -2686,6 +2686,7 @@
 		coresight-name = "coresight-modem-etm0";
 		qcom,inst-id = <2>;
 
+		qcom,secure-component;
 		atid = <36 37>;
 		out-ports {
 			port {
@@ -3777,9 +3778,73 @@
 
 			port@1 {
 				reg = <1>;
-				replicator_etr_out_tmc_etr1: endpoint {
+				replicator_etr_out_replicator_dummy: endpoint {
 					remote-endpoint =
-					<&tmc_etr1_in_replicator_etr>;
+					<&replicator_dummy_in_replicator_etr>;
+				};
+			};
+		};
+	};
+
+	dummy_replicator {
+		compatible = "qcom,coresight-dummy";
+
+		coresight-name = "coresight-replicator-dummy";
+		qcom,dummy-link;
+
+		in-ports {
+			port {
+				replicator_dummy_in_replicator_etr: endpoint {
+					remote-endpoint =
+					<&replicator_etr_out_replicator_dummy>;
+				};
+			};
+		};
+
+		out-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				replicator_dummy_out_tmc_modem: endpoint {
+					remote-endpoint =
+					<&tmc_modem_in_replicator_dummy>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				replicator_dummy_out_tmc_etr1: endpoint {
+					remote-endpoint =
+					<&tmc_etr1_in_replicator_dummy>;
+				};
+			};
+		};
+
+	};
+
+	tmc_modem: tmc_modem {
+		compatible = "qcom,coresight-secure-etr";
+		coresight-name = "coresight-modem-etr1";
+
+		real-name = "coresight-tmc-etr1";
+		qdss,support-remote-etm = <2>;
+		memory-region = <&qdss_mem>;
+		qdss,buffer-size = <0x2000000>;
+
+		qcom,secure-component;
+		coresight-csr = <&csr>;
+		csr-atid-offset = <0x108>;
+		csr-irqctrl-offset = <0x70>;
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		in-ports {
+			port {
+				tmc_modem_in_replicator_dummy: endpoint {
+					remote-endpoint =
+					<&replicator_dummy_out_tmc_modem>;
 				};
 			};
 		};
@@ -3840,6 +3905,7 @@
 		csr-irqctrl-offset = <0x70>;
 		byte-cntr-name = "byte-cntr1";
 		byte-cntr-class-name = "coresight-tmc-etr1-stream";
+		memory-region = <&qdss_mem>;
 
 		interrupts = <GIC_SPI 269 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "byte-cntr-irq";
@@ -3850,9 +3916,9 @@
 
 		in-ports {
 			port {
-				tmc_etr1_in_replicator_etr: endpoint {
+				tmc_etr1_in_replicator_dummy: endpoint {
 					remote-endpoint =
-					<&replicator_etr_out_tmc_etr1>;
+					<&replicator_dummy_out_tmc_etr1>;
 				};
 			};
 		};
