@@ -5,6 +5,9 @@
 	model = "Qualcomm Technologies, Inc. SA8195 Virtual Machine";
 	qcom,msm-name = "SA8195P";
 	qcom,msm-id = <405 0x20000>;
+	aliases {
+		hsuart0 = &qupv3_se17_4uart;
+	};
 };
 
 &soc {
@@ -157,9 +160,20 @@
 		compatible = "qcom,iommu-dma";
 		memory-region = <&system_cma>;
 	};
+
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,pdc";
+		reg = <0xb220000 0x30000>, <0x17c000f0 0x64>;
+		qcom,pdc-ranges = <0 480 94>, <94 609 31>, <125 63 1>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
 };
 
 #include "sdmshrike-pinctrl.dtsi"
+#include "sa8195-vm-qupv3.dtsi"
+#include "sa8195-vm-usb.dtsi"
 
 &tlmm {
 	/delete-property/ wakeup-parent;
