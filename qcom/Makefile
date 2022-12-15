@@ -214,6 +214,7 @@ dtb-y += $(sdmsteppeauto-dtb-y)
 LEMANS_BASE_DTB		+= lemans.dtb
 LEMANS_IVI_BASE_DTB	+= lemans-ivi.dtb
 LEMANS_ADAS_HIGH_BASE_DTB += lemans-adas-high.dtb
+LEMANS_IVI_ADAS_BASE_DTB  += lemans-ivi-adas.dtb
 
 LEMANS_BOARDS		+= lemans-rumi-overlay.dtbo
 LEMANS_IVI_BOARDS	+= lemans-ivi-adp-air-overlay.dtbo \
@@ -223,12 +224,17 @@ LEMANS_ADAS_HIGH_BOARDS += lemans-adas-high-adp-air-overlay.dtbo \
 			   lemans-adas-high-adp-star-overlay.dtbo \
 			   lemans-adas-high-qam-star-overlay.dtbo
 
+LEMANS_IVI_ADAS_BOARDS  += lemans-ivi-adas-qam-star-overlay.dtbo \
+			   lemans-ivi-adas-adp-star-overlay.dtbo
+
 gen4auto-dtb-$(CONFIG_ARCH_LEMANS) += \
 	$(call add-overlays, $(LEMANS_IVI_BOARDS),$(LEMANS_IVI_BASE_DTB))\
-	$(call add-overlays, $(LEMANS_ADAS_HIGH_BOARDS),$(LEMANS_ADAS_HIGH_BASE_DTB))
+	$(call add-overlays, $(LEMANS_ADAS_HIGH_BOARDS),$(LEMANS_ADAS_HIGH_BASE_DTB))\
+	$(call add-overlays, $(LEMANS_IVI_ADAS_BOARDS),$(LEMANS_IVI_ADAS_BASE_DTB))
 
 gen4auto-overlays-dtb-$(CONFIG_ARCH_LEMANS) +=  \
-	$(LEMANS_IVI_BOARDS) $(LEMANS_ADAS_HIGH_BOARDS) $(LEMANS_IVI_BASE_DTB) $(LEMANS_ADAS_HIGH_BASE_DTB)
+	$(LEMANS_IVI_BOARDS) $(LEMANS_ADAS_HIGH_BOARDS) $(LEMANS_IVI_BASE_DTB) $(LEMANS_ADAS_HIGH_BASE_DTB) \
+	$(LEMANS_IVI_ADAS_BOARDS) $(LEMANS_IVI_ADAS_BASE_DTB)
 
 dtb-y += $(gen4auto-dtb-y)
 
