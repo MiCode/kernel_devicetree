@@ -1266,6 +1266,29 @@
 		/* Outputs to turing */
 		qcom,smem-states = <&cdsp1_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_cdsp1: glink-edge {
+			qcom,remote-pid = <12>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_NSP1
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "cdsp1_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_NSP1
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp1";
+			qcom,glink-label = "cdsp1";
+
+			qcom,cdsp1_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
+
 	};
 
 	gpdsp0_pas: remoteproc-gpdsp0@20c00000 {
@@ -1303,6 +1326,28 @@
 
 		qcom,smem-states = <&gpdsp0_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_gpdsp0: glink-edge {
+			qcom,remote-pid = <17>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_GPDSP0
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "gpdsp0_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_GPDSP0
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "gpdsp0";
+			qcom,glink-label = "gpdsp0";
+
+			qcom,gpdsp0_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 	gpdsp1_pas: remoteproc-gpdsp1@21c00000 {
@@ -1340,6 +1385,28 @@
 
 		qcom,smem-states = <&gpdsp1_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_gpdsp1: glink-edge {
+			qcom,remote-pid = <18>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_GPDSP1
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "gpdsp1_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_GPDSP1
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "gpdsp1";
+			qcom,glink-label = "gpdsp1";
+
+			qcom,gpdsp1_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 	spmi_bus: qcom,spmi@c440000 {
