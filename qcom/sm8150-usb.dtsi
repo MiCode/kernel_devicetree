@@ -58,6 +58,35 @@
 			dr_mode = "otg";
 			usb-role-switch;
 		};
+
+		qcom,usbbam@a704000 {
+			compatible = "qcom,usb-bam-msm";
+			reg = <0xa704000 0x17000>;
+			interrupts = <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
+
+			qcom,usb-bam-fifo-baseaddr = <0x146bb000>;
+			qcom,usb-bam-num-pipes = <4>;
+			qcom,disable-clk-gating;
+			qcom,usb-bam-override-threshold = <0x4001>;
+			qcom,usb-bam-max-mbps-highspeed = <400>;
+			qcom,usb-bam-max-mbps-superspeed = <3600>;
+			qcom,reset-bam-on-connect;
+
+			qcom,pipe0 {
+				label = "ssusb-qdss-in-0";
+				qcom,usb-bam-mem-type = <2>;
+				qcom,dir = <1>;
+				qcom,pipe-num = <0>;
+				qcom,peer-bam = <0>;
+				qcom,peer-bam-physical-address = <0x6064000>;
+				qcom,src-bam-pipe-index = <0>;
+				qcom,dst-bam-pipe-index = <0>;
+				qcom,data-fifo-offset = <0x0>;
+				qcom,data-fifo-size = <0x1800>;
+				qcom,descriptor-fifo-offset = <0x1800>;
+				qcom,descriptor-fifo-size = <0x800>;
+			};
+		};
 	};
 
 	/* Primary USB port related High Speed PHY */
@@ -105,6 +134,7 @@
 				"ss_phy_irq","dm_hs_phy_irq";
 		qcom,use-pdc-interrupts;
 		qcom,default-mode-host;
+		qcom,force-gen1;
 		qcom,host-poweroff-in-pm-suspend;
 
 		USB3_GDSC-supply = <&usb30_sec_gdsc>;
@@ -143,7 +173,6 @@
 			snps,usb2-gadget-lpm-disable;
 			snps,dis-u1-entry-quirk;
 			snps,dis-u2-entry-quirk;
-			snps,force-gen1;
 			tx-fifo-resize;
 			maximum-speed = "super-speed";
 			dr_mode = "otg";

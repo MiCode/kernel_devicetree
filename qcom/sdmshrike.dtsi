@@ -403,11 +403,6 @@
 			reg = <0x0 0x8b700000 0x0 0x500000>;
 		};
 
-		pil_wlan_fw_mem: pil_wlan_fw_region@8bc00000 {
-			no-map;
-			reg = <0x0 0x8bc00000 0x0 0x180000>;
-		};
-
 		pil_npu_mem: pil_npu_region@8bd80000 {
 			no-map;
 			reg = <0x0 0x8bd80000 0x0 0x80000>;
@@ -1783,6 +1778,7 @@
 
 	qtee_shmbridge {
 		compatible = "qcom,tee-shared-memory-bridge";
+		qcom,disable-shmbridge-support;
 	};
 
 	qcom_qseecom: qseecom@87900000 {
@@ -1800,6 +1796,49 @@
 		qcom,appsbl-qseecom-support;
 		qcom,commonlib64-loaded-by-uefi;
 		qcom,qsee-reentrancy-support = <2>;
+	};
+
+	qcom_cedev: qcedev@1de0000 {
+		compatible = "qcom,qcedev";
+		reg = <0x1de0000 0x20000>,
+			<0x1dc4000 0x28000>;
+		reg-names = "crypto-base","crypto-bam-base";
+		interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,bam-pipe-pair = <2>;
+		qcom,ce-hw-instance = <0>;
+		qcom,ce-device = <0>;
+		qcom,ce-hw-shared;
+		qcom,bam-ee = <0>;
+		qcom,smmu-s1-enable;
+		qcom,no-clock-support;
+		interconnect-names = "data_path";
+		interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		iommus = <&apps_smmu 0x0512 0x0000>,
+			<&apps_smmu 0x051C 0x0005>,
+			<&apps_smmu 0x051D 0x0005>,
+			<&apps_smmu 0x051F 0x0000>;
+		qcom,iommu-dma = "atomic";
+		dma-coherent;
+
+		qcom_cedev_ns_cb {
+			compatible = "qcom,qcedev,context-bank";
+			label = "ns_context";
+			iommus = <&apps_smmu 0x0504 0x0013>,
+				<&apps_smmu 0x0508 0x0001>,
+				<&apps_smmu 0x0514 0x0013>,
+				<&apps_smmu 0x0518 0x0005>;
+			dma-coherent;
+		};
+
+		qcom_cedev_s_cb {
+			compatible = "qcom,qcedev,context-bank";
+			label = "secure_context";
+			iommus = <&apps_smmu 0x0513 0x0000>,
+				<&apps_smmu 0x051E 0x0000>;
+			qcom,iommu-vmid = <0x9>;
+			qcom,secure-context-bank;
+			dma-coherent;
+		};
 	};
 
 	qcom_rng: qrng@793000 {
@@ -1970,6 +2009,8 @@
 			dma-coherent;
 		};
 	};
+
+	msm_gpu: qcom,kgsl-3d0@2c00000 { };
 };
 
 &firmware {

@@ -45,7 +45,7 @@ dtb-y += $(waipio-dtb-y)
 
 
 KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb kalama-sg.dtb
-KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb
+KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb kalamap-qcs.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
@@ -123,9 +123,10 @@ bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
 bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(bengal-dtb-y)
 
-KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb
+KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb
 
 KONA_BOARDS += \
+                 kona-iot-v2.1-rb5-overlay.dtbo \
                  kona-iot-v2.1-vc-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
@@ -253,6 +254,11 @@ SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
 SA8155_LA_GVM_BOARDS += \
 		   sa8155-vm-la-overlay.dtbo
 
+LEMANS_LA_GVM_BASE_DTB += lemans-vm-la.dtb
+
+LEMANS_LA_GVM_BOARDS += \
+		lemans-vm-la-overlay.dtbo
+
 DIREWOLF_LV_GVM_BASE_DTB += direwolf-vm-lv.dtb
 
 DIREWOLF_LV_GVM_BOARDS += \
@@ -272,11 +278,13 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB)) \
 	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
-	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB))
+	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB) \
-	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) $(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB)
+	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) $(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
+	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 
