@@ -8,6 +8,11 @@
 
 	aliases {
 		hsuart0 = &qupv3_se2_4uart;
+		pci-domain0 = &pcie0; /* PCIe0 domain */
+		pci-domain1 = &pcie1; /* PCIe1 domain */
+		pci-domain2 = &pcie2; /* PCIe2 domain */
+		pci-domain3 = &pcie3; /* PCIe3 domain */
+		pci-domain4 = &pcie4; /* PCIe4 domain */
 	};
 };
 
@@ -482,8 +487,64 @@
 
 #include "pm8540-vm.dtsi"
 #include "direwolf-pinctrl.dtsi"
+#include "direwolf-vm-pcie.dtsi"
 #include "direwolf-qupv3.dtsi"
+#include "direwolf-vm-usb.dtsi"
 
 &qupv3_0 {
 	qcom,iommu-dma = "bypass";
+};
+
+&qupv3_1 {
+	qcom,iommu-dma = "bypass";
+};
+
+&qupv3_2 {
+	qcom,iommu-dma = "bypass";
+};
+
+&pm8540_2_gpios {
+	usb20_vbus_boost {
+		usb20_vbus_boost_default: usb20_vbus_boost_default {
+			pins = "gpio9";
+			function = "normal";
+			output-high;
+			power-source = <0>;
+		};
+	};
+};
+
+&pm8540_3_gpios {
+	usb21_vbus_boost {
+		usb21_vbus_boost_default: usb21_vbus_boost_default {
+			pins = "gpio5";
+			function = "normal";
+			output-high;
+			power-source = <0>;
+		};
+	};
+};
+
+&pm8540_4_gpios {
+	usb223_vbus_boost {
+		usb22_vbus_boost_default: usb22_vbus_boost_default {
+			pins = "gpio5";
+			function = "normal";
+			output-high;
+			power-source = <0>;
+		};
+
+		usb23_vbus_boost_default: usb23_vbus_boost_default {
+			pins = "gpio9";
+			function = "normal";
+			output-high;
+			power-source = <0>;
+		};
+	};
+};
+
+&usb2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb20_vbus_boost_default &usb21_vbus_boost_default
+				&usb22_vbus_boost_default &usb23_vbus_boost_default>;
 };
