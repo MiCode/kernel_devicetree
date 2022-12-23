@@ -152,6 +152,24 @@
 	nvmem = <&pm8150_sdam_2>;
 };
 
+&pm8150b_charger {
+	status = "ok";
+	dpdm-supply = <&usb2_phy0>;
+	smb5_vconn: qcom,smb5-vconn {
+		regulator-name = "smb5-vconn";
+	};
+
+	smb5_vbus: qcom,smb5-vbus {
+		regulator-name = "smb5-vbus";
+	};
+};
+
+&pm8150b_pdphy {
+	vdd-pdphy-supply = <&pm8150_l2>;
+	vbus-supply = <&smb5_vbus>;
+	vconn-supply = <&smb5_vconn>;
+};
+
 &pm8150b_gpios {
 	haptics_boost {
 		haptics_boost_default: haptics_boost_default {
@@ -187,4 +205,12 @@
 		enable-active-high;
 		status = "okay";
 	};
+};
+
+&usb0 {
+	status = "ok";
+	extcon = <&pm8150b_pdphy>, <&eud>;
+	#io-channel-cells = <1>;
+	io-channels= <&pm8150b_charger PSY_IIO_USB_REAL_TYPE>;
+	io-channel-names = "chg_type";
 };
