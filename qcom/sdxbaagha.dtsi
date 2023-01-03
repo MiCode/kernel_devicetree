@@ -269,6 +269,10 @@
 						  <FAST_PATH_TCS 0>;
 			};
 
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+			};
+
 			rpmhcc: clock-controller {
 				compatible = "qcom,sdxbaagha-rpmh-clk";
 				#clock-cells = <1>;
@@ -502,51 +506,74 @@
 		#mbox-cells = <2>;
 	};
 
-	mc_virt: interconnect@0 {
+	clk_virt: interconnect@0 {
+		compatible = "qcom,sdxbaagha-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
 		compatible = "qcom,sdxbaagha-mc_virt";
 		#interconnect-cells = <1>;
-		qcom,stub;
 		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
 	aggre_noc: interconnect@1640000 {
 		reg = <0x1640000 0x33400>;
 		compatible = "qcom,sdxbaagha-aggre_noc";
 		#interconnect-cells = <1>;
-		qcom,stub;
 		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
 	cnoc_main: interconnect@1580000 {
 		reg = <0x01580000 0x19200>;
 		compatible = "qcom,sdxbaagha-cnoc_main";
 		#interconnect-cells = <1>;
-		qcom,stub;
 		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
-	dc_noc_dch: interconnect@190E0000 {
+	dc_noc: interconnect@190E0000 {
 		reg = <0x190E0000 0x5080>;
-		compatible = "qcom,sdxbaagha-dc_noc_dch";
+		compatible = "qcom,sdxbaagha-dc_noc";
 		#interconnect-cells = <1>;
-		qcom,stub;
 		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
 	mem_noc: interconnect@19100000 {
 		reg = <0x19100000 0x2D080>;
 		compatible = "qcom,sdxbaagha-mem_noc";
 		#interconnect-cells = <1>;
-		qcom,stub;
 		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
-	snoc: interconnect@15C0000 {
-		reg = <0x15C0000 0x14080>;
-		compatible = "qcom,sdxbaagha-snoc";
+	pcie_anoc: interconnect@16C0000 {
+		reg = <0x16C0000 0x16400>;
+		compatible = "qcom,sdxbaagha-pcie_anoc";
 		#interconnect-cells = <1>;
-		qcom,stub;
 		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@15C0000 {
+		reg = <0x15C0000 0x14080>;
+		compatible = "qcom,sdxbaagha-system_noc";
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
 	qcom,sps {

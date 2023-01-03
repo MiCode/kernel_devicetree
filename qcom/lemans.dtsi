@@ -971,6 +971,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	system_noc: interconnect@01680000 {
@@ -979,6 +980,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	aggre1_noc:interconnect@016C0000 {
@@ -987,6 +989,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 		clocks = <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
 			<&gcc GCC_AGGRE_NOC_QUPV3_AXI_CLK>,
 			<&gcc GCC_AGGRE_USB2_PRIM_AXI_CLK>,
@@ -1000,6 +1003,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 		clocks = <&gcc GCC_AGGRE_UFS_CARD_AXI_CLK>,
 			<&rpmhcc RPMH_IPA_CLK>;
 	};
@@ -1010,6 +1014,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	gpdsp_anoc: interconnect@01780000 {
@@ -1018,6 +1023,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	mmss_noc: interconnect@017A0000 {
@@ -1026,6 +1032,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	lpass_ag_noc: interconnect@03C40000 {
@@ -1034,6 +1041,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	dc_noc: interconnect@090E0000 {
@@ -1042,6 +1050,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	gem_noc: interconnect@09100000 {
@@ -1051,6 +1060,7 @@
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 		clocks = <&gcc GCC_DDRSS_GPU_AXI_CLK>;
+		qcom,skip-qos;
 	};
 
 	nspa_noc: interconnect@260C0000 {
@@ -1059,6 +1069,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	nspb_noc: interconnect@2A0C0000 {
@@ -1067,6 +1078,7 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 
 	vendor_hooks: qcom,cpu-vendor-hooks {
@@ -1165,7 +1177,7 @@
 		reg-names = "cx","mx","nsp0";
 
 		interconnects = <&nspa_noc MASTER_CDSP_PROC &mc_virt SLAVE_EBI1>;
-		interconnect-names = "crypto_ddr";
+		interconnect-names = "rproc_ddr";
 
 		/* Inputs from turing */
 		interrupts-extended = <&intc GIC_SPI 578 IRQ_TYPE_LEVEL_HIGH>,
@@ -1186,7 +1198,7 @@
 		qcom,smem-states = <&cdsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
 
-		glink_cdsp0: glink-edge {
+		glink_cdsp: glink-edge {
 			qcom,remote-pid = <5>;
 			transport = "smem";
 			mboxes = <&ipcc_mproc IPCC_CLIENT_CDSP
@@ -1197,8 +1209,8 @@
 				      IPCC_MPROC_SIGNAL_GLINK_QMP
 				      IRQ_TYPE_EDGE_RISING>;
 
-			label = "cdsp0";
-			qcom,glink-label = "cdsp0";
+			label = "cdsp";
+			qcom,glink-label = "cdsp";
 
 			qcom,cdsp0_qrtr {
 				qcom,glink-channels = "IPCRTR";
@@ -1234,7 +1246,7 @@
 		reg-names = "cx","mx","nsp0";
 
 		interconnects = <&nspb_noc MASTER_CDSP_PROC &mc_virt SLAVE_EBI1>;
-		interconnect-names = "crypto_ddr";
+		interconnect-names = "rproc_ddr";
 
 		/* Inputs from turing */
 		interrupts-extended = <&intc GIC_SPI 799 IRQ_TYPE_LEVEL_HIGH>,
@@ -1254,6 +1266,29 @@
 		/* Outputs to turing */
 		qcom,smem-states = <&cdsp1_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_cdsp1: glink-edge {
+			qcom,remote-pid = <12>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_NSP1
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "cdsp1_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_NSP1
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp1";
+			qcom,glink-label = "cdsp1";
+
+			qcom,cdsp1_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
+
 	};
 
 	gpdsp0_pas: remoteproc-gpdsp0@20c00000 {
@@ -1273,7 +1308,7 @@
 		qcom,proxy-reg-names = "cx","mx";
 
 		interconnects = <&gpdsp_anoc MASTER_DSP0 &config_noc SLAVE_CLK_CTL>;
-		interconnect-names = "gpdsp0_anoc";
+		interconnect-names = "rproc_ddr";
 
 		interrupts-extended = <&intc GIC_SPI 769 IRQ_TYPE_LEVEL_HIGH>,
 			<&gpdsp0_smp2p_in 0 0>,
@@ -1291,6 +1326,28 @@
 
 		qcom,smem-states = <&gpdsp0_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_gpdsp0: glink-edge {
+			qcom,remote-pid = <17>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_GPDSP0
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "gpdsp0_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_GPDSP0
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "gpdsp0";
+			qcom,glink-label = "gpdsp0";
+
+			qcom,gpdsp0_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 	gpdsp1_pas: remoteproc-gpdsp1@21c00000 {
@@ -1310,7 +1367,7 @@
 		qcom,proxy-reg-names = "cx","mx";
 
 		interconnects = <&gpdsp_anoc MASTER_DSP1 &config_noc SLAVE_CLK_CTL>;
-		interconnect-names = "gpdsp1_anoc";
+		interconnect-names = "rproc_ddr";
 
 		interrupts-extended = <&intc GIC_SPI 624 IRQ_TYPE_LEVEL_HIGH>,
 			<&gpdsp1_smp2p_in 0 0>,
@@ -1328,6 +1385,28 @@
 
 		qcom,smem-states = <&gpdsp1_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_gpdsp1: glink-edge {
+			qcom,remote-pid = <18>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_GPDSP1
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "gpdsp1_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_GPDSP1
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "gpdsp1";
+			qcom,glink-label = "gpdsp1";
+
+			qcom,gpdsp1_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 	spmi_bus: qcom,spmi@c440000 {
@@ -1713,6 +1792,125 @@
 	};
 
 	msm_gpu: qcom,kgsl-3d0@3d00000 { };
+
+	qcom,msm-cdsp-loader {
+		compatible = "qcom,cdsp-loader";
+		qcom,proc-img-to-load = "cdsp";
+		qcom,rproc-handle = <&cdsp_pas>;
+	};
+
+	qcom,msm-adsprpc-mem {
+		compatible = "qcom,msm-adsprpc-mem-region";
+		memory-region = <&adsp_mem>;
+	};
+
+	msm_fastrpc: qcom,msm_fastrpc {
+		compatible = "qcom,msm-fastrpc-compute";
+		qcom,adsp-remoteheap-vmid = <22 37>;
+		qcom,fastrpc-adsp-audio-pdr;
+		qcom,rpc-latency-us = <235>;
+		qcom,fastrpc-gids = <2908>;
+		qcom,qos-cores = <0 1 2 3>;
+
+		qcom,msm_fastrpc_compute_cb0_1 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x21C1 0x0000>,
+				 <&apps_smmu 0x2161 0x0000>,
+				 <&apps_smmu 0x2141 0x0000>,
+				 <&apps_smmu 0x21E1 0x0000>,
+				 <&apps_smmu 0x2181 0x0000>,
+				 <&apps_smmu 0x25C1 0x0000>,
+				 <&apps_smmu 0x2561 0x0000>,
+				 <&apps_smmu 0x2541 0x0000>,
+				 <&apps_smmu 0x25E1 0x0000>,
+				 <&apps_smmu 0x2581 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb0_2 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x21C2 0x0000>,
+				 <&apps_smmu 0x2162 0x0000>,
+				 <&apps_smmu 0x2142 0x0000>,
+				 <&apps_smmu 0x21E2 0x0000>,
+				 <&apps_smmu 0x2182 0x0000>,
+				 <&apps_smmu 0x25C2 0x0000>,
+				 <&apps_smmu 0x2562 0x0000>,
+				 <&apps_smmu 0x2542 0x0000>,
+				 <&apps_smmu 0x25E2 0x0000>,
+				 <&apps_smmu 0x2582 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb0_3 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x21C3 0x0000>,
+				 <&apps_smmu 0x2163 0x0000>,
+				 <&apps_smmu 0x2143 0x0000>,
+				 <&apps_smmu 0x21E3 0x0000>,
+				 <&apps_smmu 0x2183 0x0000>,
+				 <&apps_smmu 0x25C3 0x0000>,
+				 <&apps_smmu 0x2563 0x0000>,
+				 <&apps_smmu 0x2543 0x0000>,
+				 <&apps_smmu 0x25E3 0x0000>,
+				 <&apps_smmu 0x2583 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_cb0_4 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			iommus = <&apps_smmu 0x21C4 0x0000>,
+				 <&apps_smmu 0x2164 0x0000>,
+				 <&apps_smmu 0x2144 0x0000>,
+				 <&apps_smmu 0x21E4 0x0000>,
+				 <&apps_smmu 0x2184 0x0000>,
+				 <&apps_smmu 0x25C4 0x0000>,
+				 <&apps_smmu 0x2564 0x0000>,
+				 <&apps_smmu 0x2544 0x0000>,
+				 <&apps_smmu 0x25E4 0x0000>,
+				 <&apps_smmu 0x2584 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_adsp_cb1 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x3003 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_adsp_cb2 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x3004 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+
+		qcom,msm_fastrpc_compute_adsp_cb3 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "adsprpc-smd";
+			iommus = <&apps_smmu 0x3005 0x0000>;
+			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-faults = "stall-disable", "HUPCF";
+			dma-coherent;
+		};
+	};
 };
 
 #include "lemans-4pmic-regulators.dtsi"
@@ -1896,7 +2094,6 @@
 	vdd-hba-fixed-regulator;
 
 	vcc-supply = <&L8A>;
-	vcc-voltage-level = <2504000 2506000>;
 	vcc-max-microamp = <1100000>;
 
 	vccq-supply = <&L4C>;
