@@ -20,17 +20,23 @@ properties:
     const: qcom,regulator-ocp-notifier
 
   interrupts:
-    description: PMIC regulator OCP notification summary interrupt.
-    maxItems: 1
+    description: |
+      PMIC regulator OCP notification summary interrupt and LDO alarm
+      notification summary interrupt
+    minItems: 1
+    maxItems: 2
 
   nvmem-cells:
     description: |
       phandle of the nvmem cell for the PMIC register region which stores the
-      PMIC OCP log.
-    maxItems: 1
+      PMIC OCP log and the region for the LDO alarm log.
+    minItems: 1
+    maxItems: 2
 
   nvmem-cell-names:
-    const: ocp_log
+    enum:
+      - ocp_log
+      - alarm_log
 
 patternProperties:
   "^periph-[0-9a-f]{3}-supply$":
@@ -56,6 +62,19 @@ examples:
         interrupts = <0x0 0x71 0x1 IRQ_TYPE_EDGE_RISING>;
         nvmem-cells = <&ocp_log>;
         nvmem-cell-names = "ocp_log";
+
+        periph-1c1-supply = <&L1B>;
+        periph-1c2-supply = <&L2B>;
+        periph-1c5-supply = <&L5B>;
+    };
+
+    regulator-ocp-notifier {
+        compatible = "qcom,regulator-ocp-notifier";
+        interrupt-parent = <&spmi_bus>;
+        interrupts = <0x0 0x71 0x1 IRQ_TYPE_EDGE_RISING>,
+                     <0x0 0x85 0x1 IRQ_TYPE_EDGE_RISING>;
+        nvmem-cells = <&ocp_log>, <&alarm_log>;
+        nvmem-cell-names = "ocp_log", "alarm_log";
 
         periph-1c1-supply = <&L1B>;
         periph-1c2-supply = <&L2B>;
