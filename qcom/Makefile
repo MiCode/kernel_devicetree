@@ -127,6 +127,9 @@ KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2
 
 KONA_BOARDS += \
                  kona-iot-v2.1-rb5-overlay.dtbo \
+                 kona-iot-v2-rb5-overlay.dtbo \
+                 kona-hdk-overlay.dtbo \
+                 kona-rb5-HDMI-overlay.dtbo \
                  kona-iot-v2.1-vc-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
