@@ -231,47 +231,7 @@
 
 };
 
-&cpufreq_hw {
-	/delete-node/ qcom,cpu-isolation;
-	qcom,cpu-isolation {
-		compatible = "qcom,cpu-isolate";
-		cpu0_isolate: cpu0-isolate {
-			qcom,cpu = <&CPU0>;
-			#cooling-cells = <2>;
-		};
 
-		cpu1_isolate: cpu1-isolate {
-			qcom,cpu = <&CPU1>;
-			#cooling-cells = <2>;
-		};
-
-		cpu4_isolate: cpu4-isolate {
-			qcom,cpu = <&CPU2>;
-			#cooling-cells = <2>;
-		};
-
-		cpu5_isolate: cpu5-isolate {
-			qcom,cpu = <&CPU3>;
-			#cooling-cells = <2>;
-		};
-
-		cpu6_isolate: cpu6-isolate {
-			qcom,cpu = <&CPU4>;
-			#cooling-cells = <2>;
-		};
-
-		cpu7_isolate: cpu7-isolate {
-			qcom,cpu = <&CPU5>;
-			#cooling-cells = <2>;
-		};
-	};
-
-	/delete-node/ cpu7-notify;
-	cpu7_notify: cpu7-notify {
-		qcom,cooling-cpu = <&CPU5>;
-		#cooling-cells = <2>;
-	};
-};
 
 &qcom_memlat {
 	ddr {
@@ -325,5 +285,66 @@
 			/delete-property/  qcom,cpulist;
 			qcom,cpulist = <&CPU2 &CPU3 &CPU4>;
 		};
+	};
+};
+
+&soc {
+	qcom,cpu-pause {
+		/delete-node/ cpu6-pause;
+		/delete-node/ cpu7-pause;
+		/delete-node/ pause-cpu6;
+		/delete-node/ pause-cpu7;
+	};
+
+	qcom,cpu-hotplug {
+		/delete-node/ cpu6-hotplug;
+		/delete-node/ cpu7-hotplug;
+	};
+
+	/delete-node/ cpufreq_cdev;
+	cpufreq_cdev: qcom,cpufreq-cdev {
+		compatible = "qcom,cpufreq-cdev";
+		qcom,cpus = <&CPU0 &CPU2 &CPU5>;
+	};
+
+};
+
+&thermal_zones {
+	cpu-1-2 {
+		cooling-maps {
+			/delete-node/ cpu12_cdev;
+		};
+	};
+
+	cpu-1-3 {
+		cooling-maps {
+			/delete-node/ cpu13_cdev;
+		};
+	};
+
+	cpu-1-6 {
+		cooling-maps {
+			/delete-node/ cpu16_cdev;
+		};
+	};
+
+	cpu-1-7 {
+		cooling-maps {
+			/delete-node/ cpu17_cdev;
+		};
+	};
+
+	ddr {
+		cooling-maps {
+			/delete-node/ cpu_cdev7;
+		};
+	};
+};
+
+&cpufreq_hw {
+	/delete-node/ cpu7-notify;
+	cpu7_notify: cpu7-notify {
+		qcom,cooling-cpu = <&CPU5>;
+		#cooling-cells = <2>;
 	};
 };
