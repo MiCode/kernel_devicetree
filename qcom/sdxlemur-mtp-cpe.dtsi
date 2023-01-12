@@ -1,0 +1,199 @@
+#include "sdxlemur-mtp.dtsi"
+
+&soc {
+	ntn3_vreg: ntn3_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "ntn3_vreg";
+		gpio = <&tlmm 107 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1000000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <4300>;
+	};
+
+	qca_vreg: qca_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "qca_vreg";
+		gpio = <&tlmm 106 GPIO_ACTIVE_HIGH>;
+		vin-supply = <&ntn3_vreg>;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <200000>;
+	};
+
+	aqr_vreg: aqr_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "aqr_vreg";
+		gpio = <&tlmm 105 GPIO_ACTIVE_HIGH>;
+		vin-supply = <&qca_vreg>;
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1000000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <2400>;
+	};
+
+	ioss_qps615_rx: qps615_rx@eth {
+		qcom,dir-rx;
+		qcom,rx-filter-ip;
+
+		qcom,ring-size = <128>;
+		qcom,buff-size = <2048>;
+
+		qcom,mod-count-min = <64>;
+		qcom,mod-count-max = <64>;
+		qcom,mod-usecs-min = <30>;
+		qcom,mod-usecs-max = <60>;
+	};
+
+	ioss_qps615_tx: qps615_tx@eth {
+		qcom,dir-tx;
+		qcom,ring-size = <512>;
+		qcom,buff-size = <2048>;
+
+		qcom,mod-count-min = <64>;
+		qcom,mod-count-max = <64>;
+		qcom,mod-usecs-min = <30>;
+		qcom,mod-usecs-max = <60>;
+	};
+
+	ioss_qps615_eth0: qps615@eth0 {
+		qcom,name = "eth0";
+		qcom,ioss_instance = <0>;
+
+		qcom,ioss_channels =
+			<&ioss_qps615_rx>,
+			<&ioss_qps615_tx>;
+	};
+
+	ioss_qps615_eth1: qps615@eth1 {
+		qcom,name = "eth1";
+		qcom,ioss_instance = <0>;
+
+		qcom,ioss_channels =
+			<&ioss_qps615_rx>,
+			<&ioss_qps615_tx>;
+	};
+};
+
+&i2c_5 {
+	status = "ok";
+
+	pcie_i2c_ctrl: pcie_i2c_ctrl {
+		compatible = "qcom,pcie0-i2c-ntn3";
+		reg = <0x77>;
+		gpio-config-reg = <0x801208>;
+		ep-reset-reg = <0x801210>;
+		ep-reset-gpio-mask = <0xf>;
+		dump-regs = <0x801330 0x801350 0x801370>;
+		reg_update = <0x82c030 0x1
+					0x828000 0x3
+					0x82bd00 0x8
+					0x82c030 0x2
+					0x828000 0x3
+					0x82bd00 0x8
+					0x82c030 0x8
+					0x828000 0x1
+					0x82bd00 0x8>;
+	};
+};
+
+
+&pcie0 {
+	qcom,boot-option = <0x1>;
+	pcie-i2c-phandle = <&i2c_5>;
+
+	vreg-3p3-supply = <&aqr_vreg>;
+
+	iommu-map = <0x0 &apps_smmu 0x0200 0x1>,
+		<0x100 &apps_smmu 0x0201 0x1>,
+		<0x208 &apps_smmu 0x0202 0x1>,
+		<0x210 &apps_smmu 0x0203 0x1>,
+		<0x218 &apps_smmu 0x0204 0x1>,
+		<0x300 &apps_smmu 0x0207 0x1>,
+		<0x400 &apps_smmu 0x0208 0x1>,
+		<0x500 &apps_smmu 0x020c 0x1>,
+		<0x501 &apps_smmu 0x020e 0x1>;
+};
+
+&pcie0_rp {
+	#address-cells = <5>;
+	#size-cells = <0>;
+
+	/* BDF 1.0.0 */
+	pcie0_bus1_dev0_fn0: pcie0_bus1_dev0_fn0 {
+		reg = <0 0 0 0 0>;
+
+		/* BDF 2.1.0 */
+		pcie0_bus2_dev1_fn0: pcie0_bus2_dev1_fn0 {
+			reg = <0x800 0x0 0x0 0x0 0x0>;
+		};
+
+		/* BDF 2.2.0 */
+		pcie0_bus2_dev2_fn0: pcie0_bus2_dev2_fn0 {
+			reg = <0x1000 0x0 0x0 0x0 0x0>;
+			cnss_pci0: cnss_pci0 {
+				reg = <0 0 0 0 0>;
+				qcom,iommu-group = <&cnss_pci_iommu_group>;
+				memory-region = <&cnss_wlan_mem>;
+
+				#address-cells = <1>;
+				#size-cells = <1>;
+			};
+		};
+
+		/* BDF 2.3.0 */
+		pcie0_bus2_dev3_fn0: pcie0_bus2_dev3_fn0 {
+			reg = <0x1800 0x0 0x0 0x0 0x0>;
+			qps615_eth0,qps615_eth0@pcie0_rp {
+				reg = <0x0 0x0 0x0 0x0 0x0>;
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&aqr_intn_wol_sig>;
+
+				compatible = "qcom,ioss-v2-device";
+				qcom,ioss = <&ioss>;
+				qcom,ioss_interfaces = <&ioss_qps615_eth0>;
+
+				/* ipa shares this group */
+				qcom,iommu-group = <&ipa_eth_group1>;
+
+				#address-cells = <1>;
+				#size-cells = <1>;
+			};
+			/* BDF 5.0.0 */
+			pcie0_bus5_dev0_fn0: pcie0_ntn3_eth0 {
+				reg = <0x0 0x0 0x0 0x0 0x0>;
+				qcom,iommu-group = <&eth0_pci_iommu_group>;
+				eth0_pci_iommu_group: eth0_pci_iommu_group {
+					qcom,iommu-dma = "atomic";
+				};
+			};
+
+			qps615_eth1,qps615_eth1@pcie0_rp {
+				reg = <0x100 0x0 0x0 0x0 0x0>;
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&napa_intn_wol_sig>;
+
+				compatible = "qcom,ioss-v2-device";
+				qcom,ioss = <&ioss>;
+				qcom,ioss_interfaces = <&ioss_qps615_eth1>;
+
+				/* ipa shares this group */
+				qcom,iommu-group = <&ipa_eth_group1>;
+
+				#address-cells = <1>;
+				#size-cells = <1>;
+			};
+			/* BDF 5.0.1 */
+			pcie0_bus5_dev0_fn1: pcie0_ntn3_eth1 {
+				reg = <0x100 0x0 0x0 0x0 0x0>;
+				qcom,iommu-group = <&eth1_pci_iommu_group>;
+				eth1_pci_iommu_group: eth1_pci_iommu_group {
+					qcom,iommu-dma = "atomic";
+				};
+			};
+		};
+	};
+};
