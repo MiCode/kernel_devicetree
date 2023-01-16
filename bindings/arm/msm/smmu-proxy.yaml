@@ -1,0 +1,50 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/bindings/arm/msm/smmu-proxy.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: SMMU Proxy Driver binding
+
+maintainers:
+  - Chris Goldsworthy <cgoldswo@quicinc.com>
+
+description: |+
+  The SMMU proxy driver allows DMA-BUFs on HLOS to be lent to the TVM and mapped
+  into an S1 context bank of the client's choosing on the TVM. The IOVA of the
+  mapped DMA-BUF is sent back to HLOS, which the client then passes to their
+  hardware as they did before.
+
+  The driver is split between HLOS and the TVM. Communication between the two
+  sides is facilitated by a message queue, such that the TVM has a single
+  message handling thread. The proxy driver directly manages the context banks
+  of the client devices, as there is no client code to manage the mappings
+  of the devices on the TVM.
+
+properties:
+  compatible:
+    items:
+      - enum:
+        - smmu-proxy-sender
+        - smmu-proxy-receiver
+        - smmu-proxy-cb
+  iommus:
+    maxItems: 1
+    description: iommus tag in form of <&apps_smmu [SID] [MASK]>, such that
+      [SID] will be for one of the relevant client context banks.
+
+required:
+  - compatible
+
+examples:
+  - |
+    smmu-proxy {
+        compatible = "smmu-proxy-sender";
+    };
+  - |
+    smmu-proxy {
+        compatible = "smmu-proxy-receiver";
+    };
+    smmu-proxy-camera-cb {
+        compatible = "smmu-proxy-cb";
+        iommus = <&apps_smmu 0x1000 0x0>;
+    };
