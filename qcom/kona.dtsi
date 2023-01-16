@@ -23,7 +23,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen {
-		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off";
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off pcie_ports=compat";
 	};
 
 	reserved_memory: reserved-memory { };
@@ -31,6 +31,9 @@
 	aliases {
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
 		serial0 = &qupv3_se12_2uart;
+		pci-domain0 = &pcie0; /* PCIe0 domain */
+		pci-domain1 = &pcie1; /* PCIe1 domain */
+		pci-domain2 = &pcie2; /* PCIe2 domain */
 	};
 
 	cpus {
@@ -778,8 +781,16 @@
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
 		vdd_cx_ao-supply = <&VDD_CX_LEVEL_AO>;
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
-		clocks = <&rpmhcc RPMH_CXO_CLK>,<&rpmhcc RPMH_CXO_CLK_A>;
-		clock-names = "bi_tcxo", "bi_tcxo_ao";
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&rpmhcc RPMH_CXO_CLK_A>,
+			<&pcie_0_pipe_clk>,
+			<&pcie_1_pipe_clk>,
+			<&pcie_2_pipe_clk>;
+		clock-names = "bi_tcxo",
+			"bi_tcxo_ao",
+			"pcie_0_pipe_clk",
+			"pcie_1_pipe_clk",
+			"pcie_2_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -963,6 +974,27 @@
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	pcie_0_pipe_clk: pcie_0_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_0_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_1_pipe_clk: pcie_1_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_1_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_2_pipe_clk: pcie_2_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_2_pipe_clk";
+		#clock-cells = <0>;
 	};
 
 	/* GCC GDSCs */
@@ -2156,3 +2188,4 @@
 #include "msm-arm-smmu-kona.dtsi"
 #include "kona-dma-heaps.dtsi"
 #include "kona-qupv3.dtsi"
+#include "kona-pcie.dtsi"
