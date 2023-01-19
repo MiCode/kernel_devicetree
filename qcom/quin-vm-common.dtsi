@@ -55,6 +55,14 @@
 		};
 	};
 
+	vdevs {
+		compatible = "simple-bus";
+		virtio_input_keyboard@1c150000 {
+			compatible = "virtio,mmio";
+			wakeup-source;
+		};
+	};
+
 	firmware: firmware {
 		android {
 			compatible = "android,firmware";
@@ -127,10 +135,14 @@
 		interrupt-controller;
 	};
 
-	regulator: virtio_regulator@1c700000 {
+	virtio_regulator@1c700000 {
 		compatible = "virtio,mmio";
 		reg = <0x1c700000 0x1000>;
 		interrupts = <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>;
+
+		regulator: virtio_regulator_device {
+			compatible = "virtio,device31";
+		};
 	};
 
 	qcom_dma_heaps: qcom,dma-heaps {
@@ -282,5 +294,18 @@
 			compatible = "virtio,device33";
 		};
 	};
-};
 
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+	};
+};
