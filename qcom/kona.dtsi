@@ -771,8 +771,22 @@
 		sleep_clk: sleep-clk {
 			compatible = "fixed-clock";
 			clock-frequency = <32000>;
-			clock-output-names = "chip_sleep_clk";
+			clock-output-names = "sleep_clk";
 			#clock-cells = <1>;
+		};
+
+		usb3_phy_wrapper_gcc_usb30_pipe_clk: usb3-phy-wrapper-gcc-usb30-pipe-clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		usb3_uni_phy_sec_gcc_usb30_pipe_clk: usb3-uni-phy-sec-gcc-usb30-pipe-clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "usb3_uni_phy_sec_gcc_usb30_pipe_clk";
+			#clock-cells = <0>;
 		};
 	};
 
@@ -784,15 +798,21 @@
 		vdd_cx_ao-supply = <&VDD_CX_LEVEL_AO>;
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
 		clocks = <&rpmhcc RPMH_CXO_CLK>,
-			<&rpmhcc RPMH_CXO_CLK_A>,
-			<&pcie_0_pipe_clk>,
-			<&pcie_1_pipe_clk>,
-			<&pcie_2_pipe_clk>;
+			 <&rpmhcc RPMH_CXO_CLK_A>,
+			 <&pcie_0_pipe_clk>,
+			 <&pcie_1_pipe_clk>,
+			 <&pcie_2_pipe_clk>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>,
+			 <&usb3_uni_phy_sec_gcc_usb30_pipe_clk>,
+			 <&sleep_clk>;
 		clock-names = "bi_tcxo",
-			"bi_tcxo_ao",
-			"pcie_0_pipe_clk",
-			"pcie_1_pipe_clk",
-			"pcie_2_pipe_clk";
+			      "bi_tcxo_ao",
+			      "pcie_0_pipe_clk",
+			      "pcie_1_pipe_clk",
+			      "pcie_2_pipe_clk",
+			      "usb3_phy_wrapper_gcc_usb30_pipe_clk",
+			      "usb3_uni_phy_sec_gcc_usb30_pipe_clk",
+			      "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -802,8 +822,12 @@
 		reg = <0x9800000 0x190000>;
 		reg-name = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
-		clocks = <&rpmhcc RPMH_CXO_CLK>;
-		clock-names = "bi_tcxo";
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&gcc GCC_NPU_GPLL0_DIV_CLK_SRC>,
+			 <&gcc GCC_NPU_GPLL0_CLK_SRC>;
+		clock-names = "bi_tcxo",
+			      "gcc_npu_gpll0_div_clk",
+			      "gcc_npu_gpll0_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -814,8 +838,14 @@
 		reg-names = "cc_base";
 		vdd_mx-supply = <&VDD_MX_LEVEL>;
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
-		clock-names = "cfg_ahb_clk";
-		clocks = <&gcc GCC_VIDEO_AHB_CLK>;
+		clock-names = "cfg_ahb_clk",
+			      "bi_tcxo_ao",
+			      "bi_tcxo",
+			      "sleep_clk";
+		clocks = <&gcc GCC_VIDEO_AHB_CLK>,
+			 <&rpmhcc RPMH_CXO_CLK_A>,
+			 <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>;
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -826,8 +856,14 @@
 		reg-names = "cc_base";
 		vdd_mx-supply = <&VDD_MX_LEVEL>;
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
-		clock-names = "cfg_ahb_clk";
-		clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+		clock-names = "cfg_ahb_clk",
+			      "bi_tcxo",
+			      "bi_tcxo_ao",
+			      "sleep_clk";
+		clocks = <&gcc GCC_CAMERA_AHB_CLK>,
+			 <&rpmhcc RPMH_CXO_CLK>,
+			 <&rpmhcc RPMH_CXO_CLK_A>,
+			 <&sleep_clk>;
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -837,8 +873,12 @@
 		reg = <0xaf00000 0x20000>;
 		reg-names = "cc_base";
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
-		clock-names = "cfg_ahb_clk";
-		clocks = <&gcc GCC_DISP_AHB_CLK>;
+		clock-names = "cfg_ahb_clk",
+			      "bi_tcxo",
+			      "bi_tcxo_ao";
+		clocks = <&gcc GCC_DISP_AHB_CLK>,
+			 <&rpmhcc RPMH_CXO_CLK>,
+			 <&rpmhcc RPMH_CXO_CLK_A>;
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -849,6 +889,12 @@
 		reg-names = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
 		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&gcc GCC_GPU_GPLL0_DIV_CLK_SRC>,
+			 <&gcc GCC_GPU_GPLL0_CLK_SRC>;
+		clock-names = "bi_tcxo",
+			      "gcc_gpu_gpll0_div_clk_src",
+			      "gcc_gpu_gpll0_clk_src";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
