@@ -3,6 +3,7 @@ platform_map = {
         "dtb_list": [
             # keep sorted
             "kalama.dtb",
+            "kalama-v2.dtb",
             "kalamap.dtb",
             "kalamap-v2.dtb",
         ],
@@ -58,16 +59,25 @@ platform_map = {
         "dtbo_list": [
             # keep sorted
             "pineapple-atp-overlay.dtbo",
+            "pineapple-cdp-nfc-overlay.dtbo",
             "pineapple-cdp-overlay.dtbo",
+            "pineapple-mtp-nfc-overlay.dtbo",
             "pineapple-mtp-overlay.dtbo",
             "pineapple-qrd-overlay.dtbo",
+            "pineapple-rcm-overlay.dtbo",
             "pineapple-rumi-overlay.dtbo",
         ],
     },
     "pineapple-tuivm": {
         "dtb_list": [
             # keep sorted
+            "pineapple-oemvm-cdp.dtb",
+            "pineapple-oemvm-mtp.dtb",
+            "pineapple-oemvm-qrd.dtb",
             "pineapple-oemvm-rumi.dtb",
+            "pineapple-vm-cdp.dtb",
+            "pineapple-vm-mtp.dtb",
+            "pineapple-vm-qrd.dtb",
             "pineapple-vm-rumi.dtb",
         ],
         "dtbo_list": [],
@@ -75,7 +85,13 @@ platform_map = {
     "pineapple-oemvm": {
         "dtb_list": [
             # keep sorted
+            "pineapple-oemvm-cdp.dtb",
+            "pineapple-oemvm-mtp.dtb",
+            "pineapple-oemvm-qrd.dtb",
             "pineapple-oemvm-rumi.dtb",
+            "pineapple-vm-cdp.dtb",
+            "pineapple-vm-mtp.dtb",
+            "pineapple-vm-qrd.dtb",
             "pineapple-vm-rumi.dtb",
         ],
         "dtbo_list": [],
