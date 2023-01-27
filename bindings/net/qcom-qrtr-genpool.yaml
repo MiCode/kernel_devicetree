@@ -24,26 +24,36 @@ properties:
       Phandle reference to a client which has a dedicated memory region for
       sharing between Virtual Machine and Digital Signal Processor subsystem.
 
-  genpool-poll:
-    $ref: /schemas/types.yaml#/definitions/flag
-    description:
-      If set, enables polling mode for RX.
+  interrupts:
+    description: |
+      IRQs for setting up and transferring data from and to an edge.
+    items:
+      - description: IRQ from an edge to check if FIFO and memory is setup
+      - description: IRQ from an edge informing there is data to consume
 
-  genpool-poll-sleep:
-    $ref: /schemas/types.yaml#/definitions/uint32
-    maxItems: 1
-    description:
-      Sleep (ms) between each poll. If not set, the default interval is 100ms.
+  mboxes:
+    description: |
+      List of phandles to mailbox channels used for setting up and transferring
+      data from and to an edge.
+    items:
+      - description: mailbox for signaling an edge that FIFO and memory is setup
+      - description: mailbox for signaling an edge there is data to consume
 
 required:
   -compatible
   -gen-pool
+  -interrupt-parent
+  -interrupts
+  -mboxes
 
 examples:
   - |
     qrtr-genpool {
         compatible = "qcom,qrtr-genpool";
         gen-pool = <&fastrpc_compute_cb1>;
-        genpool-poll;
-        genpool-poll-sleep = <1000>;
+        interrupt-parent = <&ipcc_mproc_ns1>;
+        interrupts = <IPCC_CLIENT_CDSP 0 IRQ_TYPE_EDGE_RISING>,
+                <IPCC_CLIENT_CDSP 1 IRQ_TYPE_EDGE_RISING>;
+        mboxes = <&ipcc_mproc_ns1 IPCC_CLIENT_CDSP 0>,
+                <&ipcc_mproc_ns1 IPCC_CLIENT_CDSP 1>;
     };
