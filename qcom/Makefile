@@ -167,6 +167,28 @@ cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
 	cinder-v2-du-rumi.dtb
 dtb-y += $(cinder-dtb-y)
 
+QCS405_BASE_DTB += qcs405.dtb
+
+QCS405_BOARDS += qcs405-iot-sku2-overlay.dtbo \
+	qcs405-iot-sku3-overlay.dtbo \
+	qcs405-iot-sku4-overlay.dtbo \
+	qcs405-iot-sku5-overlay.dtbo \
+	qcs405-iot-sku6-overlay.dtbo \
+	qcs405-iot-sku7-overlay.dtbo \
+	qcs405-iot-sku8-overlay.dtbo \
+	qcs405-iot-sku9-overlay.dtbo \
+	qcs405-iot-sku10-overlay.dtbo \
+	qcs407-iot-sku12-overlay.dtbo \
+	qcs407-iot-sku13-overlay.dtbo \
+	qcs407-iot-sku4-overlay.dtbo   \
+	qcs407-iot-sku6-overlay.dtbo   \
+	qcs407-iot-sku9-overlay.dtbo
+
+qcs405-dtb-$(CONFIG_ARCH_QCS405) += \
+        $(call add-overlays, $(QCS405_BOARDS) ,$(QCS405_BASE_DTB))
+
+qcs405-overlays-dtb-$(CONFIG_ARCH_QCS405) += $(QCS405_BOARDS) $(QCS405_BASE_DTB)
+dtb-y += $(qcs405-dtb-y)
 
 kaka-dtb-$(CONFIG_ARCH_KAKA) += kaka-rumi.dtb
 dtb-y += $(kaka-dtb-y)
