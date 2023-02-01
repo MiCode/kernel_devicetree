@@ -169,7 +169,8 @@ dtb-y += $(cinder-dtb-y)
 
 QCS405_BASE_DTB += qcs405.dtb
 
-QCS405_BOARDS += qcs405-iot-sku2-overlay.dtbo \
+QCS405_BOARDS += qcs405-iot-sku1-overlay.dtbo \
+	qcs405-iot-sku2-overlay.dtbo \
 	qcs405-iot-sku3-overlay.dtbo \
 	qcs405-iot-sku4-overlay.dtbo \
 	qcs405-iot-sku5-overlay.dtbo \
