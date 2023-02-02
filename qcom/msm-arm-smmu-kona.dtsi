@@ -333,31 +333,38 @@
 	iommu_test_device {
 		compatible = "qcom,iommu-debug-test";
 
-		kgsl_iommu_test_device {
+		usecase0_apps {
 			compatible = "qcom,iommu-debug-usecase";
-			iommus = <&kgsl_smmu 0x7 0>;
-			qcom,iommu-dma = "disabled";
+			iommus = <&apps_smmu 0x23 0x0>;
 		};
 
-		kgsl_iommu_coherent_test_device {
-			status = "disabled";
+		usecase1_apps_fastmap {
 			compatible = "qcom,iommu-debug-usecase";
-			iommus = <&kgsl_smmu 0x9 0>;
-			qcom,iommu-dma = "disabled";
+			iommus = <&apps_smmu 0x23 0x0>;
+			qcom,iommu-dma = "fastmap";
+		};
+
+		usecase2_apps_atomic {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x23 0x0>;
+			qcom,iommu-dma = "atomic";
+		};
+
+		usecase3_apps_dma {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x23 0x0>;
 			dma-coherent;
 		};
 
-		apps_iommu_test_device {
+		usecase4_apps_secure {
 			compatible = "qcom,iommu-debug-usecase";
-			iommus = <&apps_smmu 0x21 0>;
-			qcom,iommu-dma = "disabled";
+			iommus = <&apps_smmu 0x23 0x0>;
+			qcom,iommu-vmid = <0xa>; /* VMID_CP_PIXEL */
 		};
 
-		apps_iommu_coherent_test_device {
+		usecase5_kgsl {
 			compatible = "qcom,iommu-debug-usecase";
-			iommus = <&apps_smmu 0x23 0>;
-			qcom,iommu-dma = "disabled";
-			dma-coherent;
+			iommus = <&kgsl_smmu 0x7 0x0>;
 		};
 	};
 };
