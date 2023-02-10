@@ -145,6 +145,7 @@ KONA_BOARDS += \
 kona-dtb-$(CONFIG_ARCH_KONA) += \
         $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB))
 kona-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
+kona_le-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
 dtb-y += $(kona-dtb-y)
 
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
