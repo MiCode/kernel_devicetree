@@ -29,6 +29,7 @@
 	};
 
 	memory { device_type = "memory"; reg = <0 0>; };
+	firmware: firmware { };
 
 	reserved_memory: reserved-memory {
 		#address-cells = <1>;
@@ -136,6 +137,21 @@
 			linux,cma-default;
 		};
 
+		qseecom_mem: qseecom_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x00000000 0xffffffff>;
+			reusable;
+			alignment = <0x400000>;
+			size = <0x800000>;
+		};
+
+		qseecom_ta_mem: qseecom_ta_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x00000000 0xffffffff>;
+			reusable;
+			alignment = <0x400000>;
+			size = <0x400000>;
+		};
 	};
 
 	cpus {
@@ -753,6 +769,11 @@
 		status = "disabled";
 	};
 
+	qcom_tzlog: tz-log@14693720 {
+		compatible = "qcom,tz-log";
+		reg = <0x14693720 0x3000>;
+	};
+
 	spmi_bus: qcom,spmi@c42d000 {
 		compatible = "qcom,spmi-pmic-arb";
 		reg = <0xc42d000 0x4000>,
@@ -794,6 +815,17 @@
 	};
 
 	thermal_zones: thermal-zones {
+	};
+};
+
+&firmware {
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+	};
+
+	qcom_smcinvoke {
+		compatible = "qcom,smcinvoke";
+		qcom,support-legacy_smc;
 	};
 };
 
