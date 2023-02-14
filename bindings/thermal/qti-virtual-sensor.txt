@@ -12,7 +12,7 @@ Properties:
 	Definition: must be "qcom,vs-sensor"
 
 	Virtual sensor driver properties:
-- qcom,sensors:
+- sensor-names:
 	Usage: required
 	Value type: <List of Thermal Zones>
 	Definition: List of thermal zones whom maximum or minimum temperature need to find out.
@@ -23,25 +23,25 @@ Properties:
 	Definition: It can be 1 or 0. 1 is identifier for maximum temperature and 0 is identifier
 			for minimum temperature.
 
-- qcom,sensor_id:
-	Usage: optional
-	value type: <integer>
-	Definition: It will be 0,1,2.. depending upon how many thermal sensors are present in the target.
-
 Example:
 	virtual_sensor: virtual-sensor {
 		compatible = "qcom,vs-sensor";
 		#thermal-sensor-cells = <1>;
 
 		cpu_max: cpu-max{
-			qcom,sensors = <&cpuss_0 &cpuss_1 &cpuss_2 &cpuss_3>;
+			sensor-names = "cpuss-0",
+				"cpuss-1",
+				"cpuss-2",
+				"cpuss-3";
 			qcom,logic = <1>;
-			qcom,sensor_id = <0>;
 		};
 
 		modem_max: modem-max{
-			qcom,sensors = <&modem_offline &modem_q6 & modem_offline_fec &modem_offline_phy_0 &modem_offline_phy_1>;
+			sensor-names = "modem_offline",
+				"modem_q6",
+				"modem_offline_fec",
+				"modem_offline_phy-0",
+				"modem_offline_phy-1";
 			qcom,logic = <1>;
-			qcom,sensor_id = <1>;
 		};
 	};
