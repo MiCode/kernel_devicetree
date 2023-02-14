@@ -597,6 +597,42 @@
 	thermal_zones: thermal-zones {
 	};
 
+
+	slimbam: bamdma@3a84000 {
+		compatible = "qcom,bam-v1.7.0";
+		qcom,controlled-remotely;
+		reg = <0x3a84000 0x2c000>;
+		num-channels  = <31>;
+		interrupts = <0 164 IRQ_TYPE_LEVEL_HIGH>;
+		#dma-cells = <1>;
+		qcom,ee = <1>;
+		qcom,num-ees = <2>;
+		iommus = <&apps_smmu 0x1826 0x0>,
+			<&apps_smmu 0x182f 0x0>,
+			<&apps_smmu 0x1830 0x1>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0xc0000000>;
+		qcom,iommu-dma = "atomic";
+	};
+
+	slim_msm: slim@3ac0000 {
+		compatible = "qcom,slim-ngd-v1.5.0";
+		reg = <0x3ac0000 0x2c000>;
+		reg-names = "ctrl";
+		interrupts = <0 163 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,apps-ch-pipes = <0x700000>;
+		qcom,ea-pc = <0x2d0>;
+		iommus = <&apps_smmu 0x1826 0x0>,
+			<&apps_smmu 0x182f 0x0>,
+			<&apps_smmu 0x1830 0x1>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0xc0000000>;
+		qcom,iommu-dma = "atomic";
+		dmas = <&slimbam 3>, <&slimbam 4>;
+		dma-names = "rx", "tx";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "disabled";
+	};
+
 	intc: interrupt-controller@17a00000 {
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
