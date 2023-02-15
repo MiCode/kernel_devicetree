@@ -4,14 +4,6 @@
 #include <dt-bindings/clock/qcom,rpmcc.h>
 #include "slate.dtsi"
 
-&soc {
-	bluetooth: bt_wcn3990 {
-		compatible = "qcom,qcc5100";
-
-		status = "ok";
-	};
-};
-
 &pm5100_charger {
 	qcom,remote-fg;
 	#io-channel-cells = <1>;
@@ -32,6 +24,15 @@
 			   "batt-id",
 			   "batt-temp",
 			   "batt-volt";
+};
+
+&spmi_bus {
+	qcom,pm5100@0 {
+		pmic_lpm: qti,pmic-lpm@7200 {
+			compatible = "qti,pmic-lpm";
+			reg = <0x7200>;
+		};
+	};
 };
 
 &pm5100_gpios {

@@ -562,6 +562,55 @@
 		#reset-cells = <1>;
 	};
 
+	qcom_cedev: qcedev@1b20000 {
+		compatible = "qcom,qcedev";
+		reg = <0x1b20000 0x20000>,
+			<0x1b04000 0x24000>;
+		reg-names = "crypto-base","crypto-bam-base";
+		interrupts = <GIC_SPI 247 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,bam-pipe-pair = <2>;
+		qcom,ce-hw-instance = <0>;
+		qcom,ce-device = <0>;
+		qcom,ce-hw-shared;
+		qcom,bam-ee = <0>;
+		qcom,smmu-s1-enable;
+		qcom,no-clock-support;
+		interconnect-names = "data_path";
+		interconnects = <&sys_noc MASTER_CRYPTO_CORE0 &bimc_noc SLAVE_EBI_CH0>;
+		iommus = <&apps_smmu 0x0084 0x0011>,
+				<&apps_smmu 0x0092 0x00>,
+				<&apps_smmu 0x0086 0x0011>;
+		qcom,iommu-dma = "atomic";
+		dma-coherent;
+
+		qcom_cedev_ns_cb {
+			compatible = "qcom,qcedev,context-bank";
+			label = "ns_context";
+			iommus = <&apps_smmu 0x0086 0x0011>,
+				<&apps_smmu 0x0092 0x00>,
+				<&apps_smmu 0x0098 0x0001>;
+			dma-coherent;
+		};
+
+		qcom_cedev_s_cb {
+			compatible = "qcom,qcedev,context-bank";
+			label = "secure_context";
+			iommus = <&apps_smmu 0x093 0x000>,
+				 <&apps_smmu 0x09c 0x001>,
+				 <&apps_smmu 0x09d 0x001>,
+				 <&apps_smmu 0x09E 0x000>;
+			qcom,iommu-vmid = <0x9>;
+			qcom,secure-context-bank;
+		};
+	};
+
+	qcom_rng: qrng@4453000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x4453000 0x1000>;
+		qcom,no-qrng-config;
+		qcom,no-clock-support;
+	};
+
 	mccc_debug: syscon@447d200 {
 		compatible = "syscon";
 		reg = <0x0447d200 0x100>;

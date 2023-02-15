@@ -33,6 +33,7 @@
 		i2c4 = &qupv3_se11_i2c;
 		spi16 = &qupv3_se16_spi;
 		hsuart0 = &qupv3_se17_4uart;
+		hsuart1 = &qupv3_se12_2uart; /* GSI GNSS */
 	};
 
 	soc: soc { };
@@ -47,6 +48,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x0>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD0>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -70,6 +74,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x100>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD1>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -87,6 +94,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x200>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD2>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -104,6 +114,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x300>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD3>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -121,6 +134,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10000>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD4>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cache-size = <0x20000>;
 			cpu-release-addr = <0x0 0x90000000>;
@@ -144,6 +160,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10100>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD5>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -161,6 +180,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10200>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD6>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -178,6 +200,9 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10300>;
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD7>;
+			power-domain-names = "psci";
 			enable-method = "psci";
 			cpu-release-addr = <0x0 0x90000000>;
 			cache-size = <0x20000>;
@@ -227,6 +252,46 @@
 					cpu = <&CPU7>;
 				};
 			};
+		};
+	};
+
+	idle-states {
+		GOLD_OFF: gold-c3 {  /* C3 */
+			compatible = "arm,idle-state";
+			idle-state-name = "pc";
+			entry-latency-us = <549>;
+			exit-latency-us = <901>;
+			min-residency-us = <1774>;
+			arm,psci-suspend-param = <0x40000003>;
+			local-timer-stop;
+		};
+
+		GOLD_RAIL_OFF: gold-c4 {  /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <702>;
+			exit-latency-us = <1061>;
+			min-residency-us = <4488>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+
+		GOLD_CLUSTER_D4: gold-cluster-d4 { /* D4 */
+			compatible = "domain-idle-state";
+			idle-state-name = "pwr-l2-pc";
+			entry-latency-us = <2752>;
+			exit-latency-us = <3048>;
+			min-residency-us = <6118>;
+			arm,psci-suspend-param = <0x41000044>;
+		};
+
+		APSS_OFF: cluster-e3 { /* E3 */
+			compatible = "domain-idle-state";
+			idle-state-name = "llcc-off";
+			entry-latency-us = <3263>;
+			exit-latency-us = <6562>;
+			min-residency-us = <9987>;
+			arm,psci-suspend-param = <0x42000144>;
 		};
 	};
 };
@@ -479,6 +544,63 @@
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
+
+		CPU_PD0: cpu-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD1: cpu-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD2: cpu-pd2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD3: cpu-pd3 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD4: cpu-pd4 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD5: cpu-pd5 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD6: cpu-pd6 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD7: cpu-pd7 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CLUSTER_PD0: cluster-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD2>;
+			domain-idle-states = <&GOLD_CLUSTER_D4>;
+		};
+
+		CLUSTER_PD1: cluster-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD2>;
+			domain-idle-states = <&GOLD_CLUSTER_D4>;
+		};
+
+		CLUSTER_PD2: cluster-pd2 {
+			#power-domain-cells = <0>;
+			domain-idle-states = <&APSS_OFF>;
+		};
 	};
 
 	intc: interrupt-controller@17a00000 {
@@ -534,6 +656,7 @@
 		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&CLUSTER_PD2>;
 
 		apps_rsc_drv2: drv@2 {
 			qcom,drv-id = <2>;
@@ -556,6 +679,12 @@
 
 			apps_bcm_voter: bcm_voter {
 				compatible = "qcom,bcm-voter";
+			};
+
+			dcvs_fp: qcom,dcvs-fp {
+				compatible = "qcom,dcvs-fp";
+				qcom,ddr-bcm-name = "MC4";
+				qcom,llcc-bcm-name = "SH5";
 			};
 		};
 	};
@@ -669,6 +798,44 @@
 			compatible = "qcom,msm-imem-diag-dload";
 			reg = <0xc8 0xc8>;
 		};
+	};
+
+	cluster-device0 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD0>;
+	};
+
+	cluster-device1 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD1>;
+	};
+
+	cluster-device2 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD2>;
+	};
+
+	sys-pm-vx@c320000 {
+		compatible = "qcom,sys-pm-violators", "qcom,sys-pm-lemans";
+		reg = <0xc320000 0x0400>;
+		mboxes = <&qmp_aop 0>;
+		mbox-names = "aop";
+	};
+
+	soc-sleep-stats@c3f0000 {
+		compatible = "qcom,rpmh-sleep-stats";
+		reg = <0xc3f0000 0x400>;
+		qcom,drv-max = <0x14>;
+		ss-name = "adsp", "cdsp", "apss";
+		mboxes = <&qmp_aop 0>;
+		mbox-names = "aop";
+		ddr-freq-update;
+	};
+
+	subsystem-sleep-stats@c3f0000 {
+		compatible = "qcom,subsystem-sleep-stats";
+		reg = <0xc3f0000 0x400>;
+		ddr-freq-update;
 	};
 
 	tlmm: pinctrl@f000000 {
@@ -1094,6 +1261,217 @@
 	tcsr: syscon@1fc0000 {
 		compatible = "syscon";
 		reg = <0x1fc0000 0x30000>;
+	};
+
+	llcc_pmu: llcc-pmu@9095000 {
+		compatible = "qcom,llcc-pmu-ver2";
+		reg = <0x09095000 0x300>;
+		reg-names = "lagg-base";
+	};
+
+	ddr_freq_table: ddr-freq-table {
+		qcom,freq-tbl =
+			<  200000 >,
+			<  451000 >,
+			<  547000 >,
+			<  682000 >,
+			<  768000 >,
+			< 1555000 >,
+			< 1708000 >,
+			< 2093000 >,
+			< 2736000 >,
+			< 3197000 >;
+	};
+
+	llcc_freq_table: llcc-freq-table {
+		qcom,freq-tbl =
+			<  600000 >,
+			<  806000 >,
+			<  933000 >,
+			< 1066000 >;
+	};
+
+	ddrqos_freq_table: ddrqos-freq-table {
+		qcom,freq-tbl =
+			< 0 >,
+			< 1 >;
+	};
+
+	qcom_dcvs: qcom,dcvs {
+		compatible = "qcom,dcvs";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		qcom_ddr_dcvs_hw: ddr {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <0>;
+			qcom,bus-width = <4>;
+			qcom,freq-tbl = <&ddr_freq_table>;
+
+			ddr_dcvs_sp: sp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				interconnects = <&mc_virt MASTER_LLCC
+						 &mc_virt SLAVE_EBI1>;
+			};
+
+			ddr_dcvs_fp: fp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <1>;
+				qcom,fp-voter = <&dcvs_fp>;
+			};
+		};
+
+		qcom_llcc_dcvs_hw: llcc {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <1>;
+			qcom,bus-width = <16>;
+			qcom,freq-tbl = <&llcc_freq_table>;
+
+			llcc_dcvs_sp: sp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				interconnects = <&gem_noc MASTER_APPSS_PROC
+						 &gem_noc SLAVE_LLCC>;
+			};
+
+			llcc_dcvs_fp: fp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <1>;
+				qcom,fp-voter = <&dcvs_fp>;
+			};
+		};
+
+		qcom_ddrqos_dcvs_hw: ddrqos {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <3>;
+			qcom,bus-width = <1>;
+			qcom,freq-tbl = <&ddrqos_freq_table>;
+
+			ddrqos_dcvs_sp: sp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				interconnects = <&mc_virt MASTER_LLCC
+						 &mc_virt SLAVE_EBI1>;
+			};
+		};
+	};
+
+	qcom_memlat: qcom,memlat {
+		compatible = "qcom,memlat";
+
+		ddr {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_ddr_dcvs_hw>;
+			qcom,sampling-path = <&ddr_dcvs_fp>;
+			qcom,miss-ev = <0x1000>;
+
+			gold-0 {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3>;
+				qcom,cpufreq-memfreq-tbl =
+					< 1268000 1708000 >,
+					< 1632000 2093000 >,
+					< 2112000 2736000 >,
+					< 2362000 3197000 >;
+				qcom,sampling-enabled;
+			};
+
+			gold-1 {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+					< 1268000 1708000 >,
+					< 1632000 2093000 >,
+					< 2112000 2736000 >,
+					< 2362000 3197000 >;
+				qcom,sampling-enabled;
+			};
+
+			gold-compute {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+					< 2112000 2736000 >,
+					< 2362000 3197000 >;
+				qcom,sampling-enabled;
+				qcom,compute-mon;
+			};
+		};
+
+		llcc {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_llcc_dcvs_hw>;
+			qcom,sampling-path = <&llcc_dcvs_fp>;
+			qcom,miss-ev = <0x37>;
+
+			gold-0 {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3>;
+				qcom,cpufreq-memfreq-tbl =
+					< 2112000  933000 >,
+					< 2362000 1066000 >;
+				qcom,sampling-enabled;
+			};
+
+			gold-1 {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+					< 2112000  933000 >,
+					< 2362000 1066000 >;
+				qcom,sampling-enabled;
+			};
+
+
+			gold-compute {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+					< 2112000  933000 >,
+					< 2362000 1066000 >;
+				qcom,sampling-enabled;
+				qcom,compute-mon;
+			};
+		};
+
+		ddrqos {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_ddrqos_dcvs_hw>;
+			qcom,sampling-path = <&ddrqos_dcvs_sp>;
+			qcom,miss-ev = <0x1000>;
+
+			ddrqos_gold_lat: gold {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+					< 1881600 0 >,
+					< 2707200 1 >;
+				qcom,sampling-enabled;
+			};
+		};
+	};
+
+	bwmon_llcc: qcom,bwmon-llcc@240B6300 {
+		compatible = "qcom,bwmon4";
+		reg = <0x90B6400 0x300>, <0x90B6300 0x200>;
+		reg-names = "base", "global_base";
+		interrupts = <GIC_SPI 581 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,mport = <0>;
+		qcom,hw-timer-hz = <19200000>;
+		qcom,count-unit = <0x10000>;
+		qcom,target-dev = <&qcom_llcc_dcvs_hw>;
+	};
+
+	bwmon_ddr: qcom,bwmon-ddr@0x9091000 {
+		compatible = "qcom,bwmon5";
+		reg = <0x9091000 0x1000>;
+		reg-names = "base";
+		interrupts = <GIC_SPI 620 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,hw-timer-hz = <19200000>;
+		qcom,count-unit = <0x10000>;
+		qcom,target-dev = <&qcom_ddr_dcvs_hw>;
 	};
 
 	adsp_pas: remoteproc-adsp@3000000 {
@@ -1738,6 +2116,11 @@
 		hwlocks = <&tcsr_mutex 3>;
 	};
 
+	mini_dump_mode {
+		compatible = "qcom,minidump";
+		status = "ok";
+	};
+
 	aoss_qmp: power-controller@c300000 {
 
 		compatible = "qcom,sm8150-aoss-qmp";
@@ -2181,6 +2564,7 @@
 #include "lemans-qupv3.dtsi"
 #include "lemans-pcie.dtsi"
 #include "lemans-usb.dtsi"
+#include "lemans-coresight.dtsi"
 
 &cam_cc_titan_top_gdsc {
 	clocks = <&gcc GCC_CAMERA_AHB_CLK>;

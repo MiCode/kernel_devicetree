@@ -74,6 +74,16 @@ kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOA
 kalama_le-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
+CROW_BASE_DTB += crow.dtb
+
+CROW_BOARDS += \
+		crow-rumi-overlay.dtbo
+
+kalama-dtb-$(CONFIG_ARCH_CROW) += \
+	$(call add-overlays, $(CROW_BOARDS) ,$(CROW_BASE_DTB))
+kalama-overlays-dtb-$(CONFIG_ARCH_CROW) += $(CROW_BOARDS) $(CROW_BASE_DTB)
+dtb-y += $(kalama-dtb-y)
+
 KHAJE_BASE_DTB += khaje.dtb khajep.dtb khajeq.dtb khajeg.dtb
 
 KHAJE_BOARDS += \
@@ -127,6 +137,9 @@ KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2
 
 KONA_BOARDS += \
                  kona-iot-v2.1-rb5-overlay.dtbo \
+                 kona-iot-v2-rb5-overlay.dtbo \
+                 kona-hdk-overlay.dtbo \
+                 kona-rb5-HDMI-overlay.dtbo \
                  kona-iot-v2.1-vc-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
@@ -162,9 +175,34 @@ cinder-dtb-$(CONFIG_ARCH_CINDER) += cinder-ru-rumi.dtb \
 	cinder-v2-ru-idp.dtb \
 	cinder-v2-ru-idp-2gb.dtb \
 	cinder-v2-du-idp.dtb \
-	cinder-v2-du-x100.dtb
+	cinder-v2-du-x100.dtb \
+	cinder-v2-ru-rumi.dtb \
+	cinder-v2-du-rumi.dtb
 dtb-y += $(cinder-dtb-y)
 
+QCS405_BASE_DTB += qcs405.dtb
+
+QCS405_BOARDS += qcs405-iot-sku1-overlay.dtbo \
+	qcs405-iot-sku2-overlay.dtbo \
+	qcs405-iot-sku3-overlay.dtbo \
+	qcs405-iot-sku4-overlay.dtbo \
+	qcs405-iot-sku5-overlay.dtbo \
+	qcs405-iot-sku6-overlay.dtbo \
+	qcs405-iot-sku7-overlay.dtbo \
+	qcs405-iot-sku8-overlay.dtbo \
+	qcs405-iot-sku9-overlay.dtbo \
+	qcs405-iot-sku10-overlay.dtbo \
+	qcs407-iot-sku12-overlay.dtbo \
+	qcs407-iot-sku13-overlay.dtbo \
+	qcs407-iot-sku4-overlay.dtbo   \
+	qcs407-iot-sku6-overlay.dtbo   \
+	qcs407-iot-sku9-overlay.dtbo
+
+qcs405-dtb-$(CONFIG_ARCH_QCS405) += \
+        $(call add-overlays, $(QCS405_BOARDS) ,$(QCS405_BASE_DTB))
+
+qcs405-overlays-dtb-$(CONFIG_ARCH_QCS405) += $(QCS405_BOARDS) $(QCS405_BASE_DTB)
+dtb-y += $(qcs405-dtb-y)
 
 kaka-dtb-$(CONFIG_ARCH_KAKA) += kaka-rumi.dtb
 dtb-y += $(kaka-dtb-y)
@@ -236,6 +274,15 @@ gen4auto-overlays-dtb-$(CONFIG_ARCH_LEMANS) +=  \
 	$(LEMANS_IVI_BOARDS) $(LEMANS_ADAS_HIGH_BOARDS) $(LEMANS_IVI_BASE_DTB) $(LEMANS_ADAS_HIGH_BASE_DTB) \
 	$(LEMANS_IVI_ADAS_BOARDS) $(LEMANS_IVI_ADAS_BASE_DTB)
 
+MONACO_AUTO_BASE_DTB	+= monaco_auto-rumi.dtb
+MONACO_AUTO_BOARDS	+= monaco_auto-rumi-overlay.dtbo
+
+gen4auto-dtb-$(CONFIG_ARCH_MONACO_AUTO) += \
+	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))
+
+gen4auto-overlays-dtb-$(CONFIG_ARCH_MONACO_AUTO) +=  \
+	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)
+
 dtb-y += $(gen4auto-dtb-y)
 
 sdxpinn-dtb-$(CONFIG_ARCH_SDXPINN) += sdxpinn-rumi.dtb sa525m-rumi.dtb \
@@ -285,18 +332,24 @@ SA8195_LA_GVM_BASE_DTB += sa8195-vm-la.dtb
 SA8195_LA_GVM_BOARDS += \
                    sa8195-vm-la-overlay.dtbo
 
+DIREWOLF_LV_GVM_HEADLESS_BASE_DTB += direwolf-vm-lv-headless-mt.dtb
+
+DIREWOLF_LV_GVM_HEADLESS_BOARDS += \
+                   direwolf-vm-lv-headless-mt-overlay.dtbo
+
 autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB)) \
 	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_LV_GVM_BOARDS),$(LEMANS_LV_GVM_BASE_DTB)) \
-	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB))
+	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(DIREWOLF_LV_GVM_HEADLESS_BOARDS),$(DIREWOLF_LV_GVM_HEADLESS_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB) \
 	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) $(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
-	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB) $(LEMANS_LV_GVM_BOARDS) $(LEMANS_LV_GVM_BASE_DTB)
+	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB) $(LEMANS_LV_GVM_BOARDS) $(LEMANS_LV_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_HEADLESS_BOARDS) $(DIREWOLF_LV_GVM_HEADLESS_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 

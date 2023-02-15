@@ -8,6 +8,7 @@
 	qcom,msm-id = <405 0x20000>;
 	aliases {
 		hsuart0 = &qupv3_se17_4uart;
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 	};
 };
 
@@ -230,6 +231,70 @@
 		regulator-name = "pm8195_3_s3_level";
 		regulator-min-microvolt = <RPMH_REGULATOR_LEVEL_RETENTION>;
 		regulator-max-microvolt = <RPMH_REGULATOR_LEVEL_MAX>;
+	};
+
+	sdhc_2: sdhci@8804000 {
+		compatible = "qcom,sdhci-msm-v5";
+		reg = <0x8804000 0x1000>;
+		reg-names = "hc_mem";
+
+		interrupts = <GIC_SPI 204 IRQ_TYPE_LEVEL_HIGH>,
+			   <GIC_SPI 222 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
+			<&gcc GCC_SDCC2_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		bus-width = <4>;
+		qcom,restore-after-cx-collapse;
+
+		qcom,msm-bus,name = "sdhc2";
+		qcom,msm-bus,num-cases = <6>;
+		qcom,msm-bus,num-paths = <2>;
+		qcom,msm-bus,vectors-KBps =
+			/* No vote */
+			<0 0>, <0 0>,
+			/* 25 MB/s */
+			<65360 100000>, <100000 100000>,
+			/* 50 MB/s */
+			<130718 200000>, <100000 100000>,
+			/* 100 MB/s */
+			<261438 200000>, <130000 130000>,
+			/* 200 MB/s */
+			<261438 400000>, <300000 300000>,
+			/* Max. bandwidth */
+			<1338562 4096000>, <1338562 4096000>;
+
+		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+		qcom,dll-hsr-list = <0x0007642c 0x0 0x10 0x2C010800 0x80040868>;
+
+		qcom,devfreq,freq-table = <50000000 200000000>;
+
+		vdd-supply = <&pm8195_1_l10>;
+		qcom,vdd-voltage-level = <2950000 2960000>;
+		qcom,vdd-current-level = <200 800000>;
+
+		vdd-io-supply = <&pm8195_1_l2>;
+		qcom,vdd-io-voltage-level = <1808000 2960000>;
+		qcom,vdd-io-current-level = <200 22000>;
+
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&sdc2_on>;
+		pinctrl-1 = <&sdc2_off>;
+
+		cd-gpios = <&pm8195_1_gpios 4 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+
+		qos0 {
+			mask = <0x0f>;
+			vote = <70>;
+		};
+
+		qos1 {
+			mask = <0xf0>;
+			vote = <70>;
+		};
 	};
 };
 
