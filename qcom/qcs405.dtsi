@@ -79,6 +79,10 @@
 		#interrupt-cells = <2>;
 	};
 
+	qcom-secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
 	arch_timer: timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <GIC_PPI 2 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
@@ -88,7 +92,7 @@
 		clock-frequency = <19200000>;
 	};
 
-	timer@b120000 {
+	memtimer@b120000 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
@@ -196,6 +200,35 @@
 			reg = <0x6b0 0x20>;
 		};
 
+		pil@94c {
+			compatible = "qcom,pil-reloc-info";
+			reg = <0x94c 0xc8>;
+		};
+
+		pil@6dc {
+			compatible = "qcom,msm-imem-pil-disable-timeout";
+			reg = <0x6dc 0x4>;
+		};
+
+		diag_dload@c8 {
+			compatible = "qcom,msm-imem-diag-dload";
+			reg = <0xc8 0xc8>;
+		};
+
+		kaslr_offset@6d0 {
+			compatible = "qcom,msm-imem-kaslr_offset";
+			reg = <0x6d0 0xc>;
+		};
+
+	};
+
+	mini_dump_mode {
+		compatible = "qcom,minidump";
+		status = "ok";
+	};
+
+	vendor_hooks: qcom,cpu-vendor-hooks {
+		compatible = "qcom,cpu-vendor-hooks";
 	};
 
 	spmi_bus: qcom,spmi@200f000 {
@@ -327,6 +360,11 @@
 		reg = <0x1905000 0x20000>;
 	};
 
+	tcsr: syscon@1937000 {
+		compatible = "syscon";
+		reg = <0x1937000 0x30000>;
+	};
+
 	tcsr_mutex: hwlock {
 		compatible = "qcom,tcsr-mutex";
 		syscon = <&tcsr_mutex_block 0 0x1000>;
@@ -437,6 +475,14 @@
 		};
 	};
 };
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
+		qcom,dload-mode = <&tcsr 0x13000>;
+	};
+};
+
 
 #include "qcs405-cpu.dtsi"
 #include "qcs405-pinctrl.dtsi"
