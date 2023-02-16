@@ -491,22 +491,46 @@
 		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+	pcie_crm_hw_0_bcm_voter: bcm_voter@0 {
+		compatible = "qcom,bcm-voter";
+		qcom,crm-name = "pcie_crm";
+		qcom,crm-client-idx = <0>;
+		qcom,crm-pwr-states = <5>;
+	};
+
+	pcie_crm_hw_1_bcm_voter: bcm_voter@1 {
+		compatible = "qcom,bcm-voter";
+		qcom,crm-name = "pcie_crm";
+		qcom,crm-client-idx = <1>;
+		qcom,crm-pwr-states = <5>;
+	};
+
 	clk_virt: interconnect@0 {
 		compatible = "qcom,pineapple-clk_virt";
 		#interconnect-cells = <1>;
-		qcom,bcm-voter-names = "hlos";
-		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,bcm-voter-names = "hlos", "pcie_crm_hw_0", "pcie_crm_hw_1";
+		qcom,bcm-voters = <&apps_bcm_voter>,
+				  <&pcie_crm_hw_0_bcm_voter>,
+				  <&pcie_crm_hw_1_bcm_voter>;
 	};
 
 	mc_virt: interconnect@1 {
 		compatible = "qcom,pineapple-mc_virt";
 		#interconnect-cells = <1>;
-		qcom,bcm-voter-names = "hlos", "disp", "cam_ife_0", "cam_ife_1", "cam_ife_2";
+		qcom,bcm-voter-names = "hlos",
+				       "disp",
+				       "cam_ife_0",
+				       "cam_ife_1",
+				       "cam_ife_2",
+				       "pcie_crm_hw_0",
+				       "pcie_crm_hw_1";
 		qcom,bcm-voters = <&apps_bcm_voter>,
 				  <&disp_bcm_voter>,
 				  <&cam_bcm_voter0>,
 				  <&cam_bcm_voter1>,
-				  <&cam_bcm_voter2>;
+				  <&cam_bcm_voter2>,
+				  <&pcie_crm_hw_0_bcm_voter>,
+				  <&pcie_crm_hw_1_bcm_voter>;
 	};
 
 	config_noc: interconnect@1600000 {
@@ -539,8 +563,10 @@
 		#interconnect-cells = <1>;
 		clocks = <&gcc GCC_AGGRE_NOC_PCIE_AXI_CLK>,
 			 <&gcc GCC_CFG_NOC_PCIE_ANOC_AHB_CLK>;
-		qcom,bcm-voter-names = "hlos";
-		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,bcm-voter-names = "hlos", "pcie_crm_hw_0", "pcie_crm_hw_1";
+		qcom,bcm-voters = <&apps_bcm_voter>,
+				  <&pcie_crm_hw_0_bcm_voter>,
+				  <&pcie_crm_hw_1_bcm_voter>;
 		qcom,skip-qos;
 	};
 
@@ -585,12 +611,20 @@
 		#interconnect-cells = <1>;
 		clocks = <&gcc GCC_DDRSS_UBWCP_CLK>;
 		clock-names = "gcc_ddrss_ubwcp_clk";
-		qcom,bcm-voter-names = "hlos", "disp", "cam_ife_0", "cam_ife_1", "cam_ife_2";
+		qcom,bcm-voter-names = "hlos",
+				       "disp",
+				       "cam_ife_0",
+				       "cam_ife_1",
+				       "cam_ife_2",
+				       "pcie_crm_hw_0",
+				       "pcie_crm_hw_1";
 		qcom,bcm-voters = <&apps_bcm_voter>,
 				  <&disp_bcm_voter>,
 				  <&cam_bcm_voter0>,
 				  <&cam_bcm_voter1>,
-				  <&cam_bcm_voter2>;
+				  <&cam_bcm_voter2>,
+				  <&pcie_crm_hw_0_bcm_voter>,
+				  <&pcie_crm_hw_1_bcm_voter>;
 		qcom,skip-qos;
 	};
 
