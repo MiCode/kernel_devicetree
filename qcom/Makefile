@@ -133,7 +133,7 @@ bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
 bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(bengal-dtb-y)
 
-KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb
+KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb qrb3165-iot.dtb qrb3165n-iot.dtb
 
 KONA_BOARDS += \
                  kona-iot-v2.1-rb5-overlay.dtbo \
