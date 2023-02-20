@@ -206,6 +206,21 @@ qcs405-dtb-$(CONFIG_ARCH_QCS405) += \
 qcs405-overlays-dtb-$(CONFIG_ARCH_QCS405) += $(QCS405_BOARDS) $(QCS405_BASE_DTB)
 dtb-y += $(qcs405-dtb-y)
 
+TRINKET_BASE_DTB += trinket-iot.dtb
+
+TRINKET_BOARDS += \
+	trinket-iot-idp-overlay.dtbo \
+	trinketp-iot-idp-overlay.dtbo \
+	trinket-iot-dp-idp-overlay.dtbo \
+	trinket-iot-external-codec-idp-overlay.dtbo \
+	trinket-iot-usbc-external-codec-idp-overlay.dtbo \
+	trinket-iot-usbc-idp-overlay.dtbo
+
+trinket-dtb-$(CONFIG_ARCH_TRINKET) += \
+        $(call add-overlays, $(TRINKET_BOARDS) ,$(TRINKET_BASE_DTB))
+trinket-overlays-dtb-$(CONFIG_ARCH_TRINKET) += $(TRINKET_BOARDS) $(TRINKET_BASE_DTB)
+dtb-y += $(trinket-dtb-y)
+
 kaka-dtb-$(CONFIG_ARCH_KAKA) += kaka-rumi.dtb
 dtb-y += $(kaka-dtb-y)
 
