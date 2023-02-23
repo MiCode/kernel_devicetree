@@ -10,6 +10,15 @@
 };
 
 &tlmm {
+	key_camera_switch {
+		key_camera_switch_default: key_camera_switch_default {
+			pins = "gpio26";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
 	key_factory_reset {
 		key_factory_reset_default: key_factory_reset_default {
 			pins = "gpio22";
@@ -28,6 +37,57 @@
 		};
 	};
 };
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default &key_camera_switch_default &key_home_default &key_factory_reset_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8150_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		camera_switch {
+			label = "camera_switch";
+			gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_CAMERA>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		mute {
+			label = "mute";
+			gpios = <&pm8150_gpios 1 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_MUTE>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		factory_reset {
+			label = "factory_reset";
+			gpios = <&tlmm 22 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_F24>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
 
 &qupv3_se12_2uart {
 		status = "ok";
