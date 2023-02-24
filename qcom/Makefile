@@ -140,7 +140,8 @@ KONA_BOARDS += \
                  kona-iot-v2-rb5-overlay.dtbo \
                  kona-hdk-overlay.dtbo \
                  kona-rb5-HDMI-overlay.dtbo \
-                 kona-iot-v2.1-vc-overlay.dtbo
+                 kona-iot-v2.1-vc-overlay.dtbo \
+		 kona-rb5-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
         $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB))
