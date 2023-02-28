@@ -133,20 +133,26 @@ bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
 bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(bengal-dtb-y)
 
-KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb qrb3165-iot.dtb qrb3165n-iot.dtb
+KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb
+KONA_LE_BASE_DTB += kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb qrb3165-iot.dtb qrb3165n-iot.dtb
 
 KONA_BOARDS += \
-                 kona-iot-v2.1-rb5-overlay.dtbo \
-                 kona-iot-v2-rb5-overlay.dtbo \
                  kona-hdk-overlay.dtbo \
                  kona-rb5-HDMI-overlay.dtbo \
                  kona-iot-v2.1-vc-overlay.dtbo \
-		 kona-rb5-overlay.dtbo
+		 kona-rb5-overlay.dtbo \
+		 kona-iot-v2.1-rb5-overlay.dtbo
+
+
+KONA_LE_BOARDS += \
+		 kona-iot-v2.1-rb5-overlay.dtbo \
+		 kona-iot-v2-rb5-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
-        $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB))
+        $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB)) \
+	$(call add-overlays, $(KONA_LE_BOARDS) ,$(KONA_LE_BASE_DTB))
 kona-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
-kona_le-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
+kona_le-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_LE_BOARDS) $(KONA_LE_BASE_DTB)
 dtb-y += $(kona-dtb-y)
 
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
