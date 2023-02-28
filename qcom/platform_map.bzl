@@ -1,99 +1,132 @@
-platform_map = {
+_platform_map = {
     "kalama": {
         "dtb_list": [
-            # keep sorted
-            "kalama.dtb",
-            "kalama-v2.dtb",
-            "kalamap.dtb",
-            "kalamap-v2.dtb",
+            {"name": "kalama.dtb"},
+            {"name": "kalama-v2.dtb"},
+            {
+                "name": "kalamap.dtb",
+                "apq": True,
+            },
+            {
+                "name": "kalamap-v2.dtb",
+                "apq": True,
+            },
         ],
         "dtbo_list": [
-            # keep sorted
-            "kalama-atp-overlay.dtbo",
-            "kalama-cdp-nfc-overlay.dtbo",
-            "kalama-cdp-overlay.dtbo",
-            "kalama-cdp-wsa883x-overlay.dtbo",
-            "kalama-mtp-nfc-overlay.dtbo",
-            "kalama-mtp-overlay.dtbo",
-            "kalama-qrd-overlay.dtbo",
-            "kalama-rcm-overlay.dtbo",
-            "kalama-rumi-overlay.dtbo",
+            {"name": "kalama-atp-overlay.dtbo"},
+            {"name": "kalama-cdp-nfc-overlay.dtbo"},
+            {"name": "kalama-cdp-overlay.dtbo"},
+            {"name": "kalama-cdp-wsa883x-overlay.dtbo"},
+            {"name": "kalama-mtp-nfc-overlay.dtbo"},
+            {"name": "kalama-mtp-overlay.dtbo"},
+            {"name": "kalama-qrd-overlay.dtbo"},
+            {"name": "kalama-rcm-overlay.dtbo"},
+            {
+                "name": "kalama-rumi-overlay.dtbo",
+                "apq": False,
+            }
         ],
     },
     "kalama-tuivm": {
         "dtb_list": [
-            # keep sorted"
-            "kalama-oemvm-cdp.dtb",
-            "kalama-oemvm-mtp.dtb",
-            "kalama-oemvm-qrd.dtb",
-            "kalama-oemvm-rumi.dtb",
-            "kalama-vm-cdp.dtb",
-            "kalama-vm-mtp.dtb",
-            "kalama-vm-qrd.dtb",
-            "kalama-vm-rumi.dtb",
+            {"name": "kalama-oemvm-cdp.dtb"},
+            {"name": "kalama-oemvm-mtp.dtb"},
+            {"name": "kalama-oemvm-qrd.dtb"},
+            {"name": "kalama-oemvm-rumi.dtb"},
+            {"name": "kalama-vm-cdp.dtb"},
+            {"name": "kalama-vm-mtp.dtb"},
+            {"name": "kalama-vm-qrd.dtb"},
+            {"name": "kalama-vm-rumi.dtb"},
         ],
-        "dtbo_list": [],
     },
     "kalama-oemvm": {
         "dtb_list": [
-            # keep sorted"
-            "kalama-oemvm-cdp.dtb",
-            "kalama-oemvm-mtp.dtb",
-            "kalama-oemvm-qrd.dtb",
-            "kalama-oemvm-rumi.dtb",
-            "kalama-vm-cdp.dtb",
-            "kalama-vm-mtp.dtb",
-            "kalama-vm-qrd.dtb",
-            "kalama-vm-rumi.dtb",
+            {"name": "kalama-oemvm-cdp.dtb"},
+            {"name": "kalama-oemvm-mtp.dtb"},
+            {"name": "kalama-oemvm-qrd.dtb"},
+            {"name": "kalama-oemvm-rumi.dtb"},
+            {"name": "kalama-vm-cdp.dtb"},
+            {"name": "kalama-vm-mtp.dtb"},
+            {"name": "kalama-vm-qrd.dtb"},
+            {"name": "kalama-vm-rumi.dtb"},
         ],
-        "dtbo_list": [],
     },
     "pineapple": {
         "dtb_list": [
-            # keep sorted
-            "pineapple.dtb",
-            "pineapple-v2.dtb",
-            "pineapplep.dtb",
-            "pineapplep-v2.dtb",
+            {"name": "pineapple.dtb"},
+            {"name": "pineapple-v2.dtb"},
+            {
+                "name": "pineapplep.dtb",
+                "apq": True,
+            },
+            {
+                "name": "pineapplep-v2.dtb",
+                "apq": True,
+            },
         ],
         "dtbo_list": [
-            # keep sorted
-            "pineapple-atp-overlay.dtbo",
-            "pineapple-cdp-nfc-overlay.dtbo",
-            "pineapple-cdp-overlay.dtbo",
-            "pineapple-mtp-nfc-overlay.dtbo",
-            "pineapple-mtp-overlay.dtbo",
-            "pineapple-qrd-overlay.dtbo",
-            "pineapple-rcm-overlay.dtbo",
-            "pineapple-rumi-overlay.dtbo",
+            {"name": "pineapple-atp-overlay.dtbo"},
+            {"name": "pineapple-cdp-nfc-overlay.dtbo"},
+            {"name": "pineapple-cdp-overlay.dtbo"},
+            {"name": "pineapple-mtp-nfc-overlay.dtbo"},
+            {"name": "pineapple-mtp-overlay.dtbo"},
+            {"name": "pineapple-qrd-overlay.dtbo"},
+            {"name": "pineapple-rcm-overlay.dtbo"},
+            {
+                "name": "pineapple-rumi-overlay.dtbo",
+                "apq": False,
+            },
         ],
     },
     "pineapple-tuivm": {
         "dtb_list": [
-            # keep sorted
-            "pineapple-oemvm-cdp.dtb",
-            "pineapple-oemvm-mtp.dtb",
-            "pineapple-oemvm-qrd.dtb",
-            "pineapple-oemvm-rumi.dtb",
-            "pineapple-vm-cdp.dtb",
-            "pineapple-vm-mtp.dtb",
-            "pineapple-vm-qrd.dtb",
-            "pineapple-vm-rumi.dtb",
+            {"name": "pineapple-oemvm-cdp.dtb"},
+            {"name": "pineapple-oemvm-mtp.dtb"},
+            {"name": "pineapple-oemvm-qrd.dtb"},
+            {"name": "pineapple-oemvm-rumi.dtb"},
+            {"name": "pineapple-vm-cdp.dtb"},
+            {"name": "pineapple-vm-mtp.dtb"},
+            {"name": "pineapple-vm-qrd.dtb"},
+            {"name": "pineapple-vm-rumi.dtb"},
         ],
-        "dtbo_list": [],
     },
     "pineapple-oemvm": {
         "dtb_list": [
-            # keep sorted
-            "pineapple-oemvm-cdp.dtb",
-            "pineapple-oemvm-mtp.dtb",
-            "pineapple-oemvm-qrd.dtb",
-            "pineapple-oemvm-rumi.dtb",
-            "pineapple-vm-cdp.dtb",
-            "pineapple-vm-mtp.dtb",
-            "pineapple-vm-qrd.dtb",
-            "pineapple-vm-rumi.dtb",
+            {"name": "pineapple-oemvm-cdp.dtb"},
+            {"name": "pineapple-oemvm-mtp.dtb"},
+            {"name": "pineapple-oemvm-qrd.dtb"},
+            {"name": "pineapple-oemvm-rumi.dtb"},
+            {"name": "pineapple-vm-cdp.dtb"},
+            {"name": "pineapple-vm-mtp.dtb"},
+            {"name": "pineapple-vm-qrd.dtb"},
+            {"name": "pineapple-vm-rumi.dtb"},
         ],
-        "dtbo_list": [],
     },
 }
+
+def _get_dtb_lists(target, dt_overlay_supported):
+    if not target in _platform_map:
+        fail("{} not in device tree platform map!".format(target))
+
+    if dt_overlay_supported:
+        return _platform_map[target]
+
+    _target_map = {"dtb_list": []}
+
+    for dtb in _platform_map[target].get("dtb_list", []):
+        _target_map["dtb_list"].append(dtb)
+        dtb_base = dtb["name"].replace(".dtb", "")
+        for dtbo in _platform_map[target].get("dtbo_list", []):
+            if not dtbo.get("apq", True) and dtb.get("apq", False):
+                continue
+
+            dtbo_base = dtbo["name"].replace(".dtbo", "")
+            _target_map["dtb_list"].append({"name": "{}-{}.dtb".format(dtb_base, dtbo_base)})
+
+    return _target_map
+
+def get_dtb_list(target, dt_overlay_supported=True):
+    return [dtb["name"] for dtb in _get_dtb_lists(target, dt_overlay_supported).get("dtb_list", [])]
+
+def get_dtbo_list(target, dt_overlay_supported=True):
+    return [dtb["name"] for dtb in _get_dtb_lists(target, dt_overlay_supported).get("dtbo_list", [])]
