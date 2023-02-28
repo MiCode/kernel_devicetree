@@ -107,6 +107,18 @@ _platform_map = {
                 "apq": False,
             },
         ],
+        "binary_compatible_with": ["cliffs"],
+    },
+    "cliffs": {
+        "dtb_list": [
+            {"name": "cliffs.dtb"},
+        ],
+        "dtbo_list": [
+            {
+                "name": "cliffs-rumi-overlay.dtbo",
+                "apq": False,
+            },
+        ],
     },
     "pineapple-tuivm": {
         "dtb_list": [
