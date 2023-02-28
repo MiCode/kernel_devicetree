@@ -24,4 +24,4 @@
 | odin-r-oss | MIX 4 | Android R | LA.UM.9.14.r1-16700-LAHAINA.0 | [odin-r-oss](https://github.com/MiCode/kernel_devicetree/tree/odin-r-oss) |
 | zeus-s-oss | Mi 12, Mi 12 Pro | Android S | LA.VENDOR.1.0.r1-09100-r1.0.r1 | [zeus-s-oss](https://github.com/MiCode/kernel_devicetree/tree/zeus-s-oss) |
 | zijin-s-oss | Xiaomi Civi 1S | Android S | LA.UM.9.14.r1-18300.05-LAHAINA.QSSI12.0-1 | [zijin-s-oss](https://github.com/MiCode/kernel_devicetree/tree/zijin-s-oss) |
-| ziyi-s-oss | Xiaomi Civi s | Android S | LA.VENDOR.1.0.r1-13100-r1.0.r1_00037.0 | [ziyi-s-oss](https://github.com/MiCode/kernel_devicetree/tree/ziyi-s-oss) |
+| ziyi-s-oss | Xiaomi civi2 | Android S | LA.VENDOR.1.0.r1-13100-r1.0.r1_00037.0 | [ziyi-s-oss](https://github.com/MiCode/kernel_devicetree/tree/ziyi-s-oss) |
