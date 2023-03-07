@@ -1,0 +1,59 @@
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/net/qrtr-genpool.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: QRTR Genpool FIFO Transport Configuration
+
+maintainers:
+  - Tony Truong <truong@quicinc.com>
+
+description: |
+  Configuration properties for the QRTR Genpool FIFO Transport. This
+  configuration is to instantiate a transport for IPC Router protocol
+  communication between Virtual Machine and Digital Signal Processor subsystem.
+
+properties:
+  compatible:
+    const: qcom,qrtr-genpool
+
+  gen-pool:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    maxItems: 1
+    description:
+      Phandle reference to a client which has a dedicated memory region for
+      sharing between Virtual Machine and Digital Signal Processor subsystem.
+
+  interrupts:
+    description: |
+      IRQs for setting up and transferring data from and to an edge.
+    items:
+      - description: IRQ from an edge to check if FIFO and memory is setup
+      - description: IRQ from an edge informing there is data to consume
+
+  mboxes:
+    description: |
+      List of phandles to mailbox channels used for setting up and transferring
+      data from and to an edge.
+    items:
+      - description: mailbox for signaling an edge that FIFO and memory is setup
+      - description: mailbox for signaling an edge there is data to consume
+
+required:
+  -compatible
+  -gen-pool
+  -interrupt-parent
+  -interrupts
+  -mboxes
+
+examples:
+  - |
+    qrtr-genpool {
+        compatible = "qcom,qrtr-genpool";
+        gen-pool = <&fastrpc_compute_cb1>;
+        interrupt-parent = <&ipcc_mproc_ns1>;
+        interrupts = <IPCC_CLIENT_CDSP 0 IRQ_TYPE_EDGE_RISING>,
+                <IPCC_CLIENT_CDSP 1 IRQ_TYPE_EDGE_RISING>;
+        mboxes = <&ipcc_mproc_ns1 IPCC_CLIENT_CDSP 0>,
+                <&ipcc_mproc_ns1 IPCC_CLIENT_CDSP 1>;
+    };
