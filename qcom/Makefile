@@ -382,8 +382,8 @@ kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
                  kalama-vm-mtp.dtb \
                  kalama-vm-cdp.dtb \
                  kalama-vm-qrd.dtb \
-                 kalamap-vm-hdk.dtb \
-                 kalamap-vm-hhg.dtb \
+                 kalama-vm-hdk.dtb \
+                 kalama-vm-hhg.dtb \
                  kalama-oemvm-cdp.dtb \
                  kalama-oemvm-mtp.dtb \
                  kalama-oemvm-qrd.dtb \
