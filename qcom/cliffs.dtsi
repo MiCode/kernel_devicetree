@@ -9,6 +9,8 @@
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,cliffs.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Cliffs";
@@ -411,6 +413,10 @@
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 1>;
 			};
+
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+			};
 		};
 	};
 
@@ -468,6 +474,11 @@
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 0>;
 			};
+
+			cam_bcm_voter0: bcm_voter {
+				compatible = "qcom,bcm-voter";
+				qcom,no-amc;
+			};
 		};
 
 		cam_rsc_drv1: drv@1 {
@@ -488,6 +499,11 @@
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 0>;
 			};
+
+			cam_bcm_voter1: bcm_voter {
+				compatible = "qcom,bcm-voter";
+				qcom,no-amc;
+			};
 		};
 
 		cam_rsc_drv2: drv@2 {
@@ -507,6 +523,11 @@
 						  <SLEEP_TCS     1>,
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 0>;
+			};
+
+			cam_bcm_voter2: bcm_voter {
+				compatible = "qcom,bcm-voter";
+				qcom,no-amc;
 			};
 		};
 	};
@@ -542,6 +563,11 @@
 						  <WAKE_TCS      1>,
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 0>;
+			};
+
+			disp_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+				qcom,tcs-wait = <QCOM_ICC_TAG_AMC>;
 			};
 		};
 	};
@@ -1120,6 +1146,128 @@
 		reset-names = "rst";
 
 		status = "disabled";
+	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,cliffs-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,cliffs-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	aggre1_noc: interconnect@16E0000 {
+		compatible = "qcom,cliffs-aggre1_noc";
+		reg = <0x016E0000 0x19180>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	aggre2_noc: interconnect@1700000 {
+		compatible = "qcom,cliffs-aggre2_noc";
+		reg = <0x01700000 0x1E500>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	cnoc_cfg: interconnect@1600000 {
+		compatible = "qcom,cliffs-cnoc_cfg";
+		reg = <0x01600000 0x6900>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	cnoc_main: interconnect@1500000 {
+		compatible = "qcom,cliffs-cnoc_main";
+		reg = <0x01500000 0x14400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gem_noc: interconnect@24100000 {
+		compatible = "qcom,cliffs-gem_noc";
+		reg = <0x24100000 0xC3080>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	lpass_ag_noc: interconnect@7E40000 {
+		compatible = "qcom,cliffs-lpass_ag_noc";
+		reg = <0x07E40000 0xE080>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	lpass_lpiaon_noc: interconnect@7400000 {
+		compatible = "qcom,cliffs-lpass_lpiaon_noc";
+		reg = <0x07400000 0x19080>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	lpass_lpicx_noc: interconnect@7430000 {
+		compatible = "qcom,cliffs-lpass_lpicx_noc";
+		reg = <0x07430000 0x3A200>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mmss_noc: interconnect@1400000 {
+		compatible = "qcom,cliffs-mmss_noc";
+		reg = <0x1400000 0xDC000>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	nsp_noc: interconnect@320C0000 {
+		compatible = "qcom,cliffs-nsp_noc";
+		reg = <0x320C0000 0xE080>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	pcie_anoc: interconnect@16C0000 {
+		compatible = "qcom,cliffs-pcie_anoc";
+		reg = <0x016C0000 0x12400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@1680000 {
+		compatible = "qcom,cliffs-system_noc";
+		reg = <0x01680000 0x40000>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 };
 
