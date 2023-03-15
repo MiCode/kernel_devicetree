@@ -1,6 +1,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
-#include "kona-pmic-overlay.dtsi"
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
 
 &vendor {
 	kona_qrd_batterydata: qcom,battery-data {
@@ -186,6 +187,37 @@
 		qcom,wf-play-rate-us = <5882>;
 		qcom,wf-vmax-mv = <1697>;
 	};
+};
+
+&qupv3_se15_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+
+	#include "smb1390.dtsi"
+};
+
+&smb1390 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&smb_stat_default>;
+	status = "ok";
+};
+
+&smb1390_charger {
+	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>;
+	io-channel-names = "cp_die_temp";
+	qcom,parallel-output-mode = <2>;
+	qcom,min-ilim-ua = <750000>;
+	qcom,parallel-input-mode = <1>;
+	status = "ok";
+};
+
+&smb1390_slave {
+	status = "ok";
+};
+
+&smb1390_slave_charger {
+	status = "ok";
 };
 
 &pm8150b_charger {
