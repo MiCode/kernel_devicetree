@@ -19,7 +19,7 @@
 
 
 	chosen: chosen {
-			bootargs = "cpufreq.default_governor=performance msm_rtb.filter=0x237 ftrace_dump_on_oops";
+			bootargs = "cpufreq.default_governor=performance msm_rtb.filter=0x237 ftrace_dump_on_oops lpm_levels.sleep_disabled=1";
 	};
 
 	aliases {
@@ -509,6 +509,7 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+		qcom,gpios-reserved = <28 29>;
 	};
 
 	eud: qcom,msm-eud@88e0000 {
@@ -1193,8 +1194,12 @@
 		qcom,ecpricc = <&ecpricc>;
 		qcom,apsscc = <&apsscc>;
 		qcom,mccc = <&mccc>;
-		clock-names = "xo_clk_src";
-		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&ecpricc 0>,
+			 <&gcc 0>;
+		clock-names = "xo_clk_src",
+			      "ecpricc",
+			      "gcc";
 		#clock-cells = <1>;
 	};
 

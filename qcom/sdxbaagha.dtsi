@@ -29,6 +29,7 @@
 	};
 
 	memory { device_type = "memory"; reg = <0 0>; };
+	firmware: firmware { };
 
 	reserved_memory: reserved-memory {
 		#address-cells = <1>;
@@ -136,6 +137,21 @@
 			linux,cma-default;
 		};
 
+		qseecom_mem: qseecom_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x00000000 0xffffffff>;
+			reusable;
+			alignment = <0x400000>;
+			size = <0x800000>;
+		};
+
+		qseecom_ta_mem: qseecom_ta_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x00000000 0xffffffff>;
+			reusable;
+			alignment = <0x400000>;
+			size = <0x400000>;
+		};
 	};
 
 	cpus {
@@ -509,7 +525,6 @@
 	clk_virt: interconnect@0 {
 		compatible = "qcom,sdxbaagha-clk_virt";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -517,7 +532,6 @@
 	mc_virt: interconnect@1 {
 		compatible = "qcom,sdxbaagha-mc_virt";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -526,7 +540,6 @@
 		reg = <0x1640000 0x33400>;
 		compatible = "qcom,sdxbaagha-aggre_noc";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -535,7 +548,6 @@
 		reg = <0x01580000 0x19200>;
 		compatible = "qcom,sdxbaagha-cnoc_main";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -544,7 +556,6 @@
 		reg = <0x190E0000 0x5080>;
 		compatible = "qcom,sdxbaagha-dc_noc";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -553,7 +564,6 @@
 		reg = <0x19100000 0x2D080>;
 		compatible = "qcom,sdxbaagha-mem_noc";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -562,7 +572,6 @@
 		reg = <0x16C0000 0x16400>;
 		compatible = "qcom,sdxbaagha-pcie_anoc";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -571,7 +580,6 @@
 		reg = <0x15C0000 0x14080>;
 		compatible = "qcom,sdxbaagha-system_noc";
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -753,6 +761,11 @@
 		status = "disabled";
 	};
 
+	qcom_tzlog: tz-log@14693720 {
+		compatible = "qcom,tz-log";
+		reg = <0x14693720 0x3000>;
+	};
+
 	spmi_bus: qcom,spmi@c42d000 {
 		compatible = "qcom,spmi-pmic-arb";
 		reg = <0xc42d000 0x4000>,
@@ -794,6 +807,17 @@
 	};
 
 	thermal_zones: thermal-zones {
+	};
+};
+
+&firmware {
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+	};
+
+	qcom_smcinvoke {
+		compatible = "qcom,smcinvoke";
+		qcom,support-legacy_smc;
 	};
 };
 

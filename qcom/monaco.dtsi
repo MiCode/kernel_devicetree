@@ -1010,7 +1010,7 @@
 		memory-region = <&pil_adsp_mem>;
 
 		/* Inputs from lpass */
-		interrupts-extended = <&intc 0 282 IRQ_TYPE_LEVEL_HIGH>,
+		interrupts-extended = <&intc 0 282 IRQ_TYPE_EDGE_RISING>,
 				      <&adsp_smp2p_in 0 0>,
 				      <&adsp_smp2p_in 2 0>,
 				      <&adsp_smp2p_in 1 0>,
@@ -1604,6 +1604,23 @@
 			qcom,glinkpkt-ch-name = "slate_bt_app";
 			qcom,glinkpkt-dev-name = "glink_pkt_slate_bt_app";
 		};
+
+		qcom,glinkpkt-slate-dfu {
+			qcom,glinkpkt-edge = "slate";
+			qcom,glinkpkt-ch-name = "slate-dfu";
+			qcom,glinkpkt-dev-name = "glink_pkt_slate_dfu";
+		};
+		qcom,glinkpkt-ss-bt-ctrl {
+			qcom,glinkpkt-edge = "slate";
+			qcom,glinkpkt-ch-name = "ss_bt_ctrl";
+			qcom,glinkpkt-dev-name = "glink_pkt_ss_bt_ctrl";
+			};
+
+		qcom,glinkpkt-ss-bt-data {
+			qcom,glinkpkt-edge = "slate";
+			qcom,glinkpkt-ch-name = "ss_bt_data";
+			qcom,glinkpkt-dev-name = "glink_pkt_ss_bt_data";
+			};
 	};
 
 	jtag_mm0: jtagmm@9040000 {
@@ -1958,6 +1975,8 @@
 
 	qcom,power-state {
 		compatible = "qcom,power-state";
+		qcom,subsys-name = "adsp", "modem";
+		qcom,rproc-handle = <&adsp_pas>, <&modem_pas>;
 	};
 
 	slimbam: bamdma@A584000 {

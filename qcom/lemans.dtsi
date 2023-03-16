@@ -24,7 +24,9 @@
 
 	reserved_memory: reserved-memory { };
 
-	chosen: chosen { };
+	chosen: chosen {
+		bootargs = "qcom_dma_heaps.enable_bitstream_contig_heap=y";
+	};
 
 	aliases {
 		serial0 = &qupv3_se10_2uart;
@@ -56,6 +58,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 0 4>;
 			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -82,6 +85,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 0 4>;
 			next-level-cache = <&L2_1>;
+			#cooling-cells = <2>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -102,6 +106,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 0 4>;
 			next-level-cache = <&L2_2>;
+			#cooling-cells = <2>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -122,6 +127,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 0 4>;
 			next-level-cache = <&L2_3>;
+			#cooling-cells = <2>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -142,6 +148,7 @@
 			cpu-release-addr = <0x0 0x90000000>;
 			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			next-level-cache = <&L2_4>;
+			#cooling-cells = <2>;
 			L2_4: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -168,6 +175,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			next-level-cache = <&L2_5>;
+			#cooling-cells = <2>;
 			L2_5: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -188,6 +196,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			next-level-cache = <&L2_6>;
+			#cooling-cells = <2>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -208,6 +217,7 @@
 			cache-size = <0x20000>;
 			qcom,freq-domain = <&cpufreq_hw 1 4>;
 			next-level-cache = <&L2_7>;
+			#cooling-cells = <2>;
 			L2_7: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -852,6 +862,16 @@
 	qcom,secure-buffer {
 		compatible = "qcom,secure-buffer";
 		qcom,vmid-cp-camera-preview-ro;
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
 	};
 
 	wdog: qcom,wdt@17c10000 {
@@ -2555,6 +2575,12 @@
 	};
 };
 
+&firmware {
+	qcom_smcinvoke {
+		compatible = "qcom,smcinvoke";
+	};
+};
+
 #include "lemans-4pmic-regulators.dtsi"
 #include "lemans-gdsc.dtsi"
 #include "lemans-pinctrl.dtsi"
@@ -2785,3 +2811,5 @@
 &qupv3_se10_2uart {
 	status = "ok";
 };
+
+#include "lemans-thermal.dtsi"

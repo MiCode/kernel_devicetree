@@ -24,6 +24,8 @@
 		compatible = "qcom,slate-daemon";
 		qcom,firmware-name = "slatefw.mdt";
 		qcom,rproc-handle = <&aon_pas>;
+		/* GPIO for external flash */
+		qcom,platform-reset-gpio = <&pm5100_gpios 15 0>;
 	};
 
 	glink_slatecom:qcom,glink-slatecom-xprt-slate {
@@ -50,6 +52,10 @@
 			qcom,intents = <0x0C 1>;
 		};
 
+		qcom,glink-slate-dfu {
+			qcom,glink-channels = "slate-dfu";
+			qcom,intents = <0x24 1>;
+		};
 
 		qcom,glinkpkt-slate-ssc-hal {
 			qcom,glink-channels = "ssc_hal";
@@ -164,6 +170,17 @@
 			qcom,intents = <0x2710 2
 					0x3E8  2>;
 		};
+
+		qcom,glink-ss-bt-ctrl {
+			qcom,glink-channels = "ss_bt_ctrl";
+			qcom,intents = <0x500 10>;
+		};
+
+		qcom,glink-ss-bt-data {
+			qcom,glink-channels = "ss_bt_data";
+			qcom,intents = <0x1000 10>;
+		};
+
 	};
 
 	qcom,slatecom-rpmsg {

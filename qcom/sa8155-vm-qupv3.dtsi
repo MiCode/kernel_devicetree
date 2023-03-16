@@ -21,7 +21,37 @@
 	 * Qup2 4: SE 18
 	 * Qup2 5: SE 19
 	 */
+	/* QUPv3_0 wrapper instance */
+	qupv3_0: qcom,qupv3_0_geni_se@8c0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0x8c0000 0x6000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
+		iommus = <&apps_smmu 0xc3 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		status = "ok";
 
+		/* I2C instance for SDR Card*/
+		qupv3_se2_i2c: i2c@888000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0x888000 0x4000>;
+			interrupts = <GIC_SPI 603 IRQ_TYPE_LEVEL_HIGH>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP0_S2_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se2_i2c_active>;
+			pinctrl-1 = <&qupv3_se2_i2c_sleep>;
+			status = "disabled";
+		};
+	};
 	/* QUPv3_1  wrapper  instance */
 	qupv3_1: qcom,qupv3_1_geni_se@ac0000 {
 		compatible = "qcom,geni-se-qup";
@@ -104,5 +134,6 @@
 			pinctrl-1 = <&qupv3_se19_i2c_sleep>;
 			status = "disabled";
 		};
+
 	};
 };

@@ -133,18 +133,20 @@ bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
 bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(bengal-dtb-y)
 
-KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb
+KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb qrb3165-iot.dtb qrb3165n-iot.dtb
 
 KONA_BOARDS += \
                  kona-iot-v2.1-rb5-overlay.dtbo \
                  kona-iot-v2-rb5-overlay.dtbo \
                  kona-hdk-overlay.dtbo \
                  kona-rb5-HDMI-overlay.dtbo \
-                 kona-iot-v2.1-vc-overlay.dtbo
+                 kona-iot-v2.1-vc-overlay.dtbo \
+		 kona-rb5-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
         $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB))
 kona-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
+kona_le-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
 dtb-y += $(kona-dtb-y)
 
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
@@ -327,6 +329,14 @@ DIREWOLF_LA_GVM_BASE_DTB += direwolf-vm-la.dtb
 DIREWOLF_LA_GVM_BOARDS += \
                    direwolf-vm-la-overlay.dtbo
 
+DIREWOLF_MULTI_GVM_BASE_DTB += \
+		direwolf-vm-la-mt.dtb \
+		direwolf-vm-lv-mt.dtb
+
+DIREWOLF_MULTI_GVM_BOARDS += \
+		direwolf-vm-la-mt-overlay.dtbo \
+		direwolf-vm-lv-mt-overlay.dtbo
+
 SA8195_LA_GVM_BASE_DTB += sa8195-vm-la.dtb
 
 SA8195_LA_GVM_BOARDS += \
@@ -344,12 +354,14 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_LV_GVM_BOARDS),$(LEMANS_LV_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB)) \
-	$(call add-overlays, $(DIREWOLF_LV_GVM_HEADLESS_BOARDS),$(DIREWOLF_LV_GVM_HEADLESS_BASE_DTB))
+	$(call add-overlays, $(DIREWOLF_LV_GVM_HEADLESS_BOARDS),$(DIREWOLF_LV_GVM_HEADLESS_BASE_DTB)) \
+	$(call add-overlays, $(DIREWOLF_MULTI_GVM_BOARDS),$(DIREWOLF_MULTI_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(DIREWOLF_LV_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_BASE_DTB) \
 	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) $(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
-	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB) $(LEMANS_LV_GVM_BOARDS) $(LEMANS_LV_GVM_BASE_DTB) $(DIREWOLF_LV_GVM_HEADLESS_BOARDS) $(DIREWOLF_LV_GVM_HEADLESS_BASE_DTB)
+	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB) $(LEMANS_LV_GVM_BOARDS) $(LEMANS_LV_GVM_BASE_DTB) \
+	$(DIREWOLF_LV_GVM_HEADLESS_BOARDS) $(DIREWOLF_LV_GVM_HEADLESS_BASE_DTB) $(DIREWOLF_MULTI_GVM_BOARDS) $(DIREWOLF_MULTI_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 
