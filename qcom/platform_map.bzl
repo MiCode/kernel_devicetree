@@ -1,4 +1,14 @@
 _platform_map = {
+    "autogvm": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "direwolf-vm-la.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name":"direwolf-vm-la-overlay.dtbo"},
+        ],
+    },
     "kalama": {
         "dtb_list": [
             {"name": "kalama.dtb"},
