@@ -44,9 +44,14 @@ Child Node Supported Properties:
 	Value type: <u32>
 	Definition: Bus ID. In SPMI bus subnode, it is the physical SPMI bus
 		    ID in the system, and the allowed range is [0, 7].
+
 		    In I2C bus subnode, it is the I2C bus instance ID (indexed
 		    from 1) in the remote subsystem along with adding an offset
 		    0x100, and the allowed range is [0x101, 0x1ff].
+
+		    For SPMI-bridge bus which relies on the brain PMIC for
+		    the real SPMI bus transaction, the bus ID is specified
+		    with an offset of 0x200.
 
 Example:
 
@@ -70,6 +75,12 @@ Example:
 			i2c@107 {
 				reg = <0x107>;
 				qcom,bus-type = "i2c";
+			};
+
+			/* SPMI-bridge bus 0 */
+			spmi@200 {
+				reg = <0x200>;
+				qcom,bus-type = "spmi";
 			};
 		};
 	};

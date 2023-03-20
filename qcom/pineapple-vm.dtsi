@@ -1,5 +1,7 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-pineapple.h>
+#include <dt-bindings/arm/msm/qti-smmu-proxy-dt-ids.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
 
 / {
 	#address-cells = <0x2>;
@@ -90,14 +92,15 @@
 		vendor = "QTI";
 		image-name = "qcom,trustedvm";
 		qcom,pasid = <0x0 0x1c>;
-		qcom,qtee-config-info = "p=39,77,78,7C,8F,97,C8,11B,159,199,47E,7F1;";
+		qcom,qtee-config-info = "p=3,39,77,78,7C,8F,97,C8,FE,11B,159,199,47E,7F1;";
 		qcom,secdomain-ids = <45>;
 		qcom,primary-vm-index = <0>;
 		vm-uri = "vmuid/trusted-ui";
 		vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
 		qcom,sensitive;
 
-		iomemory-ranges = <0x0 0xa20000 0x0 0xa20000 0x0 0x4000 0x0
+		iomemory-ranges = <0x0 0x409000 0x0 0x409000 0x0 0x1000 0x0
+				0x0 0xa20000 0x0 0xa20000 0x0 0x4000 0x0
 				0x0 0xa24000 0x0 0xa24000 0x0 0x4000 0x0
 				0x0 0xc400000 0x0 0xc400000 0x0 0x3000 0x1
 				0x0 0xc42d000 0x0 0xc42d000 0x0 0x4000 0x1
@@ -108,10 +111,11 @@
 		/* For LEVM pored usecases is SE4 and SE7, for SE4 we used gpii4
 		 * and irq no is 315, for SE7 we used gpii5 and irq no is 316.
 		 */
-		gic-irq-ranges = <315 315
+		gic-irq-ranges = <101 101
+				  315 315
 				  316 316>; /* PVM->SVM IRQ transfer */
 
-		vm-attrs = "crash-fatal";
+		vm-attrs = "crash-fatal", "context-dump";
 
 		memory {
 			#address-cells = <0x2>;
@@ -141,6 +145,13 @@
 
 		vdevices {
 			generate = "/hypervisor";
+
+			minidump {
+				vdevice-type = "minidump";
+				push-compatible = "qcom,minidump_rm";
+				minidump_allowed;
+			};
+
 			rm-rpc {
 				vdevice-type = "rm-rpc";
 				generate = "/hypervisor/qcom,resource-mgr";
@@ -252,6 +263,15 @@
 					qcom,label = <0x3>;
 					allocate-base;
 				};
+			};
+
+			msgqsock-msgq {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/msgqsock-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				peer = "vm-name:qcom,oemvm";
+				qcom,label = <0x3>;
 			};
 
 			test-dbl {
@@ -401,6 +421,15 @@
 		      <0x17180000 0x100000>;    /* GICR * 8 */
 	};
 
+	ipcc_mproc_ns1: qcom,ipcc@409000 {
+		compatible = "qcom,ipcc";
+		reg = <0x409000 0x1000>;
+		interrupts = <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+	};
+
 	arch_timer: timer {
 		compatible = "arm,armv8-timer";
 		always-on;
@@ -522,6 +551,12 @@
 		gunyah-label = <3>;
 	};
 
+	qmsgq-gunyah {
+		compatible = "qcom,qmsgq-gh";
+		qcom,master;
+		msgq-label = <3>;
+	};
+
 	qcom,test-dbl {
 		compatible = "qcom,gh-dbl";
 		qcom,label = <0x4>;
@@ -556,6 +591,29 @@
 		compatible = "smmu-proxy-receiver";
 	};
 
+	qti,smmu-proxy-camera-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_CAMERA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x810 0x1020>,
+			 <&apps_smmu 0x850 0x0>,
+			 <&apps_smmu 0x18F0 0x0>;
+	};
+
+	qti,smmu-proxy-display-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_DISPLAY_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x1c01 0x0>;
+	};
+
+	qti,smmu-proxy-eva-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_EVA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x1927 0x0>;
+	};
+
 	qcom_smcinvoke {
 		compatible = "qcom,smcinvoke";
 	};
@@ -571,6 +629,10 @@
 		/* Must be memory_block_size_bytes() aligned */
 		reg = <0x60000000 0x10000000>;
 		qcom,block-size = <0x400000>;
+	};
+
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
 	};
 };
 

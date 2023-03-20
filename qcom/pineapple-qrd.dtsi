@@ -135,6 +135,20 @@
 			qcom,can-sleep;
 		};
 	};
+
+	/* SPMI bridge bus 0 with SMB1510 device */
+	spmi@200 {
+		reg = <0x200>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,bus-type = "spmi";
+
+		qcom,smb1510@d {
+			compatible = "qcom,spmi-pmic";
+			reg = <0xd SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
 };
 
 &pmic_glink_adc {
@@ -303,11 +317,18 @@
 		qcom,wf-vmax-mv = <1800>;
 		qcom,wf-pattern-period-us = <5880>;
 	};
+
+	primitive_8 {
+		/* LOW_TICK */
+		qcom,wf-vmax-mv = <1800>;
+		qcom,wf-pattern-period-us = <5880>;
+	};
 };
 
 &battery_charger {
 	qcom,wireless-fw-name = "idt9418.bin";
 	qcom,thermal-mitigation-step = <500000>;
+	#cooling-cells = <2>;
 };
 
 &eusb2_phy0 {
@@ -365,12 +386,12 @@
 				/* Parameters for USB */
 				0x4 0x4 0x4 0x4
 				/* Parameters for DP */
-				0x6 0x4 0x4 0x6>;
+				0x4 0x6 0x6 0x4>;
 		flat-gain = /bits/ 8 <
 				/* Parameters for USB */
 				0x3 0x1 0x1 0x3
 				/* Parameters for DP */
-				0x2 0x1 0x1 0x2>;
+				0x0 0x3 0x3 0x0>;
 		output-comp = /bits/ 8 <
 				/* Parameters for USB */
 				0x3 0x3 0x3 0x3

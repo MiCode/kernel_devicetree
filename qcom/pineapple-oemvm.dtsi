@@ -80,7 +80,7 @@
 		qcom,primary-vm-index = <0>;
 		vm-uri = "vmuid/oemvm";
 		vm-guid = "847bfe26-0b12-5728-812a-06103f6bdec0";
-		vm-attrs = "crash-fatal";
+		vm-attrs = "crash-fatal", "context-dump";
 
 		memory {
 			#address-cells = <0x2>;
@@ -110,6 +110,13 @@
 
 		vdevices {
 			generate = "/hypervisor";
+
+			minidump {
+				vdevice-type = "minidump";
+				push-compatible = "qcom,minidump_rm";
+				minidump_allowed;
+			};
+
 			rm-rpc {
 				vdevice-type = "rm-rpc";
 				generate = "/hypervisor/qcom,resource-mgr";
@@ -147,6 +154,15 @@
 				};
 			};
 
+			msgqsock-msgq-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/msgqsock-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				peer = "vm-name:qcom,trustedvm";
+				qcom,label = <0x3>;
+			};
+
 			test-dbl {
 				vdevice-type = "doorbell";
 				generate = "/hypervisor/test-dbl";
@@ -159,6 +175,17 @@
 				generate = "/hypervisor/test-dbl-source";
 				qcom,label = <0x5>;
 				peer-default;
+			};
+
+			qrtr-shm {
+				vdevice-type = "shm-doorbell";
+				generate = "/hypervisor/qrtr-shm";
+				push-compatible = "qcom,qrtr-gunyah-gen";
+				peer-default;
+				memory {
+					qcom,label = <0x8>;
+					allocate-base;
+				};
 			};
 		};
 	};
@@ -223,4 +250,22 @@
 		qcom,label = <0x5>;
 	};
 
+	qcom,qrtr {
+		compatible = "qcom,qrtr";
+		qcom,node-id = <21>;
+	};
+
+	qrtr-gunyah {
+		compatible = "qcom,qrtr-gunyah";
+		gunyah-label = <8>;
+	};
+
+	qmsgq-gunyah {
+		compatible = "qcom,qmsgq-gh";
+		msgq-label = <3>;
+	};
+
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
+	};
 };
