@@ -1,9 +1,31 @@
+&pm5100_adc {
+	pm5100_pa_therm_0 {
+		reg = <PM5100_ADC5_GEN3_AMUX5_THM_100K_PU>;
+	};
+
+	pm5100_quiet_therm {
+		status = "disabled";
+	};
+
+	pm5100_cam_therm {
+		reg = <PM5100_ADC5_GEN3_AMUX4_THM_100K_PU>;
+		label = "pm5100_cam_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+};
+
 &thermal_zones {
 	quiet-therm {
 		status = "disabled";
 	};
 
 	pa-therm0 {
+		polling-delay-passive = <1000>;
+		polling-delay = <0>;
+		thermal-sensors = <&pm5100_adc PM5100_ADC5_GEN3_AMUX5_THM_100K_PU>;
 		trips {
 			pa_bat_trip0: pa-bat-trip0 {
 				temperature = <42000>;
@@ -83,6 +105,9 @@
 	};
 
 	cam-therm {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pm5100_adc PM5100_ADC5_GEN3_AMUX4_THM_100K_PU>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
