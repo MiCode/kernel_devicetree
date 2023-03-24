@@ -69,6 +69,7 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
 				pineapple-oemvm-qrd.dtb \
 				pineapple-oemvm-rumi.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
+
 endif
 endif
 
@@ -85,6 +86,19 @@ kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
 dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
+
+DIREWOLF_LA_GVM_BASE_DTB += direwolf-vm-la.dtb
+
+DIREWOLF_LA_GVM_BOARDS += \
+                   direwolf-vm-la-overlay.dtbo
+
+autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
+
+autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
+
+dtb-y += $(autogvm-dtb-y)
 
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
