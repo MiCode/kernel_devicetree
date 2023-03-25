@@ -9,6 +9,22 @@ _platform_map = {
             {"name":"direwolf-vm-la-overlay.dtbo"},
         ],
     },
+    "gen3auto": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "sa8155.dtb"},
+            {"name": "sa8155p.dtb"},
+            {"name": "sa8155-v2.dtb"},
+            {"name": "sa8155p-v2.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name": "sa8155-adp-air-overlay.dtbo"},
+            {"name": "sa8155-adp-star-overlay.dtbo"},
+            {"name": "sa8155p-adp-air-overlay.dtbo"},
+            {"name": "sa8155p-adp-star-overlay.dtbo"},
+        ],
+    },
     "kalama": {
         "dtb_list": [
             {"name": "kalama.dtb"},
