@@ -4,12 +4,14 @@ _platform_map = {
             # keep sorted
             {"name": "direwolf-vm-la.dtb"},
             {"name": "lemans-vm-la.dtb"},
+            {"name": "sa8155-vm-la.dtb"},
             {"name": "sa8195-vm-la.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
             {"name":"direwolf-vm-la-overlay.dtbo"},
             {"name": "lemans-vm-la-overlay.dtbo"},
+            {"name": "sa8155-vm-la-overlay.dtbo"},
             {"name": "sa8195-vm-la-overlay.dtbo"},
         ],
     },
