@@ -224,6 +224,91 @@
 				<GIC_SPI 891 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+
+	pcie_smmu: pcie-smmu@0x15200000 {
+		compatible = "qcom,qsmmu-v500";
+		reg = <0x15200000 0x80000>,
+			<0x152F2000 0x28>;
+		reg-names = "base", "tcu-base";
+		#iommu-cells = <2>;
+		qcom,skip-init;
+		qcom,use-3-lvl-tables;
+		qcom,split-tables;
+		qcom,handoff-smrs = <0x0 0x7f>,<0x80 0x7f>,<0x440 0x0>;
+		#global-interrupts = <2>;
+		#size-cells = <1>;
+		#address-cells = <1>;
+		#tcu-testbus-version = <1>;
+		ranges;
+
+		interrupts =	<GIC_SPI 920 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 921 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 925 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 926 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 927 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 928 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 950 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 951 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 952 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 953 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 954 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 955 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 956 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 957 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 958 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 885 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 886 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 887 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 888 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 820 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 822 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 823 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 310 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 446 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 447 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 452 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 840 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 841 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 842 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 843 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 844 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 845 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 846 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 847 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 848 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 849 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 802 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 803 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 804 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 805 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 806 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 807 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 808 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 809 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 810 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 811 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 812 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 813 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 814 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 836 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 837 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 838 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 839 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 854 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 855 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 856 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 790 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 791 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 792 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 793 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 794 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 795 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 796 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 639 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 640 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
 	dma_dev@0x0 {
 		compatible = "qcom,iommu-dma";
 		memory-region = <&system_cma>;
@@ -298,6 +383,46 @@
 		startup-delay-us = <4000>;
 		enable-active-high;
 		gpio = <&pm8775_2_gpios 6 0>;
+	};
+
+	VDD_CX_LEVEL: S1A_LEVEL:
+		pm8775_a_s1_level: regulator-pm8775_a-s1-level {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "pm8775_a_s1_level";
+		regulator-min-microvolt =
+				<RPMH_REGULATOR_LEVEL_RETENTION>;
+		regulator-max-microvolt =
+				<RPMH_REGULATOR_LEVEL_MAX>;
+	};
+
+	VDD_MXC_LEVEL: S5E_LEVEL:
+		pm8775_e_s5_level: regulator-pm8775_e-s5-level {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "pm8775_e_s5_level";
+		regulator-min-microvolt =
+			<RPMH_REGULATOR_LEVEL_RETENTION>;
+		regulator-max-microvolt =
+			<RPMH_REGULATOR_LEVEL_MAX>;
+	};
+
+	pcie_0_pipe_clk: pcie_0_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_0_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_1_pipe_clk: pcie_1_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_1_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	rpmh_cxo_clk: rpmh_cxo_clk {
+		compatible = "qcom,dummycc";
+		clock-output-names = "bi_tcxo";
+		#clock-cells = <0>;
 	};
 
 	/* PWR_CTR2_VDD_1P8 supply */
@@ -391,6 +516,7 @@
 #include "pm8775-vm.dtsi"
 #include "lemans-vm-qupv3.dtsi"
 #include "lemans-vm-usb.dtsi"
+#include "lemans-vm-pcie.dtsi"
 
 &pm8775_3_gpios {
 	usb201_vbus_boost {
@@ -435,3 +561,4 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb22_vbus_boost_default>;
 };
+
