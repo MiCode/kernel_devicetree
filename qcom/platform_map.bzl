@@ -128,6 +128,20 @@ _platform_map = {
             {"name": "pineapple-vm-rumi.dtb"},
         ],
     },
+    "blair": {
+        "dtb_list": [
+            {"name": "blair.dtb"},
+        ],
+        "dtbo_list": [
+            {"name": "blair-mtp-overlay.dtbo"},
+            {"name": "blair-qrd-overlay.dtbo"},
+            {"name": "blair-cdp-overlay.dtbo"},
+            {"name": "blair-atp-overlay.dtbo"},
+            {"name": "blair-mtp-usbc-overlay.dtbo"},
+            {"name": "blair-mtp-nopmi-overlay.dtbo"},
+            {"name": "blair-qrd-nopmi-overlay.dtbo"},
+        ],
+    },
 }
 
 def _get_dtb_lists(target, dt_overlay_supported):
