@@ -87,16 +87,30 @@ dtb-y += $(kalama_tuivm-dtb-y)
 endif
 endif
 
+LEMANS_LA_GVM_BASE_DTB += lemans-vm-la.dtb
+
+LEMANS_LA_GVM_BOARDS += \
+		lemans-vm-la-overlay.dtbo
+
 DIREWOLF_LA_GVM_BASE_DTB += direwolf-vm-la.dtb
 
 DIREWOLF_LA_GVM_BOARDS += \
                    direwolf-vm-la-overlay.dtbo
 
+SA8195_LA_GVM_BASE_DTB += sa8195-vm-la.dtb
+
+SA8195_LA_GVM_BOARDS += \
+                   sa8195-vm-la-overlay.dtbo
+
 autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
+	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) \
 	$(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
+	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 
