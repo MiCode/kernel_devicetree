@@ -2706,34 +2706,41 @@
 		shared-buffer = <&hwfence_shbuf>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@81f21000 {
-		reg = <0x81f21000 0x108000>;
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring {
+		size = <0x4000>;
+		gunyah-label = <0x11>;
+	};
+
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring {
+		size = <0x4000>;
+		gunyah-label = <0x10>;
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb {
+		size = <0x100000>;
+		gunyah-label = <0x12>;
+	};
+
+	trust_ui_vm: qcom,trust_ui_vm {
 		vm_name = "trustedvm";
+		shared-buffers-size = <0x108000>;
 		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
-	oem_vm: qcom,oem_vm@82029000 {
-		reg = <0x82029000 0x104000>;
+	oem_vm_vblk0_ring: oem_vm_vblk0_ring {
+		size = <0x4000>;
+		gunyah-label = <0x13>;
+	};
+
+	oem_vm_swiotlb: oem_vm_swiotlb {
+		size = <0x100000>;
+		gunyah-label = <0x14>;
+	};
+
+	oem_vm: qcom,oem_vm {
 		vm_name = "oemvm";
+		shared-buffers-size = <0x104000>;
 		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
-	};
-
-	qcom,virtio_backend@0 {
-		compatible = "qcom,virtio_backend";
-		qcom,vm = <&trust_ui_vm>;
-		qcom,label = <0x11>;
-	};
-
-	qcom,virtio_backend@1 {
-		compatible = "qcom,virtio_backend";
-		qcom,vm = <&trust_ui_vm>;
-		qcom,label = <0x10>;
-	};
-
-	qcom,virtio_backend@2 {
-		compatible = "qcom,virtio_backend";
-		qcom,vm = <&oem_vm>;
-		qcom,label = <0x13>;
 	};
 
 	trust_ui_vm_virt_be0: trust_ui_vm_virt_be0@11 {
@@ -2757,7 +2764,7 @@
 		qcom,pas-id = <28>;
 		qcom,vmid = <45>;
 		qcom,firmware-name = "trustedvm";
-		memory-region = <&trust_ui_vm_mem>;
+		memory-region = <&trust_ui_vm_mem &vm_comm_mem>;
 		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
 	};
 
@@ -2771,7 +2778,7 @@
 		qcom,pas-id = <34>;
 		qcom,vmid = <49>;
 		qcom,firmware-name = "oemvm";
-		memory-region = <&oem_vm_mem>;
+		memory-region = <&oem_vm_mem &vm_comm_mem>;
 		virtio-backends = <&oem_vm_virt_be0>;
 	};
 
@@ -3413,36 +3420,6 @@
 		reg = <0x0 0x81f00000 0x0 0x20000>;
 	};
 
-	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@81f21000 {
-		no-map;
-		reg = <0x0 0x81f21000 0x0 0x4000>;
-		gunyah-label = <0x11>;					//for persist.img
-	};
-
-	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@81f25000 {
-		no-map;
-		reg = <0x0 0x81f25000 0x0 0x4000>;
-		gunyah-label = <0x10>;					//for system.img
-	};
-
-	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@81f29000 {
-		no-map;
-		reg = <0x0 0x81f29000 0x0 0x100000>;
-		gunyah-label = <0x12>;
-	};
-
-	oem_vm_vblk0_ring: oem_vm_vblk0_ring@82029000 {
-		no-map;
-		reg = <0x0 0x82029000 0x0 0x4000>;
-		gunyah-label = <0x13>;
-	};
-
-	oem_vm_swiotlb: oem_vm_swiotlb@8202d000 {
-		no-map;
-		reg = <0x0 0x8202d000 0x0 0x100000>;
-		gunyah-label = <0x14>;
-	};
-
 	global_sync_mem: global_sync_region@82600000 {
 		no-map;
 		reg = <0x0 0x82600000 0x0 0x100000>;
@@ -3592,6 +3569,14 @@
 	hwfence_shbuf: hwfence-shmem {
 		no-map;
 		reg = <0x0 0xe6440000 0x0 0x2dd000>;
+	};
+
+	vm_comm_mem: vm_comm_mem_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x400000>;
 	};
 
 	trust_ui_vm_mem: trust_ui_vm_region@f3800000 {
