@@ -33,6 +33,16 @@ pineapple-dtb-$(CONFIG_ARCH_PINEAPPLE) += \
 	$(call add-overlays, $(PINEAPPLE_BOARDS) $(NOAPQ_PINEAPPLE_BOARDS),$(PINEAPPLE_BASE_DTB))\
 	$(call add-overlays, $(PINEAPPLE_BOARDS) $(APQ_PINEAPPLE_BOARDS),$(PINEAPPLE_APQ_BASE_DTB))
 pineapple-overlays-dtb-$(CONFIG_ARCH_PINEAPPLE) += $(PINEAPPLE_BOARDS) $(NOAPQ_PINEAPPLE_BOARDS) $(PINEAPPLE_BASE_DTB) $(PINEAPPLE_APQ_BASE_DTB)
+
+CLIFFS_BASE_DTB += cliffs.dtb
+
+NOAPQ_CLIFFS_BOARDS += \
+		 cliffs-rumi-overlay.dtbo
+
+pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
+	$(call add-overlays, $(NOAPQ_CLIFFS_BOARDS),$(CLIFFS_BASE_DTB))
+pineapple-overlays-dtb-$(CONFIG_ARCH_CLIFFS) += $(NOAPQ_CLIFFS_BOARDS) $(CLIFFS_BASE_DTB)
+
 dtb-y += $(pineapple-dtb-y)
 
 KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb
