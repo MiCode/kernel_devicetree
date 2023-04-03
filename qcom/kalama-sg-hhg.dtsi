@@ -117,6 +117,292 @@
 		 0x6 0x53>;
 };
 
+&qupv3_se10_i2c {
+	status = "ok";
+
+	adcl: adc@48 {
+		compatible = "aks,ti-ads1015";
+		reg = <0x48>;
+		ti,vdd-supply = <&L3N>;
+		regulator-name = "ti,vdd";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#io-channel-cells = <1>;
+
+		channel@4 {
+			reg = <4>;
+			ti,gain = <2>;
+			ti,datarate = <4>;
+		};
+
+		channel@5 {
+			reg = <5>;
+			ti,gain = <2>;
+			ti,datarate = <4>;
+		};
+
+		channel@6 {
+			reg = <6>;
+			ti,gain = <1>;
+			ti,datarate = <4>;
+		};
+	};
+};
+
+&qupv3_se11_i2c {
+	status = "ok";
+
+	adcr: adc@48 {
+		compatible = "aks,ti-ads1015";
+		reg = <0x48>;
+		ti,vdd-supply = <&L3N>;
+		regulator-name = "ti,vdd";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#io-channel-cells = <1>;
+
+		channel@4 {
+			reg = <4>;
+			ti,gain = <2>;
+			ti,datarate = <4>;
+		};
+
+		channel@5 {
+			reg = <5>;
+			ti,gain = <2>;
+			ti,datarate = <4>;
+		};
+
+		channel@6 {
+			reg = <6>;
+			ti,gain = <1>;
+			ti,datarate = <4>;
+		};
+	};
+};
+
+&soc {
+	aks_joystick_mt: aks_joystick_mt {
+		status = "ok";
+		compatible = "aks,joystick_mt";
+		label = "aks-joystick-mt";
+		pinctrl-names = "default","sleep";
+		pinctrl-0 = <&gpio_key_active>;
+		pinctrl-1 = <&gpio_key_suspend>;
+		io-channels = <&adcl 4>, <&adcl 5>, <&adcl 6>, <&adcr 4>, <&adcr 5>, <&adcr 6>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		btn_screen_cap {
+			label = "btn_screen_cap";
+			gpios = <&tlmm 0 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_SYSRQ>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_function {
+			label = "btn_function";
+			gpios = <&tlmm 14 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_FN>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_mode {
+			label = "btn_mode";
+			gpios = <&tlmm 15 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_MODE>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_l1 {
+			label = "btn_l1";
+			gpios = <&tlmm 40 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_TL>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_r1 {
+			label = "btn_r1";
+			gpios = <&tlmm 48 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_TR>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_l3 {
+			label = "btn_l3";
+			gpios = <&tlmm 59 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_THUMBL>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_r3 {
+			label = "btn_r3";
+			gpios = <&tlmm 60 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_THUMBR>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_a {
+			label = "btn_a";
+			gpios = <&tlmm 89 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_A>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_b {
+			label = "btn_b";
+			gpios = <&tlmm 119 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_B>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_x {
+			label = "btn_x";
+			gpios = <&tlmm 56 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_X>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_y {
+			label = "btn_y";
+			gpios = <&tlmm 137 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_Y>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_dpad_up {
+			label = "btn_dpad_up";
+			gpios = <&tlmm 62 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_DPAD_UP>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_dpad_down {
+			label = "btn_dpad_down";
+			gpios = <&tlmm 63 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_DPAD_DOWN>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_dpad_left {
+			label = "btn_dpad_left";
+			gpios = <&tlmm 73 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_DPAD_LEFT>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_dpad_right {
+			label = "btn_dpad_right";
+			gpios = <&tlmm 75 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_DPAD_RIGHT>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_home {
+			label = "btn_home";
+			gpios = <&tlmm 85 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_HOME>;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		btn_start {
+			label = "btn_start";
+			gpios = <&tlmm 87 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <BTN_START>;
+			debounce-interval = <15>;
+			linux,can-disable;
+
+		};
+
+		axis@0 {
+			reg = <0>;
+			index = <0>;
+			linux,code = <ABS_X>;
+			abs-range = <580 2040>;
+			abs-fuzz = <5>;
+			abs-flat = <5>;
+		};
+
+		axis@1 {
+			reg = <1>;
+			index = <1>;
+			linux,code = <ABS_Y>;
+			abs-range = <630 2040>;
+			abs-fuzz = <5>;
+			abs-flat = <5>;
+		};
+
+		axis@2 {
+			reg = <2>;
+			index = <2>;
+			linux,code = <ABS_BRAKE>;
+			abs-range = <539 810>;
+			abs-fuzz = <5>;
+			abs-flat = <5>;
+		};
+
+		axis@3 {
+			reg = <0>;
+			index = <3>;
+			linux,code = <ABS_Z>;
+			abs-range = <580 2040>;
+			abs-fuzz = <5>;
+			abs-flat = <5>;
+		};
+
+		axis@4 {
+			reg = <1>;
+			index = <4>;
+			linux,code = <ABS_RZ>;
+			abs-range = <630 2040>;
+			abs-fuzz = <5>;
+			abs-flat = <5>;
+		};
+
+		axis@5 {
+			reg = <2>;
+			index = <5>;
+			linux,code = <ABS_GAS>;
+			abs-range = <539 810>;
+			abs-fuzz = <5>;
+			abs-flat = <5>;
+		};
+	};
+};
+
 &pm8550_gpios {
 	pwr_en_gpio {
 		pwr_en_gpio_default: pwr_en_gpio_default {
