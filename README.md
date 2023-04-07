@@ -26,3 +26,4 @@
 | zijin-s-oss | Xiaomi Civi 1S | Android S | LA.UM.9.14.r1-18300.05-LAHAINA.QSSI12.0-1 | [zijin-s-oss](https://github.com/MiCode/kernel_devicetree/tree/zijin-s-oss) |
 | ziyi-s-oss | Xiaomi civi2 | Android S | LA.VENDOR.1.0.r1-13100-r1.0.r1_00037.0 | [ziyi-s-oss](https://github.com/MiCode/kernel_devicetree/tree/ziyi-s-oss) |
 | mayfly-s-oss | Xiaomi 12S | Android S | LA.VENDOR.1.0.r1-13100-r1.0.r1_00037.0 | [mayfly-s-oss](https://github.com/MiCode/kernel_devicetree/tree/mayfly-s-oss) |
+| fuxi-t-oss | Xiaomi 13 | Android T | LA.VENDOR.13.2.0.r1-07300-KAILUA.0 | [fuxi-t-oss](https://github.com/MiCode/kernel_devicetree/tree/fuxi-t-oss) |
