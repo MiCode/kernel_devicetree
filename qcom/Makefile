@@ -66,6 +66,22 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(APQ_KALAMA_BOARDS),$(KALAMA_APQ_BASE_DTB))
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
+
+BLAIR_BASE_DTB += blair.dtb
+
+BLAIR_BOARDS += \
+		 blair-mtp-overlay.dtbo \
+		 blair-qrd-overlay.dtbo \
+		 blair-cdp-overlay.dtbo \
+		 blair-atp-overlay.dtbo \
+		 blair-mtp-usbc-overlay.dtbo \
+		 blair-mtp-nopmi-overlay.dtbo \
+		 blair-qrd-nopmi-overlay.dtbo
+
+blair-dtb-$(CONFIG_ARCH_BLAIR) += \
+	$(call add-overlays, $(BLAIR_BOARDS),$(BLAIR_BASE_DTB))
+blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(BLAIR_BASE_DTB)
+dtb-y += $(blair-dtb-y)
 endif
 
 ifeq ($(CONFIG_ARCH_PINEAPPLE), y)
