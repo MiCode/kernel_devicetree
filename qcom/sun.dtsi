@@ -3,6 +3,15 @@
  * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/clock/qcom,camcc-sun.h>
+#include <dt-bindings/clock/qcom,dispcc-sun.h>
+#include <dt-bindings/clock/qcom,evacc-sun.h>
+#include <dt-bindings/clock/qcom,gcc-sun.h>
+#include <dt-bindings/clock/qcom,gpucc-sun.h>
+#include <dt-bindings/clock/qcom,gxclkctl-sun.h>
+#include <dt-bindings/clock/qcom,tcsrcc-sun.h>
+#include <dt-bindings/clock/qcom,videocc-sun.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 
 / {
@@ -241,6 +250,273 @@
 			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
 			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
 		clock-frequency = <19200000>;
+	};
+
+	clocks {
+		xo_board: xo_board {
+			compatible = "fixed-clock";
+			clock-frequency = <76800000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
+
+		sleep_clk: sleep_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32000>;
+			clock-output-names = "sleep_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_0_pipe_clk: pcie_0_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_0_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		ufs_phy_rx_symbol_0_clk: ufs_phy_rx_symbol_0_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "ufs_phy_rx_symbol_0_clk";
+			#clock-cells = <0>;
+		};
+
+		ufs_phy_rx_symbol_1_clk: ufs_phy_rx_symbol_1_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "ufs_phy_rx_symbol_1_clk";
+			#clock-cells = <0>;
+		};
+
+		ufs_phy_tx_symbol_0_clk: ufs_phy_tx_symbol_0_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "ufs_phy_tx_symbol_0_clk";
+			#clock-cells = <0>;
+		};
+
+		usb3_phy_wrapper_gcc_usb30_pipe_clk: usb3_phy_wrapper_gcc_usb30_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	cxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <4>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo";
+	};
+
+	cxo_a: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <4>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo_ao";
+	};
+
+	rpmhcc: clock-controller {
+		compatible = "fixed-clock";
+		clock-output-names = "rpmh_clocks";
+		clock-frequency = <19200000>;
+		#clock-cells = <1>;
+	};
+
+	cambistmclkcc: clock-controller@1760000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "cambistmclkcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	camcc: clock-controller@ade0000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "camcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	dispcc: clock-controller@af00000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "dispcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	evacc: clock-controller@abf0000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "evacc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gcc: clock-controller@100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gpucc: clock-controller@3d90000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gpucc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gxclkctl: clock-controller@3d64000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gxclkctl_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	tcsrcc: clock-controller@f100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "tcsrcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	videocc: clock-controller@aaf0000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "videocc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@16450000 {
+		compatible = "syscon";
+		reg = <0x16450000 0x3553000>;
+	};
+
+	mccc: syscon@240ba000 {
+		compatible = "syscon";
+		reg = <0x240ba000 0x800>;
+	};
+
+	/* CAM_CC GDSCs */
+	cam_cc_ipe_0_gdsc: qcom,gdsc@adf017c {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "cam_cc_ipe_0_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	cam_cc_ofe_gdsc: qcom,gdsc@adf00c8 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "cam_cc_ofe_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	cam_cc_tfe_0_gdsc: qcom,gdsc@adf1004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "cam_cc_tfe_0_gdsc";
+	};
+
+	cam_cc_tfe_1_gdsc: qcom,gdsc@adf1084 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "cam_cc_tfe_1_gdsc";
+	};
+
+	cam_cc_tfe_2_gdsc: qcom,gdsc@adf10ec {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "cam_cc_tfe_2_gdsc";
+	};
+
+	cam_cc_titan_top_gdsc: qcom,gdsc@adf134c {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "cam_cc_titan_top_gdsc";
+	};
+
+	/* DISP_CC GDSCs */
+	disp_cc_mdss_core_gdsc: qcom,gdsc@af09000 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "disp_cc_mdss_core_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	disp_cc_mdss_core_int2_gdsc: qcom,gdsc@af0b000 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "disp_cc_mdss_core_int2_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	/* EVA_CC GDSCs */
+	eva_cc_mvs0_gdsc: qcom,gdsc@abf8068 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "eva_cc_mvs0_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	eva_cc_mvs0c_gdsc: qcom,gdsc@abf8034 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "eva_cc_mvs0c_gdsc";
+	};
+
+	/* GCC GDSCs */
+	gcc_pcie_0_gdsc: qcom,gdsc@16b004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_pcie_0_gdsc";
+	};
+
+	gcc_pcie_0_phy_gdsc: qcom,gdsc@16c000 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_pcie_0_phy_gdsc";
+	};
+
+	gcc_ufs_mem_phy_gdsc: qcom,gdsc@19e000 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_ufs_mem_phy_gdsc";
+	};
+
+	gcc_ufs_phy_gdsc: qcom,gdsc@177004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_ufs_phy_gdsc";
+	};
+
+	gcc_usb30_prim_gdsc: qcom,gdsc@139004 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_usb30_prim_gdsc";
+	};
+
+	gcc_usb3_phy_gdsc: qcom,gdsc@150018 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gcc_usb3_phy_gdsc";
+	};
+
+	/* GPU_CC GDSCs */
+	gpu_cc_cx_gdsc_hw_ctrl: syscon@3d99094 {
+		compatible = "syscon";
+		reg = <0x3d99094 0x4>;
+	};
+
+	gpu_cc_cx_gdsc: qcom,gdsc@3d99080 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gpu_cc_cx_gdsc";
+	};
+
+	/* GX_CLKCTL GDSCs */
+	gx_clkctl_gx_gdsc: qcom,gdsc@3d68024 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "gx_clkctl_gx_gdsc";
+	};
+
+	/* VIDEO_CC GDSCs */
+	video_cc_mvs0_gdsc: qcom,gdsc@aaf8068 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "video_cc_mvs0_gdsc";
+		qcom,support-hw-trigger;
+	};
+
+	video_cc_mvs0c_gdsc: qcom,gdsc@aaf8034 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "video_cc_mvs0c_gdsc";
 	};
 };
 
