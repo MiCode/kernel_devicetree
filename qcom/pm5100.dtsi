@@ -141,8 +141,9 @@
 
 		pm5100_adc: vadc@8000 {
 			compatible = "qcom,spmi-adc5-gen3";
-			reg = <0x8000>, <0x8300>;
-			reg-names = "adc5-gen3-base", "adc5-gen3-debug-base";
+			reg = <0x8000>;
+			reg-names = "adc5-gen3-base";
+			qcom,debug-base = <0x8300>;
 			#address-cells = <1>;
 			#size-cells = <0>;
 			interrupts = <0x0 0x80 0x1 IRQ_TYPE_EDGE_RISING>;
@@ -546,6 +547,17 @@
 			primitive_7 {
 				/* LIGHT_TICK */
 				qcom,primitive-id = <7>;
+				qcom,wf-vmax-mv = <4800>;
+				qcom,wf-pattern-data =  <0x0ff  S_PERIOD_T_LRA  0>,
+							<0x07f  S_PERIOD_T_LRA  0>;
+				qcom,wf-pattern-period-us = <4167>;
+				qcom,wf-brake-pattern = /bits/ 8 <0x0 0x0 0x0>;
+				qcom,wf-auto-res-disable;
+			};
+
+			primitive_8 {
+				/* LOW_TICK */
+				qcom,primitive-id = <8>;
 				qcom,wf-vmax-mv = <4800>;
 				qcom,wf-pattern-data =  <0x0ff  S_PERIOD_T_LRA  0>,
 							<0x07f  S_PERIOD_T_LRA  0>;

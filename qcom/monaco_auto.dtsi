@@ -31,7 +31,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x0>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
@@ -50,7 +50,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x100>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_1>;
 			L2_1: l2-cache {
@@ -64,7 +64,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x200>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_2>;
 			L2_2: l2-cache {
@@ -78,7 +78,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x300>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_3>;
 			L2_3: l2-cache {
@@ -92,7 +92,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10000>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_4>;
 			L2_4: l2-cache {
@@ -111,7 +111,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10100>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_5>;
 			L2_5: l2-cache {
@@ -125,7 +125,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10200>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_6>;
 			L2_6: l2-cache {
@@ -139,7 +139,7 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x10300>;
-			enable-method = "spin-table";
+			enable-method = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			next-level-cache = <&L2_7>;
 			L2_7: l2-cache {
@@ -216,6 +216,18 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+	};
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	wdog: qcom,wdt@17c10000 {
+		compatible = "qcom,msm-watchdog";
+		reg = <0x17c10000 0x1000>;
+		reg-names = "wdt-base";
+		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
 	intc: interrupt-controller@17a00000 {
@@ -298,6 +310,12 @@
 			reg = <0x17c2d000 0x1000>;
 			status = "disabled";
 		};
+	};
+
+	cpu_pmu: cpu-pmu {
+		compatible = "arm,armv8-pmuv3";
+		qcom,irq-is-percpu;
+		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_LOW>;
 	};
 
 	tcsr_mutex_block: syscon@1f40000 {
@@ -420,3 +438,4 @@
 
 #include "monaco_auto-pinctrl.dtsi"
 #include "monaco_auto-stub-regulators.dtsi"
+#include "msm-arm-smmu-monaco_auto.dtsi"

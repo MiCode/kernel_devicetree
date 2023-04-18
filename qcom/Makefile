@@ -133,20 +133,26 @@ bengal-dtb-$(CONFIG_ARCH_KHAJE) += \
 bengal-overlays-dtb-$(CONFIG_ARCH_KHAJE) += $(KHAJE_BOARDS) $(KHAJE_BASE_DTB)
 dtb-y += $(bengal-dtb-y)
 
-KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb qrb3165-iot.dtb qrb3165n-iot.dtb
+KONA_BASE_DTB += kona-iot.dtb kona-iot-v2.dtb kona-iot-v2.1.dtb kona-7230-iot-v2.1.dtb
+KONA_LE_BASE_DTB += kona-7230-iot-v2.1.dtb qrb5165-iot.dtb qrb5165n-iot.dtb qrb3165-iot.dtb qrb3165n-iot.dtb
 
 KONA_BOARDS += \
-                 kona-iot-v2.1-rb5-overlay.dtbo \
-                 kona-iot-v2-rb5-overlay.dtbo \
                  kona-hdk-overlay.dtbo \
                  kona-rb5-HDMI-overlay.dtbo \
                  kona-iot-v2.1-vc-overlay.dtbo \
-		 kona-rb5-overlay.dtbo
+		 kona-rb5-overlay.dtbo \
+		 kona-iot-v2.1-rb5-overlay.dtbo
+
+
+KONA_LE_BOARDS += \
+		 kona-iot-v2.1-rb5-overlay.dtbo \
+		 kona-iot-v2-rb5-overlay.dtbo
 
 kona-dtb-$(CONFIG_ARCH_KONA) += \
-        $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB))
+        $(call add-overlays, $(KONA_BOARDS) ,$(KONA_BASE_DTB)) \
+	$(call add-overlays, $(KONA_LE_BOARDS) ,$(KONA_LE_BASE_DTB))
 kona-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
-kona_le-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_BOARDS) $(KONA_BASE_DTB)
+kona_le-overlays-dtb-$(CONFIG_ARCH_KONA) += $(KONA_LE_BOARDS) $(KONA_LE_BASE_DTB)
 dtb-y += $(kona-dtb-y)
 
 MONACO_BASE_DTB += monaco.dtb monacop.dtb
@@ -205,6 +211,21 @@ qcs405-dtb-$(CONFIG_ARCH_QCS405) += \
 
 qcs405-overlays-dtb-$(CONFIG_ARCH_QCS405) += $(QCS405_BOARDS) $(QCS405_BASE_DTB)
 dtb-y += $(qcs405-dtb-y)
+
+TRINKET_BASE_DTB += trinket-iot.dtb
+
+TRINKET_BOARDS += \
+	trinket-iot-idp-overlay.dtbo \
+	trinketp-iot-idp-overlay.dtbo \
+	trinket-iot-dp-idp-overlay.dtbo \
+	trinket-iot-external-codec-idp-overlay.dtbo \
+	trinket-iot-usbc-external-codec-idp-overlay.dtbo \
+	trinket-iot-usbc-idp-overlay.dtbo
+
+trinket-dtb-$(CONFIG_ARCH_TRINKET) += \
+        $(call add-overlays, $(TRINKET_BOARDS) ,$(TRINKET_BASE_DTB))
+trinket-overlays-dtb-$(CONFIG_ARCH_TRINKET) += $(TRINKET_BOARDS) $(TRINKET_BASE_DTB)
+dtb-y += $(trinket-dtb-y)
 
 kaka-dtb-$(CONFIG_ARCH_KAKA) += kaka-rumi.dtb
 dtb-y += $(kaka-dtb-y)
@@ -382,8 +403,8 @@ kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
                  kalama-vm-mtp.dtb \
                  kalama-vm-cdp.dtb \
                  kalama-vm-qrd.dtb \
-                 kalamap-vm-hdk.dtb \
-                 kalamap-vm-hhg.dtb \
+                 kalama-vm-hdk.dtb \
+                 kalama-vm-hhg.dtb \
                  kalama-oemvm-cdp.dtb \
                  kalama-oemvm-mtp.dtb \
                  kalama-oemvm-qrd.dtb \
