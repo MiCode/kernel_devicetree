@@ -101,10 +101,12 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
 				pineapple-vm-mtp.dtb \
 				pineapple-vm-cdp.dtb \
 				pineapple-vm-qrd.dtb \
+				pineapple-vm-rcm.dtb \
 				pineapple-oemvm-cdp.dtb \
 				pineapple-oemvm-mtp.dtb \
 				pineapple-oemvm-qrd.dtb \
-				pineapple-oemvm-rumi.dtb
+				pineapple-oemvm-rumi.dtb \
+				pineapple-oemvm-rcm.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
 
 endif
