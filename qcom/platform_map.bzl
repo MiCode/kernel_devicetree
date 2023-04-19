@@ -1,4 +1,36 @@
 _platform_map = {
+    "autogvm": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "direwolf-vm-la.dtb"},
+            {"name": "lemans-vm-la.dtb"},
+            {"name": "sa8155-vm-la.dtb"},
+            {"name": "sa8195-vm-la.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name":"direwolf-vm-la-overlay.dtbo"},
+            {"name": "lemans-vm-la-overlay.dtbo"},
+            {"name": "sa8155-vm-la-overlay.dtbo"},
+            {"name": "sa8195-vm-la-overlay.dtbo"},
+        ],
+    },
+    "gen3auto": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "sa8155.dtb"},
+            {"name": "sa8155p.dtb"},
+            {"name": "sa8155-v2.dtb"},
+            {"name": "sa8155p-v2.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name": "sa8155-adp-air-overlay.dtbo"},
+            {"name": "sa8155-adp-star-overlay.dtbo"},
+            {"name": "sa8155p-adp-air-overlay.dtbo"},
+            {"name": "sa8155p-adp-star-overlay.dtbo"},
+        ],
+    },
     "kalama": {
         "dtb_list": [
             {"name": "kalama.dtb"},
@@ -77,6 +109,18 @@ _platform_map = {
                 "apq": False,
             },
         ],
+        "binary_compatible_with": ["cliffs"],
+    },
+    "cliffs": {
+        "dtb_list": [
+            {"name": "cliffs.dtb"},
+        ],
+        "dtbo_list": [
+            {
+                "name": "cliffs-rumi-overlay.dtbo",
+                "apq": False,
+            },
+        ],
     },
     "pineapple-tuivm": {
         "dtb_list": [
@@ -100,6 +144,20 @@ _platform_map = {
             {"name": "pineapple-vm-mtp.dtb"},
             {"name": "pineapple-vm-qrd.dtb"},
             {"name": "pineapple-vm-rumi.dtb"},
+        ],
+    },
+    "blair": {
+        "dtb_list": [
+            {"name": "blair.dtb"},
+        ],
+        "dtbo_list": [
+            {"name": "blair-mtp-overlay.dtbo"},
+            {"name": "blair-qrd-overlay.dtbo"},
+            {"name": "blair-cdp-overlay.dtbo"},
+            {"name": "blair-atp-overlay.dtbo"},
+            {"name": "blair-mtp-usbc-overlay.dtbo"},
+            {"name": "blair-mtp-nopmi-overlay.dtbo"},
+            {"name": "blair-qrd-nopmi-overlay.dtbo"},
         ],
     },
 }
