@@ -21,7 +21,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 ufshcd-core.use_mcq_mode=0";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 ufshcd-core.use_mcq_mode=0 irqaffinity=0-2";
 	};
 
 	reserved_memory: reserved-memory {};
@@ -1036,6 +1036,14 @@
 		compatible = "qcom,tcsr-mutex";
 		syscon = <&tcsr_mutex_block 0 0x1000>;
 		#hwlock-cells = <1>;
+	};
+
+	gic-interrupt-router {
+		compatible = "qcom,gic-intr-routing";
+		/* keep silver core only to avoid wakeup of gold cores */
+		qcom,gic-class0-cpus = <0 1 2>;
+		/* keep gold and gold+ cores in class1 */
+		qcom,gic-class1-cpus = <3 4 5 6 7>;
 	};
 
 	ufsphy_mem: ufsphy_mem@1d80000 {
