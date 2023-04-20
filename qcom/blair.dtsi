@@ -1,4 +1,5 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Blair";
@@ -510,6 +511,42 @@
 		interrupt-controller;
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
+	};
+
+	adsp_pas: remoteproc-adsp@a400000 {
+		compatible = "qcom,blair-adsp-pas";
+		reg = <0xa400000 0x00100>;
+		status = "ok";
+
+		memory-region = <&pil_adsp_mem>;
+
+		interrupts-extended = <&intc GIC_SPI 282 IRQ_TYPE_LEVEL_HIGH>;
+
+		interrupt-names = "qcom,wdog";
+	};
+
+	cdsp_pas: remoteproc-cdsp@b000000 {
+		compatible = "qcom,blair-cdsp-pas";
+		reg = <0xb000000 0x100000>;
+		status = "ok";
+
+		memory-region = <&pil_cdsp_mem>;
+
+		interrupts-extended = <&intc GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
+
+		interrupt-names = "qcom,wdog";
+	};
+
+	modem_pas: remoteproc-mss@06000000 {
+		compatible = "qcom,blair-modem-pas";
+		reg = <0x06000000 0x100>;
+		status = "ok";
+
+		memory-region = <&pil_mpss_wlan_mem>;
+
+		interrupts-extended = <&intc GIC_SPI 307 IRQ_TYPE_EDGE_RISING>;
+
+		interrupt-names = "qcom,wdog";
 	};
 };
 
