@@ -48,6 +48,19 @@ properties:
               - qcom,sm8350-smmu-500
               - qcom,sm8450-smmu-500
           - const: arm,mmu-500
+      - description: |
+          Qcom SoCs implementing "qcom,qsmmu-v500", which is a arm,mmu-500
+          based design with QCOM-designed TBUs and other custom features.
+
+          "qcom,virt-smmu" is a subtype of "qcom,qsmmu-v500" which
+          only supports access to the set of registers required by
+          the arm specificiation. None of the additional registers
+          normally present in qcom,qsmmu-v500 are supported
+          currently.
+        items:
+          - enum:
+              - qcom,qsmmu-v500
+              - qcom,virt-smmu
       - description: Qcom Adreno GPUs implementing "arm,smmu-v2"
         items:
           - enum:
@@ -171,6 +184,227 @@ properties:
       will be used and it is not guaranteed that IOMMU translations will be
       enabled for any given device.
     $ref: /schemas/types.yaml#/definitions/phandle
+
+  qcom,fatal-asf:
+    type: boolean
+    description: |
+      Enable BUG_ON for address size faults.  Some hardware requires special
+      fixups to recover from address size faults.  Rather than applying the
+      fixups just BUG since address size faults are due to a fundamental
+      programming error from which we don't care about recovering anyways.
+
+  qcom,skip-init:
+    type: boolean
+    description: |
+      Disable resetting configuration for all context banks during device
+      reset. This is useful for targets where some context banks are
+      dedicated to other execution environments outside of Linux and those
+      other EEs are programming their own stream match tables, SCTLR, etc.
+      Without setting this option we will trample on their configuration.
+
+  qcom,use-3-lvl-tables:
+    type: boolean
+    description: |
+      Some hardware configurations may not be optimized for using a four
+      level page table configuration. Set to use a three level page table
+      instead.
+
+  qcom,context-fault-retry:
+    type: boolean
+    description: |
+      Retry iommu faults after a tlb invalidate, if stall-on-fault is enabled.
+
+  qcom,actlr:
+    $ref: '/schemas/types.yaml#/definitions/uint16-array'
+    description: |
+      An array of <sid mask actlr-setting>.
+      Any sid X for which X&~mask==sid will be programmed with the
+      given actlr-setting.
+
+  qcom,disable-atos:
+    type: boolean
+    description: |
+      Some hardware may not have full support for atos debugging in tandem
+      with other features like power collapse.
+
+  qcom,regulator-names:
+    description: |
+      List of strings to use with the (.*)-supply property.
+
+  interconnects:
+    items:
+      - description: bus bandwidth request.
+
+  qcom,active-only:
+    type: boolean
+    description: |
+      Boolean property which denotes that interconnect votes should be
+      maintained while the CPUSS is awake (active context). The absence of
+      this property makes it so that interconnect votes will be maintained
+      irrespective of the CPUSS' state (awake or asleep).
+
+  qcom,num-context-banks-override:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    description: |
+      Optional integer. Should be set if the hypervisor virtualization is
+      disabled for debugging purposes. When this is done, some context banks
+      managed by hypervisor become visible to HLOS, but should not be accessed.
+  qcom,num-smr-override:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    description: |
+      Optional integer. See qcom,num-context-banks-override.
+
+  qcom,ignore-numpagendxb:
+    type: boolean
+    description: |
+      Optional boolean. Indicates if numpagendxb should be ignored in
+      determining the size of the global register address space and context
+      bank address space. If qcom,ignore-numpagendxb, is supplied, we instead
+      use the register space size supplied in the 'reg =' property to
+      determine the locations of the various parts of the global and context
+      bank address spaces.
+
+  qcom,iommu-dma:
+    description: |
+      default
+        Standard iommu translation behaviour. Calling iommu and DMA apis in
+        atomic context is not allowed.
+      bypass
+        DMA APIs will use 1-to-1 translation between dma_addr and phys_addr.
+      fastmap
+        DMA APIs will run faster, but use several orders of magnitude more
+        memory. Also allows using iommu and DMA apis in atomic context.
+      atomic
+        Allows using iommu and DMA apis in atomic context.
+      disabled
+        The iommu client is responsible for allocating an iommu domain.
+    enum:
+      - default
+      - bypass
+      - fastmap
+      - atomic
+      - disabled
+
+  qcom,iommu-faults:
+    $ref: '/schemas/types.yaml#/definitions/string-array'
+    description: |
+      default
+        Any faults are treated as fatal errors.
+      no-CFRE
+        Iommu faults do not return an abort to the client hardware.
+      non-fatal
+        Iommu faults do not trigger a kernel panic.
+      stall-disable
+        Iommu faults do not stall the client while the fault interrupt is
+        being handled.
+
+  qcom,iommu-vmid:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    description: |
+      An identifier indicating the security state of the client.
+
+  qcom,iommu-pagetable:
+    $ref: '/schemas/types.yaml#/definitions/string-array'
+    description: |
+      default
+        Pagetable coherency defaults to the coherency setting of the IOMMU
+        device.
+      coherent
+        Pagetables are io-coherent.
+      LLC
+        Pagetables may be saved in the system cache. Should not be used if
+        the IOMMU device is io-coherent.
+      LLC_NWA
+        Pagetables may be saved in the system cache is used, and
+        write-allocate hint is disabled.
+
+  qcom,iommu-earlymap:
+    type: boolean
+    description: |
+      Support creating mappings in the page-table before Stage 1 translation
+      is enabled.
+
+  qcom,iommu-dma-addr-pool:
+    $ref: '/schemas/types.yaml#/definitions/uint64-array'
+    maxItems: 2
+    description: |
+      Indicates the range of addresses that the dma layer will use. Defaults
+      to <0, SZ_4G> if not present.
+
+  qcom,iommu-geometry:
+    $ref: '/schemas/types.yaml#/definitions/uint64-array'
+    maxItems: 2
+    description: |
+      Defaults to <0, SZ_4G> if not present. Indicates the available IOVA
+      space when the qcom,iommu-dma property is set to "fastmap". The new
+      space created will be a superset of the IOVA range which was created
+      through the qcom,iommu-dma-addr-pool DT property.
+
+  qcom,iommu-msi-size:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    description: |
+      Indicates the amount of space--in bytes--that must be reserved from
+      the client's total IOVA space for mapping MSI registers when the
+      qcom,iommu-dma property is set to "fastmap".
+
+  qcom,iommu-defer-smr-config:
+    type: boolean
+    description: |
+      Indicates that the SMRs for the client should not be programmed when the
+      client device is attaching to the SMMU, but when the client's device
+      driver requests it at a later point in time when the client is ready for
+      DMA transfers.
+  "#address-cells":
+    const: 1
+  "#size-cells":
+    const: 1
+
+patternProperties:
+  ".*-supply$":
+    description: |
+      Phandle of the regulator that should be powered on during SMMU register
+      access. (.*) is a string from the qcom,regulator-names property.
+  ".*qtb@[0-9a-f]+":
+    type: object
+    properties:
+      compatible:
+        description: |
+          The qcom,qsmmu-v500 device implements a number of register regions
+          containing debug functionality. Each register region maps to a
+          separate tbu from the arm mmu-500 implementation.
+          "qcom,qtb500" can be used in conjunction with "qcom,qsmmuv500-tbu",
+          as the QTB500 is an implementation of a TBU with different features
+          enhancements than a regular TBU.
+        items:
+          - enum:
+              - qcom,qtb500
+              - qcom,qsmmuv500-tbu
+      reg:
+        minItems: 1
+      qcom,stream-id-range:
+        $ref: '/schemas/types.yaml#/definitions/uint32-array'
+        description: |
+          Pair of values describing the smallest supported stream-id
+          and the size of the entire set.
+      qcom,iova-width:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          The maximum number of bits that a TBU can support for IOVAs.
+      qcom,opt-out-tbu-halting:
+        type: boolean
+        description: |
+          Allow certain TBUs to opt-out from being halted for the ATOS
+          operation to proceed. Halting certain TBUs would cause considerable
+          impact to the system such as deadlocks on demand. Such TBUs can be
+          opted out to be halted from software. Should always be set for pcie.
+      interconnects:
+        items:
+          - description: bus bandwidth request.
+      qcom,num-qtb-ports:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          Specifies the number of ports that a QTB has for incoming
+          transactions.
 
 required:
   - compatible
@@ -297,4 +531,23 @@ examples:
       clocks = <&mmcc 123>,
         <&mmcc 124>;
       clock-names = "bus", "iface";
+    };
+  - |+
+    iommu@d00000 {
+      compatible = "qcom,qsmmu-v500";
+      reg = <0xd00000 0x10000>;
+      #global-interrupts = <1>;
+      interrupts = <0 73 0>,
+                   <0 73 0>;
+      #iommu-cells = <1>;
+      #address-cells = <1>;
+      #size-cells = <1>;
+      qtb@1000 {
+        compatible = "qcom,qsmmuv500-tbu";
+        reg = <0x1000 0x1000>;
+        qcom,stream-id-range = <0x800 0x400>;
+        qcom,iova-width = <36>;
+        qcom,num-qtb-ports = <1>;
+        interconnects = <&system_noc 0 &mc_virt 1>;
+      };
     };
