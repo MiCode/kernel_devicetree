@@ -176,6 +176,15 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
+	ipcc_mproc: qcom,ipcc@406000 {
+		compatible = "qcom,ipcc";
+		reg = <0x406000 0x1000>;
+		interrupts = <GIC_SPI 229 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+	};
+
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,sun-tlmm";
 		reg = <0xf000000 0x1000000>;
@@ -903,3 +912,8 @@
 &qupv3_se7_2uart {
 	status = "ok";
 };
+
+#include "ipcc-test.dtsi"
+/delete-node/ &ipcc_self_ping_adsp;
+/delete-node/ &ipcc_self_ping_cdsp;
+/delete-node/ &ipcc_self_ping_slpi;
