@@ -22,6 +22,7 @@ _platform_map = {
             {"name": "sa8155p.dtb"},
             {"name": "sa8155-v2.dtb"},
             {"name": "sa8155p-v2.dtb"},
+            {"name": "sa8195p.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
@@ -29,6 +30,8 @@ _platform_map = {
             {"name": "sa8155-adp-star-overlay.dtbo"},
             {"name": "sa8155p-adp-air-overlay.dtbo"},
             {"name": "sa8155p-adp-star-overlay.dtbo"},
+            {"name": "sa8195p-adp-air-overlay.dtbo"},
+            {"name": "sa8195p-adp-star-overlay.dtbo"},
         ],
     },
     "kalama": {
