@@ -8,6 +8,7 @@
 | gauguin-q-oss | Redmi Note 9 Pro | Android Q | LA.UM.8.13.r1-09200-SAIPAN.0 | [gauguin-q-oss](https://github.com/MiCode/kernel_devicetree/tree/gauguin-q-oss) |
 | gauguin-r-oss | Redmi Note 9 Pro | Android R | LA.UM.9.12.r1-08000-SMxx50.0 | [gauguin-r-oss](https://github.com/MiCode/kernel_devicetree/tree/gauguin-r-oss) |
 | haydn-r-oss | Redmi K40 Pro | Android R | LA.UM.9.14.r1-11500-LAHAINA.0 | [haydn-r-oss](https://github.com/MiCode/kernel_devicetree/tree/haydn-r-oss) |
+| liuqin-t-oss | Xiaomi Pad 6 Pro | Android T | LA.VENDOR.1.0.r1-13100-WAIPIO.0-1 | [liuqin-t-oss](https://github.com/MiCode/kernel_devicetree/tree/liuqin-t-oss) |
 | lisa-r-oss | Mi 11 LE | Android R | LA.UM.9.14.r1-16700-LAHAINA.0 | [lisa-r-oss](https://github.com/MiCode/kernel_devicetree/tree/lisa-r-oss) |
 | lmi-q-oss | Redmi K30 Pro| Android Q | LA.UM.8.12.r1-06000-sm8250.0 | [lmi-q-oss](https://github.com/MiCode/kernel_devicetree/tree/lmi-q-oss) |
 | munch-s-oss | Redmi K40S | Android S | LA.UM.9.12.r1-13300-SMxx50.QSSI12.0-1 | [munch-s-oss](https://github.com/MiCode/kernel_devicetree/tree/munch-s-oss) |
