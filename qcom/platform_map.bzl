@@ -34,6 +34,16 @@ _platform_map = {
             {"name": "sa8195p-adp-star-overlay.dtbo"},
         ],
     },
+    "gen4auto": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "monaco_auto.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name": "monaco_auto-rumi-overlay.dtbo"},
+        ],
+    },
     "kalama": {
         "dtb_list": [
             {"name": "kalama.dtb"},
