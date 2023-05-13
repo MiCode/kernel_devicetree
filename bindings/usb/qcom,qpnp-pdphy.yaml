@@ -1,0 +1,104 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,qpnp-pdphy.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: USB Power Delivery Physical layer
+
+maintainers:
+  - Wesley Cheng <quic_wcheng@quicinc.com>
+
+properties:
+  compatible:
+    items:
+      - enum:
+          - qcom,qpnp-pdphy
+
+  reg:
+    description: Register Base address of the qpnp pd phy
+    maxItems: 1
+
+  vdd-pdphy-supply:
+    description: phandle to the VDD supply regulator node
+
+  interrupts:
+    minItems: 1
+    maxItems: 7
+
+  interrupt-names:
+    minItems: 1
+    items:
+      - const: sig-tx
+      - const: sig-rx
+      - const: msg-tx
+      - const: msg-rx
+      - const: msg-tx-failed
+      - const: msg-tx-discarded
+      - const: msg-rx-discarded
+
+  vbus-supply:
+    description: Regulator that enables VBUS source output
+
+  vconn-supply:
+    description: Regulator that enables VCONN source output. This will be supplied on the USB CC line that is not used for communication when Ra resistance is detected.
+
+  qcom,default-sink-caps:
+    description: List of 32-bit values representing the nominal sink capabilities in voltage (millivolts) and current (milliamps) pairs.
+    $ref: /schemas/types.yaml#/definitions/uint32-matrix
+    items:
+      items:
+        -
+          description: volts
+          minimum: 0
+          maximum: 100000
+
+        -
+          description: amps
+          minimum: 0
+          maximum: 100000
+
+  qcom,no-usb3-dp-concurrency:
+    description: If present, usb3 and dp concurrency is not supported.
+    type: boolean
+
+  qcom,pd-20-source-only:
+    description: If present, only PD2.0 is supported as source.
+    type: boolean
+
+  qcom,pps-disabled:
+    description: If defined pps support will be disabled. Standard PD communication will remain unaffected.
+    type: boolean
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,qpnp-pdphy@1700 {
+          compatible = "qcom,qpnp-pdphy";
+          reg = <0x1700 0x100>;
+          vdd-pdphy-supply = <&pm8998_l24>;
+          interrupts = <0x2 0x17 0x1>,
+                       <0x2 0x17 0x2>,
+                       <0x2 0x17 0x3>,
+                       <0x2 0x17 0x4>,
+                       <0x2 0x17 0x5>,
+                       <0x2 0x17 0x6>,
+                       <0x2 0x17 0x7>;
+
+          interrupt-names = "sig-tx",
+                    "sig-rx",
+                    "msg-tx",
+                    "msg-rx",
+                    "msg-tx-failed",
+                    "msg-tx-discarded",
+                    "msg-rx-discarded";
+
+          vbus-supply = <&pm8998_l2>;
+          vconn-supply = <&pm8998_l3>;
+          qcom,no-usb3-dp-concurrency;
+          qcom,pd-20-source-only;
+          qcom,pps-disabled;
+          qcom,default-sink-caps = <5000 8000>, /* 5V @ 3A */
+                                   <9000 3000>, /* 9V @ 3A */
+                                   <12000 9000>; /* 12V @ 9A */
+    };
