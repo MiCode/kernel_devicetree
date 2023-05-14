@@ -1,0 +1,38 @@
+
+&soc {
+	/* QUPv3_0  wrapper  instance */
+	qupv3_0: qcom,qupv3_0_geni_se@9c0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0x9c0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x403 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "bypass";
+		status = "ok";
+
+		/* Debug UART Instance */
+		qupv3_se7_2uart: qcom,qup_uart@99c000 {
+			compatible = "qcom,geni-debug-uart";
+			reg = <0x99c000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se";
+			clocks = <&gcc GCC_QUPV3_WRAP0_S7_CLK>;
+			interconnect-names = "qup-core", "qup-config", "qup-memory";
+			interconnects =
+			<&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
+			<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_0>,
+			<&aggre2_noc MASTER_QUP_0 &mc_virt SLAVE_EBI1>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se7_2uart_tx_active>, <&qupv3_se7_2uart_rx_active>;
+			pinctrl-1 = <&qupv3_se7_2uart_sleep>;
+			status = "disabled";
+		};
+	};
+};
