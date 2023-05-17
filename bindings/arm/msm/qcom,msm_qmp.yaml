@@ -1,0 +1,134 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/bindings/arm/msm/msm_qmp.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: QMP Driver binding
+
+maintainers:
+  - Richard Maina <quic_rmaina@quicinc.com>
+
+description: |+
+  The QTI mailbox protocol (QMP for short) mechanism provides an
+  ultra-light weight IPC mechanism with an ultimate code-size goal of 1-2KB.
+  This transport is considered as an alternative to subsystems whose code-size
+  restriction makes it impractical to include Link.The mailbox transport
+  distinguishes between two communicating processors as-
+  - Micro-core (uCore) – This is for all practical purposes the master who
+    determines the communication protocol & features supported over the current
+    IPC mechanism.
+  - Macro-core (abbreviated as MCore) – This code adapts to the protocol
+    version and features supported by the micro core.
+  If no such distinction can be made between the two communicating cores then
+  either can be picked to be the micro-core.
+  This communication transport has further limitations and if further
+  enhancements are required, GLink should be considered.
+  - Only one channel per edge allowed.
+  - Only one message allowed to be in flight at any given time.
+  - The maximum message size which can be transmitted as a unit is fixed statically.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,qmp-mbox
+
+  label:
+    $ref: '/schemas/types.yaml#/definitions/string'
+    maxItems: 1
+    description:
+      The name of the remote proc this link connects to.
+
+  reg:
+    minItems: 1
+    description:
+      The location and size of shared memory.
+      The irq register base address for triggering interrupts.
+
+  reg-names:
+    minItems: 1
+    description:
+      'msgram' the string to identify the shared memory region.
+      'irq-reg-base' the string to identify the irq register region.
+
+  qcom,irq-mask:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    maxItems: 1
+    description:
+      The bitmask to trigger an interrupt.
+
+  mboxes:
+    description:
+      Handle to outgoing interrupt if not using irq-reg-base.
+
+  interrupt:
+    $ref: '/schemas/types.yaml#/definitions/uint32-array'
+    minItems: 1
+    description:
+      The receiving interrupt line.
+
+  mbox-desc-offset:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    maxItems: 1
+    description:
+      Offset of mailbox descriptor from start of the msgram.
+
+  priority:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    maxItems: 1
+    description: The priority of this mailbox compared to other mailboxes.
+
+  '#mbox-cells':
+      - const: 1
+    description:
+      Common mailbox binding property to identify the number of cells
+      required for the mailbox specifier, should be 1.
+
+  qcom,early-boot:
+    $ref: '/schemas/types.yaml#/definitions/boolean'
+    description:
+      Bool to indicate that this remote proc will boot before QMP.
+
+  mbox-offset:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    maxItems: 1
+    description:
+      offset of the mcore mailbox from the offset of msgram. If this
+      property is not used, qmp will use the configuration
+      provided by the ucore.
+
+  mbox-size:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    maxItems: 1
+    description:
+      size of the mcore mailbox. If this property is not used, qmp will
+      use the configuration provided by the ucore.
+
+required:
+  - compatible
+  - label
+  - reg
+  - reg-names
+  - qcom,irq-mask
+  - mboxes
+  - interrupt
+  - mbox-desc-offset
+  - number of mbox-cells
+
+examples:
+  - |
+    qmp_aop: qcom,qmp-aop {
+        compatible = "qcom,qmp-mbox";
+        label = "aop";
+        qcom,early-boot;
+        reg = <0xc300000 0x100000>,
+              <0x1799000C 0x4>;
+        reg-names = "msgram", "irq-reg-base";
+        qcom,irq-mask = <0x1>;
+        interrupt = <0 389 1>;
+        mbox-desc-offset = <0x100>;
+        priority = <1>;
+        mbox-offset = <0x500>;
+        mbox-size = <0x400>;
+        #mbox-cells = <1>;
+    };
