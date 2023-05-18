@@ -30,6 +30,29 @@ sun-dtb-$(CONFIG_ARCH_SUN) += \
 	$(call add-overlays, $(SUN_BOARDS) $(APQ_SUN_BOARDS),$(SUN_APQ_BASE_DTB))
 sun-overlays-dtb-$(CONFIG_ARCH_SUN) += $(SUN_BOARDS) $(NOAPQ_SUN_BOARDS) $(SUN_BASE_DTB) $(SUN_APQ_BASE_DTB)
 dtb-y += $(sun-dtb-y)
+
+PINEAPPLE_BASE_DTB += pineapple.dtb pineapple-v2.dtb
+PINEAPPLE_APQ_BASE_DTB += pineapplep.dtb pineapplep-v2.dtb
+
+PINEAPPLE_BOARDS += \
+		 pineapple-mtp-overlay.dtbo \
+		 pineapple-mtp-nfc-overlay.dtbo \
+		 pineapple-cdp-overlay.dtbo \
+		 pineapple-cdp-nfc-overlay.dtbo \
+		 pineapple-qrd-overlay.dtbo \
+		 pineapple-qrd-sku2-overlay.dtbo \
+		 pineapple-rcm-overlay.dtbo \
+		 pineapple-atp-overlay.dtbo
+
+NOAPQ_PINEAPPLE_BOARDS += \
+		 pineapple-rumi-overlay.dtbo
+
+pineapple-dtb-$(CONFIG_ARCH_PINEAPPLE) += \
+	$(call add-overlays, $(PINEAPPLE_BOARDS) $(NOAPQ_PINEAPPLE_BOARDS),$(PINEAPPLE_BASE_DTB))\
+	$(call add-overlays, $(PINEAPPLE_BOARDS) $(APQ_PINEAPPLE_BOARDS),$(PINEAPPLE_APQ_BASE_DTB))
+pineapple-overlays-dtb-$(CONFIG_ARCH_PINEAPPLE) += $(PINEAPPLE_BOARDS) $(NOAPQ_PINEAPPLE_BOARDS) $(PINEAPPLE_BASE_DTB) $(PINEAPPLE_APQ_BASE_DTB)
+dtb-y += $(pineapple-dtb-y)
+
 endif
 
 always-y        := $(dtb-y)
