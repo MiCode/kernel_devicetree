@@ -84,6 +84,17 @@ blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(BLAIR_BASE_DTB)
 dtb-y += $(blair-dtb-y)
 endif
 
+MONACO_AUTO_BASE_DTB	+= monaco_auto.dtb
+MONACO_AUTO_BOARDS	+= monaco_auto-rumi-overlay.dtbo
+
+gen4auto-dtb-$(CONFIG_ARCH_MONACO_AUTO) += \
+	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))
+
+gen4auto-overlays-dtb-$(CONFIG_ARCH_MONACO_AUTO) +=  \
+	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)
+
+dtb-y += $(gen4auto-dtb-y)
+
 ifeq ($(CONFIG_ARCH_PINEAPPLE), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
@@ -149,6 +160,7 @@ dtb-y += $(autogvm-dtb-y)
 
 SA8155_BASE_DTB += sa8155.dtb sa8155-v2.dtb
 SA8155P_BASE_DTB += sa8155p.dtb sa8155p-v2.dtb
+SA8195P_BASE_DTB += sa8195p.dtb
 
 SA8155_BOARDS += \
 		 sa8155-adp-star-overlay.dtbo \
@@ -158,10 +170,18 @@ SA8155P_BOARDS += \
 		       sa8155p-adp-star-overlay.dtbo \
 		       sa8155p-adp-air-overlay.dtbo
 
+SA8195P_BOARDS += \
+		sa8195p-adp-star-overlay.dtbo \
+		sa8195p-adp-air-overlay.dtbo
+
 gen3auto-dtb-$(CONFIG_ARCH_SA8155) += \
 	$(call add-overlays, $(SA8155_BOARDS),$(SA8155_BASE_DTB)) \
 	$(call add-overlays, $(SA8155P_BOARDS),$(SA8155P_BASE_DTB))
 gen3auto-overlays-dtb-$(CONFIG_ARCH_SA8155) += $(SA8155_BOARDS) $(SA8155P_BOARDS) $(SA8155_BASE_DTB) $(SA8155P_BASE_DTB)
+
+gen3auto-dtb-$(CONFIG_ARCH_SA8195) += \
+	$(call add-overlays, $(SA8195P_BOARDS),$(SA8195P_BASE_DTB))
+gen3auto-overlays-dtb-$(CONFIG_ARCH_SA8195) += $(SA8195P_BOARDS) $(SA8195P_BASE_DTB)
 
 dtb-y += $(gen3auto-dtb-y)
 
