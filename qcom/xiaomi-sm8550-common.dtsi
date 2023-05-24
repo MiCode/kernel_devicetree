@@ -6,7 +6,7 @@
 #include "kalama-thermal-overlay.dtsi"
 
 &sdhc_2 {
-	status = "ok";
+	status = "disabled";
 	vdd-supply = <&pm_humu_l9>;
 	qcom,vdd-voltage-level = <2950000 2960000>;
 	qcom,vdd-current-level = <0 800000>;
@@ -45,6 +45,28 @@
 			debounce-interval = <15>;
 			linux,can-disable;
 		};
+	};
+
+	mtdoops_pmsg@0xa7000000 {
+		compatible = "mtdoops_pmsg";
+		reg = <0xa7000000 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	hardwareinfo {
+		compatible = "xiaomi,hardware-info";
+		status = "ok";
+	};
+};
+
+&qupv3_se9_spi {
+	status = "ok";
+	ir-spi@0 {
+		compatible = "ir-spi";
+		reg = <0>;
+		spi-max-frequency = <19200000>;
+		status = "ok";
 	};
 };
 
@@ -120,7 +142,7 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	status = "ok";
+	status = "disabled";
 	qcom,i2c-touch-active = "goodix,gt9916";
 
 	goodix-berlin@5d {
@@ -193,6 +215,24 @@
 &battery_charger {
 	qcom,wireless-fw-name = "idt9418.bin";
 	qcom,thermal-mitigation = <3000000 1500000 1000000 500000>;
+};
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	ramoops@0xa7000000 {
+		compatible = "ramoops";
+		reg = <0x0 0xa7000000 0x0 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	xbl_ramdump_mem: xbl_ramdump_region@81200000 {
+		no-map;
+		reg = <0x0 0x81200000 0x0 0x280000>;
+	};
 };
 
 #if defined(SOCRATES_REGULATOR_OCP)
@@ -336,4 +376,3 @@
 	periph-d46-supply = <&L7N>;
 };
 #endif/*SOCRATES_REGULATOR_OCP*/
-
