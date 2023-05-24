@@ -28,23 +28,20 @@
 
 
 	chosen: chosen {
-			bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc";
+			bootargs = "console=ttyMSM0,115200n8 kpti=0 kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=0 kasan=off sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc";
 	};
 
 	reserved_memory: reserved-memory { };
-
-	mem-offline {
-		compatible = "qcom,mem-offline";
-		offline-sizes = <0x2 0xc0000000 0x1 0x00000000>;
-		granule = <512>;
-		mboxes = <&qmp_aop 0>;
-	};
 
 	aliases: aliases {
 		serial0 = &qupv3_se7_2uart;
 		hsuart0 = &qupv3_se14_4uart;
 		sdhc2 = &sdhc_2;
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
+		i2c0 = &qupv3_hub_i2c2;
+		i2c1 = &qupv3_se0_i2c;
+		i2c2 = &qupv3_se8_i2c;
+		i2c3 = &qupv3_se5_i2c;
 	};
 
 	sram: sram@17D09400 {
@@ -467,7 +464,12 @@
 
 	adspslpi_mem: adspslpi_region@9ea00000 {
 		no-map;
-		reg = <0x0 0x9ea00000 0x0 0x4080000>;
+		reg = <0x0 0x9ea00000 0x0 0x5c80000>;
+	};
+
+	dump_display_mem: dump_display_region@a4a80000 {
+		no-map;
+		reg = <0x0 0xa4a80000 0x0 0x800>;
 	};
 
 	/* uefi region can be reused by apps */
@@ -511,34 +513,34 @@
 
 	trust_ui_vm_mem: trust_ui_vm_region@f3800000 {
 		no-map;
-		reg = <0x0 0xf3800000 0x0 0x40ee000>;
+		//reg = <0x0 0xf3800000 0x0 0x4aee000>;
 	};
 
 	trust_ui_vm_dump: trust_ui_vm_dump@0xf78ee000 {
 		no-map;
-		reg = <0x0 0xf78ee000 0x0 0x1000>;
+		//reg = <0x0 0xf82ee000 0x0 0x1000>;
 	};
 
 	trust_ui_vm_qrtr: trust_ui_vm_qrtr@0xf78ef000 {
 		no-map;
-		reg = <0x0 0xf78ef000 0x0 0x9000>;
+		//reg = <0x0 0xf82ef000 0x0 0x9000>;
 	};
 
 	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@0xf78f8000 {
 		no-map;
-		reg = <0x0 0xf78f8000 0x0 0x4000>;
+		//reg = <0x0 0xf82f8000 0x0 0x4000>;
 		gunyah-label = <0x11>;					//for persist.img
 	};
 
 	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@0xf78fc000 {
 		no-map;
-		reg = <0x0 0xf78fc000 0x0 0x4000>;
+		//reg = <0x0 0xf82fc000 0x0 0x4000>;
 		gunyah-label = <0x10>;					//for system.img
 	};
 
 	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@0xf7900000 {
 		no-map;
-		reg = <0x0 0xf7900000 0x0 0x100000>;
+		//reg = <0x0 0xf8300000 0x0 0x100000>;
 		gunyah-label = <0x12>;
 	};
 
@@ -610,7 +612,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x1400000>;
+		size = <0x0 0x3600000>;
 	};
 
 	cdsp_secure_heap: secure_cdsp_region { /* Secure DSP */
@@ -648,8 +650,6 @@
 	ramoops_mem: ramoops_region {
 		compatible = "ramoops";
 		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
-		size = <0x0 0x200000>;
-		pmsg-size = <0x200000>;
 		mem-type = <2>;
 	};
 
@@ -1050,7 +1050,7 @@
 		qcom,primary-vm;
 		gunyah-label = <7>;
 		peer-name = <2>;
-		shared-buffer = <&trust_ui_vm_dump>;
+		//shared-buffer = <&trust_ui_vm_dump>;
 	};
 
 	clk_virt: interconnect@0 {
@@ -1345,7 +1345,7 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo";
 		qcom,proxy-clock-names = "xo";
-		status = "ok";
+		status = "disabled";
 
 		memory-region = <&spss_region_mem>;
 		qcom,spss-scsr-bits = <24 25>;
@@ -1388,7 +1388,7 @@
 		/* soc2sp rmb shared register physical address */
 		qcom,spcom-soc2sp-rmb-reg-addr = <0x01881030>;
 		qcom,spcom-soc2sp-rmb-sp-ssr-bit = <0>;
-		status = "ok";
+		status = "disabled";
 	};
 
 	spss_utils: qcom,spss_utils {
@@ -1408,7 +1408,7 @@
 		qcom,spss-emul-type-reg-addr = <0x01fc8004>;
 		pil-mem = <&spss_region_mem>;
 		qcom,pil-size = <0x0F0000>; // padding to 960KB
-		status = "ok";
+		status = "disabled";
 	};
 
 	qcom,msm-rtb {
@@ -2592,7 +2592,7 @@
 		qcom,master;
 		gunyah-label = <3>;
 		peer-name = <2>;
-		shared-buffer = <&trust_ui_vm_qrtr>;
+		//shared-buffer = <&trust_ui_vm_qrtr>;
 	};
 
 	qrtr-gunyah-oemvm {
@@ -2686,6 +2686,12 @@
 		#mbox-cells = <2>;
 	};
 
+	adsp_sleepmon: adsp-sleepmon {
+		compatible = "qcom,adsp-sleepmon";
+		qcom,wait_time_lpm = <45>;
+		qcom,wait_time_lpi = <45>;
+	};
+
 	qcom,msm-cdsp-loader {
 		compatible = "qcom,cdsp-loader";
 		qcom,proc-img-to-load = "cdsp";
@@ -2713,7 +2719,7 @@
 			iommus = <&apps_smmu 0x1961 0x0000>,
 				 <&apps_smmu 0x0C01 0x0020>,
 				 <&apps_smmu 0x19C1 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2724,7 +2730,7 @@
 			iommus = <&apps_smmu 0x1962 0x0000>,
 				 <&apps_smmu 0x0C02 0x0020>,
 				 <&apps_smmu 0x19C2 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2735,7 +2741,7 @@
 			iommus = <&apps_smmu 0x1963 0x0000>,
 				 <&apps_smmu 0x0C03 0x0020>,
 				 <&apps_smmu 0x19C3 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2746,7 +2752,7 @@
 			iommus = <&apps_smmu 0x1964 0x0000>,
 				 <&apps_smmu 0x0C04 0x0020>,
 				 <&apps_smmu 0x19C4 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2757,7 +2763,7 @@
 			iommus = <&apps_smmu 0x1965 0x0000>,
 				 <&apps_smmu 0x0C05 0x0020>,
 				 <&apps_smmu 0x19C5 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2768,7 +2774,7 @@
 			iommus = <&apps_smmu 0x1966 0x0000>,
 				 <&apps_smmu 0x0C06 0x0020>,
 				 <&apps_smmu 0x19C6 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2779,7 +2785,7 @@
 			iommus = <&apps_smmu 0x1967 0x0000>,
 				 <&apps_smmu 0x0C07 0x0020>,
 				 <&apps_smmu 0x19C7 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2790,7 +2796,7 @@
 			iommus = <&apps_smmu 0x1968 0x0000>,
 				 <&apps_smmu 0x0C08 0x0020>,
 				 <&apps_smmu 0x19C8 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2802,7 +2808,7 @@
 			iommus = <&apps_smmu 0x1969 0x0000>,
 				 <&apps_smmu 0x0C09 0x0020>,
 				 <&apps_smmu 0x19C9 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x60000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x40000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			qcom,iommu-vmid = <0xA>;	/* VMID_CP_PIXEL */
 			dma-coherent;
@@ -2813,7 +2819,7 @@
 			label = "adsprpc-smd";
 			iommus = <&apps_smmu 0x1003 0x0080>,
 				 <&apps_smmu 0x1063 0x0000>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2823,7 +2829,7 @@
 			label = "adsprpc-smd";
 			iommus = <&apps_smmu 0x1004 0x0080>,
 				 <&apps_smmu 0x1064 0x0000>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2833,7 +2839,7 @@
 			label = "adsprpc-smd";
 			iommus = <&apps_smmu 0x1005 0x0080>,
 				 <&apps_smmu 0x1065 0x0000>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			shared-cb = <8>;
 			dma-coherent;
@@ -2844,7 +2850,7 @@
 			label = "adsprpc-smd";
 			iommus = <&apps_smmu 0x1006 0x0080>,
 				 <&apps_smmu 0x1066 0x0000>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2854,7 +2860,7 @@
 			label = "adsprpc-smd";
 			iommus = <&apps_smmu 0x1007 0x0080>,
 				 <&apps_smmu 0x1067 0x0000>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2865,7 +2871,7 @@
 			iommus = <&apps_smmu 0x196C 0x0000>,
 				 <&apps_smmu 0x0C0C 0x0020>,
 				 <&apps_smmu 0x19CC 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2876,7 +2882,7 @@
 			iommus = <&apps_smmu 0x196D 0x0000>,
 				 <&apps_smmu 0x0C0D 0x0020>,
 				 <&apps_smmu 0x19CD 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2887,7 +2893,7 @@
 			iommus = <&apps_smmu 0x196E 0x0000>,
 				 <&apps_smmu 0x0C0E 0x0020>,
 				 <&apps_smmu 0x19CE 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -2898,7 +2904,7 @@
 			iommus = <&apps_smmu 0x196F 0x0000>,
 				 <&apps_smmu 0x0C0F 0x0020>,
 				 <&apps_smmu 0x19CF 0x0010>;
-			qcom,iommu-dma-addr-pool = <0x80000000 0x78000000>;
+			qcom,iommu-dma-addr-pool = <0x60000000 0x98000000>;
 			qcom,iommu-faults = "stall-disable", "HUPCF";
 			dma-coherent;
 		};
@@ -3155,7 +3161,7 @@
 		qcom,firmware-name = "trustedvm";
 		qcom,reserved-cpus = <0x5>, <0x6>;
 		qcom,unisolate-timeout-ms = <12000>;
-		memory-region = <&trust_ui_vm_mem>;
+		//memory-region = <&trust_ui_vm_mem>;
 	};
 
 	qcom,guestvm_loader@80a00000 {
@@ -3190,10 +3196,10 @@
 				&tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@0xf78f8000 {
-		reg = <0xf78f8000 0x108000>;
+	trust_ui_vm: qcom,trust_ui_vm@0xf82f8000 {
+		//reg = <0xf82f8000 0x108000>;
 		vm_name = "trustedvm";
-		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
+		//shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
 	oem_vm: qcom,oem_vm@f7afc000 {
@@ -3217,7 +3223,7 @@
 		qcom,pas-id = <28>;
 		qcom,vmid = <45>;
 		qcom,firmware-name = "trustedvm";
-		memory-region = <&trust_ui_vm_mem>;
+		//memory-region = <&trust_ui_vm_mem>;
 		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
 	};
 
@@ -3598,12 +3604,6 @@
 	thermal_zones: thermal-zones {
 	};
 
-	qcom,qbt_handler {
-		compatible = "qcom,qbt-handler";
-		qcom,ipc-gpio = <&tlmm 40 0>;
-		qcom,finger-detect-gpio = <&tlmm 41 0>;
-		qcom,intr2-gpio = <&tlmm 42 0>;
-	};
 
 	spmi_bus: spmi0_bus: qcom,spmi@c42d000 {
 		compatible = "qcom,spmi-pmic-arb";

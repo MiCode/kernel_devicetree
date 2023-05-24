@@ -49,6 +49,8 @@ KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
+		 wangshu-sm8550-overlay.dtbo \
+		 socrates-sm8550-overlay.dtbo \
 		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
 		 kalama-cdp-wsa883x-overlay.dtbo \
@@ -67,7 +69,9 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS),$(KALAMA_BASE_DTB))\
 	$(call add-overlays, $(KALAMA_BOARDS) $(APQ_KALAMA_BOARDS),$(KALAMA_APQ_BASE_DTB))
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
+socrates-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
+dtb-y += $(socrates-dtb-y)
 
 KHAJE_BASE_DTB += khaje.dtb khajep.dtb khajeq.dtb khajeg.dtb
 
