@@ -53,6 +53,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x0>;
 			enable-method = "psci";
+			cpu-idle-states = <&MEDIUM_OFF_C4>;
+			power-domains = <&CPU_PD0>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -65,6 +68,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x100>;
 			enable-method = "psci";
+			cpu-idle-states = <&MEDIUM_OFF_C4>;
+			power-domains = <&CPU_PD1>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 		};
 
@@ -73,6 +79,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x200>;
 			enable-method = "psci";
+			cpu-idle-states = <&MEDIUM_OFF_C4>;
+			power-domains = <&CPU_PD2>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 		};
 
@@ -81,6 +90,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x300>;
 			enable-method = "psci";
+			cpu-idle-states = <&MEDIUM_OFF_C4>;
+			power-domains = <&CPU_PD3>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 		};
 
@@ -89,6 +101,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x400>;
 			enable-method = "psci";
+			cpu-idle-states = <&MEDIUM_OFF_C4>;
+			power-domains = <&CPU_PD4>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 		};
 
@@ -97,6 +112,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x500>;
 			enable-method = "psci";
+			cpu-idle-states = <&MEDIUM_OFF_C4>;
+			power-domains = <&CPU_PD5>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 		};
 
@@ -105,6 +123,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x10000>;
 			enable-method = "psci";
+			cpu-idle-states = <&LARGE_OFF_C4>;
+			power-domains = <&CPU_PD6>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_6>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -117,6 +138,9 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x10100>;
 			enable-method = "psci";
+			cpu-idle-states = <&LARGE_OFF_C4>;
+			power-domains = <&CPU_PD7>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_6>;
 		};
 
@@ -157,6 +181,73 @@
 				};
 			};
 		};
+
+		idle-states {
+			entry-method = "psci";
+
+			MEDIUM_OFF_C4: medium-cluster0-c4 { /* C4 */
+				compatible = "arm,idle-state";
+				idle-state-name = "ret";
+				entry-latency-us = <93>;
+				exit-latency-us = <129>;
+				min-residency-us = <560>;
+				arm,psci-suspend-param = <0x00000004>;
+			};
+
+			LARGE_OFF_C4: large-cluster1-c4 { /* C4 */
+				compatible = "arm,idle-state";
+				idle-state-name = "ret";
+				entry-latency-us = <172>;
+				exit-latency-us = <130>;
+				min-residency-us = <686>;
+				arm,psci-suspend-param = <0x00000004>;
+			};
+
+			MEDIUM_CLUSTER_CL4: medium-cluster0-cl4 { /* CL4 */
+				compatible = "domain-idle-state";
+				idle-state-name = "l2-ret";
+				entry-latency-us = <253>;
+				exit-latency-us = <288>;
+				min-residency-us = <1492>;
+				arm,psci-suspend-param = <0x01000044>;
+			};
+
+			LARGE_CLUSTER_CL4: large-cluster1-cl4 { /* CL4 */
+				compatible = "domain-idle-state";
+				idle-state-name = "l2-ret";
+				entry-latency-us = <354>;
+				exit-latency-us = <394>;
+				min-residency-us = <3146>;
+				arm,psci-suspend-param = <0x01000044>;
+			};
+
+			MEDIUM_CLUSTER_PWR_DN: medium-cluster-cl5 { /* CL5 */
+				compatible = "domain-idle-state";
+				idle-state-name = "ret-pll-off";
+				entry-latency-us = <1964>;
+				exit-latency-us = <1901>;
+				min-residency-us = <24511>;
+				arm,psci-suspend-param = <0x01000054>;
+			};
+
+			LARGE_CLUSTER_PWR_DN: large-cluster-cl5 { /* CL5 */
+				compatible = "domain-idle-state";
+				idle-state-name = "ret-pll-off";
+				entry-latency-us = <2124>;
+				exit-latency-us = <1967>;
+				min-residency-us = <36712>;
+				arm,psci-suspend-param = <0x01000054>;
+			};
+
+			APSS_OFF: cluster-ss3 { /* SS3 */
+				compatible = "domain-idle-state";
+				idle-state-name = "apps-pc";
+				entry-latency-us = <2800>;
+				exit-latency-us = <4400>;
+				min-residency-us = <40000>;
+				arm,psci-suspend-param = <0x0200C354>;
+			};
+		};
 	};
 
 	reserved_memory: reserved-memory { };
@@ -183,6 +274,68 @@
 	#size-cells = <1>;
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+
+		CPU_PD0: cpu-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD1: cpu-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD2: cpu-pd2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD3: cpu-pd3 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD4: cpu-pd4 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD5: cpu-pd5 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD0>;
+		};
+
+		CPU_PD6: cpu-pd6 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CPU_PD7: cpu-pd7 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD1>;
+		};
+
+		CLUSTER_PD0: cluster-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD2>;
+			domain-idle-states = <&MEDIUM_CLUSTER_CL4 &MEDIUM_CLUSTER_PWR_DN>;
+		};
+
+		CLUSTER_PD1: cluster-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD2>;
+			domain-idle-states = <&LARGE_CLUSTER_CL4 &LARGE_CLUSTER_PWR_DN>;
+		};
+
+		CLUSTER_PD2: cluster-pd2 {
+			#power-domain-cells = <0>;
+			domain-idle-states = <&APSS_OFF>;
+		};
+	};
 
 	ipcc_mproc: qcom,ipcc@406000 {
 		compatible = "qcom,ipcc";
@@ -631,6 +784,7 @@
 		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&CLUSTER_PD2>;
 
 		apps_rsc_drv2: drv@2 {
 			qcom,drv-id = <2>;
@@ -646,6 +800,21 @@
 				compatible = "qcom,bcm-voter";
 			};
 		};
+	};
+
+	cluster-device0 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD0>;
+	};
+
+	cluster-device1 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD1>;
+	};
+
+	cluster-device2 {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD2>;
 	};
 
 	clocks {
