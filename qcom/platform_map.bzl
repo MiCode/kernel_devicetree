@@ -12,6 +12,33 @@ _platform_map = {
             {"name": "sun-rumi-overlay.dtbo"},
         ],
     },
+    "pineapple": {
+        "dtb_list": [
+            {"name": "pineapple.dtb"},
+            {"name": "pineapple-v2.dtb"},
+            {
+                "name": "pineapplep.dtb",
+                "apq": True,
+            },
+            {
+                "name": "pineapplep-v2.dtb",
+                "apq": True,
+            },
+        ],
+        "dtbo_list": [
+            {"name": "pineapple-atp-overlay.dtbo"},
+            {"name": "pineapple-cdp-nfc-overlay.dtbo"},
+            {"name": "pineapple-cdp-overlay.dtbo"},
+            {"name": "pineapple-mtp-nfc-overlay.dtbo"},
+            {"name": "pineapple-mtp-overlay.dtbo"},
+            {"name": "pineapple-qrd-overlay.dtbo"},
+            {"name": "pineapple-rcm-overlay.dtbo"},
+            {
+                "name": "pineapple-rumi-overlay.dtbo",
+                "apq": False,
+            },
+        ],
+    },
 }
 
 def _get_dtb_lists(target, dt_overlay_supported):
