@@ -77,6 +77,43 @@ Subnode common properties for OLEDB and AB/IBB regulator devices.
 	Definition: A boolean property to specify that IBB regulator needs to
 		    be configured in single phase always.
 
+- qcom,ibb-spur-mitigation-level
+	Usage:      optional
+	Value type: <u32>
+	Definition: IBB spur mitigation level selection options.
+			0 = IBB spur mitigation disabled
+			1 = IBB spur mitigation enabled without SQM mode
+			2 = IBB spur mitigation enabled with SQM mode.
+
+- qcom,ibb-spur-sqm-timer-ms
+	Usage:      optional
+	Value type: <u32>
+	Definition: A property to specify delay in ms for the SQM mode timeout.
+		    The is the time HW stays in SQM mode before re-evaluating the
+		    exit condition. This property is only valid when
+		    qcom,ibb-spur-mitigation-level is set to 2
+		    (IBB spur mitigation enabled with SQM mode). If not defined,
+		    1000ms will be used by default as SQM mode timeout delay.
+		    The range of values supported for this property could be
+		    100ms to 10000ms.
+
+- qcom,ibb-spur-2khz-step-size
+	Usage:      optional
+	Value type: <empty>
+	Definition: A boolean property to specify 2khz step size, instead of the 1khz.
+		    if defined this doubles the frequency selection range from
+		    1-248khz to 2-496khz, for all the frequency band thresholds.
+
+
+-qcom,ibb-spur-freq-thresholds
+	Usage:      optional
+	Value type: <prop-encoded-array>
+	Definition: Property to specify a range of thresholds for 3 frequency bands
+		    with each tuple representing a high and low threshold. Valid
+		    ranges are from 1-248khz and 2-496khz(step size 2khz).
+		    To disable a freq range,frequency band set the High and low
+                    thresholds to the MAX freq range value 248khz/496Khz.
+
 Example:
 
 pm8150a_amoled: oledb@e000 {
@@ -109,5 +146,47 @@ pm8150a_amoled: oledb@e000 {
 		regulator-max-microvolt = <5400000>;
 		qcom,swire-control;
 		qcom,aod-pd-control;
+	};
+};
+
+amoled: qcom,amoled {
+	compatible = "qcom,qpnp-amoled-regulator";
+	nvmem-cell-names ="ibb_spur_sqm_timer";
+	nvmem-cells = <&ibb_spur_sqm_timer>;
+
+	oledb_vreg: oledb@fa00 {
+		reg = <0xfa00>;
+		reg-names = "oledb_base";
+		regulator-name = "oledb_vreg";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <8000000>;
+		qcom,swire-control;
+	};
+
+	ab_vreg: ab@f900 {
+		reg = <0xf900>;
+		reg-names = "ab_base";
+		regulator-name = "ab_vreg";
+		regulator-min-microvolt = <4600000>;
+		regulator-max-microvolt = <5200000>;
+		qcom,swire-control;
+		qcom,aod-pd-control;
+	};
+
+	ibb_vreg: ibb@f800 {
+		reg = <0xf800>;
+		reg-names = "ibb_base";
+		regulator-name = "ibb_vreg";
+		regulator-min-microvolt = <800000>;
+		regulator-max-microvolt = <5400000>;
+		qcom,swire-control;
+		qcom,aod-pd-control;
+
+		qcom,ibb-spur-mitigation-level = <0>; /* Spur mitigation disabled(0) */
+		qcom,ibb-spur-sqm-timer-ms = <1000>;
+		qcom,ibb-spur-2khz-step-size;
+		qcom,ibb-spur-freq-thresholds = <100 120>, /* 100khz - 120 khz */
+						<150 170>, /* 150khz - 170 khz */
+						<-1 -1>; /* disabled */
 	};
 };
