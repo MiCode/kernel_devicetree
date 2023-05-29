@@ -437,7 +437,7 @@
 			reg = <0x0 0x93900000 0x0 0x200000>;
 		};
 
-		pil_cdsp_mem: cdsp_regions@93b00000 {
+		rproc_cdsp_mem: rproc_cdsp_region {
 			no-map;
 			reg = <0x0 0x93b00000 0x0 0x1e00000>;
 		};
@@ -769,17 +769,20 @@
 		qcom,ee = <0>;
 	};
 
+	aoss_qmp: power-controller@c300000 {
+		compatible = "qcom,sm6150-aoss-qmp";
+		reg = <0x0c300000 0x400>;
+		interrupts = <GIC_SPI 389 IRQ_TYPE_EDGE_RISING>;
+		mboxes = <&apss_shared 0>;
+
+		#clock-cells = <0>;
+		#power-domain-cells = <1>;
+	};
+
 	qmp_aop: qcom,qmp-aop@c300000 {
 		compatible = "qcom,qmp-mbox";
-		reg = <0xc300000 0x1000>, <0x17c0000C 0x4>;
-		reg-names = "msgram", "irq-reg-base";
-		qcom,irq-mask = <0x1>;
-		interrupts = <GIC_SPI 389 IRQ_TYPE_EDGE_RISING>;
-
+		qcom,qmp = <&aoss_qmp>;
 		label = "aop";
-		qcom,early-boot;
-		priority = <0>;
-		mbox-desc-offset = <0x0>;
 		#mbox-cells = <1>;
 	};
 
@@ -1379,9 +1382,8 @@
 		/*qcom,qmp = <&aoss_qmp>;*/
 		mboxes = <&qmp_aop 0>;
 
-		/* TODO */
-		/*interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
-		interconnect-names = "crypto_ddr";*/
+		interconnects = <&aggre1_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		interconnect-names = "crypto_ddr";
 
 		memory-region = <&rproc_adsp_mem>;
 
@@ -1413,8 +1415,7 @@
 
 			label = "adsp";
 			qcom,glink-label = "lpass";
-			/* TODO*/
-			/*cpu-affinity = <1 2>;*/
+			cpu-affinity = <1 2>;
 
 			qcom,adsp_qrtr {
 				qcom,glink-channels = "IPCRTR";
@@ -1446,6 +1447,118 @@
 		compatible = "google,debug-kinfo";
 		memory-region = <&kinfo_mem>;
 	};
+	qcom,smp2p-cdsp {
+		compatible = "qcom,smp2p";
+		qcom,smem = <94>, <432>;
+		interrupts = <GIC_SPI 576 IRQ_TYPE_EDGE_RISING>;
+		qcom,ipc = <&apcs 0 6>;
+		qcom,local-pid = <0>;
+		qcom,remote-pid = <5>;
+
+		cdsp_smp2p_out: master-kernel {
+				qcom,entry-name = "master-kernel";
+				#qcom,smem-state-cells = <1>;
+		};
+
+		cdsp_smp2p_in: slave-kernel {
+				qcom,entry-name = "slave-kernel";
+				interrupt-controller;
+				#interrupt-cells = <2>;
+		};
+
+		smp2p_rdbg5_out: qcom,smp2p-rdbg5-out {
+				qcom,entry-name = "rdbg";
+				#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_rdbg5_in: qcom,smp2p-rdbg5-in {
+			qcom,entry-name = "rdbg";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	cdsp_pas: remoteproc-cdsp@0x8300000 {
+		compatible = "qcom,sm6150-cdsp-pas";
+		reg = <0x8300000 0x100000>;
+		status = "ok";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		qcom,qmp = <&aoss_qmp>;
+
+		interconnects = <&aggre1_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		interconnect-names = "crypto_ddr";
+
+		memory-region = <&rproc_cdsp_mem>;
+
+		/* Inputs from ssc */
+		interrupts-extended = <&intc GIC_SPI 578 IRQ_TYPE_EDGE_RISING>,
+					<&cdsp_smp2p_in 0 0>,
+					<&cdsp_smp2p_in 2 0>,
+					<&cdsp_smp2p_in 1 0>,
+					<&cdsp_smp2p_in 3 0>,
+					<&cdsp_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to turing */
+		qcom,smem-states = <&cdsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		glink-edge {
+			qcom,remote-pid = <5>;
+			transport = "smem";
+			mboxes = <&apss_shared 4>;
+			mbox-names = "cdsp_smem";
+			interrupts = <GIC_SPI 574 IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp";
+			qcom,glink-label = "cdsp";
+
+			qcom,cdsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,msm_fastrpc_rpmsg {
+				compatible = "qcom,msm-fastrpc-rpmsg";
+				qcom,glink-channels = "fastrpcglink-apps-dsp";
+				qcom,intents = <0x64 64>;
+			};
+
+			qcom,msm_cdsprm_rpmsg {
+				compatible = "qcom,msm-cdsprm-rpmsg";
+				qcom,glink-channels = "cdsprmglink-apps-dsp";
+				qcom,intents = <0x20 12>;
+				msm_cdsp_rm: qcom,msm_cdsp_rm {
+					compatible = "qcom,msm-cdsp-rm";
+					qcom,qos-latency-us = <44>;
+					qcom,qos-maxhold-ms = <20>;
+					qcom,compute-cx-limit-en;
+					qcom,compute-priority-mode = <2>;
+					#cooling-cells = <2>;
+				};
+			};
+
+			qcom,cdsp_glink_ssr {
+				qcom,glink-channels = "glink_ssr";
+			};
+		};
+	};
+
 };
 
 #include "sm6150-regulator.dtsi"
