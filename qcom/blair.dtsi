@@ -539,6 +539,32 @@
 		};
 	};
 
+	slimbam: bamdma@A584000 {
+		compatible = "qcom,bam-v1.7.0";
+		qcom,controlled-remotely;
+		reg = <0xA584000 0x20000>, <0xA66F000 0x1000>;
+		reg-names = "bam", "bam_remote_mem";
+		num-channels  = <31>;
+		interrupts = <0 284 IRQ_TYPE_LEVEL_HIGH>;
+		#dma-cells = <1>;
+		qcom,ee = <1>;
+		qcom,num-ees = <2>;
+	};
+
+	slim_msm: slim@A5C0000 {
+		compatible = "qcom,slim-ngd-v1.5.0";
+		reg = <0xA5C0000 0x2C000>, <0xA66E000 0x1000>;
+		reg-names = "ctrl", "slimbus_remote_mem";
+		interrupts = <0 283 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,apps-ch-pipes = <0x0>;
+		qcom,ea-pc = <0x3b0>;
+		dmas = <&slimbam 3>, <&slimbam 4>;
+		dma-names = "rx", "tx";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "disabled";
+	};
+
 	intc: interrupt-controller@f200000 {
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
