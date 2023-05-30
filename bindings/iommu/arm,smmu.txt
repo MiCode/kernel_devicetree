@@ -289,6 +289,25 @@ conditions.
 		driver requests it at a later point in time when the client is ready for
 		DMA transfers.
 
+-qcom,iova-best-fit:
+		Optional, Bool
+		Makes the IOVA allocated do best-fit selection for an IOVA range, as
+		opposed to doing the default first-range selection. Will increase
+		mapping times due to the extra work spent looking for IOVAs.
+
+-qcom,iova-max-align-shift:
+		Optional, Int
+		Restricts the alignment size used for a new IOVA mapping. By default,
+		when mapping a buffer through the DMA-IOMMU driver, the alignment that
+		is used for a new mapping of size X is 2^ceil(log_2(X)). In other words
+		it's the smallest power of two number that is larger than X. So, a
+		34 MB buffer would be mapped at an address with 64 MB alignment, etc.
+		This option allows you to cap that value, such that an alignment of
+
+		qcom,iova-max-align-shift = N;
+
+		caps the alignment to 2^(12 + N) bytes.
+
 ** Examples:
 
         /* SMMU with stream matching or stream indexing */
