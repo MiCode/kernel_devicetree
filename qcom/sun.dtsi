@@ -454,8 +454,25 @@
 	};
 
 	gcc: clock-controller@100000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,sun-gcc", "syscon";
+		reg = <0x100000 0x1f4200>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&pcie_0_pipe_clk>,
+			 <&sleep_clk>,
+			 <&ufs_phy_rx_symbol_0_clk>,
+			 <&ufs_phy_rx_symbol_1_clk>,
+			 <&ufs_phy_tx_symbol_0_clk>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+		clock-names = "bi_tcxo",
+			      "pcie_0_pipe_clk",
+			      "sleep_clk",
+			      "ufs_phy_rx_symbol_0_clk",
+			      "ufs_phy_rx_symbol_1_clk",
+			      "ufs_phy_tx_symbol_0_clk",
+			      "usb3_phy_wrapper_gcc_usb30_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -556,35 +573,67 @@
 		regulator-name = "eva_cc_mvs0c_gdsc";
 	};
 
+	gcc_apcs_gdsc_vote_ctrl: syscon@15214c {
+		compatible = "syscon";
+		reg = <0x15214c 0x4>;
+	};
+
 	/* GCC GDSCs */
 	gcc_pcie_0_gdsc: qcom,gdsc@16b004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x16b004 0x4>;
 		regulator-name = "gcc_pcie_0_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
+		qcom,no-status-check-on-disable;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 0>;
+		qcom,support-cfg-gdscr;
 	};
 
 	gcc_pcie_0_phy_gdsc: qcom,gdsc@16c000 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x16c000 0x4>;
 		regulator-name = "gcc_pcie_0_phy_gdsc";
+		parent-supply = <&VDD_MX_LEVEL>;
+		qcom,retain-regs;
+		qcom,no-status-check-on-disable;
+		qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl 2>;
+		qcom,support-cfg-gdscr;
 	};
 
 	gcc_ufs_mem_phy_gdsc: qcom,gdsc@19e000 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x19e000 0x4>;
 		regulator-name = "gcc_ufs_mem_phy_gdsc";
+		parent-supply = <&VDD_MX_LEVEL>;
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	gcc_ufs_phy_gdsc: qcom,gdsc@177004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x177004 0x4>;
 		regulator-name = "gcc_ufs_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	gcc_usb30_prim_gdsc: qcom,gdsc@139004 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x139004 0x4>;
 		regulator-name = "gcc_usb30_prim_gdsc";
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	gcc_usb3_phy_gdsc: qcom,gdsc@150018 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x150018 0x4>;
 		regulator-name = "gcc_usb3_phy_gdsc";
+		parent-supply = <&VDD_MX_LEVEL>;
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	/* GPU_CC GDSCs */
