@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qcom-sdpm.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Simple Digital Power Meter(SDPM) Clock Monitoring Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  SDPM is used to monitor the operating frequency of different clocks and based
+  on operating levels of different clients, the Policy Engine will recommend a
+  new max operating level. The SDPM driver will register with the clock
+  framework for rate change notification of different clocks. These clock rate
+  will be updated to SDPM.
+
+properties:
+  compatible:
+    const: qcom,sdpm
+    description: msm battery state of charge device
+
+  reg:
+    maxItems: 1
+    description: |
+      <a b> where 'a' is the RDPM base register address and
+      'b' is the size of the RDPM address space.
+
+  clocks:
+    description: A List of phandle and clock specifier pairs as listed
+      in clock-names property.
+
+  clock-names:
+    description: |
+      List of clock names matching the clock order mentioned in
+      the clocks property.
+
+  csr-id:
+    description: Array of CSR ID matching the clock order mentioned in the
+      clocks property.
+
+patternProperties:
+  ".*-supply$":
+    description: Input supply phandle(s) to the regulator device
+      tree node that powers this domain.
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+  - csr-id
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,camcc-sdm845.h>
+    #include <dt-bindings/clock/qcom,gcc-sdm845.h>
+
+    cx_sdpm@634000 {
+      compatible = "qcom,sdpm";
+      reg = <0x00634000 0x1000>;
+      clocks = <&clock_camcc CAM_CC_CSIPHY0_CLK>,
+               <&clock_gcc GCC_UFS_PHY_AXI_CLK_SRC>;
+      clock-names = "cam_cc_csiphy0", "ufs_phy_axi";
+      csr-id = <4 7>;
+      cam_cc_csiphy0-supply = <&cam_cc_ipe_0_gdsc>;
+    };
