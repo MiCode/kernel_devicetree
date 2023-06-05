@@ -1,0 +1,244 @@
+&soc {
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,ravelin-pinctrl";
+		reg = <0xf000000 0x1000000>;
+		interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		wakeup-parent = <&pdc>;
+
+		qupv3_se2_2uart_pins: qupv3_se2_2uart_pins {
+			qupv3_se2_2uart_tx_active: qupv3_se2_2uart_tx_active {
+				mux {
+					pins = "gpio22";
+					function = "qup1_se2_l2";
+				};
+
+				config {
+					pins = "gpio22";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+
+			qupv3_se2_2uart_rx_active: qupv3_se2_2uart_rx_active {
+				mux {
+					pins = "gpio23";
+					function = "qup1_se2_l3";
+				};
+
+				config {
+					pins = "gpio23";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+
+			qupv3_se2_2uart_sleep: qupv3_se2_2uart_sleep {
+				mux {
+					pins = "gpio22", "gpio23";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio22", "gpio23";
+					drive-strength = <2>;
+					bias-pull-down;
+				};
+			};
+		};
+
+		/* WSA speaker reset pins */
+		spkr_1_sd_n {
+			spkr_1_sd_n_sleep: spkr_1_sd_n_sleep {
+				mux {
+					pins = "gpio99";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio99";
+					drive-strength = <2>;   /* 2 mA */
+					bias-pull-down;
+					input-enable;
+				};
+			};
+
+			spkr_1_sd_n_active: spkr_1_sd_n_active {
+				mux {
+					pins = "gpio99";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio99";
+					drive-strength = <16>;   /* 16 mA */
+					bias-disable;
+					output-high;
+				};
+			};
+		};
+
+		spkr_2_sd_n {
+			spkr_2_sd_n_sleep: spkr_2_sd_n_sleep {
+				mux {
+					pins = "gpio100";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio100";
+					drive-strength = <2>;   /* 2 mA */
+					bias-pull-down;
+					input-enable;
+				};
+			};
+
+			spkr_2_sd_n_active: spkr_2_sd_n_active {
+				mux {
+					pins = "gpio100";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio100";
+					drive-strength = <16>;   /* 16 mA */
+					bias-disable;
+					output-high;
+				};
+			};
+		};
+
+		/* WCD reset pin */
+		wcd_reset_active: wcd_reset_active {
+			mux {
+				pins = "gpio96";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio96";
+				drive-strength = <16>;
+				output-high;
+			};
+		};
+
+		wcd_reset_sleep: wcd_reset_sleep {
+			mux {
+				pins = "gpio96";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio96";
+				drive-strength = <16>;
+				bias-disable;
+				output-low;
+			};
+		};
+
+		sdc1_on: sdc1_on {
+			clk {
+				pins = "sdc1_clk";
+				bias-disable;
+				drive-strength = <16>;
+			};
+
+			cmd {
+				pins = "sdc1_cmd";
+				bias-pull-up;
+				drive-strength = <10>;
+			};
+
+			data {
+				pins = "sdc1_data";
+				bias-pull-up;
+				drive-strength = <10>;
+			};
+
+			rclk {
+				pins = "sdc1_rclk";
+				bias-pull-down;
+			};
+		};
+
+		sdc1_off: sdc1_off {
+			clk {
+				pins = "sdc1_clk";
+				bias-disable;
+				drive-strength = <2>;
+			};
+
+			cmd {
+				pins = "sdc1_cmd";
+				bias-pull-up;
+				drive-strength = <2>;
+			};
+
+			data {
+				pins = "sdc1_data";
+				bias-pull-up;
+				drive-strength = <2>;
+			};
+
+			rclk {
+				pins = "sdc1_rclk";
+				bias-pull-down;
+			};
+		};
+
+		sdc2_on: sdc2_on {
+			clk {
+				pins = "sdc2_clk";
+				bias-disable;
+				drive-strength = <16>;
+			};
+
+			cmd {
+				pins = "sdc2_cmd";
+				bias-pull-up;
+				drive-strength = <10>;
+			};
+
+			data {
+				pins = "sdc2_data";
+				bias-pull-up;
+				drive-strength = <10>;
+			};
+
+			sd-cd {
+				pins = "gpio101";
+				bias-pull-up;
+				drive-strength = <2>;
+			};
+		};
+
+		sdc2_off: sdc2_off {
+			clk {
+				pins = "sdc2_clk";
+				bias-disable;
+				drive-strength = <2>;
+			};
+
+			cmd {
+				pins = "sdc2_cmd";
+				bias-pull-up;
+				drive-strength = <2>;
+			};
+
+			data {
+				pins = "sdc2_data";
+				bias-pull-up;
+				drive-strength = <2>;
+			};
+
+			sd-cd {
+				pins = "gpio101";
+				bias-pull-up;
+				drive-strength = <2>;
+			};
+		};
+	};
+};
