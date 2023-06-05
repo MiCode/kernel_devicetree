@@ -31,3 +31,4 @@
 | fuxi-t-oss | Xiaomi 13 | Android T | LA.VENDOR.13.2.0.r1-07300-KAILUA.0 | [fuxi-t-oss](https://github.com/MiCode/kernel_devicetree/tree/fuxi-t-oss) |
 | mondrian-s-oss | Redmi K60 | Android S | LA.VENDOR.1.0.r1-11900-r1.0.r1_00029.0 | [mondrian-s-oss](https://github.com/MiCode/kernel_devicetree/tree/mondrian-s-oss) |
 | socrates-t-oss | Redmi K60 Pro | Android T | LA.VENDOR.13.2.0.r1-07300-r1.0.r1_00020.0 | [socrates-t-oss](https://github.com/MiCode/kernel_devicetree/tree/socrates-t-oss) |
+| marble-s-oss | Redmi Note 12 Turbo | Android S | LA.VENDOR.1.0.r1-19000-r2.0.r1_00029.0 | [marble-s-oss](https://github.com/MiCode/kernel_devicetree/tree/marble-s-oss) |
