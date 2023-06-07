@@ -23,21 +23,21 @@ properties:
     maxItems: 1
 
   clock-names:
-    const: se
+    const: se-clk
 
   interconnects:
-    maxItems: 2
+    maxItems: 3
 
   interconnect-names:
     items:
       - const: qup-core
       - const: qup-config
+      - const: qup-memory
 
   interrupts:
     minItems: 1
     items:
       - description: UART core irq
-      - description: Wakeup irq (RX GPIO)
 
   operating-points-v2: true
 
@@ -68,19 +68,23 @@ unevaluatedProperties: false
 examples:
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-    #include <dt-bindings/clock/qcom,gcc-sc7180.h>
-    #include <dt-bindings/interconnect/qcom,sc7180.h>
+    #include <dt-bindings/clock/qcom,gcc-sun.h>
+    #include <dt-bindings/interconnect/qcom,sun.h>
 
-    serial@a88000 {
+    qupv3_se0_2uart: qcom,qup_uart@a88000 {
         compatible = "qcom,geni-uart";
         reg = <0xa88000 0x7000>;
         interrupts = <GIC_SPI 355 IRQ_TYPE_LEVEL_HIGH>;
-        clock-names = "se";
+        clock-names = "se-clk";
         clocks = <&gcc GCC_QUPV3_WRAP0_S0_CLK>;
         pinctrl-0 = <&qup_uart0_default>;
-        pinctrl-names = "default";
-        interconnects = <&qup_virt MASTER_QUP_CORE_0 0 &qup_virt SLAVE_QUP_CORE_0 0>,
-                        <&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_QUP_0 0>;
-        interconnect-names = "qup-core", "qup-config";
+        pinctrl-names = "default", "sleep";
+        interconnect-names = "qup-core", "qup-config", "qup-memory";
+        interconnects = <&clk_virt MASTER_QUP_CORE_0 &clk_virt SLAVE_QUP_CORE_0>,
+                        <&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_0>,
+                        <&aggre1_noc MASTER_QUP_0 &mc_virt  SLAVE_EBI0>;
+        pinctrl-names = "default", "sleep";
+        pinctrl-0 = <&qupv3_se0_2uart_tx_active>, <&qupv3_se0_2uart_rx_active>;
+        pinctrl-1 = <&qupv3_se0_2uart_sleep>;
     };
 ...
