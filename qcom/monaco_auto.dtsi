@@ -7,6 +7,8 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
+#include <dt-bindings/interconnect/qcom,monaco_auto.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Monaco AUTO";
@@ -574,6 +576,10 @@
 						  <FAST_PATH_TCS 0>;
 			};
 
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
+			};
+
 			rpmhcc: qcom,rpmhcc {
 				compatible = "qcom,lemans-rpmh-clk";
 				#clock-cells = <1>;
@@ -1127,6 +1133,119 @@
 			      "gpucc",
 			      "videocc";
 		#clock-cells = <1>;
+	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,monaco_auto-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,monaco_auto-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	config_noc: interconnect@014C0000 {
+		compatible = "qcom,monaco_auto-config_noc";
+		reg = <0x014C0000 0x13080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	system_noc: interconnect@01680000 {
+		compatible = "qcom,monaco_auto-system_noc";
+		reg = <0x01680000 0x15080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	aggre1_noc:interconnect@016C0000 {
+		compatible = "qcom,monaco_auto-aggre1_noc";
+		reg = <0x016C0000 0x17080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	aggre2_noc: interconnect@01700000 {
+		compatible = "qcom,monaco_auto-aggre2_noc";
+		reg = <0x01700000 0x1A080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	pcie_anoc: interconnect@01760000 {
+		compatible = "qcom,monaco_auto-pcie_anoc";
+		reg = <0x01760000 0xC080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	gpdsp_anoc: interconnect@01780000 {
+		compatible = "qcom,monaco_auto-gpdsp_anoc";
+		reg = <0x01780000 0xD080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	mmss_noc: interconnect@017A0000 {
+		compatible = "qcom,monaco_auto-mmss_noc";
+		reg = <0x017A0000 0x40000>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	lpass_ag_noc: interconnect@03C40000 {
+		compatible = "qcom,monaco_auto-lpass_ag_noc";
+		reg = <0x3C40000 0x17200>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	dc_noc: interconnect@090E0000 {
+		compatible = "qcom,monaco_auto-dc_noc";
+		reg = <0x090E0000 0x5080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	gem_noc: interconnect@09100000 {
+		compatible = "qcom,monaco_auto-gem_noc";
+		reg = <0x09100000 0xF7080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	nspa_noc: interconnect@260C0000 {
+		compatible = "qcom,monaco_auto-nspa_noc";
+		reg = <0x260C0000 0x16080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
 	};
 };
 
