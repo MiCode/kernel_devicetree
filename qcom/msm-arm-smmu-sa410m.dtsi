@@ -1,0 +1,129 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+&soc {
+
+	apps_smmu: apps-smmu@0xc600000 {
+				status = "okay";
+				compatible = "qcom,qsmmu-v500";
+				reg = <0xc600000 0x80000>,
+					<0xc782000 0x20>;
+				reg-names = "base", "tcu-base";
+				#iommu-cells = <2>;
+				qcom,skip-init;
+				qcom,use-3-lvl-tables;
+				#global-interrupts = <1>;
+				#size-cells = <1>;
+				#address-cells = <1>;
+				ranges;
+				interrupts = <GIC_SPI 81 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 87 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 92 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 128 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 131 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 139 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 140 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 141 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 142 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH>;
+
+				interconnects = <&bimc_noc MASTER_AMPSS_M0
+						&sys_noc SLAVE_QDSS_STM>;
+
+				qcom,active-only;
+				qcom,actlr =
+					/* For rt TBU +3 deep PF */
+					<0x400 0x3ff 0x103>,
+					/* For nrt TBU +3 deep PF */
+					<0x800 0x3ff 0x103>;
+
+				anoc_1_tbu: anoc_1_tbu@0xc785000 {
+					compatible = "qcom,qsmmuv500-tbu";
+					reg = <0xc785000 0x1000>,
+						<0xc782200 0x8>;
+					reg-names = "base", "status-reg";
+					qcom,stream-id-range = <0x0 0x400>;
+					interconnects = <&bimc_noc MASTER_AMPSS_M0
+						&config_noc SLAVE_IMEM_CFG>,
+						<&bimc_noc MASTER_AMPSS_M0
+						&sys_noc SLAVE_QDSS_STM>;
+					qcom,iova-width = <36>;
+				};
+
+
+	};
+
+	dma_dev@0x0 {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
+	};
+
+	iommu_test_device {
+		compatible = "qcom,iommu-debug-test";
+		apps_iommu_test_device {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1E0 0>;
+		};
+
+		apps_iommu_coherent_test_device {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x1E1 0>;
+			dma-coherent;
+		};
+	};
+
+};

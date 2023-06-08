@@ -1,0 +1,177 @@
+/ {
+	model = "Qualcomm Technologies, Inc. Cinder RU";
+	compatible = "qcom,cinder";
+	qcom,msm-id = <539 0x10000>, <588 0x10000>, <589 0x10000>, <590 0x10000>;
+};
+
+#include "cinder.dtsi"
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	hyp_mem: hyp_region@80000000 {
+		no-map;
+		reg = <0x0 0x80000000 0x0 0x600000>;
+	};
+
+	xbl_dt_log_mem: xbl_dt_log@80600000 {
+		no-map;
+		reg = <0x0 0x80600000 0x0 0x40000>;
+	};
+
+	xbl_ramdump_mem: xbl_ramdump_region@80640000 {
+		no-map;
+		reg = <0x0 0x80640000 0x0 0x1c0000>;
+	};
+
+	aop_image_mem: aop_image_region@80800000 {
+		no-map;
+		reg = <0x0 0x80800000 0x0 0x60000>;
+	};
+
+	aop_cmd_db_mem: aop_cmd_db_region@80860000 {
+		compatible = "qcom,cmd-db";
+		no-map;
+		reg = <0x0 0x80860000 0x0 0x20000>;
+	};
+
+	aop_config_mem: aop_config_region@80880000 {
+		no-map;
+		reg = <0x0 0x80880000 0x0 0x20000>;
+	};
+
+	tme_crash_dump_mem: tme_crash_dump_region@808a0000 {
+		no-map;
+		reg = <0x0 0x808a0000 0x0 0x40000>;
+	};
+
+	tme_log_mem: tme_log_region@808e0000 {
+		no-map;
+		reg = <0x0 0x808e0000 0x0 0x4000>;
+	};
+
+	uefi_log_mem: uefi_log_region@808e4000 {
+		no-map;
+		reg = <0x0 0x808e4000 0x0 0x10000>;
+	};
+
+	/* secdata region can be reused by apps */
+
+	smem_mem: smem_region@80900000 {
+		no-map;
+		reg = <0x0 0x80900000 0x0 0x200000>;
+	};
+
+	cpucp_fw_mem: cpucp_fw_region@80b00000 {
+		no-map;
+		reg = <0x0 0x80b00000 0x0 0x100000>;
+	};
+
+	xbl_sc_mem: xbl_sc_region@80c00000 {
+		no-map;
+		reg = <0x0 0x80c00000 0x0 0x40000>;
+	};
+
+	/* uefi region can be reused by apps */
+
+	tz_stat_mem: tz_stat_region@81d00000 {
+		no-map;
+		reg = <0x0 0x81d00000 0x0 0x100000>;
+	};
+
+	tags_mem: tags_region@81e00000 {
+		no-map;
+		reg = <0x0 0x81e00000 0x0 0x500000>;
+	};
+
+	qtee_mem: qtee_region@82300000 {
+		no-map;
+		reg = <0x0 0x82300000 0x0 0x500000>;
+	};
+
+	ta_mem: ta_region@82800000 {
+		no-map;
+		reg = <0x0 0x82800000 0x0 0xa00000>;
+	};
+
+	fs1_mem: fs1_region@83200000 {
+		no-map;
+		reg = <0x0 0x83200000 0x0 0x400000>;
+	};
+
+	fs2_mem: fs2_region@83600000 {
+		no-map;
+		reg = <0x0 0x83600000 0x0 0x400000>;
+	};
+
+	fs3_mem: fs3_region@83a00000 {
+		no-map;
+		reg = <0x0 0x83a00000 0x0 0x400000>;
+	};
+
+	/* Linux kernel image is loaded at 0x83e00000 */
+
+	ipa_fw_mem: ipa_fw_region@8be00000 {
+		no-map;
+		reg = <0x0 0x8be00000 0x0 0x10000>;
+	};
+
+	ipa_gsi_mem: ipa_gsi_region@8be10000 {
+		no-map;
+		reg = <0x0 0x8be10000 0x0 0x14000>;
+	};
+
+	mpss_mem: mpss_region@8c000000 {
+		no-map;
+		reg = <0x0 0x8c000000 0x0 0x12c00000>;
+	};
+
+	q6_mpss_dtb_mem: q6_mpss_dtb_region@9ec00000 {
+		no-map;
+		reg = <0x0 0x9ec00000 0x0 0x80000>;
+	};
+
+	oem_tenx_mem: oem_tenx_region@a0000000 {
+		no-map;
+		reg = <0x0 0xa0000000 0x0 0x6400000>;
+	};
+
+	mpss_diag_buffer_mem: tenx_sp_region@aea00000 {
+		no-map;
+		reg = <0x0 0xaea00000 0x0 0x6400000>;
+	};
+
+	tenx_q6_buffer_mem: tenx_q6_buffer_region@b4e00000 {
+		no-map;
+		reg = <0x0 0xb4e00000 0x0 0x3200000>;
+	};
+};
+
+&usb2_phy0 {
+	vdd-supply = <&L5A>;
+	vdda18-supply = <&L14A>;
+	vdda33-supply = <&L2A>;
+	qcom,vdd-voltage-level = <0 880000 920000>;
+};
+
+&usb_qmp_phy {
+	vdd-supply = <&L5A>;
+	qcom,vdd-voltage-level = <0 880000 920000>;
+	qcom,vdd-max-load-uA = <47000>;
+	core-supply = <&L3A>;
+};
+
+&qupv3_se14_spi {
+	spidev@1 {
+		compatible = "qcom,si5518-clk";
+		spi-max-frequency = <1000000>;
+		reg = <1>;
+	};
+
+};
+
+&llcc_device {
+	max-banks = <4>;
+};

@@ -1,0 +1,181 @@
+&chosen {
+	bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 fw_devlink.strict=1";
+};
+
+&arch_timer {
+	clock-frequency = <500000>;
+};
+
+&memtimer {
+	clock-frequency = <500000>;
+};
+
+&soc {
+	pcie_ep: qcom,pcie@48020000 {
+		compatible = "qcom,pcie-ep";
+			reg = <0x48020000 0x10000>,
+				<0x48030000 0x40000>,
+				<0x48000000 0xf20>,
+				 <0x48001000 0x800>,
+				<0x48000f40 0xa8>,
+				<0x48010000 0x10000>,
+				<0x01c00000 0x4000>,
+				<0x01c10000 0x10000>,
+				<0x01c04000 0x1000>,
+				<0x01c09054 0x4>;
+			reg-names = "msi", "msi_vf","dm_core", "dm_core_vf","elbi", "iatu",
+				"parf", "phy", "mmio", "rumi";
+
+		qcom,pcie-link-speed = <1>;
+		qcom,tcsr-not-supported;
+	};
+
+	usb_emu_phy: phy@a784000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x0a784000 0x9500>;
+
+		qcom,emu-init-seq = <0xfffff 0x4
+			0xffff0 0x4
+			0x100000 0x20
+			0x0 0x20
+			0x000101F0 0x20
+			0x00100000 0x3c
+			0x0 0x3c
+			0x0 0x4>;
+	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clock-mult = <1>;
+		clock-div = <2>;
+		clocks = <&xo_board>;
+		#clock-cells = <0>;
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clock-mult = <1>;
+		clock-div = <2>;
+		clocks = <&xo_board>;
+		#clock-cells = <0>;
+	};
+};
+
+&usb0 {
+	dwc3@a600000 {
+		usb-phy = <&usb_emu_phy>, <&usb_nop_phy>;
+		dr_mode = "peripheral";
+		maximum-speed = "high-speed";
+	};
+};
+
+&qupv3_se7_2uart {
+	qcom,rumi_platform;
+};
+
+&sdhc_1 {
+	status = "ok";
+	vdd-supply = <&L10A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L7A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	/delete-property/ mmc-ddr-1_8v;
+	/delete-property/ mmc-hs200-1_8v;
+	/delete-property/ mmc-hs400-1_8v;
+	/delete-property/ mmc-hs400-enhanced-strobe;
+
+	max-frequency = <100000000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+};
+
+&gcc {
+	clocks = <&bi_tcxo>, <&sleep_clk>, <&pcie_0_pipe_clk>,
+		<&pcie_0_phy_aux_clk>, <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+	clock-names = "bi_tcxo", "sleep_clk", "pcie_0_pipe_clk",
+		"pcie_0_phy_aux_clk", "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+};
+
+&tsens0 {
+	status = "disabled";
+};
+
+&ecpricc {
+	clocks = <&bi_tcxo>,
+		<&gcc GCC_ECPRI_CC_GPLL0_CLK_SRC>,
+		<&gcc GCC_ECPRI_CC_GPLL1_EVEN_CLK_SRC>,
+		<&gcc GCC_ECPRI_CC_GPLL2_EVEN_CLK_SRC>,
+		<&gcc GCC_ECPRI_CC_GPLL3_CLK_SRC>,
+		<&gcc GCC_ECPRI_CC_GPLL4_CLK_SRC>,
+		<&gcc GCC_ECPRI_CC_GPLL5_EVEN_CLK_SRC>,
+		<&ecpri_cc_emac_synce_phy0_clk_src>,
+		<&ecpri_cc_emac_synce_phy1_clk_src>,
+		<&ecpri_cc_emac_synce_phy2_clk_src>,
+		<&ecpri_cc_emac_synce_phy3_clk_src>,
+		<&ecpri_cc_emac_synce_phy4_clk_src>,
+		<&ecpri_cc_emac_synce_phy5_clk_src>,
+		<&ecpri_cc_emac_synce_phy6_clk_src>,
+		<&ecpri_cc_emac_synce_phy7_clk_src>,
+		<&ecpri_cc_emac_synce_phy8_clk_src>,
+		<&ecpri_cc_emac_synce_phy9_clk_src>,
+		<&ecpri_cc_emac_synce_phy10_clk_src>,
+		<&ecpri_cc_emac_synce_phy11_clk_src>,
+		<&ecpri_cc_emac_synce_phy12_clk_src>,
+		<&ecpri_cc_emac_synce_phy13_clk_src>,
+		<&ecpri_cc_emac_synce_phy14_clk_src>,
+		<&ecpri_cc_emac_synce_phy15_clk_src>,
+		<&ecpri_cc_emac_synce_phy16_clk_src>,
+		<&ecpri_cc_emac_synce_phy17_clk_src>,
+		<&ecpri_cc_emac_synce_phy18_clk_src>,
+		<&ecpri_cc_emac_synce_phy19_clk_src>;
+	clock-names = "bi_tcxo",
+		"gcc_ecpri_cc_gpll0_out_main",
+		"gcc_ecpri_cc_gpll1_out_even",
+		"gcc_ecpri_cc_gpll2_out_main",
+		"gcc_ecpri_cc_gpll3_out_main",
+		"gcc_ecpri_cc_gpll4_out_main",
+		"gcc_ecpri_cc_gpll5_out_even",
+		"ecpri_cc_emac_synce_phy0_clk_src",
+		"ecpri_cc_emac_synce_phy1_clk_src",
+		"ecpri_cc_emac_synce_phy2_clk_src",
+		"ecpri_cc_emac_synce_phy3_clk_src",
+		"ecpri_cc_emac_synce_phy4_clk_src",
+		"ecpri_cc_emac_synce_phy5_clk_src",
+		"ecpri_cc_emac_synce_phy6_clk_src",
+		"ecpri_cc_emac_synce_phy7_clk_src",
+		"ecpri_cc_emac_synce_phy8_clk_src",
+		"ecpri_cc_emac_synce_phy9_clk_src",
+		"ecpri_cc_emac_synce_phy10_clk_src",
+		"ecpri_cc_emac_synce_phy11_clk_src",
+		"ecpri_cc_emac_synce_phy12_clk_src",
+		"ecpri_cc_emac_synce_phy13_clk_src",
+		"ecpri_cc_emac_synce_phy14_clk_src",
+		"ecpri_cc_emac_synce_phy15_clk_src",
+		"ecpri_cc_emac_synce_phy16_clk_src",
+		"ecpri_cc_emac_synce_phy17_clk_src",
+		"ecpri_cc_emac_synce_phy18_clk_src",
+		"ecpri_cc_emac_synce_phy19_clk_src";
+};
+
+&rpmhcc {
+	compatible = "qcom,dummycc";
+	clock-output-names = "rpmhcc_clocks";
+};
+
+&debugcc {
+	clocks = <&bi_tcxo>;
+	clock-names = "xo_clk_src";
+};
+
+&cpufreq_hw {
+	clocks = <&bi_tcxo>, <&gcc GCC_GPLL0>;
+	clock-names = "xo", "alternate";
+};

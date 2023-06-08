@@ -1,0 +1,105 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h>
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup.memory=nokmem,nosocket";
+	};
+
+	soc: soc { };
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x0 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x2000000>;
+			linux,cma-default;
+		};
+
+		pmem_shared: pmem_shared_region {
+			reg = <0x1 0x6a500000 0x0 0x51400000>;
+			label = "pmem_shared_mem";
+		};
+
+		qseecom_mem: qseecom_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1400000>;
+		};
+
+		qseecom_ta_mem: qseecom_ta_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1000000>;
+		};
+	};
+};
+
+&soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	interrupt-parent = <&intc>;
+	ranges = <0x0 0x0 0x0 0xffffffff>;
+	compatible = "simple-bus";
+
+	intc: vgic@0 {
+		qvm,vdev = "gic";
+		#interrupt-cells = <3>;
+		interrupt-controller;
+	};
+
+	qcom_dma_heaps: qcom,dma-heaps {
+		compatible = "qcom,dma-heaps";
+
+		qcom,qseecom {
+			qcom,dma-heap-name = "qcom,qseecom";
+			qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+			memory-region = <&qseecom_mem>;
+		};
+
+		qcom,qseecom_ta {
+			qcom,dma-heap-name = "qcom,qseecom-ta";
+			qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+			memory-region = <&qseecom_ta_mem>;
+		};
+	};
+
+	qcom,msm-imem@14680000 {
+		compatible = "qcom,msm-imem";
+		reg = <0x14680000 0x1000>;
+		ranges = <0x0 0x14680000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_stats@6b0 {
+			compatible = "qcom,msm-imem-boot_stats";
+			reg = <0x6b0 0x20>;
+		};
+	};
+
+	qcom,mpm2-sleep-counter@c221000 {
+		compatible = "qcom,mpm2-sleep-counter";
+		reg = <0xc221000 0x1000>;
+		clock-frequency = <32768>;
+	};
+};
+

@@ -1,0 +1,38 @@
+#include "kalama-qrd.dtsi"
+
+&sdhc_2 {
+	cd-gpios = <&pm8550_gpios 12 GPIO_ACTIVE_HIGH>;
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "default";
+};
+
+&redriver {
+	status = "disabled";
+};
+
+&regulator_ocp_notifier {
+	/delete-property/ periph-bc3-supply;
+	/delete-property/ periph-bc4-supply;
+	/delete-property/ periph-bc5-supply;
+	/delete-property/ periph-bc6-supply;
+	/delete-property/ periph-bc7-supply;
+};
+
+&pm8550b_eusb2_repeater {
+	qcom,param-override-seq =
+		/* <value reg_offset> */
+		/* Adjust HS trasmit amplitude */
+		<0xb 0x51
+		/* Squelch detection threshold */
+		 0x3 0x54
+		/* Tx pre-emphasis tuning */
+		 0x3 0x57
+		/* HS disconnect threshold */
+		 0x6 0x53>;
+};
+
+&pcie1 {
+	qcom,boot-option = <0x2>;
+};
