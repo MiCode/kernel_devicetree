@@ -68,6 +68,7 @@ kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOA
 dtb-y += $(kalama-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
+BLAIR_APQ_BASE_DTB += blairp.dtb
 
 BLAIR_BOARDS += \
 		 blair-mtp-overlay.dtbo \
@@ -78,9 +79,19 @@ BLAIR_BOARDS += \
 		 blair-mtp-nopmi-overlay.dtbo \
 		 blair-qrd-nopmi-overlay.dtbo
 
+APQ_BLAIR_BOARDS += \
+		 blairp-mtp-overlay.dtbo \
+		 blairp-qrd-overlay.dtbo \
+		 blairp-cdp-overlay.dtbo \
+		 blairp-atp-overlay.dtbo \
+		 blairp-mtp-usbc-overlay.dtbo \
+		 blairp-mtp-nopmi-overlay.dtbo \
+		 blairp-qrd-nopmi-overlay.dtbo
+
 blair-dtb-$(CONFIG_ARCH_BLAIR) += \
-	$(call add-overlays, $(BLAIR_BOARDS),$(BLAIR_BASE_DTB))
-blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(BLAIR_BASE_DTB)
+	$(call add-overlays, $(BLAIR_BOARDS),$(BLAIR_BASE_DTB))\
+	$(call add-overlays, $(APQ_BLAIR_BOARDS),$(BLAIR_APQ_BASE_DTB))
+blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(APQ_BLAIR_BOARDS) $(BLAIR_BASE_DTB) $(BLAIR_APQ_BASE_DTB)
 dtb-y += $(blair-dtb-y)
 endif
 

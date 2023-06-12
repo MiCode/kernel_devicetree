@@ -10,7 +10,7 @@ _platform_map = {
         ],
         "dtbo_list": [
             # keep sorted
-            {"name":"direwolf-vm-la-overlay.dtbo"},
+            {"name": "direwolf-vm-la-overlay.dtbo"},
             {"name": "lemans-vm-la-overlay.dtbo"},
             {"name": "lemans-vm-lv-overlay.dtbo"},
             {"name": "sa8155-vm-la-overlay.dtbo"},
@@ -71,7 +71,7 @@ _platform_map = {
             {
                 "name": "kalama-rumi-overlay.dtbo",
                 "apq": False,
-            }
+            },
         ],
     },
     "kalama-tuivm": {
@@ -164,6 +164,10 @@ _platform_map = {
     "blair": {
         "dtb_list": [
             {"name": "blair.dtb"},
+            {
+                "name": "blairp.dtb",
+                "apq": True,
+            },
         ],
         "dtbo_list": [
             {"name": "blair-mtp-overlay.dtbo"},
@@ -173,6 +177,13 @@ _platform_map = {
             {"name": "blair-mtp-usbc-overlay.dtbo"},
             {"name": "blair-mtp-nopmi-overlay.dtbo"},
             {"name": "blair-qrd-nopmi-overlay.dtbo"},
+            {"name": "blairp-mtp-overlay.dtbo"},
+            {"name": "blairp-qrd-overlay.dtbo"},
+            {"name": "blairp-cdp-overlay.dtbo"},
+            {"name": "blairp-atp-overlay.dtbo"},
+            {"name": "blairp-mtp-usbc-overlay.dtbo"},
+            {"name": "blairp-mtp-nopmi-overlay.dtbo"},
+            {"name": "blairp-qrd-nopmi-overlay.dtbo"},
         ],
     },
 }
@@ -203,8 +214,8 @@ def _get_dtb_lists(target, dt_overlay_supported):
 
     return ret
 
-def get_dtb_list(target, dt_overlay_supported=True):
+def get_dtb_list(target, dt_overlay_supported = True):
     return [dtb["name"] for dtb in _get_dtb_lists(target, dt_overlay_supported).get("dtb_list", [])]
 
-def get_dtbo_list(target, dt_overlay_supported=True):
+def get_dtbo_list(target, dt_overlay_supported = True):
     return [dtb["name"] for dtb in _get_dtb_lists(target, dt_overlay_supported).get("dtbo_list", [])]
