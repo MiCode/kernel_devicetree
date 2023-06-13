@@ -371,6 +371,46 @@
 
 };
 
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,gcc-blair.h>
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-blair";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L7A>;
+	vdda-phy-max-microamp = <85700>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4A>;
+	vdda-pll-max-microamp = <18300>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+	vdd-hba-fixed-regulator;
+
+	vcc-supply = <&L24A>;
+	vcc-voltage-level = <2950000 2960000>;
+	vcc-max-microamp = <800000>;
+
+	vccq2-supply = <&L11A>;
+	vccq2-max-microamp = <800000>;
+	vccq2-voltage-level = <1800000 1800000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L4A>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	reset-gpios = <&tlmm 156 GPIO_ACTIVE_LOW>;
+	resets = <&gcc GCC_UFS_PHY_BCR>;
+	reset-names = "rst";
+
+	status = "ok";
+};
+
 &qupv3_se8_i2c {
 	#address-cells = <1>;
 	#size-cells = <0>;
