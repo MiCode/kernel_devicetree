@@ -96,13 +96,24 @@ dtb-y += $(blair-dtb-y)
 endif
 
 MONACO_AUTO_BASE_DTB	+= monaco_auto.dtb
+MONACO_AUTO_IVI_BASE_DTB	+= monaco_auto-ivi.dtb
+MONACO_AUTO_ADAS_BASE_DTB	+= monaco_auto-adas.dtb
+
 MONACO_AUTO_BOARDS	+= monaco_auto-rumi-overlay.dtbo
+MONACO_AUTO_IVI_BOARDS	+= monaco_auto-ivi-adp-star-overlay.dtbo \
+			   monaco_auto-ivi-adp-air-overlay.dtbo
+MONACO_AUTO_ADAS_BOARDS	+= monaco_auto-adas-adp-star-overlay.dtbo \
+			   monaco_auto-adas-adp-air-overlay.dtbo
 
 gen4auto-dtb-$(CONFIG_ARCH_MONACO_AUTO) += \
-	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))
+	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))\
+	$(call add-overlays, $(MONACO_AUTO_IVI_BOARDS),$(MONACO_AUTO_IVI_BASE_DTB))\
+	$(call add-overlays, $(MONACO_AUTO_ADAS_BOARDS),$(MONACO_AUTO_ADAS_BASE_DTB))
 
 gen4auto-overlays-dtb-$(CONFIG_ARCH_MONACO_AUTO) +=  \
-	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)
+	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)\
+	$(MONACO_AUTO_IVI_BOARDS),$(MONACO_AUTO_IVI_BASE_DTB)\
+	$(MONACO_AUTO_ADAS_BOARDS),$(MONACO_AUTO_ADAS_BASE_DTB)
 
 dtb-y += $(gen4auto-dtb-y)
 
