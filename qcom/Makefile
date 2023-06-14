@@ -93,6 +93,22 @@ blair-dtb-$(CONFIG_ARCH_BLAIR) += \
 	$(call add-overlays, $(APQ_BLAIR_BOARDS),$(BLAIR_APQ_BASE_DTB))
 blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(APQ_BLAIR_BOARDS) $(BLAIR_BASE_DTB) $(BLAIR_APQ_BASE_DTB)
 dtb-y += $(blair-dtb-y)
+
+HOLI_BASE_DTB += holi.dtb
+
+HOLI_BOARDS += \
+		 holi-mtp-overlay.dtbo \
+		 holi-qrd-overlay.dtbo \
+		 holi-cdp-overlay.dtbo \
+		 holi-atp-overlay.dtbo \
+		 holi-mtp-usbc-overlay.dtbo
+
+holi-dtb-$(CONFIG_ARCH_HOLI) += \
+	$(call add-overlays, $(HOLI_BOARDS),$(HOLI_BASE_DTB))
+holi-overlays-dtb-$(CONFIG_ARCH_HOLI) += $(HOLI_BOARDS) $(HOLI_BASE_DTB)
+dtb-y += $(holi-dtb-y)
+
+
 endif
 
 MONACO_AUTO_BASE_DTB	+= monaco_auto.dtb
