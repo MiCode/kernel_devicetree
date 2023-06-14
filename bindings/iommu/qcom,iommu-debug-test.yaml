@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 %YAML 1.2
 ---
-$id: "http://devicetree.org/schemas/iommu/iommu-debug-test.yaml#"
+$id: "http://devicetree.org/schemas/iommu/qcom,iommu-debug-test.yaml#"
 $schema: "http://devicetree.org/meta-schemas/core.yaml#"
 
 title: IOMMU Debugging and Testing Framework Device Tree Bindings
@@ -19,18 +19,23 @@ properties:
     items:
       - const: qcom,iommu-debug-test
 
-  child nodes:
-    compatible: : qcom,iommu-debug-usecase
-    iommus:
-      minItems: 1
-      items:
-        - description: IOMMU specifier with a SID and an SMR mask
-      description:
-        IOMMU specifier with a SID and an SMR mask
+  sample_usecase:
+    description: |
+      A child device with various iommu properties under test.
+    type: object
+    properties:
+      compatible:
+        const: qcom,iommu-debug-usecase
+      iommus:
+        minItems: 1
+        description:
+          IOMMU specifier with a SID and an SMR mask
 
 required:
   - compatible
   - iommus
+
+additionalProperties: false
 
 examples:
   - |
@@ -39,5 +44,5 @@ examples:
         sample_usecase {
           compatible = "qcom,iommu-debug-usecase";
           iommus = <&apps_smmu 0x7e1 0>;
-        }
+        };
     };
