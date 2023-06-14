@@ -46,6 +46,20 @@ _platform_map = {
             {"name": "monaco_auto-rumi-overlay.dtbo"},
         ],
     },
+    "sdmsteppeauto": {
+        "dtb_list": [
+            #keep sorted
+            {"name": "sa6155.dtb"},
+            {"name": "sa6155p.dtb"},
+        ],
+        "dtbo_list": [
+            #keep sorted
+            {"name": "sa6155-adp-air-overlay.dtbo"},
+            {"name": "sa6155-adp-star-overlay.dtbo"},
+            {"name": "sa6155p-adp-air-overlay.dtbo"},
+            {"name": "sa6155p-adp-star-overlay.dtbo"},
+        ],
+    },
     "kalama": {
         "dtb_list": [
             {"name": "kalama.dtb"},
