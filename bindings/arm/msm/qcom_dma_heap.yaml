@@ -23,11 +23,11 @@ properties:
     description: Container of DMA-BUF heap nodes
 
   compatible:
-    items:
-      -const: qcom,dma-heaps
+    const: qcom,dma-heaps
 
 patternProperties:
   '^qcom,[a-zA-Z]+$':
+    type: object
     properties:
       qcom,dma-heap-name:
         $ref: '/schemas/types.yaml#/definitions/string'
@@ -35,44 +35,37 @@ patternProperties:
         description: The name given to this heap.
 
       qcom,dma-heap-type:
-        $ref: '/schemas/types.yaml#/definitions/string'
-        maxItems: 1
-        items:
-          - enum:
-              - HEAP_TYPE_SECURE_CARVEOUT
-              - HEAP_TYPE_CARVEOUT
-              - HEAP_TYPE_CMA
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        enum:
+          - HEAP_TYPE_SECURE_CARVEOUT
+          - HEAP_TYPE_CARVEOUT
+          - HEAP_TYPE_CMA
         description: |
           The heap type to use for this heap.
 
       qcom,uncached-heap:
-      Usage: optional
-      Value type: <boolean>
-      Definition: Denotes whether this heap provides uncached memory or not.
+        type: boolean
+        description: Denotes whether this heap provides uncached memory or not.
 
       qcom,dynamic-heap:
-      Usage: optional
-      Value type: <boolean>
-      Definition: Denotes whether a heap can have memory dynamically added and
+        type: boolean
+        description: Denotes whether a heap can have memory dynamically added and
            subtracted from it. Heaps with this property are assumed to start off
            with no memory, and must have memory added to them prior to any use.
 
       qcom,token:
         $ref: '/schemas/types.yaml#/definitions/uint32'
-        minItems: 1
         description: |
           Specifies the set of secure domains which will be able to access
           the memory-region.
 
       qcom,max-align:
         $ref: '/schemas/types.yaml#/definitions/uint32'
-        minItems: 1
         description: |
           Maximum alignment of an allocation, in units of page order.
 
       memory-region:
         $ref: '/schemas/types.yaml#/definitions/phandle'
-        maxItems: 1
         description: |
           Specifies the reserved memory region that this heap will allocate
           memory from. This property is only required for heaps that draw memory
@@ -87,12 +80,13 @@ patternProperties:
 required:
   - compatible
 
+additionalProperties: false
+
 examples:
   - |
+    #include <dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h>
     qcom,dma-heaps {
         compatible = "qcom,dma-heaps";
-        #address-cells = <1>;
-	#size-cells = <0>;
 
         qcom,adsp {
             qcom,dma-heap-name = "qcom,adsp";
