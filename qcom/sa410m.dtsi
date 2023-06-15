@@ -1,0 +1,473 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	interrupt-parent = <&intc>;
+
+	memory { device_type = "memory"; reg = <0 0 0 0>; };
+
+	reserved_memory: reserved-memory { };
+
+	mem-offline {
+		compatible = "qcom,mem-offline";
+		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
+				<0x1 0xc0000000 0x0 0x80000000>,
+				<0x2 0xc0000000 0x1 0x40000000>;
+		granule = <512>;
+	};
+
+	aliases {
+	};
+
+	firmware: firmware {};
+
+	cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		CPU0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x0>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
+			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
+			L2_0: l2-cache {
+				compatible = "arm,arch-cache";
+				cache-level = <2>;
+			};
+
+			L1_I_0: l1-icache {
+				compatible = "arm,arch-cache";
+			};
+
+			L1_D_0: l1-dcache {
+				compatible = "arm,arch-cache";
+			};
+		};
+
+		CPU1: cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x1>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
+			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
+
+			L1_I_1: l1-icache {
+				compatible = "arm,arch-cache";
+			};
+
+			L1_D_1: l1-dcache {
+				compatible = "arm,arch-cache";
+			};
+		};
+
+		CPU2: cpu@2 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x2>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
+			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
+
+			L1_I_2: l1-icache {
+				compatible = "arm,arch-cache";
+			};
+
+			L1_D_2: l1-dcache {
+				compatible = "arm,arch-cache";
+			};
+		};
+
+		CPU3: cpu@3 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x3>;
+			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
+			next-level-cache = <&L2_0>;
+			#cooling-cells = <2>;
+
+			L1_I_3: l1-icache {
+				compatible = "arm,arch-cache";
+			};
+
+			L1_D_3: l1-dcache {
+				compatible = "arm,arch-cache";
+			};
+		};
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&CPU0>;
+				};
+
+				core1 {
+					cpu = <&CPU1>;
+				};
+
+				core2 {
+					cpu = <&CPU2>;
+				};
+
+				core3 {
+					cpu = <&CPU3>;
+				};
+			};
+		};
+	};
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7";
+	};
+
+	soc: soc { };
+};
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	hyp_region: hyp_region@45600000 {
+		no-map;
+		reg = <0x0 0x45600000 0x0 0x700000>;
+	};
+
+	xbl_aop_mem: xbl_aop_mem@45d00000 {
+		no-map;
+		reg = <0x0 0x45d00000 0x0 0x200000>;
+	};
+
+	sec_apps_mem: sec_apps_region@45fff000 {
+		no-map;
+		reg = <0x0 0x45fff000 0x0 0x1000>;
+	};
+
+	smem_region: smem@46000000 {
+		no-map;
+		reg = <0x0 0x46000000 0x0 0x200000>;
+	};
+
+	pil_modem_mem: modem_region@4ab00000 {
+		no-map;
+		reg = <0x0 0x4ab00000 0x0 0x6900000>;
+	};
+
+	wlan_msa_mem: wlan_msa_region@51400000 {
+		no-map;
+		reg = <0x0 0x51400000 0x0 0x100000>;
+	};
+
+	pil_adsp_mem: adsp_regions@51500000 {
+		no-map;
+		reg = <0x0 0x51500000 0x0 0x1400000>;
+	};
+
+	pil_ipa_fw_mem: ips_fw_region@52900000 {
+		no-map;
+		reg = <0x0 0x52900000 0x0 0x10000>;
+	};
+
+	pil_ipa_gsi_mem: ipa_gsi_region@52910000 {
+		no-map;
+		reg = <0x0 0x52910000 0x0 0x5000>;
+	};
+
+	tz_stat: tz_stat@53200000 {
+		no-map;
+		reg = <0x0 0x53200000 0x0 0x100000>;
+	};
+
+	pimem_vault: pimem_vault@53300000 {
+		no-map;
+		reg = <0x0 0x53300000 0x0 0x1500000>;
+	};
+
+	adsp_mem: adsp_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0 0x00000000 0 0xffffffff>;
+		reusable;
+		alignment = <0 0x400000>;
+		size = <0 0x800000>;
+	};
+
+	dump_mem: mem_dump_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x800000>;
+	};
+
+	user_contig_mem: user_contig_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
+	};
+
+	qseecom_mem: qseecom_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x700000>;
+	};
+
+	qseecom_ta_mem: qseecom_ta_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x400000>;
+	};
+
+	memshare_mem: memshare_region {
+		compatible = "shared-dma-pool";
+		no-map;
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		alignment = <0x0 0x100000>;
+		size = <0x0 0x800000>;
+	};
+
+	/* global autoconfigured region for contiguous allocations */
+	system_cma:linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
+	};
+};
+
+&soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	ranges = <0 0 0 0xffffffff>;
+	compatible = "simple-bus";
+
+	intc: interrupt-controller@f200000 {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <3>;
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		#redistributor-regions = <1>;
+		redistributor-stride = <0x0 0x20000>;
+		reg = <0xf200000 0x10000>,     /* GICD */
+		      <0xf300000 0x100000>;    /* GICR * 8 */
+		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+		#gpio-cells = <0>;
+	};
+
+	arch_timer: timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <GIC_PPI 1 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 2 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 3 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 0 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
+		clock-frequency = <19200000>;
+	};
+
+	memtimer: timer@f120000 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		compatible = "arm,armv7-timer-mem";
+		reg = <0xf120000 0x1000>;
+		clock-frequency = <19200000>;
+
+		frame@f121000 {
+			frame-number = <0>;
+			interrupts = <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf121000 0x1000>,
+			      <0xf122000 0x1000>;
+		};
+
+		frame@f123000 {
+			frame-number = <1>;
+			interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf123000 0x1000>;
+			status = "disabled";
+		};
+
+		frame@f124000 {
+			frame-number = <2>;
+			interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf124000 0x1000>;
+			status = "disabled";
+		};
+
+		frame@f125000 {
+			frame-number = <3>;
+			interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf125000 0x1000>;
+			status = "disabled";
+		};
+
+		frame@f126000 {
+			frame-number = <4>;
+			interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf126000 0x1000>;
+			status = "disabled";
+		};
+
+		frame@f127000 {
+			frame-number = <5>;
+			interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf127000 0x1000>;
+			status = "disabled";
+		};
+
+		frame@f128000 {
+			frame-number = <6>;
+			interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0xf128000 0x1000>;
+			status = "disabled";
+		};
+	};
+
+	tlmm: pinctrl@500000 {
+			compatible = "qcom,sa410m-pinctrl";
+			reg = <0x500000 0x7F000>,
+			      <0x598000 0xD000>;
+			reg-names = "normal" , "extended";
+			interrupts = <GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+			gpio-ranges = <&tlmm 0 0 139>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+			//wakeup-parent = <&wakegic>;
+	};
+
+	qcom-secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
+	qcom_scm: qcomscm {
+		compatible = "qcom,scm";
+	};
+
+	thermal_zones: thermal-zones { };
+};
+
+#include "sa410m-stub-regulators.dtsi"
+
+#include "scuba-thermal.dtsi"
+
+&thermal_zones {
+	gpu {
+		trips {
+			gpu-cxip-trip {
+				temperature = <105000>;
+			};
+
+			gpu-trip {
+				temperature = <105000>;
+			};
+
+			gpu-cx-mon {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			/delete-node/ gpu_cdev;
+			/delete-node/ gpu-cx-cdev0;
+		};
+	};
+
+	cpuss-0 {
+		trips {
+			cpu-0-2-config {
+				temperature = <115000>;
+			};
+		};
+	};
+
+	cpuss-1 {
+		trips {
+			cpu-1-3-configs {
+				temperature = <115000>;
+			};
+		};
+	};
+
+	mdm-0 {
+		trips {
+			mdm0-cx-mon {
+				temperature = <105000>;
+			};
+
+			mdm0_emer_mon: mdm0-emer-mon {
+				temperature = <125000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			/delete-node/ mdm0-cx-cdev0;
+			/delete-node/ mdm0-cx-cdev2;
+
+			mdm0-cx-cdev1 {
+				cooling-device = <&modem_proc 1 1>;
+			};
+
+			mdm0-emer-cdev0 {
+				trip = <&mdm0_emer_mon>;
+				cooling-device = <&modem_proc 3 3>;
+			};
+		};
+	};
+
+	mdm-1 {
+		trips {
+			mdm1-cx-mon {
+				temperature = <105000>;
+			};
+
+			mdm1_emer_mon: mdm1-emer-mon {
+				temperature = <125000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			/delete-node/ mdm1-cx-cdev0;
+			/delete-node/ mdm1-cx-cdev2;
+
+			mdm1-cx-cdev1 {
+				cooling-device = <&modem_proc 1 1>;
+			};
+
+			mdm1-emer-cdev0 {
+				trip = <&mdm1_emer_mon>;
+				cooling-device = <&modem_proc 3 3>;
+			};
+		};
+	};
+};
+
+#include "msm-arm-smmu-sa410m.dtsi"
+#include "sa410m-pinctrl.dtsi"

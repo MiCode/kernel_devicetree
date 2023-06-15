@@ -1,0 +1,17 @@
+#include "kalama-sg-hhg.dtsi"
+
+&soc {
+	nvme_vreg: nvme_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "nvme_vreg";
+		gpio = <&pm8550_gpios 11 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+	};
+};
+
+&pcie1 {
+	vreg-3p3-supply = <&nvme_vreg>;
+	qcom,boot-option = <0x2>;
+};

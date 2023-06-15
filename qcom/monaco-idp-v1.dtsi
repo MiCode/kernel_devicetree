@@ -1,0 +1,63 @@
+#include "monaco-idp-v1-common.dtsi"
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm5100.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
+
+&sdhc_1 {
+	status = "ok";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	vdd-supply = <&L25A>;
+	qcom,vdd-voltage-level = <3080000 3080000>;
+	qcom,vdd-current-level = <0 250000>;
+
+	vdd-io-supply = <&L15A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 250000>;
+};
+
+&soc {
+	bluetooth: bt_wcn3990 {
+		compatible = "qcom,qcc5100";
+
+		status = "ok";
+	};
+};
+
+&pm5100_charger {
+	qcom,remote-fg;
+	#io-channel-cells = <1>;
+	io-channels = <&pm5100_adc PM5100_ADC5_GEN3_USB_SNS_V_16>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_USB_IN_I>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_CHG_TEMP>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_DIE_TEMP>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_VPH_PWR>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_BAT_ID_100K_PU>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_BATT_THM_100K_PU>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_VBAT_SNS_QBG>;
+
+	io-channel-names = "usb_in_voltage",
+			   "usb_in_current",
+			   "chg_temp",
+			   "die_temp",
+			   "vph_voltage",
+			   "batt-id",
+			   "batt-temp",
+			   "batt-volt";
+};
+
+&pm5100_gpios {
+	nfc_clk {
+		nfc_clk_default: nfc_clk_default {
+		pins = "gpio4";
+		function = "normal";
+		input-enable;
+		power-source = <1>;
+		};
+	};
+};
