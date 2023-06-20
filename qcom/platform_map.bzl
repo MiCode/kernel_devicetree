@@ -40,9 +40,15 @@ _platform_map = {
         "dtb_list": [
             # keep sorted
             {"name": "monaco_auto.dtb"},
+            {"name": "monaco_auto-adas.dtb"},
+            {"name": "monaco_auto-ivi.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
+            {"name": "monaco_auto-adas-adp-air-overlay.dtbo"},
+            {"name": "monaco_auto-adas-adp-star-overlay.dtbo"},
+            {"name": "monaco_auto-ivi-adp-air-overlay.dtbo"},
+            {"name": "monaco_auto-ivi-adp-star-overlay.dtbo"},
             {"name": "monaco_auto-rumi-overlay.dtbo"},
         ],
     },
