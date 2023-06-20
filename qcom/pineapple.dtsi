@@ -657,7 +657,7 @@
 
 	pdc: interrupt-controller@b220000 {
 		compatible = "qcom,pineapple-pdc", "qcom,pdc";
-		reg = <0xb220000 0x30000>, <0x174000f0 0x64>;
+		reg = <0xb220000 0x10000>, <0x174000f0 0x64>;
 		qcom,pdc-ranges = <0 480 94>, <94 609 31>,
 				  <125 63 1>, <126 716 12>,
 				  <138 251 5>, <143 244 4>;
@@ -694,6 +694,12 @@
 
 	mini_dump_mode {
 		compatible = "qcom,minidump";
+		status = "ok";
+	};
+
+	va_mini_dump {
+		compatible = "qcom,va-minidump";
+		memory-region = <&va_md_mem>;
 		status = "ok";
 	};
 
@@ -859,7 +865,6 @@
 			disp_bcm_voter: bcm_voter {
 				compatible = "qcom,bcm-voter";
 				qcom,tcs-wait = <QCOM_ICC_TAG_AMC>;
-				qcom,no-amc;
 			};
 		};
 	};
@@ -1560,6 +1565,8 @@
 		shared-ice-cfg = <&ice_cfg>;
 		dma-coherent;
 
+		qcom,bypass-pbl-rst-wa;
+
 		status = "disabled";
 
 		qos0 {
@@ -1751,6 +1758,23 @@
 		qcom,hyplog-enabled;
 		hyplog-address-offset = <0x410>;
 		hyplog-size-offset = <0x414>;
+		tmecrashdump-address-offset = <0x81CA0000>;
+	};
+
+	qcom_qseecom: qseecom@c1700000 {
+		compatible = "qcom,qseecom";
+		memory-region = <&qseecom_mem>;
+		qseecom_mem = <&qseecom_mem>;
+		qseecom_ta_mem = <&qseecom_ta_mem>;
+		qcom,no-user-contig-mem-support;
+		qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		qcom,disk-encrypt-pipe-pair = <2>;
+		qcom,no-clock-support;
+		qcom,appsbl-qseecom-support;
+		qcom,commonlib64-loaded-by-uefi;
+		qcom,qsee-reentrancy-support = <2>;
 	};
 
 	qcom_cedev: qcedev@1de0000 {
@@ -1763,7 +1787,9 @@
 		qcom,offload-ops-support;
 		qcom,bam-pipe-offload-cpb-hlos = <1>;
 		qcom,bam-pipe-offload-hlos-cpb = <3>;
+		qcom,bam-pipe-offload-hlos-cpb-1 = <8>;
 		qcom,bam-pipe-offload-hlos-hlos = <4>;
+		qcom,bam-pipe-offload-hlos-hlos-1 = <9>;
 		qcom,ce-hw-instance = <0>;
 		qcom,ce-device = <0>;
 		qcom,ce-hw-shared;
@@ -2062,6 +2088,12 @@
 			qcom,glinkpkt-dev-name = "qmc_cma";
 			qcom,glinkpkt-enable-ch-close;
 		};
+
+		qcom,glinkpkt-xpan_control {
+			qcom,glinkpkt-edge = "adsp";
+			qcom,glinkpkt-ch-name = "bt_cp_ctrl";
+			qcom,glinkpkt-dev-name = "bt_cp_ctrl";
+		};
 	};
 
 	qcom,glink {
@@ -2323,7 +2355,8 @@
 			qcom,msm_cdsprm_rpmsg {
 				compatible = "qcom,msm-cdsprm-rpmsg";
 				qcom,glink-channels = "cdsprmglink-apps-dsp";
-				qcom,intents = <0x20 12>;
+				qcom,intents = <0x20 12
+						0xF00 12>;
 
 				msm_cdsp_rm: qcom,msm_cdsp_rm {
 					compatible = "qcom,msm-cdsp-rm";
@@ -2406,6 +2439,11 @@
 		compatible = "qcom,mem-buf";
 		qcom,mem-buf-capabilities = "supplier";
 		qcom,vmid = <3>;
+	};
+
+	qcom,hdcp {
+		compatible = "qcom,hdcp";
+		qcom,use-smcinvoke = <1>;
 	};
 
 	qcom,mem-buf-msgq {
@@ -2841,8 +2879,8 @@
 				qcom,cpulist = <&CPU0 &CPU1>;
 				qcom,cpufreq-memfreq-tbl =
 					< 1132800  547000 >,
-					< 1574400  768000 >,
-					< 2073600 1555000 >;
+					< 1536000  768000 >,
+					< 2131200 1555000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2850,13 +2888,13 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6>;
 				qcom,cpufreq-memfreq-tbl =
-					<  614400  547000 >,
-					<  921600  768000 >,
-					< 1171200 1555000 >,
-					< 1401600 1708000 >,
-					< 1996800 2736000 >,
-					< 2246400 3187000 >,
-					< 2476800 4224000 >;
+					<  576000  547000 >,
+					<  902400  768000 >,
+					< 1152000 1555000 >,
+					< 1382400 2092000 >,
+					< 1958400 2736000 >,
+					< 2188800 3686000 >,
+					< 3187200 4224000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2864,13 +2902,13 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					<  614400  547000 >,
-					<  921600  768000 >,
-					< 1171200 1555000 >,
-					< 1401600 1708000 >,
-					< 1996800 2736000 >,
-					< 2246400 3187000 >,
-					< 2476800 4224000 >;
+					<  576000  547000 >,
+					<  902400  768000 >,
+					< 1152000 1555000 >,
+					< 1382400 2092000 >,
+					< 1958400 2736000 >,
+					< 2188800 3686000 >,
+					< 3187200 4224000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2878,8 +2916,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1881600  547000 >,
-					< 2476800 1555000 >;
+					< 2073600  547000 >,
+					< 3187200 2092000 >;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
 			};
@@ -2888,8 +2926,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 2246400  547000 >,
-					< 2476800 4224000 >;
+					< 2188800  547000 >,
+					< 3187200 4224000 >;
 				qcom,sampling-enabled;
 			};
 		};
@@ -2905,8 +2943,8 @@
 				qcom,cpulist = <&CPU0 &CPU1>;
 				qcom,cpufreq-memfreq-tbl =
 					<  902400  300000 >,
-					< 1574400  466000 >,
-					< 2073600  600000 >;
+					< 1536000  466000 >,
+					< 2131200  600000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2914,12 +2952,12 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					<  614400  300000 >,
-					< 1171200  466000 >,
-					< 1401600  600000 >,
-					< 1996800  806000 >,
-					< 2246400  933000 >,
-					< 2476800 1066000 >;
+					<  576000  300000 >,
+					< 1152000  466000 >,
+					< 1382400  600000 >,
+					< 1958400  806000 >,
+					< 2188800  933000 >,
+					< 3187200 1066000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2927,8 +2965,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1881600  300000 >,
-					< 2476800  600000 >;
+					< 2073600  300000 >,
+					< 3187200  600000 >;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
 			};
@@ -2945,17 +2983,18 @@
 				qcom,cpulist = <&CPU0 &CPU1>;
 				qcom,cpufreq-memfreq-tbl =
 					<  307200  307200 >,
-					<  441600  384000 >,
+					<  460800  384000 >,
 					<  556800  595200 >,
-					<  787200  691200 >,
+					<  787200  710400 >,
 					<  902400  806400 >,
-					< 1248000 1036800 >,
-					< 1363200 1152000 >,
-					< 1478400 1267200 >,
-					< 1574400 1382400 >,
-					< 1785600 1497600 >,
-					< 1977600 1612800 >,
-					< 2073600 1728000 >;
+					< 1017600  921600 >,
+					< 1132800 1017600 >,
+					< 1344000 1132800 >,
+					< 1536000 1363200 >,
+					< 1651200 1459200 >,
+					< 1747200 1555200 >,
+					< 1939200 1651200 >,
+					< 2131200 1728000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2963,15 +3002,15 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6>;
 				qcom,cpufreq-memfreq-tbl =
-					<  499200  307200 >,
-					<  614400  595200 >,
-					<  921600  806400 >,
-					< 1171200  921600 >,
-					< 1401600 1036800 >,
-					< 1632000 1267200 >,
-					< 1996800 1497600 >,
-					< 2246400 1612800 >,
-					< 2476800 1728000 >;
+					<  460800  307200 >,
+					<  576000  595200 >,
+					<  902400  806400 >,
+					< 1152000 1017600 >,
+					< 1382400 1132800 >,
+					< 1843200 1363200 >,
+					< 2073600 1459200 >,
+					< 2188800 1555200 >,
+					< 3187200 1728000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2979,15 +3018,15 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					<  499200  307200 >,
-					<  614400  595200 >,
-					<  921600  806400 >,
-					< 1171200  921600 >,
-					< 1401600 1036800 >,
-					< 1632000 1267200 >,
-					< 1996800 1497600 >,
-					< 2246400 1612800 >,
-					< 2476800 1728000 >;
+					<  460800  307200 >,
+					<  576000  595200 >,
+					<  902400  806400 >,
+					< 1152000 1017600 >,
+					< 1382400 1132800 >,
+					< 1843200 1363200 >,
+					< 2073600 1459200 >,
+					< 2188800 1555200 >,
+					< 3187200 1728000 >;
 				qcom,sampling-enabled;
 			};
 
@@ -2995,8 +3034,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 2016000  307200 >,
-					< 2476800 1728000 >;
+					< 2073600  307200 >,
+					< 3187200 1728000 >;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
 			};
@@ -3012,8 +3051,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1881600 0 >,
-					< 2476800 1 >;
+					< 1958400 0 >,
+					< 3187200 1 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3021,8 +3060,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 1401600 0 >,
-					< 2476800 1 >;
+					< 1382400 0 >,
+					< 3187200 1 >;
 				qcom,sampling-enabled;
 			};
 
@@ -3030,8 +3069,8 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU7>;
 				qcom,cpufreq-memfreq-tbl =
-					< 2016000 0 >,
-					< 2476800 1 >;
+					< 2073600 0 >,
+					< 3187200 1 >;
 				qcom,sampling-enabled;
 			};
 		};
@@ -3298,9 +3337,9 @@
 		reg = <0x0 0x9b09a000 0x0 0x2000>;
 	};
 
-	spss_region_mem: spss_region_region@9b100000 {
+	spss_region_mem: spss_region_region@9b0a0000 {
 		no-map;
-		reg = <0x0 0x9b100000 0x0 0x180000>;
+		reg = <0x0 0x9b0a0000 0x0 0x1e0000>;
 	};
 
 	/* First part of the "SPU secure shared memory" region */
@@ -3332,22 +3371,22 @@
 
 	cdsp_mem: cdsp_region@9ca00000 {
 		no-map;
-		reg = <0x0 0x9ca00000 0x0 0x2000000>;
+		reg = <0x0 0x9ca00000 0x0 0x1400000>;
 	};
 
-	q6_cdsp_dtb_mem: q6_cdsp_dtb_region@9ea00000 {
+	q6_cdsp_dtb_mem: q6_cdsp_dtb_region@9de00000 {
 		no-map;
-		reg = <0x0 0x9ea00000 0x0 0x80000>;
+		reg = <0x0 0x9de00000 0x0 0x80000>;
 	};
 
-	q6_adsp_dtb_mem: q6_adsp_dtb_region@9ea80000 {
+	q6_adsp_dtb_mem: q6_adsp_dtb_region@9de80000 {
 		no-map;
-		reg = <0x0 0x9ea80000 0x0 0x80000>;
+		reg = <0x0 0x9de80000 0x0 0x80000>;
 	};
 
-	adsp_slpi_mem: adspslpi_region@9eb00000 {
+	adsp_slpi_mem: adspslpi_region@9df00000 {
 		no-map;
-		reg = <0x0 0x9eb00000 0x0 0x4080000>;
+		reg = <0x0 0x9df00000 0x0 0x4080000>;
 	};
 
 	/* uefi region can be reused by apps */
@@ -3396,6 +3435,13 @@
 	llcc_lpi_mem: llcc_lpi_region@ff800000 {
 		no-map;
 		reg = <0x0 0xff800000 0x0 0x600000>;
+	};
+
+	va_md_mem: va_md_mem_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x1000000>;
 	};
 
 	sp_mem: sp_region {  /* SPSS-HLOS ION shared mem */

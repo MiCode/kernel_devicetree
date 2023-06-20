@@ -68,6 +68,7 @@ kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOA
 dtb-y += $(kalama-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
+BLAIR_APQ_BASE_DTB += blairp.dtb
 
 BLAIR_BOARDS += \
 		 blair-mtp-overlay.dtbo \
@@ -78,9 +79,19 @@ BLAIR_BOARDS += \
 		 blair-mtp-nopmi-overlay.dtbo \
 		 blair-qrd-nopmi-overlay.dtbo
 
+APQ_BLAIR_BOARDS += \
+		 blairp-mtp-overlay.dtbo \
+		 blairp-qrd-overlay.dtbo \
+		 blairp-cdp-overlay.dtbo \
+		 blairp-atp-overlay.dtbo \
+		 blairp-mtp-usbc-overlay.dtbo \
+		 blairp-mtp-nopmi-overlay.dtbo \
+		 blairp-qrd-nopmi-overlay.dtbo
+
 blair-dtb-$(CONFIG_ARCH_BLAIR) += \
-	$(call add-overlays, $(BLAIR_BOARDS),$(BLAIR_BASE_DTB))
-blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(BLAIR_BASE_DTB)
+	$(call add-overlays, $(BLAIR_BOARDS),$(BLAIR_BASE_DTB))\
+	$(call add-overlays, $(APQ_BLAIR_BOARDS),$(BLAIR_APQ_BASE_DTB))
+blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(APQ_BLAIR_BOARDS) $(BLAIR_BASE_DTB) $(BLAIR_APQ_BASE_DTB)
 dtb-y += $(blair-dtb-y)
 endif
 
@@ -101,10 +112,12 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
 				pineapple-vm-mtp.dtb \
 				pineapple-vm-cdp.dtb \
 				pineapple-vm-qrd.dtb \
+				pineapple-vm-rcm.dtb \
 				pineapple-oemvm-cdp.dtb \
 				pineapple-oemvm-mtp.dtb \
 				pineapple-oemvm-qrd.dtb \
-				pineapple-oemvm-rumi.dtb
+				pineapple-oemvm-rumi.dtb \
+				pineapple-oemvm-rcm.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
 
 endif
@@ -129,6 +142,11 @@ LEMANS_LA_GVM_BASE_DTB += lemans-vm-la.dtb
 LEMANS_LA_GVM_BOARDS += \
 		lemans-vm-la-overlay.dtbo
 
+LEMANS_LV_GVM_BASE_DTB += lemans-vm-lv.dtb
+
+LEMANS_LV_GVM_BOARDS += \
+		lemans-vm-lv-overlay.dtbo
+
 DIREWOLF_LA_GVM_BASE_DTB += direwolf-vm-la.dtb
 
 DIREWOLF_LA_GVM_BOARDS += \
@@ -148,12 +166,14 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(LEMANS_LV_GVM_BOARDS),$(LEMANS_LV_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) \
 	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) \
 	$(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
+	$(LEMANS_LV_GVM_BOARDS) $(LEMANS_LV_GVM_BASE_DTB) \
 	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
@@ -184,6 +204,22 @@ gen3auto-dtb-$(CONFIG_ARCH_SA8195) += \
 gen3auto-overlays-dtb-$(CONFIG_ARCH_SA8195) += $(SA8195P_BOARDS) $(SA8195P_BASE_DTB)
 
 dtb-y += $(gen3auto-dtb-y)
+
+SA6155_BASE_DTB += sa6155.dtb
+SA6155P_BASE_DTB += sa6155p.dtb
+
+SA6155_BOARDS += sa6155-adp-star-overlay.dtbo \
+                sa6155-adp-air-overlay.dtbo
+
+SA6155P_BOARDS += sa6155p-adp-star-overlay.dtbo \
+                sa6155p-adp-air-overlay.dtbo
+
+sdmsteppeauto-dtb-$(CONFIG_ARCH_SA6155) += \
+	$(call add-overlays, $(SA6155_BOARDS),$(SA6155_BASE_DTB))\
+	$(call add-overlays, $(SA6155P_BOARDS),$(SA6155P_BASE_DTB))
+sdmsteppeauto-overlays-dtb-$(CONFIG_ARCH_SA6155) += $(SA6155_BOARDS) $(SA6155P_BOARDS) $(SA6155_BASE_DTB) $(SA6155P_BASE_DTB)
+
+dtb-y += $(sdmsteppeauto-dtb-y)
 
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)

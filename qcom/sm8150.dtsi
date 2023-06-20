@@ -353,7 +353,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "qcom_dma_heaps.enable_bitstream_contig_heap=y kpti=0 ssbd=force-off";
+		bootargs = "qcom_dma_heaps.enable_bitstream_contig_heap=y kpti=0 ssbd=force-off rcupdate.rcu_expedited=1";
 	};
 
 	soc: soc { };
@@ -539,6 +539,12 @@
 			alignment = <0x0 0x400000>;
 			size = <0x0 0x2800000>;
 			linux,cma-default;
+		};
+
+		kinfo_mem: debug_kinfo_region {
+			alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+			size = <0x0 0x1000>;
+			no-map;
 		};
 	};
 
@@ -2088,6 +2094,11 @@
 	};
 
 	msm_gpu: qcom,kgsl-3d0@2c00000 { };
+
+	google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
+	};
 };
 
 &firmware {
