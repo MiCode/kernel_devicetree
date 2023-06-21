@@ -1,0 +1,71 @@
+#include "monaco_auto-regulators.dtsi"
+
+&apps_rsc_drv2 {
+	/delete-node/ rpmh-regulator-smpc9;
+	/delete-node/ rpmh-regulator-nsp0lvl;
+
+	rpmh-regulator-ldoc6 {
+		compatible = "qcom,rpmh-vrm-regulator";
+		qcom,resource-name = "ldoc6";
+		qcom,regulator-type = "pmic5-ldo";
+		qcom,supported-modes =
+			<RPMH_REGULATOR_MODE_LPM
+			RPMH_REGULATOR_MODE_HPM>;
+		qcom,mode-threshold-currents = <0 30000>;
+
+		L6C:
+		pm7255_c_l6: regulator-pm7255_c-l6 {
+			regulator-name = "pm7255_c_l6";
+			qcom,set = <RPMH_REGULATOR_SET_ALL>;
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+		};
+	};
+
+	rpmh-regulator-nsp0lvl {
+		compatible = "qcom,rpmh-arc-regulator";
+		qcom,resource-name = "nsp0.lvl";
+
+		VDD_NSP_0_LEVEL: S1A_LEVEL:
+		pm7255_a_s1_level: regulator-pm7255_a-s1-level {
+			regulator-name = "pm7255_a_s1_level";
+			qcom,set = <RPMH_REGULATOR_SET_ALL>;
+			regulator-min-microvolt =
+				<RPMH_REGULATOR_LEVEL_SVS_L1>;
+			regulator-max-microvolt =
+				<RPMH_REGULATOR_LEVEL_MAX>;
+			qcom,init-voltage-level =
+				<RPMH_REGULATOR_LEVEL_SVS_L1>;
+		};
+	};
+
+	rpmh-regulator-smpa4 {
+		compatible = "qcom,rpmh-vrm-regulator";
+		qcom,resource-name = "smpa4";
+
+		S4A:
+		pm7255_a_s4: regulator-pm7255_a-s4 {
+			regulator-name = "pm7255_a_s4";
+			qcom,set = <RPMH_REGULATOR_SET_ALL>;
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+		};
+	};
+
+	rpmh-regulator-smpa9 {
+		compatible = "qcom,rpmh-vrm-regulator";
+		qcom,resource-name = "smpa9";
+
+		S9A:
+		pm7255_a_s9: regulator-pm7255_a-s9 {
+			regulator-name = "pm7255_a_s9";
+			qcom,set = <RPMH_REGULATOR_SET_ALL>;
+			regulator-min-microvolt = <1352000>;
+			regulator-max-microvolt = <1352000>;
+			qcom,init-voltage = <1352000>;
+		};
+	};
+};
