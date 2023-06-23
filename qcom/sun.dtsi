@@ -475,8 +475,17 @@
 	};
 
 	evacc: clock-controller@abf0000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "evacc_clocks";
+		compatible = "qcom,sun-evacc", "syscon";
+		reg = <0xabf0000 0x10000>;
+		reg-name = "cc_base";
+		vdd_mm-supply = <&VDD_MM_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>,
+			 <&gcc GCC_EVA_AHB_CLK>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -615,14 +624,22 @@
 
 	/* EVA_CC GDSCs */
 	eva_cc_mvs0_gdsc: qcom,gdsc@abf8068 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xabf8068 0x4>;
 		regulator-name = "eva_cc_mvs0_gdsc";
+		parent-supply = <&eva_cc_mvs0c_gdsc>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
+		qcom,support-cfg-gdscr;
 	};
 
 	eva_cc_mvs0c_gdsc: qcom,gdsc@abf8034 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0xabf8034 0x4>;
 		regulator-name = "eva_cc_mvs0c_gdsc";
+		parent-supply = <&VDD_MM_MXC_VOTER_LEVEL>;
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	gcc_apcs_gdsc_vote_ctrl: syscon@15214c {
