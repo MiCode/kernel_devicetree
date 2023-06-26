@@ -147,6 +147,16 @@ _platform_map = {
         ],
         "binary_compatible_with": ["cliffs"],
     },
+    "niobe": {
+        "dtb_list": [
+            {"name": "niobe.dtb"},
+        ],
+        "dtbo_list": [
+            {
+                "name": "niobe-rumi-overlay.dtbo",
+            },
+        ],
+    },
     "cliffs": {
         "dtb_list": [
             {"name": "cliffs.dtb"},
