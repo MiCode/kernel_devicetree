@@ -7,10 +7,14 @@
 
 &soc {
 	apps_smmu: apps-smmu@15000000 {
-		compatible = "arm,smmu-v2";
+		compatible = "qcom,qsmmu-v500";
 		reg = <0x15000000 0x100000>;
 		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
 		#global-interrupts = <1>;
+		#size-cells = <1>;
+		#address-cells = <1>;
+		ranges;
 		dma-coherent;
 
 		interrupts =	<GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
@@ -110,7 +114,6 @@
 				<GIC_SPI 695 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 696 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 697 IRQ_TYPE_LEVEL_HIGH>,
-				/* cb interrupts above 96 are not functional yet */
 				<GIC_SPI 410 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 488 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 489 IRQ_TYPE_LEVEL_HIGH>,
@@ -123,11 +126,120 @@
 				<GIC_SPI 496 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 497 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 498 IRQ_TYPE_LEVEL_HIGH>,
-				/* cb interrupt 108 missing data on ipcat; set it to 499 */
 				<GIC_SPI 499 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 500 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 501 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 502 IRQ_TYPE_LEVEL_HIGH>;
+
+		anoc_1_qtb: anoc_1_qtb@16f2000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x16f2000 0x1000>;
+			qcom,stream-id-range = <0x0 0x400>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <1>;
+		};
+
+		anoc_2_qtb: anoc_2_qtb@171b000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x171b000 0x1000>;
+			qcom,stream-id-range = <0x400 0x400>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <1>;
+		};
+
+		cam_hf_qtb: cam_hf_qtb@17d2000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x17d2000 0x1000>;
+			qcom,stream-id-range = <0x800 0x400>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <2>;
+		};
+
+		nsp_qtb: nsp_qtb@7d3000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x7d3000 0x1000>;
+			qcom,stream-id-range = <0xc00 0x400>;
+			qcom,iova-width = <34>;
+			qcom,num-qtb-ports = <2>;
+		};
+
+		lpass_qtb: lpass_qtb@7b3000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x7b3000 0x1000>;
+			qcom,stream-id-range = <0x1000 0x400>;
+			qcom,iova-width = <32>;
+			qcom,num-qtb-ports = <1>;
+		};
+
+		pcie_qtb: pcie_qtb@16cd000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x16cd000 0x1000>;
+			qcom,stream-id-range = <0x1400 0x400>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <1>;
+			qcom,opt-out-tbu-halting;
+		};
+
+		sf_qtb: sf_qtb@17d1000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x17d1000 0x1000>;
+			qcom,stream-id-range = <0x1800 0x400>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <2>;
+		};
+
+		mdp_hf_qtb: mdp_hf_qtb@17d0000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x17d0000 0x1000>;
+			qcom,stream-id-range = <0x1c00 0x400>;
+			qcom,iova-width = <32>;
+			qcom,num-qtb-ports = <2>;
+		};
+
+		ubwcp_qtb: ubwcp_qtb@24423000 {
+			compatible = "qcom,qsmmuv500-tbu", "qcom,qtb500";
+			reg = <0x24423000 0x1000>;
+			qcom,stream-id-range = <0x2000 0x400>;
+			qcom,iova-width = <36>;
+			qcom,num-qtb-ports = <1>;
+		};
 	};
 
+	dma_dev {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
+	};
+
+	iommu_test_device {
+		compatible = "qcom,iommu-debug-test";
+
+		usecase0_apps {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x400 0x0>;
+		};
+
+		usecase1_apps_fastmap {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x400 0x0>;
+			qcom,iommu-dma = "fastmap";
+		};
+
+		usecase2_apps_atomic {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x400 0x0>;
+			qcom,iommu-dma = "atomic";
+		};
+
+		usecase3_apps_dma {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x400 0x0>;
+			dma-coherent;
+		};
+
+		usecase4_apps_secure {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x400 0x0>;
+			qcom,iommu-vmid = <0xa>; /* VMID_CP_PIXEL */
+		};
+	};
 };
