@@ -14,22 +14,38 @@ properties:
     items:
       - const: qcom,virtio-mem
 
-  reg:
-    description:
-      Physical address and size of hotpluggable region. Must be aligned
-      to memory_block_size_bytes() - 128 Mb on arm64.
-
   qcom,block-size:
     description:
       Minimum transfer size in bytes. Should be multiple of PAGE_SIZE.
 
+  qcom,max-size:
+    $ref: '/schemas/types.yaml#/definitions/uint64'
+    description: |
+      Maximum amount of hotpluggable memory this device supports.
+
+  qcom,ipa-range:
+    $ref: '/schemas/types.yaml#/definitions/uint64-array'
+    description: |
+      An inclusive range describing what address range the hypervisor
+      is allowed to choose when adding hotpluggable memory for this
+      device.
+
+  qcom,memory-encryption:
+    type: boolean
+    description: |
+      Indicates that virtio-mem should only accept memory which has at least
+      the same level of encryption as the base kernel.
+
 required:
   - compatible
+  - qcom,size
+  - qcom,ipa-range
   - qcom,block-size
 
 example:
 	virtio_mem_device@0x60000000 {
 		compatible = "qcom,virtio-mem";
-		reg = <0x60000000 0x10000000>;
 		qcom,block_size = <0x400000>;
+		qcom,size = <0x0 0x10000000>;
+		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
 	};
