@@ -184,6 +184,7 @@ _platform_map = {
     "blair": {
         "dtb_list": [
             {"name": "blair.dtb"},
+            {"name": "holi.dtb"},
             {
                 "name": "blairp.dtb",
                 "apq": True,
@@ -204,6 +205,11 @@ _platform_map = {
             {"name": "blairp-mtp-usbc-overlay.dtbo"},
             {"name": "blairp-mtp-nopmi-overlay.dtbo"},
             {"name": "blairp-qrd-nopmi-overlay.dtbo"},
+            {"name": "holi-mtp-overlay.dtbo"},
+            {"name": "holi-qrd-overlay.dtbo"},
+            {"name": "holi-cdp-overlay.dtbo"},
+            {"name": "holi-atp-overlay.dtbo"},
+            {"name": "holi-mtp-usbc-overlay.dtbo"},
         ],
     },
 }
