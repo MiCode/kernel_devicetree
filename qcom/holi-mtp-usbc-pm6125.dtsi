@@ -1,8 +1,28 @@
-#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
-#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/linux-event-codes.h>
 #include "holi-pm7250b.dtsi"
+#include "blair-pmic-overlay-pm6125.dtsi"
+#include <dt-bindings/iio/qti_power_supply_iio.h>
 
 &soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmr735a_gpios 1 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+
 	mtp_batterydata: qcom,battery-data {
 		qcom,batt-id-range-pct = <15>;
 		#include "qg-batterydata-alium-3600mah.dtsi"
@@ -116,9 +136,25 @@
 	qcom,cl-feedback-on;
 	qcom,tcss-enable;
 	qcom,fvss-enable;
-	qcom,fvss-vbatt-mv = <3300>;
 	qcom,bass-enable;
 	qcom,use-cp-iin-sns;
+	qcom,vbatt-cutoff-mv = <3400>;
+	qcom,vbatt-empty-mv = <3200>;
+	qcom,vbatt-empty-cold-mv = <3100>;
+	qcom,vbatt-low-mv = <3500>;
+	qcom,fvss-vbatt-mv = <3500>;
+};
+
+&pm7250b_charger {
+	dpdm-supply = <&qusb2_phy0>;
+
+	smb5_vbus: qcom,smb5-vbus {
+		regulator-name = "smb5-vbus";
+	};
+
+	smb5_vconn: qcom,smb5-vconn {
+		regulator-name = "smb5-vconn";
+	};
 };
 
 &pm7250b_vadc {
@@ -175,18 +211,6 @@
 	status = "ok";
 };
 
-&pm7250b_charger {
-	dpdm-supply = <&qusb2_phy0>;
-
-	smb5_vbus: qcom,smb5-vbus {
-		regulator-name = "smb5-vbus";
-	};
-
-	smb5_vconn: qcom,smb5-vconn {
-		regulator-name = "smb5-vconn";
-	};
-};
-
 &pm7250b_pdphy {
 	vdd-pdphy-supply = <&L7E>;
 	vbus-supply = <&smb5_vbus>;
@@ -221,16 +245,4 @@
 			   "real_type",
 			   "typec_mode",
 			   "pe_start";
-};
-
-&usb0 {
-	extcon = <&pm7250b_pdphy>, <&pm7250b_charger>, <&eud>;
-	#io-channel-cells = <1>;
-	io-channels= <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>;
-	io-channel-names = "chg_type";
-
-	dwc3@4e00000 {
-		dr_mode = "otg";
-	};
-
 };
