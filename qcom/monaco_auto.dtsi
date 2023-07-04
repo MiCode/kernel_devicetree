@@ -9,6 +9,7 @@
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 #include <dt-bindings/interconnect/qcom,monaco_auto.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Monaco AUTO";
@@ -1316,6 +1317,37 @@
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 		qcom,skip-qos;
+	};
+
+	adsp_pas: remoteproc-adsp@3000000 {
+		compatible = "qcom,monaco_auto-adsp-pas";
+		reg = <0x3000000 0x00100>;
+
+		memory-region = <&adsp_mem>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		vdd_cx-supply = <&VDD_LPI_CX_LEVEL>;
+		qcom,vdd_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		vdd_mx-supply = <&VDD_LPI_MX_LEVEL>;
+		qcom,vdd_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "cx","mx";
+
+		interrupts-extended =	<&intc GIC_SPI 486 IRQ_TYPE_LEVEL_HIGH>,
+					<&adsp_smp2p_in 0 0>,
+					<&adsp_smp2p_in 2 0>,
+					<&adsp_smp2p_in 1 0>,
+					<&adsp_smp2p_in 3 0>;
+
+		interrupt-names =	"wdog",
+					"fatal",
+					"handover",
+					"ready",
+					"stop-ack";
+
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
 	};
 };
 
