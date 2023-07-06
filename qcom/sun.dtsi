@@ -4,6 +4,7 @@
  */
 
 #include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/clock/qcom,cambistmclkcc-sun.h>
 #include <dt-bindings/clock/qcom,camcc-sun.h>
 #include <dt-bindings/clock/qcom,dispcc-sun.h>
 #include <dt-bindings/clock/qcom,evacc-sun.h>
@@ -458,8 +459,16 @@
 	};
 
 	cambistmclkcc: clock-controller@1760000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "cambistmclkcc_clocks";
+		compatible = "qcom,sun-cambistmclkcc", "syscon";
+		reg = <0x1760000 0x6000>;
+		reg-name = "cc_base";
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>,
+			 <&gcc GCC_CAM_BIST_MCLK_AHB_CLK>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
