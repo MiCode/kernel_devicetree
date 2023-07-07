@@ -3,6 +3,7 @@ _platform_map = {
         "dtb_list": [
             # keep sorted
             {"name": "sun.dtb"},
+            {"name": "sun-v2.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
@@ -67,8 +68,8 @@ def _get_dtb_lists(target, dt_overlay_supported):
 
     return ret
 
-def get_dtb_list(target, dt_overlay_supported=True):
+def get_dtb_list(target, dt_overlay_supported = True):
     return [dtb["name"] for dtb in _get_dtb_lists(target, dt_overlay_supported).get("dtb_list", [])]
 
-def get_dtbo_list(target, dt_overlay_supported=True):
+def get_dtbo_list(target, dt_overlay_supported = True):
     return [dtb["name"] for dtb in _get_dtb_lists(target, dt_overlay_supported).get("dtbo_list", [])]
