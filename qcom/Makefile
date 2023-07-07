@@ -93,16 +93,43 @@ blair-dtb-$(CONFIG_ARCH_BLAIR) += \
 	$(call add-overlays, $(APQ_BLAIR_BOARDS),$(BLAIR_APQ_BASE_DTB))
 blair-overlays-dtb-$(CONFIG_ARCH_BLAIR) += $(BLAIR_BOARDS) $(APQ_BLAIR_BOARDS) $(BLAIR_BASE_DTB) $(BLAIR_APQ_BASE_DTB)
 dtb-y += $(blair-dtb-y)
+
+HOLI_BASE_DTB += holi.dtb
+
+HOLI_BOARDS += \
+		 holi-mtp-overlay.dtbo \
+		 holi-qrd-overlay.dtbo \
+		 holi-cdp-overlay.dtbo \
+		 holi-atp-overlay.dtbo \
+		 holi-mtp-usbc-overlay.dtbo
+
+holi-dtb-$(CONFIG_ARCH_HOLI) += \
+	$(call add-overlays, $(HOLI_BOARDS),$(HOLI_BASE_DTB))
+holi-overlays-dtb-$(CONFIG_ARCH_HOLI) += $(HOLI_BOARDS) $(HOLI_BASE_DTB)
+dtb-y += $(holi-dtb-y)
+
+
 endif
 
 MONACO_AUTO_BASE_DTB	+= monaco_auto.dtb
+MONACO_AUTO_IVI_BASE_DTB	+= monaco_auto-ivi.dtb
+MONACO_AUTO_ADAS_BASE_DTB	+= monaco_auto-adas.dtb
+
 MONACO_AUTO_BOARDS	+= monaco_auto-rumi-overlay.dtbo
+MONACO_AUTO_IVI_BOARDS	+= monaco_auto-ivi-adp-star-overlay.dtbo \
+			   monaco_auto-ivi-adp-air-overlay.dtbo
+MONACO_AUTO_ADAS_BOARDS	+= monaco_auto-adas-adp-star-overlay.dtbo \
+			   monaco_auto-adas-adp-air-overlay.dtbo
 
 gen4auto-dtb-$(CONFIG_ARCH_MONACO_AUTO) += \
-	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))
+	$(call add-overlays, $(MONACO_AUTO_BOARDS),$(MONACO_AUTO_BASE_DTB))\
+	$(call add-overlays, $(MONACO_AUTO_IVI_BOARDS),$(MONACO_AUTO_IVI_BASE_DTB))\
+	$(call add-overlays, $(MONACO_AUTO_ADAS_BOARDS),$(MONACO_AUTO_ADAS_BASE_DTB))
 
 gen4auto-overlays-dtb-$(CONFIG_ARCH_MONACO_AUTO) +=  \
-	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)
+	$(MONACO_AUTO_BOARDS) $(MONACO_AUTO_BASE_DTB)\
+	$(MONACO_AUTO_IVI_BOARDS),$(MONACO_AUTO_IVI_BASE_DTB)\
+	$(MONACO_AUTO_ADAS_BOARDS),$(MONACO_AUTO_ADAS_BASE_DTB)
 
 dtb-y += $(gen4auto-dtb-y)
 

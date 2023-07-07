@@ -93,7 +93,12 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
-			next-level-cache = <&L2_2>;
+			next-level-cache = <&L2_3>;
+			L2_3: l2-cache {
+			      compatible = "arm,arch-cache";
+			      cache-level = <2>;
+			      next-level-cache = <&L3_0>;
+			};
 		};
 
 		CPU4: cpu@400 {
@@ -173,22 +178,22 @@
 				core2 {
 					cpu = <&CPU2>;
 				};
-
-				core3 {
-					cpu = <&CPU3>;
-				};
 			};
 
 			cluster1 {
 				core0 {
-					cpu = <&CPU4>;
+					cpu = <&CPU3>;
 				};
 
 				core1 {
-					cpu = <&CPU5>;
+					cpu = <&CPU4>;
 				};
 
 				core2 {
+					cpu = <&CPU5>;
+				};
+
+				core3 {
 					cpu = <&CPU6>;
 				};
 			};
@@ -418,6 +423,14 @@
 		interrupt-controller;
 	};
 
+	cache-controller@25000000 {
+		compatible = "qcom,cliffs-llcc", "qcom,llcc-v50";
+		reg = <0x25000000 0x800000> , <0x25800000 0x200000>;
+		reg-names = "llcc_base", "llcc_broadcast_base";
+		interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
+		cap-based-alloc-and-pwr-collapse;
+	};
+
 	cluster-device {
 		compatible = "qcom,lpm-cluster-dev";
 		power-domains = <&CLUSTER_PD>;
@@ -501,7 +514,7 @@
 		compatible = "qcom,cpuss-sleep-stats";
 		reg = <0x17800054 0x4>, <0x17810054 0x4>, <0x17820054 0x4>,
 		      <0x17830054 0x4>, <0x17840054 0x4>, <0x17850054 0x4>,
-		      <0x17860054 0x4>, <0x17870054 0x4>, <0x178a0098 0x4>,
+		      <0x17860054 0x4>, <0x17870054 0x4>, <0x178b0098 0x4>,
 		      <0x178c0000 0x10000>;
 		reg-names = "seq_lpm_cntr_cfg_cpu0", "seq_lpm_cntr_cfg_cpu1",
 			    "seq_lpm_cntr_cfg_cpu2", "seq_lpm_cntr_cfg_cpu3",
@@ -550,6 +563,48 @@
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
 		qcom,gpios-reserved = <56 57 58 59>;
+	};
+
+	spmi_bus: spmi0_bus: qcom,spmi@c42d000 {
+		compatible = "qcom,spmi-pmic-arb";
+		reg = <0xc42d000 0x4000>,
+		      <0xc400000 0x3000>,
+		      <0xc500000 0x400000>,
+		      <0xc440000 0x80000>,
+		      <0xc4c0000 0x10000>;
+		reg-names = "cnfg", "core", "chnls", "obsrvr", "intr";
+		interrupts-extended = <&pdc 1 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "periph_irq";
+		interrupt-controller;
+		#interrupt-cells = <4>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		cell-index = <0>;
+		qcom,channel = <0>;
+		qcom,ee = <0>;
+		qcom,bus-id = <0>;
+	};
+
+	spmi1_bus: qcom,spmi@c432000 {
+		compatible = "qcom,spmi-pmic-arb";
+		reg = <0xc432000 0x4000>,
+		      <0xc400000 0x3000>,
+		      <0xc500000 0x400000>,
+		      <0xc440000 0x80000>,
+		      <0xc4d0000 0x10000>;
+		reg-names = "cnfg", "core", "chnls", "obsrvr", "intr";
+		interrupts-extended = <&pdc 3 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "periph_irq";
+		interrupt-controller;
+		#interrupt-cells = <4>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		cell-index = <0>;
+		qcom,channel = <0>;
+		qcom,ee = <0>;
+		qcom,bus-id = <1>;
+		depends-on-supply = <&spmi0_bus>;
+		status = "disabled";
 	};
 
 	qcom,msm-imem@14680000 {

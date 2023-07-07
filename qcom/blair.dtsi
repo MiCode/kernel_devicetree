@@ -17,7 +17,7 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 	chosen {
-		bootargs = "log_buf_len=256K rcupdate.rcu_expedited=1 fw_devlink.strict=1 rcu_nocbs=0-7 kpti=off nmi_watchdog=0 nosoftlockup nowatchdog cpufreq.default_governor=performance";
+		bootargs = "loglevel=6 log_buf_len=256K swiotlb=noforce kernel.panic_on_rcu_stall=1 rcupdate.rcu_expedited=1 fw_devlink.strict=1 service_locator.enable=1 rcu_nocbs=0-7 kpti=off irqaffinity=0-1 nosoftlockup cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc cgroup.memory=nokmem,nosocket printk.console_no_auto_verbose=1 kasan=off loop.max_part=7 can.stats_timer=0 firmware_class.path=/vendor/firmware_mnt/image pcie_ports=compat disable_dma32=on";
 	};
 
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
@@ -26,7 +26,7 @@
 
 	reserved_memory: reserved-memory { };
 
-	aliases {
+	aliases: aliases {
 		serial0 = &qupv3_se9_2uart;
 		hsuart0 = &qupv3_se1_4uart;
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
@@ -47,6 +47,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			dynamic-power-coefficient = <100>;
+			capacity-dmips-mhz = <1024>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -70,6 +72,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_1>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			dynamic-power-coefficient = <100>;
+			capacity-dmips-mhz = <1024>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -88,6 +92,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_2>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			dynamic-power-coefficient = <100>;
+			capacity-dmips-mhz = <1024>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -106,6 +112,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_3>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			dynamic-power-coefficient = <100>;
+			capacity-dmips-mhz = <1024>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -124,6 +132,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_4>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			dynamic-power-coefficient = <100>;
+			capacity-dmips-mhz = <1024>;
 			L2_4: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -142,6 +152,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_5>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			dynamic-power-coefficient = <100>;
+			capacity-dmips-mhz = <1024>;
 			L2_5: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -160,6 +172,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_6>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
+			dynamic-power-coefficient = <520>;
+			capacity-dmips-mhz = <1946>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -178,6 +192,8 @@
 			cpu-release-addr = <0x0 0x50000000>;
 			next-level-cache = <&L2_7>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
+			dynamic-power-coefficient = <520>;
+			capacity-dmips-mhz = <1946>;
 			L2_7: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -397,13 +413,6 @@
 		reusable;
 		alignment = <0 0x400000>;
 		size = <0 0x5c00000>;
-	};
-
-	dump_mem: mem_dump_region {
-		compatible = "shared-dma-pool";
-		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
-		reusable;
-		size = <0 0x800000>;
 	};
 
 	splash_memory: splash_region@0x85200000 {
@@ -866,8 +875,9 @@
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
 		clock-names = "xo";
 
-		interconnects = <&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI>;
-		interconnect-names = "crypto_ddr";
+		interconnects = <&bimc MASTER_AMPSS_M0 &bimc SLAVE_EBI>,
+				<&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI>;
+		interconnect-names = "rproc_ddr","crypto_ddr";
 
 		memory-region = <&pil_adsp_mem>;
 
@@ -933,8 +943,9 @@
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
 		clock-names = "xo";
 
-		interconnects = <&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI>;
-		interconnect-names = "crypto_ddr";
+		interconnects = <&bimc MASTER_AMPSS_M0 &bimc SLAVE_EBI>,
+				<&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI>;
+		interconnect-names = "rproc_ddr","crypto_ddr";
 
 		memory-region = <&pil_cdsp_mem>;
 
@@ -994,12 +1005,13 @@
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
 		clock-names = "xo";
 
-		interconnects = <&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI>;
-		interconnect-names = "crypto_ddr";
+		interconnects = <&bimc MASTER_AMPSS_M0 &bimc SLAVE_EBI>,
+				<&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI>;
+		interconnect-names = "rproc_ddr","crypto_ddr";
 
 		memory-region = <&pil_mpss_wlan_mem>;
 
-		interrupts-extended = <&intc GIC_SPI 307 IRQ_TYPE_EDGE_RISING>,
+		interrupts-extended = <&intc GIC_SPI 307 IRQ_TYPE_LEVEL_HIGH>,
 			<&modem_smp2p_in 0 0>,
 			<&modem_smp2p_in 2 0>,
 			<&modem_smp2p_in 1 0>,
@@ -1383,7 +1395,7 @@
 		compatible = "qcom,memlat";
 
 		ddr {
-			complatible = "qcom,memlat-grp";
+			compatible = "qcom,memlat-grp";
 			qcom,target-dev = <&qcom_ddr_dcvs_hw>;
 			qcom,sampling-path = <&ddr_dcvs_sp>;
 			qcom,miss-ev = <0x2A>;
@@ -1392,28 +1404,24 @@
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5>;
 				qcom,sampling-enabled;
-				ddr4-tbl {
-					qcom,cpufreq-memfreq-tbl =
-						<  691200  300000 >,
-						<  940800  451000 >,
-						< 1113600  547000 >,
-						< 1516800  768000 >,
-						< 1804800 1017000 >;
-				};
+				qcom,cpufreq-memfreq-tbl =
+					<  691200  300000 >,
+					<  940800  451000 >,
+					< 1113600  547000 >,
+					< 1516800  768000 >,
+					< 1804800 1017000 >;
 			};
 
 			gold {
 				compatible = "qcom,memlat-mon";
 				qcom,cpulist = <&CPU6 &CPU7>;
 				qcom,sampling-enabled;
-				ddr4-tbl {
-					qcom,cpufreq-memfreq-tbl =
-						<  940800   547000 >,
-						< 1228800  1017000 >,
-						< 1516800  1555000 >,
-						< 1900800  1804000 >,
-						< 2054400  2092000 >;
-				};
+				qcom,cpufreq-memfreq-tbl =
+					<  940800   547000 >,
+					< 1228800  1017000 >,
+					< 1516800  1555000 >,
+					< 1900800  1804000 >,
+					< 2054400  2092000 >;
 			};
 
 			silver-compute {
@@ -1421,13 +1429,11 @@
 				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5>;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
-				ddr4-tbl {
-					qcom,cpufreq-memfreq-tbl =
-						<  691200   300000 >,
-						< 1113600   451000 >,
-						< 1516800   547000 >,
-						< 1804800   768000 >;
-				};
+				qcom,cpufreq-memfreq-tbl =
+					<  691200   300000 >,
+					< 1113600   451000 >,
+					< 1516800   547000 >,
+					< 1804800   768000 >;
 			};
 
 			gold-compute {
@@ -1435,15 +1441,13 @@
 				qcom,cpulist = <&CPU6 &CPU7>;
 				qcom,sampling-enabled;
 				qcom,compute-mon;
-				ddr4-tbl {
-					qcom,cpufreq-memfreq-tbl =
-						< 1248800    547000 >,
-						< 1401600    768000 >,
-						< 1516800   1017000 >,
-						< 1651200   1555000 >,
-						< 1900800   1804000 >,
-						< 2054400   2092000 >;
-				};
+				qcom,cpufreq-memfreq-tbl =
+					< 1248800    547000 >,
+					< 1401600    768000 >,
+					< 1516800   1017000 >,
+					< 1651200   1555000 >,
+					< 1900800   1804000 >,
+					< 2054400   2092000 >;
 			};
 		};
 
@@ -1486,6 +1490,7 @@
 		reg = <0x4520300 0x300>, <0x4520200 0x200>;
 		reg-names = "base", "global_base";
 		interrupts = <GIC_SPI 421 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,mport = <0>;
 		qcom,hw-timer-hz = <19200000>;
 		qcom,count-unit = <0x10000>;
 		qcom,target-dev = <&qcom_ddr_dcvs_hw>;
@@ -1859,3 +1864,15 @@
 &qupv3_se9_2uart {
 	status = "ok";
 };
+
+&qupv3_se10_i2c {
+	status = "ok";
+	fsa4480: fsa4480@42 {
+		status = "disabled";
+		compatible = "qcom,fsa4480-i2c";
+		reg = <0x42>;
+	};
+};
+
+#include "blair-debug.dtsi"
+#include "blair-coresight.dtsi"

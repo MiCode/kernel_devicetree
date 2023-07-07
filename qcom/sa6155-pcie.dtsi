@@ -113,12 +113,12 @@
 		perst-gpio = <&tlmm 101 0>;
 		wake-gpio = <&tlmm 100 0>;
 
-		gdsc-vdd-supply = <&pcie_0_gdsc>;
-		vreg-1p8-supply = <&L12A>;
+		gdsc-core-vdd-supply = <&pcie_0_gdsc>;
+		vreg-1p2-supply = <&L12A>;
 		vreg-0p9-supply = <&L5A>;
 		vreg-cx-supply = <&VDD_CX_LEVEL>;
 
-		qcom,vreg-1p8-voltage-level = <1800000 1800000 24000>;
+		qcom,vreg-1p2-voltage-level = <1800000 1800000 24000>;
 		qcom,vreg-0p9-voltage-level = <925000 925000 24000>;
 		qcom,vreg-cx-voltage-level = <RPMH_REGULATOR_LEVEL_MAX
 					RPMH_REGULATOR_LEVEL_NOM 0>;
@@ -186,14 +186,18 @@
 			<&gcc GCC_PCIE0_PHY_REFGEN_CLK>,
 			<&gcc GCC_PCIE_PHY_AUX_CLK>;
 
-		clock-names = "pcie_0_pipe_clk", "pcie_0_ref_clk_src",
+
+		clock-names = "pcie_pipe_clk", "pcie_ref_clk_src",
 				"pcie_0_aux_clk", "pcie_0_cfg_ahb_clk",
 				"pcie_0_mstr_axi_clk", "pcie_0_slv_axi_clk",
-				"pcie_0_ldo", "pcie_0_slv_q2a_axi_clk",
-				"pcie_phy_refgen_clk", "pcie_phy_aux_clk";
+				"pcie_ldo", "pcie_0_slv_q2a_axi_clk",
+				"pcie_phy_refgen_clk","pcie_phy_aux_clk";
 
-		max-clock-frequency-hz = <0>, <0>, <19200000>, <0>, <0>, <0>,
-					<0>, <0>, <0>, <0>, <100000000>, <0>;
+		clock-frequency = <0>, <0>, <19200000>, <0>, <0>,
+					<0>, <0>, <0>, <100000000>, <0>;
+
+		clock-suppressible = <0>, <0>, <0>, <0>, <0>, <0>, <1>,
+						 <0>, <0>, <0>;
 
 		resets = <&gcc GCC_PCIE_0_BCR>,
 			<&gcc GCC_PCIE_0_PHY_BCR>;
