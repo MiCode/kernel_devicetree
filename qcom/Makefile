@@ -100,6 +100,7 @@ HOLI_BOARDS += \
 		 holi-mtp-overlay.dtbo \
 		 holi-qrd-overlay.dtbo \
 		 holi-cdp-overlay.dtbo \
+		 holi-cdp-lcd-overlay.dtbo \
 		 holi-atp-overlay.dtbo \
 		 holi-mtp-usbc-overlay.dtbo
 
