@@ -208,6 +208,7 @@ _platform_map = {
             {"name": "holi-mtp-overlay.dtbo"},
             {"name": "holi-qrd-overlay.dtbo"},
             {"name": "holi-cdp-overlay.dtbo"},
+            {"name": "holi-cdp-lcd-overlay.dtbo"},
             {"name": "holi-atp-overlay.dtbo"},
             {"name": "holi-mtp-usbc-overlay.dtbo"},
         ],
