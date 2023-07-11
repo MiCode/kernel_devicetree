@@ -33,3 +33,4 @@
 | socrates-t-oss | Redmi K60 Pro | Android T | LA.VENDOR.13.2.0.r1-07300-r1.0.r1_00020.0 | [socrates-t-oss](https://github.com/MiCode/kernel_devicetree/tree/socrates-t-oss) |
 | marble-s-oss | Redmi Note 12 Turbo | Android S | LA.VENDOR.1.0.r1-19000-r2.0.r1_00029.0 | [marble-s-oss](https://github.com/MiCode/kernel_devicetree/tree/marble-s-oss) |
 | ishtar-t-oss | Xiaomi 13 Ultra | Android T | LA.VENDOR.13.2.0.r1-07300-KAILUA.0 | [ishtar-t-oss](https://github.com/MiCode/kernel_devicetree/tree/ishtar-t-oss) |
+| diting-s-oss | Redmi K50 Ultra | Android S | qcom-S-LA.VENDOR.1.0.r1-13100-r1.0.r1_00037.0 |[diting-s-oss](https://github.com/MiCode/kernel_devicetree/tree/diting-s-oss) |
