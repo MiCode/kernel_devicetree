@@ -1364,6 +1364,35 @@
 
 		qcom,smem-states = <&adsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_adsp: glink-edge {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+
+			mboxes = <&ipcc_mproc IPCC_CLIENT_LPASS
+					IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "adsp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_LPASS
+				IPCC_MPROC_SIGNAL_GLINK_QMP
+				IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+			cpu-affinity = <1 2>;
+
+			qcom,adsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,apr_tal_rpmsg {
+				qcom,glink-channels = "apr_audio_svc";
+				qcom,intents = <0x200 20>;
+			};
+		};
 	};
 
 	cdsp_pas: remoteproc-cdsp@26300000 {
@@ -1402,6 +1431,34 @@
 
 		qcom,smem-states = <&cdsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_cdsp: glink-edge {
+			qcom,remote-pid = <5>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_CDSP
+					IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "cdsp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_CDSP
+					IPCC_MPROC_SIGNAL_GLINK_QMP
+					IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp";
+			qcom,glink-label = "cdsp";
+
+			qcom,cdsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,msm_fastrpc_rpmsg {
+				compatible = "qcom,msm-fastrpc-rpmsg";
+				qcom,glink-channels = "fastrpcglink-apps-dsp";
+				qcom,intents = <0x64 64>;
+			};
+		};
 	};
 
 	gpdsp_pas: remoteproc-gpdsp0@20c00000 {
@@ -1438,6 +1495,30 @@
 
 		qcom,smem-states = <&gpdsp0_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
+
+		glink_gpdsp0: glink-edge {
+			qcom,remote-pid = <17>;
+
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_GPDSP0
+					IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "gpdsp0_smem";
+
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_GPDSP0
+					IPCC_MPROC_SIGNAL_GLINK_QMP
+					IRQ_TYPE_EDGE_RISING>;
+
+			label = "gpdsp0";
+			qcom,glink-label = "gpdsp0";
+
+			qcom,gpdsp0_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 	spmi_bus: qcom,spmi@c440000 {
