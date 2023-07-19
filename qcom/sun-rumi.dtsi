@@ -3,6 +3,9 @@
  * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,gcc-pineapple.h>
+
 &reserved_memory {
 	spintable: spintable_region@90000000 {
 		no-map;
@@ -98,4 +101,24 @@
 	qcom,disable-lpm;
 
 	status = "ok";
+};
+
+&sdhc_2 {
+	status = "ok";
+	vdd-supply = <&pm_humu_l9>;
+	qcom,vdd-voltage-level = <2950000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&pm_humu_l8>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 5600>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 55 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_SDCC2_BCR>;
+	reset-names = "core_reset";
 };
