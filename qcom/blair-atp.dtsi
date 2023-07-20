@@ -342,6 +342,7 @@
 
 	/* Enable mx_cdev for PM6350 */
 	rpm-regulator-smpa5 {
+		proxy-supply = <&S5A_LEVEL>;
 		regulator-s5-level {
 			status = "okay";
 		};
@@ -361,11 +362,47 @@
 
 	/* Enable mx_cdev for PM6150A */
 	rpm-regulator-smpe1 {
+		regulator-s1-level {
+			status = "okay";
+		};
+
+		regulator-s1-floor-level {
+			status = "okay";
+		};
+
+		regulator-s1-level-ao {
+			status = "okay";
+		};
+
 		cx-cdev-lvl {
 			status = "okay";
 		};
 	};
+
+	/* VDD_LPI_CX supply */
+	rpm-regulator-ldoa1 {
+		regulator-l1-level {
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldoa3 {
+		proxy-supply = <&pm6350_l3>;
+	};
+
+	rpm-regulator-ldoa8 {
+		proxy-supply = <&pm6350_l8>;
+	};
+
+	/* VDD_LPI_MX supply */
+	rpm-regulator-ldoa17 {
+		regulator-l17-level {
+			status = "okay";
+		};
+	};
 };
+
+#include "holi-atp-pm7250b.dtsi"
 
 &soc {
 
@@ -409,6 +446,42 @@
 	status = "ok";
 };
 
+&sdhc_1 {
+	status = "ok";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	vdd-supply = <&L24A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L11A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	vdd-supply = <&L22A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L5A>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	cd-gpios = <&tlmm 94 GPIO_ACTIVE_LOW>;
+};
+
 &qupv3_se8_i2c {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -440,4 +513,16 @@
 		synaptics,extend_report;
 		synaptics,firmware-name = "synaptics_firmware.img";
 	};
+};
+
+&usb0 {
+	extcon = <&pm7250b_pdphy>, <&pm7250b_charger>, <&eud>;
+	#io-channel-cells = <1>;
+	io-channels= <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>;
+	io-channel-names = "chg_type";
+
+	dwc3@4e00000 {
+		dr_mode = "otg";
+	};
+
 };

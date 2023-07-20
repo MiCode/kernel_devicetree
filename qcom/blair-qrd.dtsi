@@ -1,4 +1,6 @@
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/linux-event-codes.h>
+#include "blair-pmic-overlay-pm6125.dtsi"
 #include <dt-bindings/clock/qcom,gcc-blair.h>
 
 &ufsphy_mem {
@@ -36,7 +38,61 @@
 	status = "ok";
 };
 
+&sdhc_1 {
+	status = "ok";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	vdd-supply = <&L24A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L11A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	vdd-supply = <&L22A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L5A>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	cd-gpios = <&tlmm 94 GPIO_ACTIVE_LOW>;
+};
+
 &soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmr735a_gpios 1 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+
 	touch_avdd: touch_avdd_stub {
 		/*
 		 * Touch eLDO controlled by gpio#53 is always ON.
@@ -75,5 +131,48 @@
 		pinctrl-0 = <&ts_active>;
 		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
 		pinctrl-2 = <&pmx_ts_release>;
+	};
+};
+
+&qupv3_se10_i2c {
+	awinic@64 {
+		compatible = "awinic,aw2016_led";
+		reg = <0x64>;
+
+		awinic,red {
+			awinic,name = "red";
+			awinic,id = <0>;
+			awinic,imax = <2>;
+			awinic,led-current = <3>;
+			awinic,max-brightness = <255>;
+			awinic,rise-time-ms = <6>;
+			awinic,hold-time-ms = <0>;
+			awinic,fall-time-ms = <6>;
+			awinic,off-time-ms = <4>;
+		};
+
+		awinic,green {
+			awinic,name = "green";
+			awinic,id = <1>;
+			awinic,imax = <2>;
+			awinic,led-current = <3>;
+			awinic,max-brightness = <255>;
+			awinic,rise-time-ms = <6>;
+			awinic,hold-time-ms = <0>;
+			awinic,fall-time-ms = <6>;
+			awinic,off-time-ms = <4>;
+		};
+
+		awinic,blue {
+			awinic,name = "blue";
+			awinic,id = <2>;
+			awinic,imax = <2>;
+			awinic,led-current = <3>;
+			awinic,max-brightness = <255>;
+			awinic,rise-time-ms = <6>;
+			awinic,hold-time-ms = <0>;
+			awinic,fall-time-ms = <6>;
+			awinic,off-time-ms = <4>;
+		};
 	};
 };
