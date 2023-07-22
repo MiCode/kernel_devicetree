@@ -1,0 +1,104 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/spmi/qcom,spmi-pmic-arb-debug.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. SPMI Debug Controller (PMIC Arbiter)
+
+maintainers:
+  - David Collins <quic_collinsd@quicinc.com>
+
+description: |
+  The SPMI PMIC Arbiter is found on various QTI chips.  It is an SPMI controller
+  with wrapping arbitration logic to allow for multiple on-chip devices to
+  control a single SPMI master.
+
+  The PMIC Arbiter debug bus is present starting at arbiter version 5.  It has
+  read and write access to all PMIC peripherals regardless of ownership
+  configurations.  It cannot be used on production devices because it is
+  disabled by an eFuse.
+
+properties:
+  compatible:
+    const: qcom,spmi-pmic-arb-debug
+
+  reg:
+    minItems: 1
+    items:
+      - description: PMIC arbiter module registers
+      - description: Debug bus fuse register
+
+  reg-names:
+    minItems: 1
+    items:
+      - const: core
+      - const: fuse
+
+  clocks:
+    maxItems: 1
+    description: SPMI debug controller clock
+
+  clock-names:
+    items:
+      - const: core_clk
+
+  '#address-cells': true
+
+  '#size-cells': true
+
+  qcom,fuse-enable-bit:
+    description: |
+      The bit within the fuse register which is set when the debug bus is
+      available.  Only one of qcom,fuse-enable-bit and qcom-fuse-disable-bit
+      should be specified.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 0
+    maximum: 31
+
+  qcom,fuse-disable-bit:
+    description: |
+      The bit within the fuse register which is set when the debug bus is not
+      available.  Only one of qcom,fuse-enable-bit and qcom-fuse-disable-bit
+      should be specified.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 0
+    maximum: 31
+
+required:
+  - compatible
+  - reg
+  - reg-names
+
+allOf:
+  - $ref: spmi.yaml
+  - if:
+      required:
+        - qcom,fuse-enable-bit
+    then:
+      properties:
+        qcom,fuse-disable-bit: false
+
+  - if:
+      required:
+        - qcom,fuse-disable-bit
+    then:
+      properties:
+        qcom,fuse-enable-bit: false
+
+additionalProperties: false
+
+examples:
+  - |
+    #define QDSS_CLK 0
+
+    spmi@6b22000 {
+      compatible = "qcom,spmi-pmic-arb-debug";
+      reg = <0x6b22000 0x60>, <0x7820a8 4>;
+      reg-names = "core", "fuse";
+      clocks = <&clock_aop QDSS_CLK>;
+      clock-names = "core_clk";
+      qcom,fuse-disable-bit = <12>;
+      #address-cells = <2>;
+      #size-cells = <0>;
+    };
