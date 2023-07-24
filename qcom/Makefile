@@ -72,6 +72,15 @@ dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif
 
+ifeq ($(CONFIG_ARCH_SUN), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+sun_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += sun-vm-rumi.dtb \
+				sun-oemvm-rumi.dtb
+dtb-y += $(sun_tuivm-dtb-y)
+
+endif
+endif
+
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
 clean-files     := *.dtb *.dtbo

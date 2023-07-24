@@ -13,6 +13,20 @@ _platform_map = {
             {"name": "sun-rumi-overlay.dtbo"},
         ],
     },
+    "sun-tuivm": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "sun-oemvm-rumi.dtb"},
+            {"name": "sun-vm-rumi.dtb"},
+        ],
+    },
+    "sun-oemvm": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "sun-oemvm-rumi.dtb"},
+            {"name": "sun-vm-rumi.dtb"},
+        ],
+    },
     "pineapple": {
         "dtb_list": [
             {"name": "pineapple.dtb"},
