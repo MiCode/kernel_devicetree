@@ -138,6 +138,7 @@ _platform_map = {
             {"name": "pineapple-mtp-nfc-overlay.dtbo"},
             {"name": "pineapple-mtp-overlay.dtbo"},
             {"name": "pineapple-qrd-overlay.dtbo"},
+            {"name": "pineapple-qrd-sku2-overlay.dtbo"},
             {"name": "pineapple-rcm-overlay.dtbo"},
             {
                 "name": "pineapple-rumi-overlay.dtbo",
