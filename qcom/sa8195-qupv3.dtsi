@@ -541,6 +541,29 @@
 			status = "disabled";
 		};
 
+		/* GNSS UART Instance */
+		qupv3_se9_2uart: qcom,qup_uart@a84000 {
+			compatible = "qcom,msm-geni-serial-hs";
+			reg = <0xa84000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 354 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S1_CLK>;
+			interconnect-names = "qup-core", "qup-config", "qup-memory";
+			interconnects =
+			<&aggre2_noc MASTER_QUP_1 &mc_virt SLAVE_EBI1>,
+			<&aggre2_noc MASTER_QUP_1 &mc_virt SLAVE_EBI1>,
+			<&aggre2_noc MASTER_QUP_1 &mc_virt SLAVE_EBI1>;
+			dmas = <&gpi_dma1 0 1 2 64 0>,
+			<&gpi_dma1 1 1 2 64 0>;
+			dma-names = "tx", "rx";
+			pinctrl-names = "default", "active", "sleep";
+			pinctrl-0 = <&qupv3_se9_2uart_default>;
+			pinctrl-1 = <&qupv3_se9_2uart_active>;
+			pinctrl-2 = <&qupv3_se9_2uart_sleep>;
+			status = "disabled";
+		};
+
 		qupv3_se10_i2c: i2c@a88000 {
 			compatible = "qcom,i2c-geni";
 			reg = <0xa88000 0x4000>;
