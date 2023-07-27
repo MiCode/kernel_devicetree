@@ -25,7 +25,8 @@ PINEAPPLE_BOARDS += \
 		 pineapple-qrd-sku2-overlay.dtbo \
 		 pineapple-rcm-overlay.dtbo \
 		 pineapple-atp-overlay.dtbo \
-		 pineapplep-hdk-overlay.dtbo
+		 pineapplep-hdk-overlay.dtbo \
+		 pineapple-dpm-overlay.dtbo
 
 NOAPQ_PINEAPPLE_BOARDS += \
 		 pineapple-rumi-overlay.dtbo

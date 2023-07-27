@@ -151,6 +151,7 @@ _platform_map = {
             {"name": "pineapple-qrd-sku2-overlay.dtbo"},
             {"name": "pineapple-rcm-overlay.dtbo"},
             {"name": "pineapplep-hdk-overlay.dtbo"},
+            {"name": "pineapple-dpm-overlay.dtbo"},
             {
                 "name": "pineapple-rumi-overlay.dtbo",
                 "apq": False,
