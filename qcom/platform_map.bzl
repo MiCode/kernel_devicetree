@@ -213,6 +213,14 @@ _platform_map = {
             {"name": "holi-mtp-usbc-overlay.dtbo"},
         ],
     },
+    "pitti": {
+        "dtb_list": [
+            {"name": "pitti.dtb"},
+        ],
+        "dtbo_list": [
+            {"name": "pitti-rumi-overlay.dtbo"},
+        ],
+    },
 }
 
 def _get_dtb_lists(target, dt_overlay_supported):
