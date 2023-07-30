@@ -24,7 +24,8 @@ PINEAPPLE_BOARDS += \
 		 pineapple-qrd-overlay.dtbo \
 		 pineapple-qrd-sku2-overlay.dtbo \
 		 pineapple-rcm-overlay.dtbo \
-		 pineapple-atp-overlay.dtbo
+		 pineapple-atp-overlay.dtbo \
+		 pineapplep-hdk-overlay.dtbo
 
 NOAPQ_PINEAPPLE_BOARDS += \
 		 pineapple-rumi-overlay.dtbo
@@ -156,11 +157,13 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
 				pineapple-vm-cdp.dtb \
 				pineapple-vm-qrd.dtb \
 				pineapple-vm-rcm.dtb \
+				pineapplep-vm-hdk.dtb \
 				pineapple-oemvm-cdp.dtb \
 				pineapple-oemvm-mtp.dtb \
 				pineapple-oemvm-qrd.dtb \
 				pineapple-oemvm-rumi.dtb \
-				pineapple-oemvm-rcm.dtb
+				pineapple-oemvm-rcm.dtb \
+				pineapplep-oemvm-hdk.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
 
 endif
