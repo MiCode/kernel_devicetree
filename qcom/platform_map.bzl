@@ -188,11 +188,13 @@ _platform_map = {
     },
     "pineapple-tuivm": {
         "dtb_list": [
+            {"name": "pineapple-oemvm-rcm.dtb"},
             {"name": "pineapple-oemvm-cdp.dtb"},
             {"name": "pineapple-oemvm-mtp.dtb"},
             {"name": "pineapple-oemvm-qrd.dtb"},
             {"name": "pineapple-oemvm-rumi.dtb"},
             {"name": "pineapplep-oemvm-hdk.dtb"},
+            {"name": "pineapple-vm-rcm.dtb"},
             {"name": "pineapple-vm-cdp.dtb"},
             {"name": "pineapple-vm-mtp.dtb"},
             {"name": "pineapple-vm-qrd.dtb"},
@@ -203,11 +205,13 @@ _platform_map = {
     },
     "pineapple-oemvm": {
         "dtb_list": [
+            {"name": "pineapple-oemvm-rcm.dtb"},
             {"name": "pineapple-oemvm-cdp.dtb"},
             {"name": "pineapple-oemvm-mtp.dtb"},
             {"name": "pineapple-oemvm-qrd.dtb"},
             {"name": "pineapple-oemvm-rumi.dtb"},
             {"name": "pineapplep-oemvm-hdk.dtb"},
+            {"name": "pineapple-vm-rcm.dtb"},
             {"name": "pineapple-vm-cdp.dtb"},
             {"name": "pineapple-vm-mtp.dtb"},
             {"name": "pineapple-vm-qrd.dtb"},
