@@ -13,3 +13,36 @@
 &sdhc_2 {
 	cd-gpios = <&pm8550_gpios 12 GPIO_ACTIVE_HIGH>;
 };
+
+&tlmm {
+	fan_enable_pin {
+		mux {
+			pins = "gpio183";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio183";
+			bias-pull-up;
+			drive-strength = <16>;
+		};
+	};
+};
+
+&qupv3_hub_i2c4 {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	fancontroller: max31760@50 {
+		compatible = "maxim,max31760";
+		reg = <0x50>;
+		#cooling-cells = <2>;
+		maxim,fan-num = <1>;
+		maxim,vdd-supply = <&BOB1>;
+		maxim,vcca-supply = <&L15B>;
+		regulator-name = "maxim,vdd", "maxim,vcca";
+		maxim,pwr-en-gpio = <&tlmm 183 GPIO_ACTIVE_LOW>;
+		status = "ok";
+	};
+};
