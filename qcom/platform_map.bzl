@@ -10,6 +10,7 @@ _platform_map = {
             {"name": "lemans-vm-lv.dtb"},
             {"name": "sa8155-vm-la.dtb"},
             {"name": "sa8195-vm-la.dtb"},
+            {"name": "monaco-vm-la.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
@@ -21,6 +22,7 @@ _platform_map = {
             {"name": "lemans-vm-lv-overlay.dtbo"},
             {"name": "sa8155-vm-la-overlay.dtbo"},
             {"name": "sa8195-vm-la-overlay.dtbo"},
+            {"name": "monaco-vm-la-overlay.dtbo"},
         ],
     },
     "gen3auto": {
