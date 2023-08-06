@@ -1,5 +1,9 @@
 #include <dt-bindings/thermal/thermal_qti.h>
 
+&msm_gpu {
+	#cooling-cells = <2>;
+};
+
 &soc {
 	tsens0:tsens@c263000 {
 		compatible = "qcom,tsens-v2";
@@ -88,6 +92,11 @@
 		qcom,cpus = <&CPU0 &CPU2 &CPU4>;
 	};
 
+	qcom,devfreq-cdev {
+		compatible = "qcom,devfreq-cdev";
+		qcom,devfreq = <&msm_gpu>;
+	};
+
 	qmi-tmd-devices {
 		compatible = "qcom,qmi-cooling-devices";
 
@@ -101,6 +110,16 @@
 
 			cdsp_hw: cdsp_hw {
 				qcom,qmi-dev-name = "cdsp_hw";
+				#cooling-cells = <2>;
+			};
+
+			cdsp_sw_hvx: cdsp_sw_hvx {
+				qcom,qmi-dev-name = "cdsp_sw_hvx";
+				#cooling-cells = <2>;
+			};
+
+			cdsp_sw_hmx: cdsp_sw_hmx {
+				qcom,qmi-dev-name = "cdsp_sw_hmx";
 				#cooling-cells = <2>;
 			};
 		};
@@ -269,6 +288,14 @@
 				temperature = <130000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			gpu0_cdev {
+				trip = <&gpuss0_config>;
+				cooling-device = <&msm_gpu THERMAL_NO_LIMIT
+							THERMAL_NO_LIMIT>;
 			};
 		};
 	};
@@ -510,6 +537,14 @@
 				temperature = <130000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			gpu1_cdev {
+				trip = <&gpuss1_config>;
+				cooling-device = <&msm_gpu THERMAL_NO_LIMIT
+							THERMAL_NO_LIMIT>;
 			};
 		};
 	};
@@ -762,9 +797,21 @@
 		};
 
 		cooling-maps {
-			nsp000_cdev {
+			nsp000_cdev1 {
 				trip = <&nsp000_config>;
 				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp000_cdev2 {
+				trip = <&nsp000_config>;
+				cooling-device = <&cdsp_sw_hvx THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp000_cdev3 {
+				trip = <&nsp000_config>;
+				cooling-device = <&cdsp_sw_hmx THERMAL_NO_LIMIT
 								THERMAL_NO_LIMIT>;
 			};
 		};
@@ -795,9 +842,21 @@
 		};
 
 		cooling-maps {
-			nsp010_cdev {
+			nsp010_cdev1 {
 				trip = <&nsp010_config>;
 				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp010_cdev2 {
+				trip = <&nsp010_config>;
+				cooling-device = <&cdsp_sw_hvx THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp010_cdev3 {
+				trip = <&nsp010_config>;
+				cooling-device = <&cdsp_sw_hmx THERMAL_NO_LIMIT
 								THERMAL_NO_LIMIT>;
 			};
 		};
@@ -828,9 +887,21 @@
 		};
 
 		cooling-maps {
-			nsp020_cdev {
+			nsp020_cdev1 {
 				trip = <&nsp020_config>;
 				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp020_cdev2 {
+				trip = <&nsp020_config>;
+				cooling-device = <&cdsp_sw_hvx THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp020_cdev3 {
+				trip = <&nsp020_config>;
+				cooling-device = <&cdsp_sw_hmx THERMAL_NO_LIMIT
 								THERMAL_NO_LIMIT>;
 			};
 		};
@@ -1046,9 +1117,21 @@
 		};
 
 		cooling-maps {
-			nsp001_cdev {
+			nsp001_cdev1 {
 				trip = <&nsp001_config>;
 				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp001_cdev2 {
+				trip = <&nsp001_config>;
+				cooling-device = <&cdsp_sw_hvx THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp001_cdev3 {
+				trip = <&nsp001_config>;
+				cooling-device = <&cdsp_sw_hmx THERMAL_NO_LIMIT
 								THERMAL_NO_LIMIT>;
 			};
 		};
@@ -1079,9 +1162,21 @@
 		};
 
 		cooling-maps {
-			nsp011_cdev {
+			nsp011_cdev1 {
 				trip = <&nsp011_config>;
 				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp011_cdev2 {
+				trip = <&nsp011_config>;
+				cooling-device = <&cdsp_sw_hvx THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp011_cdev3 {
+				trip = <&nsp011_config>;
+				cooling-device = <&cdsp_sw_hmx THERMAL_NO_LIMIT
 								THERMAL_NO_LIMIT>;
 			};
 		};
@@ -1112,9 +1207,21 @@
 		};
 
 		cooling-maps {
-			nsp021_cdev {
+			nsp021_cdev1 {
 				trip = <&nsp021_config>;
 				cooling-device = <&cdsp_sw THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp021_cdev2 {
+				trip = <&nsp021_config>;
+				cooling-device = <&cdsp_sw_hvx THERMAL_NO_LIMIT
+								THERMAL_NO_LIMIT>;
+			};
+
+			nsp021_cdev3 {
+				trip = <&nsp021_config>;
+				cooling-device = <&cdsp_sw_hmx THERMAL_NO_LIMIT
 								THERMAL_NO_LIMIT>;
 			};
 		};
