@@ -139,6 +139,7 @@ _platform_map = {
             {"name": "pineapple-mtp-overlay.dtbo"},
             {"name": "pineapple-qrd-overlay.dtbo"},
             {"name": "pineapple-rcm-overlay.dtbo"},
+            {"name": "pineapplep-hdk-overlay.dtbo"},
             {
                 "name": "pineapple-rumi-overlay.dtbo",
                 "apq": False,
@@ -163,10 +164,12 @@ _platform_map = {
             {"name": "pineapple-oemvm-mtp.dtb"},
             {"name": "pineapple-oemvm-qrd.dtb"},
             {"name": "pineapple-oemvm-rumi.dtb"},
+            {"name": "pineapplep-oemvm-hdk.dtb"},
             {"name": "pineapple-vm-cdp.dtb"},
             {"name": "pineapple-vm-mtp.dtb"},
             {"name": "pineapple-vm-qrd.dtb"},
             {"name": "pineapple-vm-rumi.dtb"},
+            {"name": "pineapplep-vm-hdk.dtb"},
         ],
     },
     "pineapple-oemvm": {
@@ -175,10 +178,12 @@ _platform_map = {
             {"name": "pineapple-oemvm-mtp.dtb"},
             {"name": "pineapple-oemvm-qrd.dtb"},
             {"name": "pineapple-oemvm-rumi.dtb"},
+            {"name": "pineapplep-oemvm-hdk.dtb"},
             {"name": "pineapple-vm-cdp.dtb"},
             {"name": "pineapple-vm-mtp.dtb"},
             {"name": "pineapple-vm-qrd.dtb"},
             {"name": "pineapple-vm-rumi.dtb"},
+            {"name": "pineapplep-vm-hdk.dtb"},
         ],
     },
     "blair": {
@@ -208,8 +213,17 @@ _platform_map = {
             {"name": "holi-mtp-overlay.dtbo"},
             {"name": "holi-qrd-overlay.dtbo"},
             {"name": "holi-cdp-overlay.dtbo"},
+            {"name": "holi-cdp-lcd-overlay.dtbo"},
             {"name": "holi-atp-overlay.dtbo"},
             {"name": "holi-mtp-usbc-overlay.dtbo"},
+        ],
+    },
+    "pitti": {
+        "dtb_list": [
+            {"name": "pitti.dtb"},
+        ],
+        "dtbo_list": [
+            {"name": "pitti-rumi-overlay.dtbo"},
         ],
     },
 }
