@@ -32,7 +32,7 @@
 
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat";
 		stdout-path = "/soc/qcom,qupv3_1_geni_se@ac0000/qcom,qup_uart@a9c000:115200n8";
 	};
 
@@ -360,11 +360,21 @@
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
 		interrupt-controller;
+		ranges;
 		#redistributor-regions = <1>;
 		redistributor-stride = <0x0 0x40000>;
 		reg = <0x16000000 0x10000>,	/* GICD */
 		      <0x16080000 0x200000>;	/* GICR * 8 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		gic_its: msi-controller@0x16040000 {
+			compatible = "arm,gic-v3-its";
+			msi-controller;
+			#msi-cells = <1>;
+			reg = <0x16040000 0x20000>;
+		};
 	};
 
 	memtimer: timer@16800000 {
@@ -1622,6 +1632,7 @@
 #include "sun-qupv3.dtsi"
 #include "sun-usb.dtsi"
 #include "sun-thermal.dtsi"
+#include "sun-pcie.dtsi"
 
 &qupv3_se7_2uart {
 	status = "ok";
