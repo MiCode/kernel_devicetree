@@ -38,7 +38,12 @@ pineapple-overlays-dtb-$(CONFIG_ARCH_PINEAPPLE) += $(PINEAPPLE_BOARDS) $(NOAPQ_P
 CLIFFS_BASE_DTB += cliffs.dtb
 
 NOAPQ_CLIFFS_BOARDS += \
-		 cliffs-rumi-overlay.dtbo
+		 cliffs-rumi-overlay.dtbo \
+		 cliffs-atp-overlay.dtbo \
+		 cliffs-cdp-overlay.dtbo \
+		 cliffs-mtp-overlay.dtbo \
+		 cliffs-qrd-overlay.dtbo \
+		 cliffs-rcm-overlay.dtbo
 
 pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(NOAPQ_CLIFFS_BOARDS),$(CLIFFS_BASE_DTB))
