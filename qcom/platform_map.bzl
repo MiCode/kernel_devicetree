@@ -173,6 +173,11 @@ _platform_map = {
                 "name": "cliffs-rumi-overlay.dtbo",
                 "apq": False,
             },
+            {"name": "cliffs-atp-overlay.dtbo"},
+            {"name": "cliffs-cdp-overlay.dtbo"},
+            {"name": "cliffs-mtp-overlay.dtbo"},
+            {"name": "cliffs-qrd-overlay.dtbo"},
+            {"name": "cliffs-rcm-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {
