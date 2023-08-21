@@ -198,6 +198,16 @@
 		#hwlock-cells = <1>;
 	};
 
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,sun-pdc", "qcom,pdc";
+		reg = <0xb220000 0x10000>, <0x164400F0 0x64>;
+		qcom,pdc-ranges = <0 745 51>, <51 527 47>,
+				  <98 609 32>, <130 717 12>,
+				  <142 251 5>, <147 796 16>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
 
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,sun-tlmm";
@@ -207,6 +217,7 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+		wakeup-parent = <&pdc>;
 	};
 
 	intc: interrupt-controller@16000000 {
