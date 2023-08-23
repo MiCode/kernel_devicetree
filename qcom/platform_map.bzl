@@ -167,6 +167,7 @@ _platform_map = {
     "cliffs": {
         "dtb_list": [
             {"name": "cliffs.dtb"},
+            {"name": "cliffs7.dtb"},
         ],
         "dtbo_list": [
             {
