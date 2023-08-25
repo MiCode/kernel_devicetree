@@ -559,7 +559,7 @@
 		sleep_clk: sleep-clk {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <32764>;
+			clock-frequency = <32000>;
 			clock-output-names = "sleep_clk";
 		};
 	};
@@ -850,8 +850,9 @@
 		reg = <0xaf00000 0x20000>;
 		reg-names = "cc_base";
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
-		clocks = <&gcc GCC_DISP_AHB_CLK>, <&rpmhcc RPMH_CXO_CLK>;
-		clock-names = "iface", "bi_tcxo";
+		clocks = <&gcc GCC_DISP_AHB_CLK>, <&rpmhcc RPMH_CXO_CLK>,
+			<&rpmhcc RPMH_CXO_CLK_A>, <&sleep_clk>;
+		clock-names = "iface", "bi_tcxo", "bi_tcxo_ao", "sleep_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -1824,7 +1825,8 @@
 						< 1152000  768000 >,
 						< 1344000  960000 >,
 						< 1689600 1228800 >,
-						< 2016000 1344000 >;
+						< 2016000 1344000 >,
+						< 2131200 1612800 >;
 				qcom,sampling-enabled;
 			};
 
@@ -1837,7 +1839,8 @@
 						< 1152000  768000 >,
 						< 1344000  960000 >,
 						< 1689600 1228800 >,
-						< 2016000 1344000 >;
+						< 2016000 1344000 >,
+						< 2419200 1612800 >;
 				qcom,sampling-enabled;
 			};
 		};

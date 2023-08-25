@@ -38,7 +38,12 @@ pineapple-overlays-dtb-$(CONFIG_ARCH_PINEAPPLE) += $(PINEAPPLE_BOARDS) $(NOAPQ_P
 CLIFFS_BASE_DTB += cliffs.dtb
 
 NOAPQ_CLIFFS_BOARDS += \
-		 cliffs-rumi-overlay.dtbo
+		 cliffs-rumi-overlay.dtbo \
+		 cliffs-atp-overlay.dtbo \
+		 cliffs-cdp-overlay.dtbo \
+		 cliffs-mtp-overlay.dtbo \
+		 cliffs-qrd-overlay.dtbo \
+		 cliffs-rcm-overlay.dtbo
 
 pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(NOAPQ_CLIFFS_BOARDS),$(CLIFFS_BASE_DTB))
@@ -67,6 +72,17 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(APQ_KALAMA_BOARDS),$(KALAMA_APQ_BASE_DTB))
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
+
+NIOBE_BASE_DTB += niobe.dtb
+
+NOAPQ_NIOBE_BOARDS += \
+		 niobe-rumi-overlay.dtbo
+
+niobe-dtb-$(CONFIG_ARCH_NIOBE) += \
+	$(call add-overlays, $(NOAPQ_NIOBE_BOARDS),$(NIOBE_BASE_DTB))\
+	$(call add-overlays, $(APQ_NIOBE_BOARDS),$(NIOBE_APQ_BASE_DTB))
+niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
+dtb-y += $(niobe-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
 BLAIR_APQ_BASE_DTB += blairp.dtb
@@ -193,10 +209,27 @@ LEMANS_LV_GVM_BASE_DTB += lemans-vm-lv.dtb
 LEMANS_LV_GVM_BOARDS += \
 		lemans-vm-lv-overlay.dtbo
 
+LEMANS_MULTI_GVM_BASE_DTB += \
+		lemans-vm-la-mt.dtb
+
+LEMANS_MULTI_GVM_BOARDS += \
+		lemans-vm-la-mt-overlay.dtbo
+
+LEMANS_MULTI_LA_GVM_BASE_DTB += \
+		lemans-vm-la1-mt.dtb
+
+LEMANS_MULTI_LA_GVM_BOARDS += \
+		lemans-vm-la1-mt-overlay.dtbo
+
 DIREWOLF_LA_GVM_BASE_DTB += direwolf-vm-la.dtb
 
 DIREWOLF_LA_GVM_BOARDS += \
                    direwolf-vm-la-overlay.dtbo
+
+DIREWOLF_LV_GVM_BASE_DTB += direwolf-vm-lv.dtb
+
+DIREWOLF_LV_GVM_BOARDS += \
+                   direwolf-vm-lv-overlay.dtbo
 
 SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
 
@@ -212,15 +245,21 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_LV_GVM_BOARDS),$(LEMANS_LV_GVM_BASE_DTB)) \
-	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB))
+	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(LEMANS_MULTI_GVM_BOARDS),$(LEMANS_MULTI_GVM_BASE_DTB)) \
+	$(call add-overlays, $(LEMANS_MULTI_LA_GVM_BOARDS),$(LEMANS_MULTI_LA_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) \
 	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) \
 	$(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
+	$(DIREWOLF_LV_GVM_BOARDS) $(DIREWOLF_LV_GVM_BASE_DTB) \
 	$(LEMANS_LV_GVM_BOARDS) $(LEMANS_LV_GVM_BASE_DTB) \
-	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB)
+	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB) \
+	$(LEMANS_MULTI_GVM_BOARDS) $(LEMANS_MULTI_GVM_BASE_DTB) \
+	$(LEMANS_MULTI_LA_GVM_BOARDS) $(LEMANS_MULTI_LA_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 

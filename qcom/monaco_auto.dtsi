@@ -619,7 +619,6 @@
 		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
-		power-domains = <&CLUSTER_PD2>;
 
 		apps_rsc_drv2: drv@2 {
 			qcom,drv-id = <2>;
@@ -1341,6 +1340,11 @@
 		reg = <0x1fc0000 0x30000>;
 	};
 
+	mini_dump_mode {
+		compatible = "qcom,minidump";
+		status = "ok";
+	};
+
 	nspa_noc: interconnect@260C0000 {
 		compatible = "qcom,monaco_auto-nspa_noc";
 		reg = <0x260C0000 0x16080>;
@@ -1698,6 +1702,272 @@
 			vote = <44>;
 		};
 	};
+
+	qcom_pmu: qcom,pmu {
+		compatible = "qcom,pmu";
+		qcom,pmu-events-tbl =
+			< 0x0008 0xFF 0xFF 0xFF >,
+			< 0x0011 0xFF 0xFF 0xFF >,
+			< 0x0017 0xFF 0xFF 0xFF >,
+			< 0x0037 0xFF 0xFF 0xFF >,
+			< 0x1000 0xFF 0xFF 0xFF >;
+	};
+
+	ddr_freq_table: ddr-freq-table {
+		qcom,freq-tbl =
+			<  200000 >,
+			<  451000 >,
+			<  547000 >,
+			<  682000 >,
+			<  768000 >,
+			< 1555000 >,
+			< 1708000 >,
+			< 2093000 >,
+			< 2736000 >,
+			< 3197000 >;
+	};
+
+	llcc_freq_table: llcc-freq-table {
+		qcom,freq-tbl =
+			<  600000 >,
+			<  806000 >,
+			<  933000 >,
+			< 1066000 >;
+	};
+
+	qcom_dcvs: qcom,dcvs {
+		compatible = "qcom,dcvs";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		qcom_ddr_dcvs_hw: ddr {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <0>;
+			qcom,bus-width = <4>;
+			qcom,freq-tbl = <&ddr_freq_table>;
+
+			ddr_dcvs_sp: sp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				interconnects = <&mc_virt MASTER_LLCC
+					&mc_virt SLAVE_EBI1>;
+			};
+		};
+
+		qcom_llcc_dcvs_hw: llcc {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <1>;
+			qcom,bus-width = <16>;
+			qcom,freq-tbl = <&llcc_freq_table>;
+
+			llcc_dcvs_sp: sp {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				interconnects = <&gem_noc MASTER_APPSS_PROC
+					&gem_noc SLAVE_LLCC>;
+			};
+		};
+
+		qcom_l3_1_dcvs_hw: l3_1 {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <2>;
+			qcom,bus-width = <32>;
+			reg = <0x18590000 0x4000>, <0x18590100 0xa0>;
+			reg-names = "l3-base", "l3tbl-base";
+
+			l3_1_dcvs_sp: sp_1 {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				qcom,shared-offset = <0x0090>;
+			};
+		};
+
+		qcom_l3_0_dcvs_hw: l3_0 {
+			compatible = "qcom,dcvs-hw";
+			qcom,dcvs-hw-type = <5>;
+			qcom,bus-width = <32>;
+			reg = <0x18592000 0x4000>, <0x18592100 0xa0>;
+			reg-names = "l3-base", "l3tbl-base";
+
+			l3_0_dcvs_sp: sp_0 {
+				compatible = "qcom,dcvs-path";
+				qcom,dcvs-path-type = <0>;
+				qcom,shared-offset = <0x0090>;
+			};
+		};
+	};
+
+	qcom_memlat: qcom,memlat {
+		compatible = "qcom,memlat";
+
+		ddr {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_ddr_dcvs_hw>;
+			qcom,sampling-path = <&ddr_dcvs_sp>;
+			qcom,miss-ev = <0x1000>;
+
+			silver {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1117000 1708000 >,
+						< 1459000 2093000 >,
+						< 1805000 2736000 >,
+						< 1958000 3197000 >;
+				qcom,sampling-enabled;
+			};
+
+			gold {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1190000 1708000 >,
+						< 1498000 2093000 >,
+						< 1901000 2736000 >,
+						< 2112000 3197000 >;
+				qcom,sampling-enabled;
+			};
+
+			prime {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU2 &CPU3>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1267000 1708000 >,
+						< 1632000 2093000 >,
+						< 2054000 2736000 >,
+						< 2362400 3197000 >;
+				qcom,sampling-enabled;
+			};
+
+			gold-compute {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3>;
+				qcom,cpufreq-memfreq-tbl =
+						< 2054000 2736000 >,
+						< 2362400 3197000 >;
+				qcom,sampling-enabled;
+				qcom,compute-mon;
+			};
+		};
+
+		llcc {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_llcc_dcvs_hw>;
+			qcom,sampling-path = <&llcc_dcvs_sp>;
+			qcom,miss-ev = <0x37>;
+
+			silver {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1117000  600000 >,
+						< 1459000  806000 >,
+						< 1805000  933000 >,
+						< 1958000 1066000 >;
+				qcom,sampling-enabled;
+			};
+
+			gold {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1190000  600000 >,
+						< 1498000  806000 >,
+						< 1901000  933000 >,
+						< 2112000 1066000 >;
+				qcom,sampling-enabled;
+			};
+
+			prime {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU2 &CPU3>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1267000  600000 >,
+						< 1632000  806000 >,
+						< 2054000  933000 >,
+						< 2362400 1066000 >;
+				qcom,sampling-enabled;
+			};
+		};
+
+		l3_1 {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_l3_0_dcvs_hw>;
+			qcom,sampling-path = <&l3_0_dcvs_sp>;
+			qcom,miss-ev = <0x17>;
+
+			silver {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU4 &CPU5 &CPU6 &CPU7>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1117000  921600 >,
+						< 1459000 1228800 >,
+						< 1805000 1478400 >,
+						< 1958000 1612800 >;
+				qcom,sampling-enabled;
+			};
+		};
+
+		l3_0 {
+			compatible = "qcom,memlat-grp";
+			qcom,target-dev = <&qcom_l3_1_dcvs_hw>;
+			qcom,sampling-path = <&l3_1_dcvs_sp>;
+			qcom,miss-ev = <0x17>;
+
+			gold {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU0 &CPU1>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1190000  921600 >,
+						< 1498000 1228800 >,
+						< 1901000 1478400 >,
+						< 2112000 1612800 >;
+				qcom,sampling-enabled;
+			};
+
+			prime {
+				compatible = "qcom,memlat-mon";
+				qcom,cpulist = <&CPU2 &CPU3>;
+				qcom,cpufreq-memfreq-tbl =
+						< 1267000  921600 >,
+						< 1632000 1228800 >,
+						< 2054000 1478400 >,
+						< 2362400 1612800 >;
+				qcom,sampling-enabled;
+			};
+		};
+	};
+
+	bwmon_llcc: qcom,bwmon-llcc@90B6400 {
+		compatible = "qcom,bwmon4";
+		reg = <0x90B6400 0x300>, <0x90B6300 0x200>;
+		reg-names = "base", "global_base";
+		interrupts = <GIC_SPI 581 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,mport = <0>;
+		qcom,hw-timer-hz = <19200000>;
+		qcom,count-unit = <0x10000>;
+		qcom,target-dev = <&qcom_llcc_dcvs_hw>;
+	};
+
+	bwmon_ddr: qcom,bwmon-ddr@0x9091000 {
+		compatible = "qcom,bwmon5";
+		reg = <0x9091000 0x1000>;
+		reg-names = "base";
+		interrupts = <GIC_SPI 620 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,hw-timer-hz = <19200000>;
+		qcom,count-unit = <0x10000>;
+		qcom,target-dev = <&qcom_ddr_dcvs_hw>;
+	};
+
+	qfprom: qfprom@780158 {
+		compatible = "qcom,qfprom";
+		reg = <0x780158 0x4>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		read-only;
+		ranges;
+	};
 };
 
 #include "monaco_auto-usb.dtsi"
@@ -1709,6 +1979,7 @@
 #include "lemans-gdsc.dtsi"
 #include "monaco_auto-qupv3.dtsi"
 #include "monaco_auto-debug.dtsi"
+#include "monaco_auto-pcie.dtsi"
 
 /* CAM_CC GDSCs */
 &cam_cc_titan_top_gdsc {

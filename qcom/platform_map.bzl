@@ -3,7 +3,10 @@ _platform_map = {
         "dtb_list": [
             # keep sorted
             {"name": "direwolf-vm-la.dtb"},
+            {"name": "direwolf-vm-lv.dtb"},
             {"name": "lemans-vm-la.dtb"},
+            {"name": "lemans-vm-la-mt.dtb"},
+            {"name": "lemans-vm-la1-mt.dtb"},
             {"name": "lemans-vm-lv.dtb"},
             {"name": "sa8155-vm-la.dtb"},
             {"name": "sa8195-vm-la.dtb"},
@@ -11,7 +14,10 @@ _platform_map = {
         "dtbo_list": [
             # keep sorted
             {"name": "direwolf-vm-la-overlay.dtbo"},
+            {"name": "direwolf-vm-lv-overlay.dtbo"},
             {"name": "lemans-vm-la-overlay.dtbo"},
+            {"name": "lemans-vm-la-mt-overlay.dtbo"},
+            {"name": "lemans-vm-la1-mt-overlay.dtbo"},
             {"name": "lemans-vm-lv-overlay.dtbo"},
             {"name": "sa8155-vm-la-overlay.dtbo"},
             {"name": "sa8195-vm-la-overlay.dtbo"},
@@ -138,6 +144,7 @@ _platform_map = {
             {"name": "pineapple-mtp-nfc-overlay.dtbo"},
             {"name": "pineapple-mtp-overlay.dtbo"},
             {"name": "pineapple-qrd-overlay.dtbo"},
+            {"name": "pineapple-qrd-sku2-overlay.dtbo"},
             {"name": "pineapple-rcm-overlay.dtbo"},
             {"name": "pineapplep-hdk-overlay.dtbo"},
             {
@@ -146,6 +153,16 @@ _platform_map = {
             },
         ],
         "binary_compatible_with": ["cliffs"],
+    },
+    "niobe": {
+        "dtb_list": [
+            {"name": "niobe.dtb"},
+        ],
+        "dtbo_list": [
+            {
+                "name": "niobe-rumi-overlay.dtbo",
+            },
+        ],
     },
     "cliffs": {
         "dtb_list": [
@@ -156,6 +173,11 @@ _platform_map = {
                 "name": "cliffs-rumi-overlay.dtbo",
                 "apq": False,
             },
+            {"name": "cliffs-atp-overlay.dtbo"},
+            {"name": "cliffs-cdp-overlay.dtbo"},
+            {"name": "cliffs-mtp-overlay.dtbo"},
+            {"name": "cliffs-qrd-overlay.dtbo"},
+            {"name": "cliffs-rcm-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {

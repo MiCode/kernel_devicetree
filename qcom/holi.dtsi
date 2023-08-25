@@ -1,4 +1,5 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Holi";
@@ -16,6 +17,8 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	reserved_memory: reserved-memory { };
+
+	firmware: firmware { };
 
 	cpus {
 		#address-cells = <2>;
@@ -243,8 +246,10 @@
 	/* secdata can be reused by apps */
 
 	smem_mem: smem_region@80900000 {
-		no-map;
+		compatible = "qcom,smem";
 		reg = <0x0 0x80900000 0x0 0x200000>;
+		hwlocks = <&tcsr_mutex 3>;
+		no-map;
 	};
 
 	cpucp_fw_mem: cpucp_fw_region@80b00000 {
@@ -316,6 +321,16 @@
 		no-map;
 		reg = <0x0 0xc1800000 0x0 0x3900000>;
 	};
+
+	/* global autoconfigured region for contiguous allocations */
+	system_cma: linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
+	};
 };
 
 &soc {
@@ -338,6 +353,29 @@
 		reg = <0xf200000 0x10000>,     /* GICD */
 		      <0xf240000 0x100000>;    /* GICR * 8 */
 		interrupts = <GIC_PPI 8 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	rpm_bus: qcom,rpm-smd {
+		compatible = "qcom,rpm-smd";
+		rpm-channel-name = "rpm_requests";
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_AOP
+			      IPCC_MPROC_SIGNAL_GLINK_QMP
+			      IRQ_TYPE_EDGE_RISING>;
+		rpm-channel-type = <15>; /* SMD_APPS_RPM */
+	};
+
+	mpm: interrupt-controller@45f01b8 {
+		compatible = "qcom,mpm-holi", "qcom,mpm";
+		reg = <0x45f01b8 0x1000>,
+		      <0x0f40000c 0x4>,  /* MSM_APCS_GCC_BASE 4K */
+		      <0xf421000 0x1000>;
+		reg-names = "vmpm", "ipc", "timer";
+		interrupts = <GIC_SPI 197 IRQ_TYPE_EDGE_RISING>;
+		qcom,num-mpm-irqs = <96>;
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		#interrupt-cells = <2>;
 	};
 
 	arch_timer: timer {
@@ -414,6 +452,15 @@
 		interrupts = <GIC_PPI 5 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+	load_mode {
+		compatible = "qcom,dload-mode";
+	};
+
+	tcsr: syscon@3c0000 {
+		compatible = "syscon";
+		reg = <0x3c0000 0x40000>;
+	};
+
 	qcom,msm-imem@c125000 {
 		compatible = "qcom,msm-imem";
 		reg = <0xc125000 0x1000>;
@@ -463,6 +510,30 @@
 		reg-names = "pshold-base", "tcsr-boot-misc-detect";
 	};
 
+	eud: qcom,msm-eud@1628000 {
+		compatible = "qcom,msm-eud";
+		interrupt-names = "eud_irq";
+		interrupts = <GIC_SPI 189 IRQ_TYPE_LEVEL_HIGH>;
+		reg = <0x1628000 0x2000>,
+			<0x162A000 0x1000>,
+			<0x3E5018 0x4>;
+		reg-names = "eud_base", "eud_mode_mgr2",
+					"eud_tcsr_check_reg";
+		qcom,secure-eud-en;
+		qcom,eud-tcsr-check-enable;
+		status = "ok";
+	};
+
+	qcom,mpm2-sleep-counter@0x4403000 {
+		compatible = "qcom,mpm2-sleep-counter";
+		reg = <0x4403000 0x1000>;
+		clock-frequency = <32768>;
+	};
+
+	vendor_hooks: qcom,cpu-vendor-hooks {
+		compatible = "qcom,cpu-vendor-hooks";
+	};
+
 	wdog: qcom,wdt@f410000 {
 		compatible = "qcom,msm-watchdog";
 		reg = <0xf410000 0x1000>;
@@ -484,6 +555,63 @@
 		#mbox-cells = <2>;
 	};
 
+	adsp_pas: remoteproc-adsp@a400000 {
+		compatible = "qcom,holi-adsp-pas";
+		reg = <0xa400000 0x00100>;
+		status = "ok";
+
+		interrupts-extended = <&intc GIC_SPI 282 IRQ_TYPE_LEVEL_HIGH>;
+
+		interrupt-names = "wdog";
+	};
+
+	cdsp_pas: remoteproc-cdsp@b000000 {
+		compatible = "qcom,holi-cdsp-pas";
+		reg = <0xb000000 0x100000>;
+		status = "ok";
+
+		interrupts-extended = <&intc GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
+
+		interrupt-names = "wdog";
+	};
+
+	modem_pas: remoteproc-mss@06000000 {
+		compatible = "qcom,holi-modem-pas";
+		reg = <0x06000000 0x100>;
+		status = "ok";
+
+		interrupts-extended = <&intc GIC_SPI 307 IRQ_TYPE_LEVEL_HIGH>;
+
+		interrupt-names = "wdog";
+	};
+
+	tcsr_mutex_block: syscon@340000 {
+		compatible = "syscon";
+		reg = <0x340000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+
+	rpm_msg_ram: memory@045f0000 {
+		compatible = "qcom,rpm-msg-ram";
+		reg = <0x45f0000 0x7000>;
+	};
+
+	rpm-glink {
+		compatible = "qcom,glink-rpm";
+		qcom,rpm-msg-ram = <&rpm_msg_ram>;
+		mboxes = <&ipcc_mproc IPCC_CLIENT_AOP
+			  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+		mbox-names = "rpm_smem";
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_AOP
+			      IPCC_MPROC_SIGNAL_GLINK_QMP
+			      IRQ_TYPE_EDGE_RISING>;
+	};
 
 	qcom_pmu: qcom,pmu {
 		compatible = "qcom,pmu";
@@ -638,6 +766,24 @@
 		};
 	};
 
+	qfprom: qfprom@1b40000 {
+		compatible = "qcom,qfprom";
+		reg = <0x1b40000 0x7000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ready-only;
+		ranges;
+
+		adsp_variant: adsp_variant@1E6 {
+			reg = <0x1E6 0x2>;
+			bits = <6 4>;
+		};
+
+		boot_config: boot_config@6070 {
+			reg = <0x6070 0x4>;
+		};
+	};
+
 	bwmon_ddr: qcom,bwmon-ddr@4520300 {
 		compatible = "qcom,bwmon4";
 		reg = <0x4520300 0x300>, <0x4520200 0x200>;
@@ -650,4 +796,14 @@
 	};
 };
 
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
+		qcom,dload-mode = <&tcsr 0x13000>;
+	};
+};
+
 #include "holi-pinctrl.dtsi"
+#include "pm6350-rpm-regulator.dtsi"
+#include "pm6150l-rpm-regulator.dtsi"
+#include "blair-regulators-pm6350.dtsi"
