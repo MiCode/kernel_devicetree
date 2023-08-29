@@ -210,10 +210,12 @@ LEMANS_LV_GVM_BOARDS += \
 		lemans-vm-lv-overlay.dtbo
 
 LEMANS_MULTI_GVM_BASE_DTB += \
-		lemans-vm-la-mt.dtb
+		lemans-vm-la-mt.dtb \
+		lemans-vm-lv-mt.dtb
 
 LEMANS_MULTI_GVM_BOARDS += \
-		lemans-vm-la-mt-overlay.dtbo
+		lemans-vm-la-mt-overlay.dtbo \
+		lemans-vm-lv-mt-overlay.dtbo
 
 LEMANS_MULTI_LA_GVM_BASE_DTB += \
 		lemans-vm-la1-mt.dtb
