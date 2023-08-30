@@ -13,6 +13,26 @@
 };
 
 &soc {
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,pdc";
+		reg = <0xb220000 0x10000>;
+		qcom,pdc-ranges = <9 489 2>, <12 492 1>, <14 494 2>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,monaco_auto-pinctrl";
+		reg = <0xf000000 0x1000000>;
+		interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		wakeup-parent = <&pdc>;
+	};
+
 	apps_smmu: apps-smmu@15000000 {
 		compatible = "qcom,qsmmu-v500";
 		reg = <0x15000000 0x100000>,
@@ -242,10 +262,68 @@
 				<GIC_SPI 639 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 640 IRQ_TYPE_LEVEL_HIGH>;
-		};
+	};
 
-		dma_dev@0x0 {
-			compatible = "qcom,iommu-dma";
-			memory-region = <&system_cma>;
-		};
+	dma_dev@0x0 {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
+	};
+
+	usb3_phy_wrapper_gcc_usb30_prim_pipe_clk: usb3_phy_wrapper_gcc_usb30_prim_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "usb3_phy_wrapper_gcc_usb30_prim_pipe_clk";
+		#clock-cells = <0>;
+	};
+};
+
+#include "monaco_auto-pinctrl.dtsi"
+#include "monaco-vm-usb.dtsi"
+
+&regulator {
+	gcc_usb30_prim_gdsc: gcc_usb30_prim_gdsc {
+		regulator-name = "gcc_usb30_prim_gdsc";
+	};
+
+	gcc_pcie_0_gdsc: gcc_pcie_0_gdsc {
+		regulator-name = "gcc_pcie_0_gdsc";
+	};
+
+	gcc_pcie_1_gdsc: gcc_pcie_1_gdsc {
+		regulator-name = "gcc_pcie_1_gdsc";
+	};
+
+	gcc_usb20_prim_gdsc: gcc_usb20_prim_gdsc {
+		regulator-name = "gcc_usb20_prim_gdsc";
+	};
+
+	L7A: pm7255_a_l7: regulator-pm7255_a-l7 {
+		regulator-name = "ldoa7";
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <912000>;
+	};
+
+	L7C: pm7255_c_l7: regulator-pm7255_c-l7 {
+		regulator-name = "ldoc7";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
+	L9A: pm7255_a_l9: regulator-pm7255_a-l9 {
+		regulator-name = "ldoa9";
+		regulator-min-microvolt = <2970000>;
+		regulator-max-microvolt = <3072000>;
+	};
+
+	L5A: pm7255_a_l5: regulator-pm7255_a-l5 {
+		regulator-name = "ldoa5";
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
+	};
+
+	L6A: pm7255_a_l6: regulator-pm7255_a-l6 {
+		regulator-name = "ldoa6";
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <912000>;
+	};
 };
