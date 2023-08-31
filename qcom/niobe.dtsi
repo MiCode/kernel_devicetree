@@ -1,3 +1,11 @@
+#include <dt-bindings/clock/qcom,camcc-niobe.h>
+#include <dt-bindings/clock/qcom,dispcc0-niobe.h>
+#include <dt-bindings/clock/qcom,dispcc1-niobe.h>
+#include <dt-bindings/clock/qcom,gcc-niobe.h>
+#include <dt-bindings/clock/qcom,gpucc-niobe.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/clock/qcom,tcsrcc-niobe.h>
+#include <dt-bindings/clock/qcom,videocc-niobe.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
 #include <dt-bindings/power/qcom-aoss-qmp.h>
@@ -327,6 +335,300 @@
 		qcom,client-id = <0x00000001>;
 	};
 
+	clocks {
+		xo_board: xo_board {
+			compatible = "fixed-clock";
+			clock-frequency = <76800000>;
+			clock-output-names = "xo_board";
+			#clock-cells = <0>;
+		};
+
+		sleep_clk: sleep_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <32000>;
+			clock-output-names = "sleep_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_0_pipe_clk: pcie_0_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_0_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_1_phy_aux_clk: pcie_1_phy_aux_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_1_phy_aux_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_1_pipe_clk: pcie_1_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_1_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_2_phy_aux_clk: pcie_2_phy_aux_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_2_phy_aux_clk";
+			#clock-cells = <0>;
+		};
+
+		pcie_2_pipe_clk: pcie_2_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "pcie_2_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		ufs_phy_rx_symbol_0_clk: ufs_phy_rx_symbol_0_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "ufs_phy_rx_symbol_0_clk";
+			#clock-cells = <0>;
+		};
+
+		ufs_phy_rx_symbol_1_clk: ufs_phy_rx_symbol_1_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "ufs_phy_rx_symbol_1_clk";
+			#clock-cells = <0>;
+		};
+
+		ufs_phy_tx_symbol_0_clk: ufs_phy_tx_symbol_0_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "ufs_phy_tx_symbol_0_clk";
+			#clock-cells = <0>;
+		};
+
+		usb3_phy_wrapper_gcc_usb30_pipe_clk: usb3_phy_wrapper_gcc_usb30_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "usb3_phy_wrapper_gcc_usb30_pipe_clk";
+			#clock-cells = <0>;
+		};
+
+		usb3_sec_phy_wrapper_gcc_usb30_pipe_clk: usb3_sec_phy_wrapper_gcc_usb30_pipe_clk {
+			compatible = "fixed-clock";
+			clock-frequency = <1000>;
+			clock-output-names = "usb3_sec_phy_wrapper_gcc_usb30_pipe_clk";
+			#clock-cells = <0>;
+		};
+	};
+
+	rpmhcc: clock-controller {
+		compatible = "fixed-clock";
+		clock-output-names = "rpmh_clocks";
+		clock-frequency = <19200000>;
+		#clock-cells = <1>;
+	};
+
+	camcc: clock-controller@ade0000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "camcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	dispcc0: clock-controller@af00000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "dispcc0_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	dispcc1: clock-controller@a900000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "dispcc1_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gcc: clock-controller@100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	gpucc: clock-controller@3d90000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gpucc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	tcsrcc: clock-controller@1f40000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "tcsrcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	videocc: clock-controller@abf0000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "videocc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
 };
 
 #include "niobe-stub-regulators.dtsi"
+#include "pineapple-gdsc.dtsi"
+
+&cam_cc_bps_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&cam_cc_ife_0_gdsc {
+	compatible = "regulator-fixed";
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&cam_cc_ife_1_gdsc {
+	compatible = "regulator-fixed";
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&cam_cc_ipe_0_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&cam_cc_titan_top_gdsc {
+	compatible = "regulator-fixed";
+	reg = <0xadf4024 0x4>;
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&mdss_0_disp_cc_mdss_core_gdsc {
+	compatible = "regulator-fixed";
+	regulator-name = "mdss_0_disp_cc_mdss_core_gdsc";
+	proxy-supply = <&mdss_0_disp_cc_mdss_core_gdsc>;
+	status = "ok";
+};
+
+&mdss_0_disp_cc_mdss_core_int2_gdsc {
+	compatible = "regulator-fixed";
+	regulator-name = "mdss_0_disp_cc_mdss_core_int2_gdsc";
+	status = "ok";
+};
+
+&mdss_1_disp_cc_mdss_core_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&mdss_1_disp_cc_mdss_core_int2_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&gcc_pcie_0_gdsc {
+	compatible = "regulator-fixed";
+	qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl &gcc_apcs_gdsc_sleep_ctrl 0>;
+	status = "ok";
+};
+
+&gcc_pcie_0_phy_gdsc {
+	compatible = "regulator-fixed";
+	qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl &gcc_apcs_gdsc_sleep_ctrl 3>;
+	status = "ok";
+};
+
+&gcc_pcie_1_gdsc {
+	compatible = "regulator-fixed";
+	qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl &gcc_apcs_gdsc_sleep_ctrl 1>;
+	status = "ok";
+};
+
+&gcc_pcie_1_phy_gdsc {
+	compatible = "regulator-fixed";
+	qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl &gcc_apcs_gdsc_sleep_ctrl 4>;
+	status = "ok";
+};
+
+&gcc_pcie_2_gdsc {
+	compatible = "regulator-fixed";
+	qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl &gcc_apcs_gdsc_sleep_ctrl 5>;
+	status = "ok";
+};
+
+&gcc_pcie_2_phy_gdsc {
+	compatible = "regulator-fixed";
+	qcom,collapse-vote = <&gcc_apcs_gdsc_vote_ctrl &gcc_apcs_gdsc_sleep_ctrl 6>;
+	status = "ok";
+};
+
+&gcc_ufs_mem_phy_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&gcc_ufs_phy_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&gcc_usb30_prim_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&gcc_usb30_sec_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&gcc_usb3_phy_gdsc {
+	compatible = "regulator-fixed";
+	reg = <0x15000c 0x4>;
+	status = "ok";
+};
+
+&gcc_usb3_sec_phy_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&gpu_cc_cx_gdsc_hw_ctrl {
+	reg = <0x3d99094 0x4>;
+};
+
+&gpu_cc_cx_gdsc {
+	compatible = "regulator-fixed";
+	reg = <0x3d99080 0x4>;
+	status = "ok";
+};
+
+&video_cc_mvs0_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&video_cc_mvs0c_gdsc {
+	compatible = "regulator-fixed";
+	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&video_cc_mvs1_gdsc {
+	compatible = "regulator-fixed";
+	status = "ok";
+};
+
+&video_cc_mvs1c_gdsc {
+	compatible = "regulator-fixed";
+	qcom,support-hw-trigger;
+	status = "ok";
+};
