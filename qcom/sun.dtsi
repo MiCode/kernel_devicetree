@@ -634,8 +634,17 @@
 	};
 
 	gpucc: clock-controller@3d90000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gpucc_clocks";
+		compatible = "qcom,sun-gpucc", "syscon";
+		reg = <0x3d90000 0x9800>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&gcc GCC_GPU_GPLL0_CLK_SRC>,
+			 <&gcc GCC_GPU_GPLL0_DIV_CLK_SRC>;
+		clock-names = "bi_tcxo",
+			      "gpll0_out_main",
+			      "gpll0_out_main_div";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -849,14 +858,23 @@
 	};
 
 	gpu_cc_cx_gdsc: qcom,gdsc@3d99080 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x3d99080 0x4>;
 		regulator-name = "gpu_cc_cx_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		hw-ctrl-addr = <&gpu_cc_cx_gdsc_hw_ctrl>;
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	/* GX_CLKCTL GDSCs */
 	gx_clkctl_gx_gdsc: qcom,gdsc@3d68024 {
-		compatible = "qcom,stub-regulator";
+		compatible = "qcom,gdsc";
+		reg = <0x3d68024 0x4>;
 		regulator-name = "gx_clkctl_gx_gdsc";
+		parent-supply = <&VDD_GFX_GFX_MXC_VOTER_LEVEL>;
+		qcom,retain-regs;
+		qcom,support-cfg-gdscr;
 	};
 
 	/* VIDEO_CC GDSCs */
