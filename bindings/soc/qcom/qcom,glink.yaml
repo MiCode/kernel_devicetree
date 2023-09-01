@@ -1,0 +1,99 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/glink.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: QTI GLINK edge binding
+
+maintainers:
+  - Lei Han <quic_leihan@quicinc.com>
+
+description: |
+  This binding describes a QTI GLINK edge, a fifo
+  based mechanism for communication between subsystem-pairs
+  on various QTI platforms. Two types of edges can
+  be described by the binding; the GLINK RPM edge and a
+  SMEM based edge.
+
+properties:
+  compatible:
+    const: qcom,glink-rpm
+
+  label:
+    $ref: '/schemas/types.yaml#/definitions/string'
+    maxItems: 1
+    description:
+      The subsystem name this edge corresponds to.
+
+  interrupts:
+    maxItems: 1
+    description:
+      The IRQ used by the remote processor to signal
+      this processor about communication related events.
+
+  qcom,remote-pid:
+    $ref: '/schemas/types.yaml#/definitions/uint32'
+    maxItems: 1
+    description:
+      The identifier of the remote endpoint of this edge.
+
+  qcom,rpm-msg-ram:
+    $ref: '/schemas/types.yaml#/definitions/phandle'
+    maxItems: 1
+    description:
+      The handle to RPM message memory resource.
+
+  mboxes:
+    maxItems: 1
+    description:
+      Reference to the "rpm_hlos" mailbox in APCS.
+
+required:
+  - interrupts
+  - mboxes
+
+oneOf:
+  - required:
+      - compatible
+      - qcom,rpm-msg-ram
+  - required:
+      - qcom,remote-pid
+
+additionalProperties: false
+
+examples:
+  #The following example represents the GLINK RPM node on
+  #a MSM8996 device, with the function for the "rpm_request"
+  #channel defined, which is used for regulators and root clocks.
+  - |
+    apcs_glb: mailbox@9820000 {
+        compatible = "qcom,msm8996-apcs-hmss-global";
+        reg = <0x9820000 0x1000>;
+
+        #mbox-cells = <1>;
+    };
+
+    rpm_msg_ram: memory@68000 {
+        compatible = "qcom,rpm-msg-ram";
+        reg = <0x68000 0x6000>;
+    };
+
+    rpm-glink {
+        compatible = "qcom,glink-rpm";
+
+        interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
+
+        qcom,rpm-msg-ram = <&rpm_msg_ram>;
+
+        mboxes = <&apcs_glb 0>;
+
+        rpm-requests {
+            compatible = "qcom,rpm-msm8996";
+            qcom,glink-channels = "rpm_requests";
+
+            qcom,intents = <0x400 5
+                            0x800 1>;
+            ...
+        };
+    };
