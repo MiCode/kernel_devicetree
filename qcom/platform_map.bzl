@@ -8,8 +8,10 @@ _platform_map = {
             {"name": "lemans-vm-la-mt.dtb"},
             {"name": "lemans-vm-la1-mt.dtb"},
             {"name": "lemans-vm-lv.dtb"},
+            {"name": "lemans-vm-lv-mt.dtb"},
             {"name": "sa8155-vm-la.dtb"},
             {"name": "sa8195-vm-la.dtb"},
+            {"name": "monaco-vm-la.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
@@ -19,8 +21,10 @@ _platform_map = {
             {"name": "lemans-vm-la-mt-overlay.dtbo"},
             {"name": "lemans-vm-la1-mt-overlay.dtbo"},
             {"name": "lemans-vm-lv-overlay.dtbo"},
+            {"name": "lemans-vm-lv-mt-overlay.dtbo"},
             {"name": "sa8155-vm-la-overlay.dtbo"},
             {"name": "sa8195-vm-la-overlay.dtbo"},
+            {"name": "monaco-vm-la-overlay.dtbo"},
         ],
     },
     "gen3auto": {
@@ -167,6 +171,7 @@ _platform_map = {
     "cliffs": {
         "dtb_list": [
             {"name": "cliffs.dtb"},
+            {"name": "cliffs7.dtb"},
         ],
         "dtbo_list": [
             {

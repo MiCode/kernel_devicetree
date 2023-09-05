@@ -51,6 +51,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			capacity-dmips-mhz = <1946>;
+			dynamic-power-coefficient = <472>;
 			next-level-cache = <&L2_0>;
 			#cooling-cells = <2>;
 			L2_0: l2-cache {
@@ -75,6 +77,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			capacity-dmips-mhz = <1946>;
+			dynamic-power-coefficient = <472>;
 			next-level-cache = <&L2_1>;
 			#cooling-cells = <2>;
 			L2_1: l2-cache {
@@ -94,6 +98,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
+			capacity-dmips-mhz = <1946>;
+			dynamic-power-coefficient = <507>;
 			next-level-cache = <&L2_2>;
 			#cooling-cells = <2>;
 			L2_2: l2-cache {
@@ -113,6 +119,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
+			capacity-dmips-mhz = <1946>;
+			dynamic-power-coefficient = <507>;
 			next-level-cache = <&L2_3>;
 			#cooling-cells = <2>;
 			L2_3: l2-cache {
@@ -132,6 +140,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 2>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_4>;
 			#cooling-cells = <2>;
 			L2_4: l2-cache {
@@ -156,6 +166,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 2>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_5>;
 			#cooling-cells = <2>;
 			L2_5: l2-cache {
@@ -175,6 +187,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 2>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_6>;
 			#cooling-cells = <2>;
 			L2_6: l2-cache {
@@ -194,6 +208,8 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xc0000000>;
 			qcom,freq-domain = <&cpufreq_hw 2>;
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_7>;
 			#cooling-cells = <2>;
 			L2_7: l2-cache {
@@ -751,7 +767,7 @@
 		compatible = "qcom,rpmh-stats-v3";
 		reg = <0x0c3f0000 0x400>;
 		qcom,qmp = <&aoss_qmp>;
-		ss-name = "modem", "adsp", "adsp_island", "cdsp", "apss";
+		ss-name = "modem", "adsp", "adsp_island", "cdsp", "apss", "cdsp1", "gpdsp0", "gpdsp1";
 	};
 
 	arch_timer: timer {
@@ -1353,6 +1369,18 @@
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
+	eud: qcom,msm-eud@08901000 {
+		compatible = "qcom,msm-eud";
+		reg =   <0x08901000 0x2000>,
+			 <0x08903000 0x1000>;
+		reg-names = "eud_base", "eud_mode_mgr2";
+		interrupt-parent = <&pdc>;
+		interrupts = <11 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "eud_irq";
+		qcom,secure-eud-en;
+		status = "ok";
+	};
+
 	adsp_pas: remoteproc-adsp@3000000 {
 		compatible = "qcom,monaco_auto-adsp-pas";
 		reg = <0x3000000 0x00100>;
@@ -1368,7 +1396,7 @@
 		qcom,vdd_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
 		reg-names = "cx","mx";
 
-		interrupts-extended =	<&intc GIC_SPI 486 IRQ_TYPE_LEVEL_HIGH>,
+		interrupts-extended =	<&intc GIC_SPI 486 IRQ_TYPE_EDGE_RISING>,
 					<&adsp_smp2p_in 0 0>,
 					<&adsp_smp2p_in 2 0>,
 					<&adsp_smp2p_in 1 0>,
@@ -1433,7 +1461,7 @@
 		interconnects = <&nspa_noc MASTER_CDSP_PROC &mc_virt SLAVE_EBI1>;
 		interconnect-names = "rproc_ddr";
 
-		interrupts-extended =	<&intc GIC_SPI 578 IRQ_TYPE_LEVEL_HIGH>,
+		interrupts-extended =	<&intc GIC_SPI 578 IRQ_TYPE_EDGE_RISING>,
 					<&cdsp_smp2p_in 0 0>,
 					<&cdsp_smp2p_in 2 0>,
 					<&cdsp_smp2p_in 1 0>,
@@ -1497,7 +1525,7 @@
 		interconnects = <&gpdsp_anoc MASTER_DSP0 &config_noc SLAVE_CLK_CTL>;
 		interconnect-names = "rproc_ddr";
 
-		interrupts-extended =	<&intc GIC_SPI 768 IRQ_TYPE_LEVEL_HIGH>,
+		interrupts-extended =	<&intc GIC_SPI 768 IRQ_TYPE_EDGE_RISING>,
 					<&gpdsp0_smp2p_in 0 0>,
 					<&gpdsp0_smp2p_in 2 0>,
 					<&gpdsp0_smp2p_in 1 0>,
@@ -1891,7 +1919,7 @@
 			};
 		};
 
-		l3_1 {
+		l3_0 {
 			compatible = "qcom,memlat-grp";
 			qcom,target-dev = <&qcom_l3_0_dcvs_hw>;
 			qcom,sampling-path = <&l3_0_dcvs_sp>;
@@ -1909,7 +1937,7 @@
 			};
 		};
 
-		l3_0 {
+		l3_1 {
 			compatible = "qcom,memlat-grp";
 			qcom,target-dev = <&qcom_l3_1_dcvs_hw>;
 			qcom,sampling-path = <&l3_1_dcvs_sp>;
@@ -1968,6 +1996,19 @@
 		read-only;
 		ranges;
 	};
+
+	pil_gpu_mem: pil_gpu_region@9d600000 {
+		no-map;
+		reg = <0x0 0x9d600000 0x0 0x2000>;
+	};
+
+	msm_gpu: qcom,kgsl-3d0@3d00000 { };
+
+	llcc_pmu: llcc-pmu@9095000 {
+		compatible = "qcom,llcc-pmu-ver2";
+		reg = <0x09095000 0x300>;
+		reg-names = "lagg-base";
+	};
 };
 
 #include "monaco_auto-usb.dtsi"
@@ -1979,6 +2020,7 @@
 #include "lemans-gdsc.dtsi"
 #include "monaco_auto-qupv3.dtsi"
 #include "monaco_auto-debug.dtsi"
+#include "monaco_auto-coresight.dtsi"
 #include "monaco_auto-pcie.dtsi"
 
 /* CAM_CC GDSCs */
