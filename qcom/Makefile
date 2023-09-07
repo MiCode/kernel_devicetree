@@ -187,7 +187,8 @@ endif
 
 ifeq ($(CONFIG_ARCH_CLIFFS), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
-pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb
+pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
+		cliffs-oemvm-rumi.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif

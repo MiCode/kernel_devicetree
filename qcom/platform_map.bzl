@@ -213,10 +213,16 @@ _platform_map = {
             {"name": "pineapple-vm-rumi.dtb"},
             {"name": "pineapplep-vm-hdk.dtb"},
         ],
+        "binary_compatible_with": ["cliffs-oemvm"],
     },
     "cliffs-tuivm": {
         "dtb_list": [
             {"name": "cliffs-vm-rumi.dtb"},
+        ],
+    },
+    "cliffs-oemvm": {
+        "dtb_list": [
+            {"name": "cliffs-oemvm-rumi.dtb"},
         ],
     },
     "blair": {
