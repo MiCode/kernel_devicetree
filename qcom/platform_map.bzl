@@ -329,7 +329,13 @@ _platform_map = {
             {"name": "pitti.dtb"},
         ],
         "dtbo_list": [
-            {"name": "pitti-rumi-overlay.dtbo"},
+            {"name": "pitti-atp-overlay.dtbo"},
+            {"name": "pitti-idp-overlay.dtbo"},
+            {"name": "pitti-qrd-overlay.dtbo"},
+            {
+                "name": "pitti-rumi-overlay.dtbo",
+                "apq": False,
+            },
         ],
     },
     "volcano": {

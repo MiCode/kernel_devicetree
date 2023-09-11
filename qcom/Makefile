@@ -153,7 +153,7 @@ dtb-y += $(holi-dtb-y)
 # pitti-dtb
 PITTI_BASE_DTB += pitti.dtb
 
-#PITTI_BOARDS += \
+PITTI_BOARDS += \
 		 pitti-atp-overlay.dtbo \
 		 pitti-idp-overlay.dtbo \
 		 pitti-qrd-overlay.dtbo
@@ -162,9 +162,8 @@ NOAPQ_PITTI_BOARDS += \
 		 pitti-rumi-overlay.dtbo
 
 pitti-dtb-$(CONFIG_ARCH_PITTI) += \
-	$(call add-overlays, $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS),$(PITTI_BASE_DTB))\
-	$(call add-overlays, $(PITTI_BOARDS) $(APQ_PITTI_BOARDS),$(PITTI_APQ_BASE_DTB))
-pitti-overlays-dtb-$(CONFIG_ARCH_PITTI) += $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS) $(PITTI_BASE_DTB) $(PITTI_APQ_BASE_DTB)
+	$(call add-overlays, $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS),$(PITTI_BASE_DTB))
+pitti-overlays-dtb-$(CONFIG_ARCH_PITTI) += $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS) $(PITTI_BASE_DTB)
 dtb-y += $(pitti-dtb-y)
 
 endif
