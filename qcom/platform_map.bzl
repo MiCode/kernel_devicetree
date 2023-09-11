@@ -219,11 +219,21 @@ _platform_map = {
     "cliffs-tuivm": {
         "dtb_list": [
             {"name": "cliffs-vm-rumi.dtb"},
+            {"name": "cliffs-vm-atp.dtb"},
+            {"name": "cliffs-vm-cdp.dtb"},
+            {"name": "cliffs-vm-mtp.dtb"},
+            {"name": "cliffs-vm-qrd.dtb"},
+            {"name": "cliffs-vm-rcm.dtb"},
         ],
     },
     "cliffs-oemvm": {
         "dtb_list": [
             {"name": "cliffs-oemvm-rumi.dtb"},
+            {"name": "cliffs-oemvm-atp.dtb"},
+            {"name": "cliffs-oemvm-cdp.dtb"},
+            {"name": "cliffs-oemvm-mtp.dtb"},
+            {"name": "cliffs-oemvm-qrd.dtb"},
+            {"name": "cliffs-oemvm-rcm.dtb"},
         ],
     },
     "blair": {
