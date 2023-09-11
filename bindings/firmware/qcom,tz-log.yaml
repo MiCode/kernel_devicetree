@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/sleepstate-smp2p.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: TZLOG (Trust Zone log)
+
+maintainers:
+  - Vikas Kumar Sharma <quic_vksharma@quicinc.com>
+
+description: |
+  The tz_log driver is a platform device driver that exposes a debugfs
+  interface for accessing and displaying diagnostic information
+  related to secure code (Trustzone/QSEE).
+
+properties:
+  compatible:
+    const: qcom,tz-log
+
+  reg:
+    description: |
+	  Offset and size of the register set for the device
+
+  qcom,hyplog-enabled:
+    description: |
+      Indicates(boolean) if driver supports HYP logger service.
+
+  hyplog-address-offset:
+    description: |
+      Register offset to get the HYP log base address.
+	$ref: /schemas/types.yaml#/definitions/uint32
+
+  hyplog-size-offset:
+    description: |
+      Register offset to get the HYP log size parameter.
+	$ref: /schemas/types.yaml#/definitions/uint32
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+  	qcom,tz-log@146bf720 {
+		compatible = "qcom,tz-log";
+                reg = <0x146bf720, 0x3000>;
+		qcom,hyplog-enabled;
+		hyplog-address-offset = 0x410;
+		hyplog-size-offset = 0x414;
+	};
