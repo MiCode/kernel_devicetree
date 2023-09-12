@@ -455,6 +455,14 @@
 		size = <0x0 0x2000000>;
 		linux,cma-default;
 	};
+
+	adsp_mem: adsp_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0 0x00000000 0 0xffffffff>;
+		reusable;
+		alignment = <0 0x400000>;
+		size = <0 0x800000>;
+	};
 };
 
 #include "blair-dma-heaps.dtsi"
@@ -1192,6 +1200,18 @@
 		reg-names = "rmtfs";
 		qcom,client-id = <0x00000001>;
 		qcom,vm-nav-path;
+	};
+
+	qcom,msm-cdsp-loader {
+		compatible = "qcom,cdsp-loader";
+		qcom,proc-img-to-load = "cdsp";
+		qcom,rproc-handle = <&cdsp_pas>;
+	};
+
+	qcom,msm-adsprpc-mem {
+		compatible = "qcom,msm-adsprpc-mem-region";
+		memory-region = <&adsp_mem>;
+		restrict-access;
 	};
 
 	ufsphy_mem: ufsphy_mem@4807000 {
