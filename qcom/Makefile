@@ -189,7 +189,18 @@ endif
 ifeq ($(CONFIG_ARCH_CLIFFS), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
+		cliffs-vm-atp.dtb \
+		cliffs-vm-cdp.dtb \
+		cliffs-vm-mtp.dtb \
+		cliffs-vm-qrd.dtb \
+		cliffs-vm-rcm.dtb \
+		cliffs-oemvm-atp.dtb \
+		cliffs-oemvm-cdp.dtb \
+		cliffs-oemvm-mtp.dtb \
+		cliffs-oemvm-qrd.dtb \
+		cliffs-oemvm-rcm.dtb \
 		cliffs-oemvm-rumi.dtb
+
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif
