@@ -240,6 +240,17 @@
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,volcano-pdc";
+		reg = <0xb220000 0x10000>, <0x174000f0 0x64>;
+		qcom,pdc-ranges = <0 480 40>, <40 140 11>, <51 527 47>,
+				  <98 609 31>, <129 63 1>, <130 716 12>,
+				  <142 251 5>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+
 arch_timer: timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
@@ -316,7 +327,8 @@ memtimer: timer@17420000 {
 		gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		/* TODO: Add qcom,gpios-reserved and pdc as wakeup parent*/
+		wakeup-parent = <&pdc>;
+		/* TODO: Add qcom,gpios-reserved */
 	};
 };
 
