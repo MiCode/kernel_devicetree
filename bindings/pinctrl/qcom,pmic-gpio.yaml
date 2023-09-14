@@ -53,9 +53,11 @@ properties:
           - qcom,pm8994-gpio
           - qcom,pm8998-gpio
           - qcom,pma8084-gpio
+          - qcom,pmd802x-gpio
           - qcom,pmi8950-gpio
           - qcom,pmi8994-gpio
           - qcom,pmi8998-gpio
+          - qcom,pmih010x-gpio
           - qcom,pmk8350-gpio
           - qcom,pmk8550-gpio
           - qcom,pmm8155au-gpio
@@ -136,6 +138,7 @@ allOf:
               - qcom,pm8005-gpio
               - qcom,pm8450-gpio
               - qcom,pm8916-gpio
+              - qcom,pmd802x-gpio
               - qcom,pmk8350-gpio
               - qcom,pmr735a-gpio
               - qcom,pmr735b-gpio
@@ -311,6 +314,21 @@ allOf:
 
   - if:
       properties:
+        comptaible:
+          contains:
+            enum:
+              - qcom,pmih010x-gpio
+    then:
+      properties:
+        gpio-line-names:
+          minItems: 18
+          maxItems: 18
+        gpio-reserved-ranges:
+          minItems: 1
+          maxItems: 9
+
+  - if:
+      properties:
         compatible:
           contains:
             enum:
@@ -439,8 +457,10 @@ $defs:
                  - gpio1-gpio22 for pm8994
                  - gpio1-gpio26 for pm8998
                  - gpio1-gpio22 for pma8084
+                 - gpio1-gpio4 for pmd802x
                  - gpio1-gpio2 for pmi8950
                  - gpio1-gpio10 for pmi8994
+                 - gpio1-gpio18 for pmih010x
                  - gpio1-gpio4 for pmk8350
                  - gpio1-gpio6 for pmk8550
                  - gpio1-gpio10 for pmm8155au
