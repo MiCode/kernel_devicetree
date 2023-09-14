@@ -168,6 +168,14 @@
 	qcom-scm {
 		compatible = "qcom,scm";
 	};
+
+	qcom_smcinvoke {
+		compatible = "qcom,smcinvoke";
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+	};
 };
 
 &soc {
@@ -345,6 +353,14 @@
 		};
 	};
 
+	qcom_tzlog: tz-log@14680720 {
+		compatible = "qcom,tz-log";
+		reg = <0x14680720 0x3000>;
+		qcom,hyplog-enabled;
+		hyplog-address-offset = <0x410>;
+		hyplog-size-offset = <0x414>;
+	};
+
 	tlmm: pinctrl@f000000 {
 		compatible = "qcom,sun-tlmm";
 		reg = <0xf000000 0x202000>;
@@ -467,9 +483,6 @@
 			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
 			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
 		clock-frequency = <19200000>;
-	};
-
-	qcom_tzlog: tz-log@0 {
 	};
 
 	clk_virt: interconnect@0 {
@@ -1398,6 +1411,22 @@
 		compatible = "qcom,cmd-db";
 		no-map;
 		reg = <0x0 0x81c60000 0x0 0x20000>;
+	};
+
+	qseecom_mem: qseecom_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1400000>;
+	};
+
+	qseecom_ta_mem: qseecom_ta_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x1000000>;
 	};
 
 	/* merged aop_config, tme_crash_dump, tme_log and uefi_log regions */
