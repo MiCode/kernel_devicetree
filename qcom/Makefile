@@ -120,7 +120,14 @@ HOLI_BOARDS += \
 		 holi-cdp-overlay.dtbo \
 		 holi-cdp-lcd-overlay.dtbo \
 		 holi-atp-overlay.dtbo \
-		 holi-mtp-usbc-overlay.dtbo
+		 holi-mtp-usbc-overlay.dtbo \
+		 holi-mtp-pm6125-overlay.dtbo \
+		 holi-cdp-pm6125-overlay.dtbo \
+		 holi-mtp-usbc-pm6125-overlay.dtbo \
+		 holi-mtp-pm6125-nopmi-overlay.dtbo \
+		 holi-qrd-pm6125-overlay.dtbo \
+		 holi-cdp-lcd-pm6125-overlay.dtbo \
+		 holi-qrd-pm6125-nopmi-overlay.dtbo
 
 holi-dtb-$(CONFIG_ARCH_HOLI) += \
 	$(call add-overlays, $(HOLI_BOARDS),$(HOLI_BASE_DTB))
