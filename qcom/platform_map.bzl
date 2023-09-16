@@ -266,6 +266,13 @@ _platform_map = {
             {"name": "holi-cdp-lcd-overlay.dtbo"},
             {"name": "holi-atp-overlay.dtbo"},
             {"name": "holi-mtp-usbc-overlay.dtbo"},
+            {"name": "holi-mtp-pm6125-overlay.dtbo"},
+            {"name": "holi-cdp-pm6125-overlay.dtbo"},
+            {"name": "holi-mtp-usbc-pm6125-overlay.dtbo"},
+            {"name": "holi-mtp-pm6125-nopmi-overlay.dtbo"},
+            {"name": "holi-qrd-pm6125-overlay.dtbo"},
+            {"name": "holi-cdp-lcd-pm6125-overlay.dtbo"},
+            {"name": "holi-qrd-pm6125-nopmi-overlay.dtbo"},
         ],
     },
     "pitti": {
