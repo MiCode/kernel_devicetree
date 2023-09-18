@@ -29,6 +29,20 @@ _platform_map = {
             {"name": "monaco-vm-lv-overlay.dtbo"},
         ],
     },
+    "autoghgvm": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "lemans-gunyah-vm-cob.dtb"},
+            {"name": "lemans-gunyah-vm-qam.dtb"},
+            {"name": "lemans-gunyah-vm-vp.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name": "lemans-gunyah-vm-cob-overlay.dtbo"},
+            {"name": "lemans-gunyah-vm-qam-overlay.dtbo"},
+            {"name": "lemans-gunyah-vm-vp-overlay.dtbo"},
+        ],
+    },
     "gen3auto": {
         "dtb_list": [
             # keep sorted
