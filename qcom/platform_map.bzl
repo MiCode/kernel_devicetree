@@ -40,6 +40,30 @@ _platform_map = {
             },
         ],
     },
+    "pineapple-tuivm": {
+        "dtb_list": [
+            {"name": "pineapple-oemvm-cdp.dtb"},
+            {"name": "pineapple-oemvm-mtp.dtb"},
+            {"name": "pineapple-oemvm-qrd.dtb"},
+            {"name": "pineapple-oemvm-rumi.dtb"},
+            {"name": "pineapple-vm-cdp.dtb"},
+            {"name": "pineapple-vm-mtp.dtb"},
+            {"name": "pineapple-vm-qrd.dtb"},
+            {"name": "pineapple-vm-rumi.dtb"},
+        ],
+    },
+    "pineapple-oemvm": {
+        "dtb_list": [
+            {"name": "pineapple-oemvm-cdp.dtb"},
+            {"name": "pineapple-oemvm-mtp.dtb"},
+            {"name": "pineapple-oemvm-qrd.dtb"},
+            {"name": "pineapple-oemvm-rumi.dtb"},
+            {"name": "pineapple-vm-cdp.dtb"},
+            {"name": "pineapple-vm-mtp.dtb"},
+            {"name": "pineapple-vm-qrd.dtb"},
+            {"name": "pineapple-vm-rumi.dtb"},
+        ],
+    },
 }
 
 def _get_dtb_lists(target, dt_overlay_supported):

@@ -2423,22 +2423,6 @@
 		compatible = "smmu-proxy-sender";
 	};
 
-	tlmm-vm-mem-access {
-		compatible = "qcom,tlmm-vm-mem-access";
-		qcom,master;
-		tlmm-vm-gpio-list = <&tlmm 86 0 &tlmm 87 0 &tlmm 133 0 &tlmm 137 0 &tlmm 48 0 &tlmm 49 0
-					&tlmm 50 0 &tlmm 51 0 &tlmm 161 0 &tlmm 162 0 &tlmm 91 0
-					 &tlmm 60 0 &tlmm 61 0 &tlmm 62 0 &tlmm 63 0 &tlmm 88 0>;
-	};
-
-	tlmm-vm-test {
-		compatible = "qcom,tlmm-vm-test";
-		qcom,master;
-		tlmm-vm-gpio-list = <&tlmm 86 0 &tlmm 87 0 &tlmm 133 0 &tlmm 137 0 &tlmm 48 0 &tlmm 49 0
-					&tlmm 50 0 &tlmm 51 0 &tlmm 161 0 &tlmm 162 0 &tlmm 91 0
-					 &tlmm 60 0 &tlmm 61 0 &tlmm 62 0 &tlmm 63 0 &tlmm 88 0>;
-	};
-
 	cpusys-vm-shmem-access {
 		compatible = "qcom,cpusys-vm-shmem-access";
 		gunyah-label = <5>;
@@ -2542,11 +2526,6 @@
 		restrict-access;
 	};
 
-	qcom,test-dbl {
-		compatible = "qcom,gh-dbl";
-		qcom,label = <0x4>;
-	};
-
 	qcom,pmic_glink {
 		compatible = "qcom,pmic-glink";
 		qcom,pmic-glink-channel = "PMIC_RTR_ADSP_APPS";
@@ -2607,21 +2586,6 @@
 			#io-channel-cells = <1>;
 			status = "disabled";
 		};
-	};
-
-	qcom,test-msgq {
-		compatible = "qcom,gh-msgq-test";
-		gunyah-label = <4>;
-		qcom,primary;
-	};
-
-	qcom,gh-qtimer@17425000 {
-		compatible = "qcom,gh-qtmr";
-		reg = <0x17425000 0x1000>;
-		reg-names = "qtmr-base";
-		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "qcom,qtmr-intr";
-		qcom,primary;
 	};
 
 	msm_gpu: qcom,kgsl-3d0@3d00000 { };
@@ -3082,34 +3046,11 @@
 		memory-region = <&kinfo_mem>;
 	};
 
-	dmesg-dump {
-		compatible = "qcom,dmesg-dump";
-		qcom,primary-vm;
-		gunyah-label = <7>;
-		peer-name = <2>;
-		memory-region = <&vm_comm_mem>;
-		shared-buffer-size = <0x1000>;
-	};
-
 	qcom,qrtr-mhi-cnss {
 		compatible = "qcom,qrtr-mhi";
 		qcom,dev-id = <0x1107>;
 		qcom,net-id = <0>;
 		qcom,low-latency;
-	};
-
-	qcom,qrtr-gunyah-tuivm {
-		compatible = "qcom,qrtr-gunyah";
-		qcom,master;
-		gunyah-label = <3>;
-		peer-name = <2>;
-	};
-
-	qcom,qrtr-gunyah-oemvm {
-		compatible = "qcom,qrtr-gunyah";
-		qcom,master;
-		gunyah-label = <8>;
-		peer-name = <4>;
 	};
 
 	qcom,health_monitor {
@@ -3120,15 +3061,6 @@
 			qcom,ssrestart-string = "mpss";
 			qcom,rproc_phandle = <&modem_pas>;
 		};
-	};
-
-	qcom,gunyah-panic-notifier {
-		compatible = "qcom,gh-panic-notifier";
-		qcom,primary-vm;
-		gunyah-label = <9>;
-		peer-name = <2>;
-		memory-region = <&vm_comm_mem>;
-		shared-buffer-size = <0x1000>;
 	};
 
 	qfprom: qfprom@221c2000 {
@@ -3393,17 +3325,13 @@
 	};
 
 	trust_ui_vm_mem: trust_ui_vm_region@f3800000 {
-		compatible = "shared-dma-pool";
 		reg = <0x0 0xf3800000 0x0 0x4400000>;
-		reusable;
-		alignment = <0x0 0x400000>;
+		no-map;
 	};
 
 	oem_vm_mem: oem_vm_region@f7c00000 {
-		compatible = "shared-dma-pool";
 		reg = <0x0 0xf7c00000 0x0 0x4c00000>;
-		reusable;
-		alignment = <0x0 0x400000>;
+		no-map;
 	};
 
 	llcc_lpi_mem: llcc_lpi_region@ff800000 {

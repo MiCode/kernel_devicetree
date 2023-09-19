@@ -55,6 +55,23 @@ dtb-y += $(pineapple-dtb-y)
 
 endif
 
+ifeq ($(CONFIG_ARCH_PINEAPPLE), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
+				pineapple-vm-mtp.dtb \
+				pineapple-vm-cdp.dtb \
+				pineapple-vm-qrd.dtb \
+				pineapple-vm-rcm.dtb \
+				pineapple-oemvm-cdp.dtb \
+				pineapple-oemvm-mtp.dtb \
+				pineapple-oemvm-qrd.dtb \
+				pineapple-oemvm-rumi.dtb \
+				pineapple-oemvm-rcm.dtb
+dtb-y += $(pineapple_tuivm-dtb-y)
+
+endif
+endif
+
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
 clean-files     := *.dtb *.dtbo
