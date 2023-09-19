@@ -183,6 +183,7 @@ _platform_map = {
             {"name": "cliffs-mtp-overlay.dtbo"},
             {"name": "cliffs-qrd-overlay.dtbo"},
             {"name": "cliffs-rcm-overlay.dtbo"},
+            {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {
@@ -198,6 +199,7 @@ _platform_map = {
             {"name": "pineapple-vm-rumi.dtb"},
             {"name": "pineapplep-vm-hdk.dtb"},
         ],
+        "binary_compatible_with": ["cliffs-tuivm"],
     },
     "pineapple-oemvm": {
         "dtb_list": [
@@ -211,6 +213,27 @@ _platform_map = {
             {"name": "pineapple-vm-qrd.dtb"},
             {"name": "pineapple-vm-rumi.dtb"},
             {"name": "pineapplep-vm-hdk.dtb"},
+        ],
+        "binary_compatible_with": ["cliffs-oemvm"],
+    },
+    "cliffs-tuivm": {
+        "dtb_list": [
+            {"name": "cliffs-vm-rumi.dtb"},
+            {"name": "cliffs-vm-atp.dtb"},
+            {"name": "cliffs-vm-cdp.dtb"},
+            {"name": "cliffs-vm-mtp.dtb"},
+            {"name": "cliffs-vm-qrd.dtb"},
+            {"name": "cliffs-vm-rcm.dtb"},
+        ],
+    },
+    "cliffs-oemvm": {
+        "dtb_list": [
+            {"name": "cliffs-oemvm-rumi.dtb"},
+            {"name": "cliffs-oemvm-atp.dtb"},
+            {"name": "cliffs-oemvm-cdp.dtb"},
+            {"name": "cliffs-oemvm-mtp.dtb"},
+            {"name": "cliffs-oemvm-qrd.dtb"},
+            {"name": "cliffs-oemvm-rcm.dtb"},
         ],
     },
     "blair": {

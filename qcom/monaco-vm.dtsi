@@ -4,6 +4,10 @@
 	model = "Qualcomm Technologies, Inc. Monaco Guest Virtual Machine";
 	qcom,msm-name  = "SA_MONACO_IVI";
 	qcom,msm-id = <606 0x10000>;
+
+	aliases {
+		hsuart0 = &qupv3_se2_4uart;
+	};
 };
 
 &firmware {
@@ -13,6 +17,66 @@
 };
 
 &soc {
+	tcsr_compute_signal_glb: syscon@0x1fd8000 {
+		compatible = "syscon";
+		reg = <0x1fd8000 0x1000>;
+	};
+
+	tcsr_compute_signal_sender0: syscon@0x1fd9000 {
+		compatible = "syscon";
+		reg = <0x1fd9000 0x1000>;
+	};
+
+	tcsr_compute_signal_sender1: syscon@0x1fdd000 {
+		compatible = "syscon";
+		reg = <0x1fdd000 0x1000>;
+	};
+
+	tcsr_compute_signal_receiver0: syscon@0x1fdb000 {
+		compatible = "syscon";
+		reg = <0x1fdb000 0x1000>;
+	};
+
+	tcsr_compute_signal_receiver1: syscon@0x1fdf000 {
+		compatible = "syscon";
+		reg = <0x1fdf000 0x1000>;
+	};
+
+	hgsl_tcsr_sender0: hgsl_tcsr_sender0 {
+		compatible = "qcom,hgsl-tcsr-sender";
+		syscon = <&tcsr_compute_signal_sender0>;
+		syscon-glb = <&tcsr_compute_signal_glb>;
+	};
+
+	hgsl_tcsr_sender1: hgsl_tcsr_sender1 {
+		compatible = "qcom,hgsl-tcsr-sender";
+		syscon = <&tcsr_compute_signal_sender1>;
+		syscon-glb = <&tcsr_compute_signal_glb>;
+	};
+
+	hgsl_tcsr_receiver0: hgsl_tcsr_receiver0 {
+		compatible = "qcom,hgsl-tcsr-receiver";
+		syscon = <&tcsr_compute_signal_receiver0>;
+		interrupts = <0 238 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	hgsl_tcsr_receiver1: hgsl_tcsr_receiver1 {
+		compatible = "qcom,hgsl-tcsr-receiver";
+		syscon = <&tcsr_compute_signal_receiver1>;
+		interrupts = <0 239 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	msm_gpu_hyp: qcom,hgsl@0x2c00000 {
+		compatible = "qcom,hgsl";
+		reg = <0x2c00000 0x8>, <0x2c8f000 0x4>;
+		reg-names = "hgsl_reg_hwinf", "hgsl_reg_gmucx";
+
+		qcom,glb-db-senders = <&hgsl_tcsr_sender0
+					&hgsl_tcsr_sender1>;
+		qcom,glb-db-receivers = <&hgsl_tcsr_receiver0
+					&hgsl_tcsr_receiver1>;
+	};
+
 	pdc: interrupt-controller@b220000 {
 		compatible = "qcom,pdc";
 		reg = <0xb220000 0x10000>;
@@ -30,7 +94,6 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		wakeup-parent = <&pdc>;
 	};
 
 	apps_smmu: apps-smmu@15000000 {
@@ -275,10 +338,21 @@
 		clock-output-names = "usb3_phy_wrapper_gcc_usb30_prim_pipe_clk";
 		#clock-cells = <0>;
 	};
+
+	qcom_rng_ee3: qrng@10d3000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x10d3000 0x1000>;
+		qcom,no-qrng-config;
+		clocks = <&dummycc RPMH_HWKM_CLK>;
+		clock-names = "km_clk_src";
+		status = "disabled";
+	};
 };
 
 #include "monaco_auto-pinctrl.dtsi"
 #include "monaco-vm-usb.dtsi"
+#include "pm8775-vm.dtsi"
+#include "monaco-vm-qupv3.dtsi"
 
 &regulator {
 	gcc_usb30_prim_gdsc: gcc_usb30_prim_gdsc {
@@ -326,4 +400,36 @@
 		regulator-min-microvolt = <880000>;
 		regulator-max-microvolt = <912000>;
 	};
+};
+
+&pm8775_1_gpios {
+	usb201_vbus_boost {
+		usb20_vbus_boost_default: usb20_vbus_boost_default {
+			pins = "gpio9";
+			function = "normal";
+			output-high;
+			power-source = <0>;
+		};
+	};
+};
+
+&pm8775_2_gpios {
+	usb22_vbus_boost {
+		usb22_vbus_boost_default: usb22_vbus_boost_default {
+			pins = "gpio7";
+			function = "normal";
+			output-high;
+			power-source = <0>;
+		};
+	};
+};
+
+&usb0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb20_vbus_boost_default>;
+};
+
+&usb2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb22_vbus_boost_default>;
 };

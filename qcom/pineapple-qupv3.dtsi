@@ -905,6 +905,32 @@
 			status = "disabled";
 		};
 
+		/* Ganges UWB Q2SPI SE Instance */
+		qupv3_se13_q2spi: q2spi@894000 {
+			compatible = "qcom,q2spi-msm-geni";
+			reg = <0x894000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 587 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S5_CLK>;
+			interconnect-names = "qup-core", "qup-config", "qup-memory";
+			interconnects =
+			<&clk_virt MASTER_QUP_CORE_2 &clk_virt SLAVE_QUP_CORE_2>,
+			<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_2>,
+			<&aggre2_noc MASTER_QUP_2 &mc_virt  SLAVE_EBI1>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se13_q2spi_mosi_active>, <&qupv3_se13_q2spi_miso_active>,
+				<&qupv3_se13_q2spi_clk_active>, <&qupv3_se13_q2spi_doorbell_active>;
+			pinctrl-1 = <&qupv3_se13_q2spi_sleep>, <&qupv3_se13_q2spi_miso_sleep>;
+			dmas = <&gpi_dma2 0 5 14 64 0>,
+				<&gpi_dma2 1 5 14 64 0>;
+			dma-names = "tx", "rx";
+			q2spi-max-frequency = <10000000>;
+			status = "disabled";
+		};
+
 		/* HS UART Instance */
 		qupv3_se14_4uart: qcom,qup_uart@898000 {
 			compatible = "qcom,msm-geni-serial-hs";
