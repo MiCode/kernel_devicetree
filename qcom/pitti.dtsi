@@ -7,6 +7,7 @@
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/interconnect/qcom,pitti.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/spmi/spmi.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Pitti";
@@ -1328,12 +1329,101 @@
 	qcom,glink {
 		compatible = "qcom,glink";
 	};
+
+	spmi_bus: qcom,spmi@1c40000 {
+		compatible = "qcom,spmi-pmic-arb";
+		reg = <0x1c40000 0x1100>,
+			<0x1e00000 0x2000000>,
+			<0x3e00000 0x100000>,
+			<0x3f00000 0xa0000>,
+			 <0x1c0a000 0x26000>;
+		reg-names = "core", "chnls", "obsrvr", "intr", "cnfg";
+		interrupt-names = "periph_irq";
+		interrupts-extended = <&mpm 86 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,ee = <0>;
+		qcom,channel = <0>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		interrupt-controller;
+		#interrupt-cells = <4>;
+		cell-index = <0>;
+	};
+
+	spmi_debug_bus: qcom,spmi-debug@8a08000 {
+		compatible = "qcom,spmi-pmic-arb-debug";
+		reg = <0x08a08000 0x60>;
+		reg-names = "core";
+		clock-names = "core_clk";
+		#address-cells = <2>;
+		#size-cells = <0>;
+		depends-on-supply = <&spmi_bus>;
+
+		qcom,pm6125-debug@0 {
+			compatible = "qcom,spmi-pmic";
+			reg = <0 SPMI_USID>;
+			#address-cells = <2>;
+			#size-cells = <0>;
+			qcom,can-sleep;
+		};
+	};
+
+	thermal_zones: thermal-zones {};
+
+	qcom,pmic_glink {
+		compatible = "qcom,pmic-glink";
+		qcom,pmic-glink-channel = "PMIC_RTR_ADSP_APPS";
+		qcom,subsys-name = "lpass";
+		qcom,protection-domain = "tms/servreg", "msm/adsp/charger_pd";
+		depends-on-supply = <&ipcc_mproc>;
+
+		battery_charger: qcom,battery_charger {
+			compatible = "qcom,battery-charger";
+	};
+
+		ucsi: qcom,ucsi {
+			compatible = "qcom,ucsi-glink";
+		};
+
+		altmode: qcom,altmode {
+			compatible = "qcom,altmode-glink";
+			#altmode-cells = <1>;
+		};
+	};
+
+	qcom,pmic_glink_log {
+		compatible = "qcom,pmic-glink";
+		qcom,pmic-glink-channel = "PMIC_LOGS_ADSP_APPS";
+
+		qcom,battery_debug {
+			compatible = "qcom,battery-debug";
+		};
+
+		qcom,charger_ulog_glink {
+			compatible = "qcom,charger-ulog-glink";
+		};
+
+		spmi_glink_debug: qcom,spmi_glink_debug {
+			compatible = "qcom,spmi-glink-debug";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			depends-on-supply = <&spmi_bus>;
+		};
+
+		pmic_glink_adc: qcom,glink-adc {
+			compatible = "qcom,glink-adc";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			#io-channel-cells = <1>;
+			status = "disabled";
+		};
+	};
 };
 
 #include "ipcc-test.dtsi"
 #include "pitti-pinctrl.dtsi"
 #include "pitti-usb.dtsi"
 #include "pitti-qupv3.dtsi"
+#include "pitti-pmic-overlay.dtsi"
 
 &qupv3_se8_2uart {
 	status = "ok";
