@@ -64,11 +64,13 @@
 		vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
 		qcom,sensitive;
 
+		iomemory-ranges = <0x0 0x409000 0x0 0x409000 0x0 0x1000 0x0>;
 		/* For LEVM pored use cases is SE4(QUP0_SE4) and SE11(QUP1_SE3), for SE4 we used
 		 * gpii5(QUPV3_0_GPII5) and irq no is 316, for SE11 we used gpii5(QUPV3_1_GPII5)
 		 * and irq no is 625.
 		 */
-		gic-irq-ranges = <316 316
+		gic-irq-ranges = <101 101
+				  316 316
 				  625 625>; /* PVM->SVM IRQ transfer */
 
 		vm-attrs = "crash-fatal", "context-dump";
@@ -258,6 +260,15 @@
 		redistributor-stride = <0x0 0x40000>;
 		reg = <0x17100000 0x10000>,     /* GICD */
 		      <0x17180000 0x100000>;    /* GICR * 8 */
+	};
+
+	ipcc_mproc_ns1: qcom,ipcc@409000 {
+		compatible = "qcom,ipcc";
+		reg = <0x409000 0x1000>;
+		interrupts = <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
 	};
 
 	arch_timer: timer {
