@@ -1,0 +1,167 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-qmi-sensor.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. QMI Thermal Mitigation(TS) Sensor
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  The QMI TS Sensor driver can list the sensors that are available in the
+  remote subsystem. This driver can read the temperature, set threshold and
+  get threshold notification.
+
+  Each child node of the QMI TS devicetree node represents a remote
+  subsystem and it can have more than one remote sensor names.
+
+properties:
+  $nodename:
+    const: qcom,qmi-sensors
+
+  '#thermal-sensor-cells':
+    const: 1
+    description: See thermal.txt for description.
+
+patternProperties:
+  "^(modem|cdsp|adsp|slpi)":
+    type: object
+    description: This child nodes describes the subsystem properties.
+
+    properties:
+      qcom,instance-id:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Remote subsystem QMI server instance id to be used for
+          communicating with QMI.
+
+          Minimum one child node is required. Child node name and its alias are
+          used as cooling device name and phandle for that cooling device.
+
+      qcom,qmi-sensor-names:
+        $ref: /schemas/types.yaml#/definitions/string-array
+        description: |
+          Remote sensor names. Below strings are the only acceptable
+          sensor names.
+        minItems: 1
+        items:
+          enum:
+            - pa
+            - pa_1
+            - pa_2
+            - qfe_pa0
+            - qfe_wtr0
+            - modem_tsens
+            - qfe_mmw0
+            - qfe_mmw1
+            - qfe_mmw2
+            - qfe_mmw3
+            - xo_therm
+            - qfe_pa_mdm
+            - qfe_pa_wtr
+            - qfe_mmw_streamer0
+            - qfe_mmw0_mod
+            - qfe_mmw1_mod
+            - qfe_mmw2_mod
+            - qfe_mmw3_mod
+            - qfe_ret_pa0
+            - qfe_wtr_pa0
+            - qfe_wtr_pa1
+            - qfe_wtr_pa2
+            - qfe_wtr_pa3
+            - sys_therm1
+            - sys_therm2
+            - modem_tsens1
+            - mmw_pa1
+            - mmw_pa2
+            - mmw_pa3
+            - sdr_mmw_therm
+            - qtm_therm
+            - modem_bcl_warn
+            - sdr0_pa0
+            - sdr0_pa1
+            - sdr0_pa2
+            - sdr0_pa3
+            - sdr0_pa4
+            - sdr0_pa5
+            - sdr0
+            - sdr1_pa0
+            - sdr1_pa1
+            - sdr1_pa2
+            - sdr1_pa3
+            - sdr1_pa4
+            - sdr1_pa5
+            - sdr1
+            - mmw0
+            - mmw1
+            - mmw2
+            - mmw3
+            - mmw_ific0
+            - sub1_modem_cfg
+            - sub1_lte_cc
+            - sub1_mcg_fr1_cc
+            - sub1_mcg_fr2_cc
+            - sub1_scg_fr1_cc
+            - sub1_scg_fr2_cc
+            - sub2_modem_cfg
+            - sub2_lte_cc
+            - sub2_mcg_fr1_cc
+            - sub2_mcg_fr2_cc
+            - sub2_scg_fr1_cc
+            - sub2_scg_fr2_cc
+            - isense_trim
+            - epm0
+            - epm1
+            - epm2
+            - epm3
+            - epm4
+            - epm5
+            - epm6
+            - epm7
+            - sdr0_pa
+            - sdr1_pa
+            - sub0_sdr0_pa
+            - sub1_sdr0_pa
+            - sys_therm3
+            - sys_therm4
+            - sys_therm5
+            - sys_therm6
+            - beamer_n_therm
+            - beamer_e_therm
+            - beamer_w_therm
+
+    required:
+      - qcom,instance-id
+      - qcom,qmi-sensor-names
+
+    additionalProperties: false
+
+required:
+  - compatible
+  - '#thermal-sensor-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+      #include <dt-bindings/thermal/thermal_qti.h>
+
+      qmi_sensor: qmi-ts-sensors {
+          compatible = "qcom,qmi-sensors";
+          #thermal-sensor-cells = <1>;
+
+          modem {
+              qcom,instance-id = <0x0>;
+              qcom,qmi-sensor-names = "pa",
+                                      "pa_1",
+                                      "qfe_pa0",
+                                      "qfe_wtr0";
+          };
+
+          cdsp {
+              qcom,instance-id = <QMI_CDSP_INST_ID>;
+              qcom,qmi-sensor-names = "isense_trim";
+          };
+      };
