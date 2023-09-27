@@ -347,12 +347,53 @@
 		clock-names = "km_clk_src";
 		status = "disabled";
 	};
+
+	VDD_CX_LEVEL: S7A_LEVEL:
+		pm7255_a_s7_level: regulator-pm7255_a-s7-level {
+			compatible = "qcom,stub-regulator";
+			regulator-name = "pm7255_a_s7_level";
+			regulator-min-microvolt =
+				<RPMH_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+				<RPMH_REGULATOR_LEVEL_MAX>;
+	};
+
+	VDD_MXC_LEVEL: S6A_LEVEL:
+		pm7255_a_s6_level: regulator-pm7255_a-s6-level {
+			compatible = "qcom,stub-regulator";
+			regulator-name = "pm7225_a_s6_level";
+			regulator-min-microvolt =
+				<RPMH_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+				<RPMH_REGULATOR_LEVEL_MAX>;
+	};
+
+	rpmh_cxo_clk: rpmh_cxo_clk {
+		compatible = "qcom,dummycc";
+		clock-output-names = "bi_tcxo";
+		#clock-cells = <0>;
+	};
+
+	pcie_0_pipe_clk: pcie_0_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_0_pipe_clk";
+		#clock-cells = <0>;
+	};
+
+	pcie_1_pipe_clk: pcie_1_pipe_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <1000>;
+		clock-output-names = "pcie_1_pipe_clk";
+		#clock-cells = <0>;
+	};
 };
 
 #include "monaco_auto-pinctrl.dtsi"
 #include "monaco-vm-usb.dtsi"
 #include "pm8775-vm.dtsi"
 #include "monaco-vm-qupv3.dtsi"
+#include "monaco-vm-pcie.dtsi"
 
 &regulator {
 	gcc_usb30_prim_gdsc: gcc_usb30_prim_gdsc {
