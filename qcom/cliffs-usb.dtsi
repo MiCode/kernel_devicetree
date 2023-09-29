@@ -29,6 +29,7 @@
 				"dm_hs_phy_irq", "ss_phy_irq";
 		qcom,use-pdc-interrupts;
 
+		qcom,use-eusb2-phy;
 		qcom,dis-sending-cm-l1-quirk;
 		qcom,core-clk-rate = <200000000>;
 		qcom,core-clk-rate-hs = <66666667>;
@@ -59,7 +60,7 @@
 			dma-coherent;
 
 			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
-			usb-phy = <&usb_nop_phy>, <&usb_qmp_dp_phy>;
+			usb-phy = <&eusb2_phy0>, <&usb_qmp_dp_phy>;
 			snps,disable-clk-gating;
 			snps,has-lpm-erratum;
 			snps,hird-threshold = /bits/ 8 <0x0>;
@@ -77,6 +78,28 @@
 
 	usb_nop_phy: usb_nop_phy {
 		compatible = "usb-nop-xceiv";
+	};
+
+	/* USB port related High Speed PHY */
+	eusb2_phy0: hsphy@88e3000 {
+		compatible = "qcom,usb-snps-eusb2-phy";
+		reg = <0x88e3000 0x154>,
+			<0x088e2000 0x4>,
+			<0x0c278000 0x4>;
+		reg-names = "eusb2_phy_base",
+			"eud_enable_reg",
+			"eud_detect_reg";
+
+		vdd-supply = <&L2B>;
+		qcom,vdd-voltage-level = <0 880000 950000>;
+		vdda12-supply = <&L4B>;
+
+		clocks = <&rpmhcc RPMH_CXO_PAD_CLK>,
+			<&tcsrcc TCSR_USB2_CLKREF_EN>;
+		clock-names = "ref_clk_src", "ref_clk";
+
+		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+		reset-names = "phy_reset";
 	};
 
 	/* USB port related QMP USB DP Combo PHY */
