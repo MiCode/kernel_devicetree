@@ -24,7 +24,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat ufshcd-core.use_mcq_mode=0 irqaffinity=0-2 slub_debug=-";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat ufshcd-core.use_mcq_mode=0 irqaffinity=0-2 slub_debug=- cpufreq.default_governor=performance";
 		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
@@ -50,6 +50,7 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD0>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
@@ -73,6 +74,7 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
@@ -86,6 +88,7 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_2>;
@@ -104,6 +107,7 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1690>;
 			dynamic-power-coefficient = <287>;
 			next-level-cache = <&L2_3>;
@@ -122,6 +126,7 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD4>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1690>;
 			dynamic-power-coefficient = <287>;
 			next-level-cache = <&L2_4>;
@@ -140,6 +145,7 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD5>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1690>;
 			dynamic-power-coefficient = <287>;
 			next-level-cache = <&L2_5>;
@@ -158,6 +164,7 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD6>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			capacity-dmips-mhz = <1690>;
 			dynamic-power-coefficient = <287>;
 			next-level-cache = <&L2_6>;
@@ -176,6 +183,7 @@
 			cpu-idle-states = <&GOLD_PLUS_OFF &GOLD_PLUS_RAIL_OFF>;
 			power-domains = <&CPU_PD7>;
 			power-domain-names = "psci";
+			qcom,freq-domain = <&cpufreq_hw 2>;
 			capacity-dmips-mhz = <1843>;
 			dynamic-power-coefficient = <664>;
 			next-level-cache = <&L2_7>;
@@ -445,6 +453,11 @@
 
 			apps_bcm_voter: bcm_voter {
 				compatible = "qcom,bcm-voter";
+			};
+
+			rpmhcc: clock-controller {
+				compatible = "qcom,cliffs-rpmh-clk";
+				#clock-cells = <1>;
 			};
 
 			dcvs_fp: qcom,dcvs-fp {
@@ -938,13 +951,6 @@
 		};
 	};
 
-	rpmhcc: clock-controller {
-		compatible = "fixed-clock";
-		clock-output-names = "rpmh_clocks";
-		clock-frequency = <19200000>;
-		#clock-cells = <1>;
-	};
-
 	camcc_crmc: syscon@adda000 {
 		compatible = "syscon";
 		reg = <0xadda000 0x2000>;
@@ -1033,6 +1039,52 @@
 			"sleep_clk", "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@17a80000 {
+		compatible = "syscon";
+		reg = <0x17a80000 0x21000>;
+	};
+
+	mccc: syscon@240ba000 {
+		compatible = "syscon";
+		reg = <0x240ba000 0x54>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,cliffs-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,camcc = <&camcc>;
+		qcom,dispcc = <&dispcc>;
+		qcom,gcc = <&gcc>;
+		qcom,gpucc = <&gpucc>;
+		qcom,videocc = <&videocc>;
+		qcom,mccc = <&mccc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&camcc 0>,
+			<&dispcc 0>, <&gcc 0>,
+			<&gpucc 0>, <&videocc 0>;
+		clock-names = "xo_clk_src", "camcc",
+			"dispcc", "gcc",
+			"gpucc", "videocc";
+		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17d91000 0x1000>, <0x17d92000 0x1000>, <0x17d93000 0x1000>;
+		reg-names = "freq-domain0", "freq-domain1", "freq-domain2";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int", "dcvsh1_int", "dcvsh2_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>, <&cpufreq_hw 1>, <&cpufreq_hw 2>;
 	};
 
 	tcsr: syscon@1fc0000 {
