@@ -34,7 +34,7 @@
 
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat mem-offline.bypass_send_msg=1 cpuidle.off=1";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-1 pcie_ports=compat mem-offline.bypass_send_msg=1 cpuidle.off=1";
 		stdout-path = "/soc/qcom,qupv3_1_geni_se@ac0000/qcom,qup_uart@a9c000:115200n8";
 	};
 
@@ -807,6 +807,14 @@
 			"llcc3_base", "llcc_broadcast_base";
 		interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
 		cap-based-alloc-and-pwr-collapse;
+	};
+
+	gic-interrupt-router {
+		compatible = "qcom,gic-intr-routing";
+		/* keep a few m cores in class0 only to avoid wakeup of l cores */
+		qcom,gic-class0-cpus = <0 1>;
+		/* keep other cores in class1 */
+		qcom,gic-class1-cpus = <2 3 4 5 6 7>;
 	};
 
 	qcom,secure-buffer {
