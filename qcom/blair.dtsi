@@ -870,6 +870,17 @@
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
+
+		smp2p_rdbg2_out: qcom,smp2p-rdbg2-out {
+			qcom,entry-name = "rdbg";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_rdbg2_in: qcom,smp2p-rdbg2-in {
+			qcom,entry-name = "rdbg";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
 	};
 
 	qcom,smp2p-cdsp {
@@ -890,6 +901,17 @@
 
 		cdsp_smp2p_in: slave-kernel {
 			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		smp2p_rdbg5_out: qcom,smp2p-rdbg5-out {
+			qcom,entry-name = "rdbg";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_rdbg5_in: qcom,smp2p-rdbg5-in {
+			qcom,entry-name = "rdbg";
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
@@ -1469,7 +1491,6 @@
 
 	qcom_pmu: qcom,pmu {
 		compatible = "qcom,pmu";
-		qcom,long-counter;
 		qcom,pmu-events-tbl =
 			< 0x0008 0xFF 0xFF 0xFF >,
 			< 0x0011 0xFF 0xFF 0xFF >,
@@ -1859,6 +1880,7 @@
 		iommus = <&apps_smmu 0x60 0x0>;
 		qcom,iommu-dma = "fastmap";
 
+		non-removable;
 		status = "disabled";
 
 		qos0 {
@@ -1943,6 +1965,9 @@
 		mmc-hs200-1_8v;
 		mmc-hs400-1_8v;
 		mmc-hs400-enhanced-strobe;
+
+		qcom,devfreq,freq-table = <50000000 200000000>;
+		qcom,scaling-lower-bus-speed-mode = "DDR52";
 
 		cap-mmc-hw-reset;
 
@@ -2063,6 +2088,7 @@
 	};
 };
 
+#include "ipcc-test.dtsi"
 #include "blair-pinctrl.dtsi"
 #include "pm6125-rpm-regulator.dtsi"
 #include "blair-usb.dtsi"
@@ -2162,3 +2188,4 @@
 
 #include "blair-debug.dtsi"
 #include "blair-coresight.dtsi"
+#include "msm-rdbg.dtsi"

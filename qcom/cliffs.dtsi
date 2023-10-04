@@ -24,7 +24,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 ufshcd-core.use_mcq_mode=0 irqaffinity=0-2 slub_debug=-";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat ufshcd-core.use_mcq_mode=0 irqaffinity=0-2 slub_debug=-";
 		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
@@ -34,6 +34,7 @@
 
 	aliases: aliases {
 		serial0 = &qupv3_se5_2uart;
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
 	};
 
@@ -333,11 +334,21 @@
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
 		interrupt-controller;
+		ranges;
 		#redistributor-regions = <1>;
 		redistributor-stride = <0x0 0x40000>;
 		reg = <0x17100000 0x10000>,	/* GICD */
 		      <0x17180000 0x200000>;	/* GICR * 8 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		gic_its: msi-controller@17140000 {
+			compatible = "arm,gic-v3-its";
+			msi-controller;
+			#msi-cells = <1>;
+			reg = <0x17140000 0x20000>;
+		};
 	};
 
 	arch_timer: timer {
@@ -452,6 +463,11 @@
 		#interrupt-cells = <2>;
 		interrupt-parent = <&intc>;
 		interrupt-controller;
+	};
+
+	pcie_pdc: pdc@b350000 {
+		compatible = "qcom,cliffs-pcie-pdc", "qcom,pcie-pdc";
+		reg = <0xb350000 0x20000>;
 	};
 
 	cache_cont: cache-controller@25000000 {
@@ -595,6 +611,30 @@
 				qcom,tcs-wait = <QCOM_ICC_TAG_AMC>;
 			};
 		};
+	};
+
+	cam_crm: crm@add7000 {
+		label = "cam_crm";
+		compatible = "qcom,cam-crm";
+		reg = <0xadd7000 0x2000>, <0xadd9800 0x800>, <0xadda000 0x2000>;
+		reg-names = "base", "crm_b", "crm_c";
+		interrupts = <GIC_SPI 121 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "cam_crm";
+		clocks = <&camcc CAM_CC_DRV_AHB_CLK>;
+		qcom,hw-drv-ids = <0 1 2>;
+		qcom,sw-drv-ids = <0>;
+	};
+
+	pcie_crm: crm@1d01000 {
+		label = "pcie_crm";
+		compatible = "qcom,pcie-crm";
+		reg = <0x1d01000 0x3000>, <0x1d04800 0x800>, <0x1d05000 0x2000>;
+		reg-names = "base", "crm_b", "crm_c";
+		interrupts = <GIC_SPI 248 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "pcie_crm";
+		clocks = <&pcie_0_pipe_clk>;
+		qcom,hw-drv-ids = <0>;
+		qcom,sw-drv-ids = <0>;
 	};
 
 	sram@c3f0000 {
@@ -790,6 +830,61 @@
 		qcom,vmid = <50>;
 		qcom,firmware-name = "cpusys_vm";
 		memory-region = <&cpusys_vm_mem>;
+	};
+
+	oem_vm_vblk0_ring: oem_vm_vblk0_ring {
+		size = <0x4000>;
+		gunyah-label = <0x13>;
+	};
+
+	oem_vm_swiotlb: oem_vm_swiotlb {
+		size = <0x100000>;
+		gunyah-label = <0x14>;
+	};
+
+	oem_vm: qcom,oem_vm {
+		vm_name = "oemvm";
+		shared-buffers-size = <0x104000>;
+		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
+	};
+
+	oem_vm_virt_be0: oem_vm_virt_be0@13 {
+		qcom,vm = <&oem_vm>;
+		qcom,label = <0x13>;
+	};
+
+	gh-secure-vm-loader@1 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <34>;
+		qcom,vmid = <49>;
+		qcom,firmware-name = "oemvm";
+		memory-region = <&oem_vm_mem &vm_comm_mem>;
+		virtio-backends = <&oem_vm_virt_be0>;
+	};
+
+	qcom,qrtr-gunyah-oemvm {
+		compatible = "qcom,qrtr-gunyah";
+		qcom,master;
+		gunyah-label = <8>;
+		peer-name = <4>;
+	};
+
+	dmesg-dump {
+		compatible = "qcom,dmesg-dump";
+		qcom,primary-vm;
+		gunyah-label = <7>;
+		peer-name = <2>;
+		memory-region = <&vm_comm_mem>;
+		shared-buffer-size = <0x1000>;
+	};
+
+	qcom,gunyah-panic-notifier {
+		compatible = "qcom,gh-panic-notifier";
+		qcom,primary-vm;
+		gunyah-label = <9>;
+		peer-name = <2>;
+		memory-region = <&vm_comm_mem>;
+		shared-buffer-size = <0x1000>;
 	};
 
 	clocks {
@@ -1093,6 +1188,8 @@
 		};
 	};
 
+	msm_gpu: qcom,kgsl-3d0@3d00000 { };
+
 	mmio_sram: mmio-sram@17D09400 {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -1144,6 +1241,9 @@
 		compatible = "qcom,cpufreq-stats-v2";
 	};
 
+	qcom_dynpf: qcom,dynpf {
+		compatible = "qcom,dynpf";
+	};
 
 	qcom,smp2p-cdsp {
 		compatible = "qcom,smp2p";
@@ -1578,10 +1678,88 @@
 		#size-cells = <1>;
 		read-only;
 		ranges;
+
+		feat_conf6: feat_conf6@0118 {
+			reg = <0x0118 0x4>;
+		};
 	};
 
 	qfprom_sys: qfprom@0 {
 		compatible = "qcom,qfprom-sys";
+
+		nvmem-cells = <&feat_conf6>;
+		nvmem-cell-names = "feat_conf6";
+	};
+
+	sdhc2_opp_table: sdhc2-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-100000000 {
+			opp-hz = /bits/ 64 <100000000>;
+			opp-peak-kBps = <160000 100000>;
+			opp-avg-kBps = <50000 0>;
+		};
+
+		opp-202000000 {
+			opp-hz = /bits/ 64 <202000000>;
+			opp-peak-kBps = <200000 120000>;
+			opp-avg-kBps = <104000 0>;
+		};
+	};
+
+	sdhc_2: sdhci@8804000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+
+		reg = <0x08804000 0x1000>;
+		reg-names = "hc";
+
+		interrupts = <GIC_SPI 207 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <4>;
+		no-sdio;
+		no-mmc;
+		qcom,restore-after-cx-collapse;
+
+		qcom,uses_level_shifter;
+
+		resets = <&gcc GCC_SDCC2_BCR>;
+		reset-names = "core_reset";
+
+		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
+			<&gcc GCC_SDCC2_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		/*
+		 * DLL HSR settings. Refer go/hsr - <Target> DLL settings.
+		 * Note that the DLL_CONFIG_2 value is not passed from the
+		 * device tree, but it is calculated in the driver.
+		 */
+		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
+					0x090106C0 0x80040868>;
+
+		iommus = <&apps_smmu 0x140 0x0>;
+		dma-coherent;
+		qcom,iommu-dma = "fastmap";
+
+		interconnects = <&aggre1_noc MASTER_SDCC_2 &mc_virt SLAVE_EBI1>,
+			      <&gem_noc MASTER_APPSS_PROC &cnoc_cfg
+			      SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc2_opp_table>;
+
+		qos0 {
+			mask = <0xf8>;
+			vote = <44>;
+		};
+
+		qos1 {
+			mask = <0x07>;
+			vote = <44>;
+		};
 	};
 
 	ufsphy_mem: ufsphy_mem@1d80000 {
@@ -2233,6 +2411,17 @@
 #include "ipcc-test.dtsi"
 #include "cliffs-usb.dtsi"
 #include "cliffs-qupv3.dtsi"
+#include "cliffs-pcie.dtsi"
+#include "msm-rdbg.dtsi"
+
+&qupv3_se0_i2c {
+	status = "ok";
+	wcd_usbss: wcd939x_i2c@e {
+		compatible = "qcom,wcd939x-i2c";
+		reg = <0xe>;
+		vdd-usb-cp-supply = <&L7B>;
+	};
+};
 
 &cam_cc_bps_gdsc {
 	clocks = <&gcc GCC_CAMERA_AHB_CLK>;

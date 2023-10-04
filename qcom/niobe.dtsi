@@ -26,7 +26,9 @@
 
 	reserved_memory: reserved-memory {};
 
-	aliases { };
+	aliases {
+		serial0 = &qupv3_se5_2uart;
+	};
 
 	firmware: firmware {};
 
@@ -498,8 +500,27 @@
 
 };
 
+&reserved_memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* global autoconfigured region for contiguous allocations */
+		system_cma: linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
+		};
+};
+
+#include "niobe-reserved-memory.dtsi"
 #include "niobe-stub-regulators.dtsi"
 #include "pineapple-gdsc.dtsi"
+#include "niobe-pinctrl.dtsi"
+#include "niobe-qupv3.dtsi"
 
 &cam_cc_bps_gdsc {
 	compatible = "regulator-fixed";
@@ -649,5 +670,9 @@
 &video_cc_mvs1c_gdsc {
 	compatible = "regulator-fixed";
 	qcom,support-hw-trigger;
+	status = "ok";
+};
+
+&qupv3_se5_2uart {
 	status = "ok";
 };
