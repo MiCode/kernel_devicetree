@@ -1,0 +1,46 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,pmic-eusb2-repeater.yaml##
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. eUSB2 Repeater
+
+maintainers:
+  - Ronak Vijay Raheja <quic_rraheja@quicinc.com>
+
+properties:
+  compatible:
+    const: qcom,pmic-eusb2-repeater
+
+  reg:
+    description: address and length of the register set for the device
+    minItems: 1
+
+  vdd3-supply:
+    description: phandle to the 3V supply for eUSB2 repeater
+
+  vdd18-supply:
+    description: phandle to the 1.8V supply for eUSB2 repeater
+
+  qcom,param-override-seq:
+    description: parameter override sequence with value, reg offset pair
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+required:
+  - compatible
+  - reg
+  - vdd3-supply
+  - vdd18-supply
+
+additionalProperties: false
+
+examples:
+  - |
+    eusb2_repeater@fd00 {
+      compatible = "qcom,pmic-eusb2-repeater";
+      reg = <0xfd00 0xff>;
+      vdd18-supply = <&pm8841_s2_corner>;
+      vdd3-supply = <&pm8941_l6>;
+      qcom,param-override-seq = <0x4 0x57>;
+    };
+...
