@@ -185,6 +185,8 @@ _platform_map = {
             {"name": "cliffs-qrd-overlay.dtbo"},
             {"name": "cliffs-rcm-overlay.dtbo"},
             {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo"},
+            {"name": "cliffs-mtp-pm8550b-overlay.dtbo"},
+            {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-pm8550b-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {
