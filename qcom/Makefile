@@ -19,7 +19,9 @@ SUN_BASE_DTB += sun.dtb sun-v2.dtb
 
 SUN_BOARDS += \
 		 sun-mtp-overlay.dtbo \
+		 sun-mtp-kiwi-overlay.dtbo \
 		 sun-cdp-overlay.dtbo \
+		 sun-cdp-kiwi-overlay.dtbo \
 		 sun-qrd-overlay.dtbo
 
 NOAPQ_SUN_BOARDS += \
