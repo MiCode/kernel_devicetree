@@ -25,6 +25,7 @@ properties:
       - enum:
           - qcom,spmi-vadc
           - qcom,spmi-adc5
+          - qcom,spmi-adc5-lite
           - qcom,spmi-adc-rev2
           - qcom,spmi-adc7
 
@@ -105,6 +106,12 @@ patternProperties:
           - items:
               - const: 10
               - const: 81
+          - items:
+              - enum: [ 32, 14, 28 ]
+              - const: 100
+          - items:
+              - const: 1000
+              - enum: [ 305185, 610370 ]
 
       qcom,ratiometric:
         description: |
@@ -114,10 +121,9 @@ patternProperties:
               channel calibration. If property is not found, channel will be
               calibrated with 0.625V and 1.25V reference channels, also
               known as absolute calibration.
-            - For compatible property "qcom,spmi-adc5", "qcom,spmi-adc7" and
-              "qcom,spmi-adc-rev2", if this property is specified VADC will use
-              the VDD reference (1.875V) and GND for channel calibration. If
-              property is not found, channel will be calibrated with 0V and 1.25V
+            - For all other compatible properties, if this property is specified
+              VADC will use the VDD reference (1.875V) and GND for channel calibration.
+              If property is not found, channel will be calibrated with 0V and 1.25V
               reference channels, also known as absolute calibration.
         type: boolean
 
@@ -203,6 +209,29 @@ allOf:
             qcom,hw-settle-time:
               enum: [ 15, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1, 2,
                       4, 6, 8, 10, 16, 32, 64, 128 ]
+              default: 15
+
+            qcom,avg-samples:
+              enum: [ 1, 2, 4, 8, 16 ]
+              default: 1
+
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: qcom,spmi-adc5-lite
+
+    then:
+      patternProperties:
+        "^channel@[0-9a-f]+$":
+          properties:
+            qcom,decimation:
+              enum: [ 250, 420, 840 ]
+              default: 840
+
+            qcom,hw-settle-time:
+              enum: [ 15, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1, 2,
+                      4, 6, 8, 10]
               default: 15
 
             qcom,avg-samples:
