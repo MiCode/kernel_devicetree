@@ -359,7 +359,53 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		/* Valid pins */
-		gpios = /bits/ 16 <>;
+		gpios = /bits/ 16 <16 17 18 19 44 45 46 47>;
+	};
+
+	tlmm-vm-test {
+		compatible = "qcom,tlmm-vm-test";
+		pinctrl-names = "active", "sleep";
+		pinctrl-0 = <&qupv3_se1_7i2c_active>;
+		pinctrl-1 = <&qupv3_se1_7i2c_sleep>;
+		tlmm-vm-gpio-list = <&tlmm 16 0 &tlmm 17 0 &tlmm 18 0 &tlmm 19 0
+				     &tlmm 44 0 &tlmm 45 0 &tlmm 46 0 &tlmm 47 0>;
+	};
+
+	pinctrl@f000000 {
+		qupv3_se1_7i2c_pins: qupv3_se1_7i2c_pins {
+			qupv3_se1_7i2c_active: qupv3_se1_7i2c_active {
+			       mux {
+				       pins = "gpio16";
+				       function = "qup0_se4_l0";
+			       };
+
+			       config {
+				       pins = "gpio16";
+				       drive-strength = <2>;
+				       bias-pull-up;
+			       };
+		       };
+
+			qupv3_se1_7i2c_sleep: qupv3_se1_7i2c_sleep {
+			      mux {
+				      pins = "gpio16";
+				      function = "gpio";
+			      };
+
+			      config {
+				      pins = "gpio16";
+				      drive-strength = <2>;
+				      bias-disable;
+			      };
+		      };
+	     };
+
+	};
+
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		tlmm-vm-gpio-list = <&tlmm 16 0 &tlmm 17 0 &tlmm 18 0 &tlmm 19 0
+				     &tlmm 44 0 &tlmm 45 0 &tlmm 46 0 &tlmm 47 0>;
 	};
 
 	qcom_smcinvoke {
