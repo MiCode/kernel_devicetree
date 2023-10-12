@@ -161,6 +161,7 @@ PITTI_BOARDS += \
 		 pitti-atp-overlay.dtbo \
 		 pitti-idp-overlay.dtbo \
 		 pitti-qrd-overlay.dtbo \
+		 pitti-idp-pmiv0104-overlay.dtbo \
 		 pitti-idp-apache-overlay.dtbo \
 		 pitti-idp-amoled-overlay.dtbo \
 		 pitti-idp-3gb-overlay.dtbo \
