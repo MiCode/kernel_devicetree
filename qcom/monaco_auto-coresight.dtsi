@@ -50,6 +50,192 @@
 		};
 	};
 
+	tpdm_llm_silver: tpdm@68b0000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x68b0000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <66>;
+		coresight-name = "coresight-tpdm-llm-silver";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_llm_silver_out_tpda_apss_0: endpoint {
+					remote-endpoint =
+					<&tpda_apss_0_in_tpdm_llm_silver>;
+				};
+			};
+		};
+	};
+
+	tpdm_llm_gold: tpdm@68a0000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x68a0000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <66>;
+		coresight-name = "coresight-tpdm-llm-gold";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_llm_gold_out_tpda_apss_1: endpoint {
+					remote-endpoint =
+					<&tpda_apss_1_in_tpdm_llm_gold>;
+				};
+			};
+		};
+	};
+
+	tpdm_apss_llm: tpdm@68c0000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x68c0000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <66>;
+		coresight-name = "coresight-tpdm-apss-llm";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_apss_llm_out_tpda_apss_2: endpoint {
+					remote-endpoint =
+					<&tpda_apss_2_in_tpdm_apss_llm>;
+				};
+			};
+		};
+	};
+
+	tpdm_actpm: tpdm@6860000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x6860000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <66>;
+		coresight-name = "coresight-tpdm-actpm";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_apss0_out_tpda_apss_3: endpoint {
+					remote-endpoint =
+					<&tpda_apss_3_in_tpdm_apss0>;
+				};
+			};
+		};
+	};
+
+	tpdm_apss: tpdm@6861000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x6861000 0x1000>;
+		reg-names = "tpdm-base";
+
+		atid = <66>;
+		coresight-name = "coresight-tpdm-apss";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_apps1_out_tpda_apss_4: endpoint {
+					remote-endpoint =
+					<&tpda_apss_4_in_tpdm_apps1>;
+				};
+			};
+		};
+	};
+
+	tpda_apss: tpda@6863000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb969>;
+		reg = <0x06863000 0x1000>;
+		reg-names = "tpda-base";
+
+		coresight-name = "coresight-tpda-apss";
+
+		qcom,tpda-atid = <66>;
+		qcom,dsb-elem-size = <3 32>;
+		qcom,cmb-elem-size = <0 32>,
+				     <1 32>,
+				     <2 64>;
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		in-ports {
+
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				tpda_apss_0_in_tpdm_llm_silver: endpoint {
+					remote-endpoint =
+					<&tpdm_llm_silver_out_tpda_apss_0>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				tpda_apss_1_in_tpdm_llm_gold: endpoint {
+					remote-endpoint =
+					<&tpdm_llm_gold_out_tpda_apss_1>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+				tpda_apss_2_in_tpdm_apss_llm: endpoint {
+					remote-endpoint =
+					<&tpdm_apss_llm_out_tpda_apss_2>;
+				};
+			};
+
+			port@3 {
+				reg = <3>;
+				tpda_apss_3_in_tpdm_apss0: endpoint {
+					remote-endpoint =
+					<&tpdm_apss0_out_tpda_apss_3>;
+				};
+			};
+
+			port@4 {
+				reg = <4>;
+				tpda_apss_4_in_tpdm_apps1: endpoint {
+					remote-endpoint =
+					<&tpdm_apps1_out_tpda_apss_4>;
+				};
+			};
+
+		};
+
+		out-ports {
+			port {
+				tpda_apss_out_funnel_apps: endpoint {
+					remote-endpoint =
+					<&funnel_apps_in_tpda_apss>;
+				};
+			};
+		};
+
+	};
+
+
 	etm0: etm@6040000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bbd05>;
@@ -69,6 +255,174 @@
 			port {
 				etm0_out_funnel_etm: endpoint {
 					remote-endpoint = <&funnel_etm_in_etm0>;
+				};
+			};
+		};
+	};
+
+	etm1: etm@6140000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6140000 0x1000>;
+		cpu = <&CPU1>;
+
+		atid = <2>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm1";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm1_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm1>;
+				};
+			};
+		};
+	};
+
+	etm2: etm@6240000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6240000 0x1000>;
+		cpu = <&CPU2>;
+
+		atid = <3>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm2";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm2_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm2>;
+				};
+			};
+		};
+	};
+
+	etm3: etm@6340000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6340000 0x1000>;
+		cpu = <&CPU3>;
+
+		atid = <4>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm3";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm3_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm3>;
+				};
+			};
+		};
+	};
+
+	etm4: etm@6440000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6440000 0x1000>;
+		cpu = <&CPU4>;
+
+		atid = <5>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm4";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm4_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm4>;
+				};
+			};
+		};
+	};
+
+	etm5: etm@6540000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6540000 0x1000>;
+		cpu = <&CPU5>;
+
+		atid = <6>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm5";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm5_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm5>;
+				};
+			};
+		};
+	};
+
+	etm6: etm@6640000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6640000 0x1000>;
+		cpu = <&CPU6>;
+
+		atid = <7>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm6";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm6_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm6>;
+				};
+			};
+		};
+	};
+
+	etm7: etm@6740000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bbd05>;
+
+		reg = <0x6740000 0x1000>;
+		cpu = <&CPU7>;
+
+		atid = <8>;
+
+		qcom,tupwr-disable;
+		coresight-name = "coresight-etm7";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				etm7_out_funnel_etm: endpoint {
+					remote-endpoint = <&funnel_etm_in_etm7>;
 				};
 			};
 		};
@@ -102,7 +456,56 @@
 			port@0 {
 				reg = <0>;
 				funnel_etm_in_etm0: endpoint {
-				remote-endpoint = <&etm0_out_funnel_etm>;
+					remote-endpoint = <&etm0_out_funnel_etm>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				funnel_etm_in_etm1: endpoint {
+					remote-endpoint = <&etm1_out_funnel_etm>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+				funnel_etm_in_etm2: endpoint {
+					remote-endpoint = <&etm2_out_funnel_etm>;
+				};
+			};
+
+			port@3 {
+				reg = <3>;
+				funnel_etm_in_etm3: endpoint {
+					remote-endpoint = <&etm3_out_funnel_etm>;
+				};
+			};
+
+			port@4 {
+				reg = <4>;
+				funnel_etm_in_etm4: endpoint {
+					remote-endpoint = <&etm4_out_funnel_etm>;
+				};
+			};
+
+			port@5 {
+				reg = <5>;
+				funnel_etm_in_etm5: endpoint {
+					remote-endpoint = <&etm5_out_funnel_etm>;
+				};
+			};
+
+			port@6 {
+				reg = <6>;
+				funnel_etm_in_etm6: endpoint {
+					remote-endpoint = <&etm6_out_funnel_etm>;
+				};
+			};
+
+			port@7 {
+				reg = <7>;
+				funnel_etm_in_etm7: endpoint {
+					remote-endpoint = <&etm7_out_funnel_etm>;
 				};
 			};
 		};
@@ -131,6 +534,15 @@
 						<&funnel_etm_out_funnel_apss>;
 				};
 			};
+
+			port@3 {
+				reg = <3>;
+				funnel_apps_in_tpda_apss: endpoint {
+					remote-endpoint =
+						<&tpda_apss_out_funnel_apps>;
+				};
+			};
+
 		};
 
 		out-ports {
