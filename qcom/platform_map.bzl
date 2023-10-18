@@ -9,7 +9,8 @@ _platform_map = {
             # keep sorted
             {"name": "sun-cdp-overlay.dtbo"},
             {"name": "sun-mtp-overlay.dtbo"},
-            {"name": "sun-qrd-overlay.dtbo"},
+            {"name": "sun-qrd-sku1-overlay.dtbo"},
+            {"name": "sun-qrd-sku2-overlay.dtbo"},
             {"name": "sun-rumi-overlay.dtbo"},
         ],
     },
