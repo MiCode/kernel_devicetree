@@ -1207,14 +1207,48 @@
 		#reset-cells = <1>;
 	};
 
-	apsscc: syscon@16450000 {
-		compatible = "syscon";
-		reg = <0x16450000 0x3553000>;
-	};
-
 	mccc: syscon@240ba000 {
 		compatible = "syscon";
 		reg = <0x240ba000 0x800>;
+	};
+
+	gxclkctldebugcc: syscon@3d64000 {
+		compatible = "syscon";
+		reg = <0x3d64000 0x6000>;
+	};
+
+	debugcc: qcom,cc-debug {
+		compatible = "qcom,sun-debugcc";
+		qcom,gcc = <&gcc>;
+		qcom,gpucc = <&gpucc>;
+		qcom,gxclkctl = <&gxclkctldebugcc>;
+		qcom,videocc = <&videocc>;
+		qcom,evacc = <&evacc>;
+		qcom,dispcc = <&dispcc>;
+		qcom,camcc = <&camcc>;
+		qcom,cambistmclkcc = <&cambistmclkcc>;
+		qcom,mccc = <&mccc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&cambistmclkcc 0>,
+			 <&camcc 0>,
+			 <&dispcc 0>,
+			 <&evacc 0>,
+			 <&gcc 0>,
+			 <&gpucc 0>,
+			 <&gxclkctl 0>,
+			 <&tcsrcc 0>,
+			 <&videocc 0>;
+		clock-names = "xo_clk_src",
+			      "cambistmclkcc",
+			      "camcc",
+			      "dispcc",
+			      "evacc",
+			      "gcc",
+			      "gpucc",
+			      "gxclkctl",
+			      "tcsrcc",
+			      "videocc";
+		#clock-cells = <1>;
 	};
 
 	/* CAM_CC GDSCs */
