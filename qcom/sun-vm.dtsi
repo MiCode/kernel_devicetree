@@ -150,6 +150,40 @@
 				};
 			};
 
+			ddump-shm {
+				vdevice-type = "shm-doorbell";
+				generate = "/hypervisor/ddump-shm";
+				push-compatible = "qcom,ddump-gunyah-gen";
+				peer-default;
+				memory {
+					qcom,label = <0x7>;
+					allocate-base;
+				};
+			};
+
+			gunyah-panic-notifier-shm {
+				vdevice-type = "shm-doorbell";
+				generate = "/hypervisor/gpn-shm";
+				push-compatible = "qcom,gunyah-panic-gen";
+				peer-default;
+				memory {
+					qcom,label = <0x9>;
+					allocate-base;
+				};
+			};
+
+			gpiomem0 {
+				vdevice-type = "iomem";
+				patch = "/soc/tlmm-vm-mem-access";
+				push-compatible = "qcom,tlmm-vm-mem-access";
+				peer-default;
+				memory {
+					qcom,label = <0x8>;
+					qcom,mem-info-tag = <0x3>;
+					allocate-base;
+				};
+			};
+
 		};
 	};
 
@@ -173,29 +207,25 @@
 		reg = <0x0 0x0>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		status="disabled";
 	};
 
 	tlmm: pinctrl@f000000 {
-		compatible = "qcom,sun-vm-pinctrl";
-		reg = <0x0F000000 0x1000000>;
+		compatible = "qcom,sun-vm-tlmm";
+		reg = <0x0F000000 0x0202000>;
 		interrupts-extended = <&vm_tlmm_irq 1 IRQ_TYPE_LEVEL_HIGH>;
 		gpio-controller;
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		/* Valid pins */
-		gpios = /bits/ 16 <86 87 133 137 48 49 50 51 161 162 91 60 61 62 63 88>;
-		status="disabled";
+		gpios = /bits/ 16 <86 87 98 97 48 49 50 51 161 162 100 28 29 30 31 88>;
 	};
 
 	tlmm-vm-mem-access {
 		compatible = "qcom,tlmm-vm-mem-access";
-		tlmm-vm-gpio-list = <&tlmm 86 0 &tlmm 87 0 &tlmm 133 0 &tlmm 137 0 &tlmm 48 0
-					&tlmm 49 0 &tlmm 50 0 &tlmm 51 0 &tlmm 161 0 &tlmm 162 0
-					&tlmm 91 0 &tlmm 60 0 &tlmm 61 0 &tlmm 62 0 &tlmm 63 0
-					&tlmm 88 0>;
-		status="disabled";
+		tlmm-vm-gpio-list = <&tlmm 86 0 &tlmm 87 0 &tlmm 98 0 &tlmm 97 0 &tlmm 48 0 &tlmm 49 0
+					&tlmm 50 0 &tlmm 51 0 &tlmm 161 0 &tlmm 162 0 &tlmm 100 0
+					 &tlmm 28 0 &tlmm 29 0 &tlmm 30 0 &tlmm 31 0 &tlmm 88 0>;
 	};
 
 	psci {
