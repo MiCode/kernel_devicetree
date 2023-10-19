@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/remoteproc/qcom,spss-utils.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: QTI Secure Processor SubSystem Utilities
+
+maintainers:
+  - Nurit Lichtenstein <quic_nuritl@quicinc.com>
+
+description:
+  The Secure Processor SubSystem (SPSS) is a dedicated subsystem for security.
+  It has its own CPU, memories, and cryptographic engine.
+  It shall provide cryptographic services to other subsystems.
+  The SPSS firmware is loaded by PIL driver.
+  The communication with SPSS is done via spcom driver, using glink.
+  This document defines the binding for a component that selects the SPSS firmware file, according to a dedicated fuse and the platform HW version.
+
+  required:
+  - compatible
+  - qcom,spss-fuse1-addr
+  - qcom,spss-fuse1-bit
+  - qcom,spss-fuse2-addr
+  - qcom,spss-fuse2-bit
+  - qcom,spss-dev-firmware-name
+  - qcom,spss-test-firmware-name
+  - qcom,spss-prod-firmware-name
+  - qcom,spss-debug-reg-addr
+  - qcom,spss-emul-type-reg-addr
+
+examples:
+  #The following example represents the spss-utils node on a sun device.
+  - |
+  qcom,spss_utils {
+      compatible = "qcom,spss-utils";
+
+      qcom,spss-fuse1-addr = <0x007841c4>;
+      qcom,spss-fuse1-bit = <27>;
+      qcom,spss-fuse2-addr = <0x007841c4>;
+      qcom,spss-fuse2-bit = <26>;
+      qcom,spss-dev-firmware-name  = "spss1d";  /* 8 chars max */
+      qcom,spss-test-firmware-name = "spss1t";  /* 8 chars max */
+      qcom,spss-prod-firmware-name = "spss1p";  /* 8 chars max */
+      qcom,spss-debug-reg-addr = <0x01886020>;
+      qcom,spss-emul-type-reg-addr = <0x01fc8004>;
+   };
