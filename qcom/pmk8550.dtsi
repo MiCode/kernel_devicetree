@@ -25,6 +25,11 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 
+			smb1510_present: smb1510_present@5d {
+				reg = <0x5d 0x1>;
+				bits = <5 5>;
+			};
+
 			ocp_log: ocp-log@76 {
 				reg = <0x76 0x6>;
 			};
@@ -56,6 +61,16 @@
 			reg = <0x7500>;
 		};
 
+		pmk8550_sdam_13: sdam@7c00 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x7c00>;
+		};
+
+		pmk8550_sdam_14: sdam@7d00 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x7d00>;
+		};
+
 		pmk8550_sdam_21: sdam@8400 {
 			compatible = "qcom,spmi-sdam";
 			reg = <0x8400>;
@@ -64,6 +79,22 @@
 		pmk8550_sdam_22: sdam@8500 {
 			compatible = "qcom,spmi-sdam";
 			reg = <0x8500>;
+		};
+
+		pmk8550_sdam_41: sdam@9800 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x9800>;
+		};
+
+		pmk8550_sdam_43: sdam@9a00 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x9a00>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			ibb_spur_sqm_timer: sqm-timer@b8 {
+				reg = <0xb8 0x2>;
+			};
 		};
 
 		pmk8550_sdam_46: sdam@9d00 {
@@ -106,6 +137,24 @@
 			#interrupt-cells = <2>;
 		};
 
+		pmk8550_pwm_1: qcom,pwms@e800 {
+			status = "disabled";
+			compatible = "qcom,pwm-lpg";
+			reg = <0xe800>;
+			reg-names = "lpg-base";
+			qcom,num-lpg-channels = <1>;
+			#pwm-cells = <2>;
+		};
+
+		pmk8550_pwm_2: qcom,pwms@e900 {
+			status = "disabled";
+			compatible = "qcom,pwm-lpg";
+			reg = <0xe900>;
+			reg-names = "lpg-base";
+			qcom,num-lpg-channels = <1>;
+			#pwm-cells = <2>;
+		};
+
 		pmk8550_rtc: rtc@6100 {
 			compatible = "qcom,pmk8350-rtc";
 			reg = <0x6100>, <0x6200>;
@@ -143,6 +192,15 @@
 				reg = <PMK8550_ADC5_GEN3_DIE_TEMP>;
 				label = "pmk8550_die_temp";
 				qcom,pre-scaling = <1 1>;
+			};
+
+			pmk8550_xo_therm {
+				reg = <PMK8550_ADC5_GEN3_AMUX_THM1_XO_THERM_100K_PU>;
+				label = "pmk8550_xo_therm";
+				qcom,ratiometric;
+				qcom,hw-settle-time = <200>;
+				qcom,pre-scaling = <1 1>;
+				qcom,adc-tm-type = <1>;
 			};
 
 			/* PM8550 Channel nodes */

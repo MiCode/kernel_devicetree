@@ -1,5 +1,6 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-cliffs.h>
+#include <dt-bindings/arm/msm/qti-smmu-proxy-dt-ids.h>
 
 / {
 	#address-cells = <0x2>;
@@ -8,7 +9,7 @@
 	interrupt-parent = <&vgic>;
 
 	chosen {
-		bootargs = "nokaslr log_buf_len=256K console=hvc0 loglevel=8";
+		bootargs = "nokaslr log_buf_len=256K console=hvc0 loglevel=8 memhp_default_state=online_movable memory_hotplug.memmap_on_memory=1";
 	};
 
 	cpus {
@@ -87,7 +88,8 @@
 		vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
 		qcom,sensitive;
 
-		iomemory-ranges = <0x0 0x409000 0x0 0x409000 0x0 0x1000 0x0>;
+		iomemory-ranges = <0x0 0x409000 0x0 0x409000 0x0 0x1000 0x0
+				0x0 0xae8f000 0x0 0xae8f000 0x0 0x1000 0x0>;
 		/* For LEVM pored use cases is SE4(QUP0_SE4) and SE11(QUP1_SE3), for SE4 we used
 		 * gpii5(QUPV3_0_GPII5) and irq no is 316, for SE11 we used gpii5(QUPV3_1_GPII5)
 		 * and irq no is 625.
@@ -292,6 +294,13 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
+	gcc: clock-controller@100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
@@ -358,7 +367,57 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		/* Valid pins */
-		gpios = /bits/ 16 <>;
+		gpios = /bits/ 16 <16 17 18 19 44 45 46 47 128 129 131 29 177 54 77 78>;
+	};
+
+	tlmm-vm-test {
+		compatible = "qcom,tlmm-vm-test";
+		pinctrl-names = "active", "sleep";
+		pinctrl-0 = <&qupv3_se1_7i2c_active>;
+		pinctrl-1 = <&qupv3_se1_7i2c_sleep>;
+		tlmm-vm-gpio-list = <&tlmm 16 0 &tlmm 17 0 &tlmm 18 0 &tlmm 19 0
+				     &tlmm 44 0 &tlmm 45 0 &tlmm 46 0 &tlmm 47 0
+				     &tlmm 128 0 &tlmm 129 0 &tlmm 131 0 &tlmm 29 0
+				     &tlmm 177 0 &tlmm 54 0 &tlmm 77 0 &tlmm 78 0>;
+	};
+
+	pinctrl@f000000 {
+		qupv3_se1_7i2c_pins: qupv3_se1_7i2c_pins {
+			qupv3_se1_7i2c_active: qupv3_se1_7i2c_active {
+			       mux {
+				       pins = "gpio16";
+				       function = "qup0_se4_l0";
+			       };
+
+			       config {
+				       pins = "gpio16";
+				       drive-strength = <2>;
+				       bias-pull-up;
+			       };
+		       };
+
+			qupv3_se1_7i2c_sleep: qupv3_se1_7i2c_sleep {
+			      mux {
+				      pins = "gpio16";
+				      function = "gpio";
+			      };
+
+			      config {
+				      pins = "gpio16";
+				      drive-strength = <2>;
+				      bias-disable;
+			      };
+		      };
+	     };
+
+	};
+
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		tlmm-vm-gpio-list = <&tlmm 16 0 &tlmm 17 0 &tlmm 18 0 &tlmm 19 0
+				     &tlmm 44 0 &tlmm 45 0 &tlmm 46 0 &tlmm 47 0
+				     &tlmm 128 0 &tlmm 129 0 &tlmm 131 0 &tlmm 29 0
+				     &tlmm 177 0 &tlmm 54 0 &tlmm 77 0 &tlmm 78 0>;
 	};
 
 	qcom_smcinvoke {
@@ -374,4 +433,51 @@
 	logbuf: qcom,logbuf-vendor-hooks {
 		compatible = "qcom,logbuf-vendor-hooks";
 	};
+
+	qti,smmu-proxy {
+		compatible = "smmu-proxy-receiver";
+	};
+
+	qti,smmu-proxy-camera-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_CAMERA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x810 0x1020>,
+			<&apps_smmu 0x18F0 0x0>;
+	};
+
+	qti,smmu-proxy-display-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_DISPLAY_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x1c01 0x0>;
+	};
+
+	qti,smmu-proxy-eva-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_EVA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x1927 0x0>;
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "consumer";
+		qcom,vmid = <45>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+	};
+
+	virtio_mem_device {
+		compatible = "qcom,virtio-mem";
+		/* Must be memory_block_size_bytes() aligned */
+		qcom,max-size = <0x0 0x10000000>;
+		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
+		qcom,block-size = <0x400000>;
+	};
 };
+
+#include "cliffs-vm-dma-heaps.dtsi"
+#include "msm-arm-smmu-cliffs-vm.dtsi"

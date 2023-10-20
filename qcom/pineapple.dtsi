@@ -34,7 +34,7 @@
 	aliases: aliases {
 		serial0 = &qupv3_se15_2uart;
 		hsuart0	= &qupv3_se14_4uart;
-		sdhc2 = &sdhc_2;
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
 	};
 
@@ -1364,13 +1364,13 @@
 		opp-100000000 {
 			opp-hz = /bits/ 64 <100000000>;
 			opp-peak-kBps = <160000 100000>;
-			opp-avg-kBps = <80000 50000>;
+			opp-avg-kBps = <50000 0>;
 		};
 
 		opp-202000000 {
 			opp-hz = /bits/ 64 <202000000>;
 			opp-peak-kBps = <200000 120000>;
-			opp-avg-kBps = <80000 50000>;
+			opp-avg-kBps = <104000 0>;
 		};
 	};
 
@@ -1379,7 +1379,7 @@
 
 		compatible = "qcom,sdhci-msm-v5";
 		reg = <0x08804000 0x1000>;
-		reg-names = "hc_mem";
+		reg-names = "hc";
 
 		interrupts = <GIC_SPI 207 IRQ_TYPE_LEVEL_HIGH>,
 				<GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
@@ -1404,6 +1404,9 @@
 
 		iommus = <&apps_smmu 0x540 0x0>;
 		dma-coherent;
+
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
 
 		interconnects = <&aggre2_noc MASTER_SDCC_2 &mc_virt SLAVE_EBI1>,
 			      <&gem_noc MASTER_APPSS_PROC &config_noc

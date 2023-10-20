@@ -12,6 +12,7 @@ _platform_map = {
             {"name": "sa8155-vm-la.dtb"},
             {"name": "sa8195-vm-la.dtb"},
             {"name": "monaco-vm-la.dtb"},
+            {"name": "monaco-vm-lv.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
@@ -25,6 +26,7 @@ _platform_map = {
             {"name": "sa8155-vm-la-overlay.dtbo"},
             {"name": "sa8195-vm-la-overlay.dtbo"},
             {"name": "monaco-vm-la-overlay.dtbo"},
+            {"name": "monaco-vm-lv-overlay.dtbo"},
         ],
     },
     "gen3auto": {
@@ -151,6 +153,7 @@ _platform_map = {
             {"name": "pineapple-qrd-sku2-overlay.dtbo"},
             {"name": "pineapple-rcm-overlay.dtbo"},
             {"name": "pineapplep-hdk-overlay.dtbo"},
+            {"name": "pineapple-dpm-overlay.dtbo"},
             {
                 "name": "pineapple-rumi-overlay.dtbo",
                 "apq": False,
@@ -184,6 +187,8 @@ _platform_map = {
             {"name": "cliffs-qrd-overlay.dtbo"},
             {"name": "cliffs-rcm-overlay.dtbo"},
             {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo"},
+            {"name": "cliffs-mtp-pm8550b-overlay.dtbo"},
+            {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-pm8550b-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {

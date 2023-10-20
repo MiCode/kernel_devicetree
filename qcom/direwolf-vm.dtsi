@@ -361,9 +361,18 @@
 		compatible = "qcom,msm-rng";
 		reg = <0x10d3000 0x1000>;
 		qcom,no-qrng-config;
-		clocks = <&dummycc RPMH_HWKM_CLK>;
-		clock-names = "km_clk_src";
+		qcom,no-clock-support;
 		status = "disabled";
+	};
+
+	ptp_virtual {
+		compatible = "qcom,ptp_virtual";
+		reg = <0xeb600000 0x1000>,
+			<0x20b0c 0x1000>,
+			<0x17c23000 0x1000>;
+		reg-names = "ptp_carveout_mem",
+				"ptp_reg",
+				"qtimer_reg";
 	};
 
 	qcom_rng_ee4: qrng@10d4000 {
@@ -670,6 +679,11 @@
 #include "direwolf-vm-qupv3.dtsi"
 #include "direwolf-vm-usb.dtsi"
 #include "direwolf-vm-ufs.dtsi"
+
+&hab {
+	/delete-node/ mmidgrp1600;
+};
+
 &qupv3_0 {
 	qcom,iommu-dma = "bypass";
 };

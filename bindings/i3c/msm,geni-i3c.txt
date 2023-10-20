@@ -12,6 +12,8 @@ Required properties:
 - reg: I3C master registers.
 - qcom,wrapper-core: Wrapper QUPv3 core containing this I3C controller.
 - qcom,ibi-ctrl-id: IBI controller instance number.
+- dmas: gpi dma nodes for tx channel and rx channel.
+- dma-names: gpi dma names for tx and rx.
 
 Optional properties:
 - se-clock-frequency: Source serial clock frequency to use.
@@ -19,6 +21,7 @@ Optional properties:
 - max_i3c_devs: Nos. devices planned to be connected on the bus.
   If not defined, defaults to 1.
 - qcom,ibic-naon: add if IBI controller is NAON.
+- i3c_rgltr1-supply: i3c bus regulators.
 
 Mandatory properties defined by the generic binding (see
 Documentation/devicetree/bindings/i3c/i3c.txt for more details):
@@ -52,4 +55,8 @@ Example:
 		#size-cells = <0>;
 		qcom,wrapper-core = <&qupv3_0>;
 		qcom,ibi-ctrl-id = <0>;
+		i3c_rgltr1-supply = <&L3N>;
+		dmas = <&gpi_dma1 0 0 4 64 0>,
+			<&gpi_dma1 1 0 4 64 0>;
+		dma-names = "tx", "rx";
 	};

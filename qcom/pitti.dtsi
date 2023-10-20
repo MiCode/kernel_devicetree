@@ -25,6 +25,7 @@
 
 	aliases {
 		serial0 = &qupv3_se8_2uart;
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 	};
 
 	cpus {
@@ -483,24 +484,6 @@
 		};
 	};
 
-	bi_tcxo: bi_tcxo {
-		compatible = "fixed-factor-clock";
-		clocks = <&xo_board>;
-		clock-mult = <1>;
-		clock-div = <1>;
-		#clock-cells = <0>;
-		clock-output-names = "bi_tcxo";
-	};
-
-	bi_tcxo_a: bi_tcxo_ao {
-		compatible = "fixed-factor-clock";
-		clocks = <&xo_board>;
-		clock-mult = <1>;
-		clock-div = <1>;
-		#clock-cells = <0>;
-		clock-output-names = "bi_tcxo_ao";
-	};
-
 	rpmcc: clock-controller {
 		compatible = "fixed-clock";
 		clock-output-names = "rpmcc_clocks";
@@ -516,8 +499,23 @@
 	};
 
 	gcc: clock-controller@1400000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gcc_clocks";
+		compatible = "qcom,pitti-gcc", "syscon";
+		reg = <0x1400000 0x1f7400>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&sleep_clk>,
+			 <&ufs_phy_rx_symbol_0_clk>,
+			 <&ufs_phy_rx_symbol_1_clk>,
+			 <&ufs_phy_tx_symbol_0_clk>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "ufs_phy_rx_symbol_0_clk",
+			      "ufs_phy_rx_symbol_1_clk",
+			      "ufs_phy_tx_symbol_0_clk",
+			      "usb3_phy_wrapper_gcc_usb30_pipe_clk";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -531,51 +529,124 @@
 
 	/* DISP_CC GDSCs */
 	disp_cc_mdss_core_gdsc: qcom,gdsc@5f09000 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x5f09000 0x4>;
 		regulator-name = "disp_cc_mdss_core_gdsc";
+		clocks = <&gcc GCC_DISP_AHB_CLK>;
+		clock-names = "ahb_clk";
+		parent-supply = <&VDD_CX_LEVEL>;
+		proxy-supply = <&disp_cc_mdss_core_gdsc>;
+		qcom,proxy-consumer-enable;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 		qcom,support-cfg-gdscr;
 	};
 
 	disp_cc_mdss_core_int2_gdsc: qcom,gdsc@5f0b000 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x5f0b000 0x4>;
 		regulator-name = "disp_cc_mdss_core_int2_gdsc";
+		clocks = <&gcc GCC_DISP_AHB_CLK>;
+		clock-names = "ahb_clk";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 		qcom,support-cfg-gdscr;
 	};
 
 	/* GCC GDSCs */
 	gcc_camss_top_gdsc: qcom,gdsc@1458004 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x1458004 0x4>;
 		regulator-name = "gcc_camss_top_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 		qcom,support-cfg-gdscr;
 	};
 
 	gcc_ufs_phy_gdsc: qcom,gdsc@1445008 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x1445008 0x4>;
 		regulator-name = "gcc_ufs_phy_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-cfg-gdscr;
 	};
 
 	gcc_usb30_prim_gdsc: qcom,gdsc@141a010 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x141a010 0x4>;
 		regulator-name = "gcc_usb30_prim_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-cfg-gdscr;
 	};
 
 	gcc_vcodec0_gdsc: qcom,gdsc@146d040 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x146d040 0x4>;
 		regulator-name = "gcc_vcodec0_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 		qcom,support-cfg-gdscr;
 	};
 
 	gcc_venus_gdsc: qcom,gdsc@146d01c {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x146d01c 0x4>;
 		regulator-name = "gcc_venus_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		qcom,retain-regs;
 		qcom,support-hw-trigger;
 		qcom,support-cfg-gdscr;
+	};
+
+	sdhc_2: sdhci@4784000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+
+		reg = <0x4784000 0x1000>;
+		reg-names = "hc";
+
+		interrupts = <GIC_SPI 350 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 353 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <4>;
+		no-sdio;
+		no-mmc;
+		qcom,restore-after-cx-collapse;
+
+		resets = <&gcc GCC_SDCC2_BCR>;
+		reset-names = "core_reset";
+
+		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
+			<&gcc GCC_SDCC2_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		/*
+		 * DLL HSR settings. Refer go/hsr - <Target> DLL settings.
+		 * Note that the DLL_CONFIG_2 value is not passed from the
+		 * device tree, but it is calculated in the driver.
+		 */
+		qcom,dll-hsr-list = <0x0007642C 0x0 0x10
+					0x2C010800 0x80040868>;
+
+		iommus = <&apps_smmu 0x140 0x0>;
+		qcom,iommu-dma = "fastmap";
+
+		qos0 {
+			mask = <0xc0>;
+			vote = <44>;
+		};
+
+		qos1 {
+			mask = <0x3f>;
+			vote = <44>;
+		};
 	};
 
 	/* GPU_CC GDSCs */
@@ -585,15 +656,62 @@
 	};
 
 	gpu_cc_cx_gdsc: qcom,gdsc@59990d0 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x59990d0 0x4>;
 		regulator-name = "gpu_cc_cx_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		clocks = <&gcc GCC_GPU_CFG_AHB_CLK>;
+		clock-names = "ahb_clk";
+		hw-ctrl-addr = <&gpu_cc_cx_gdsc_hw_ctrl>;
+		qcom,no-status-check-on-disable;
+		qcom,clk-dis-wait-val = <8>;
+		qcom,retain-regs;
 		qcom,support-cfg-gdscr;
 	};
 
+	gpu_cc_gx_sw_reset: syscon@5999050 {
+		compatible = "syscon";
+		reg = <0x5999050 0x4>;
+	};
+
+	gpu_cc_gx_domain_addr: syscon@599917c {
+		compatible = "syscon";
+		reg = <0x599917c 0x4>;
+	};
+
 	gpu_cc_gx_gdsc: qcom,gdsc@5999054 {
-		compatible = "regulator-fixed";
+		compatible = "qcom,gdsc";
+		reg = <0x5999054 0x4>;
 		regulator-name = "gpu_cc_gx_gdsc";
+		parent-supply = <&VDD_CX_LEVEL>;
+		clocks = <&gcc GCC_GPU_CFG_AHB_CLK>;
+		clock-names = "ahb_clk";
+		sw-reset = <&gpu_cc_gx_sw_reset>;
+		domain-addr = <&gpu_cc_gx_domain_addr>;
+		qcom,retain-regs;
 		qcom,support-cfg-gdscr;
+	};
+
+	qcom,rmtfs_sharedmem@0 {
+		compatible = "qcom,sharedmem-uio";
+		reg = <0x0 0x280000>;
+		reg-names = "rmtfs";
+		qcom,client-id = <0x00000001>;
+	};
+
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+		qcom,vmid-cp-camera-preview-ro;
+	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
 	};
 
 };
@@ -604,3 +722,22 @@
 &qupv3_se8_2uart {
 	status = "ok";
 };
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	/* global autoconfigured region for contiguous allocations */
+	system_cma: linux,cma {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+		linux,cma-default;
+	};
+};
+
+#include "pitti-reserved-memory.dtsi"
+#include "pitti-dma-heaps.dtsi"

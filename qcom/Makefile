@@ -25,7 +25,8 @@ PINEAPPLE_BOARDS += \
 		 pineapple-qrd-sku2-overlay.dtbo \
 		 pineapple-rcm-overlay.dtbo \
 		 pineapple-atp-overlay.dtbo \
-		 pineapplep-hdk-overlay.dtbo
+		 pineapplep-hdk-overlay.dtbo \
+		 pineapple-dpm-overlay.dtbo
 
 NOAPQ_PINEAPPLE_BOARDS += \
 		 pineapple-rumi-overlay.dtbo
@@ -44,7 +45,9 @@ NOAPQ_CLIFFS_BOARDS += \
 		 cliffs-mtp-overlay.dtbo \
 		 cliffs-qrd-overlay.dtbo \
 		 cliffs-rcm-overlay.dtbo \
-		 cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo
+		 cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo \
+		 cliffs-mtp-pm8550b-overlay.dtbo \
+		 cliffs-mtp-hmt-2s-nfc-wcd9395-pm8550b-overlay.dtbo
 
 pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(NOAPQ_CLIFFS_BOARDS),$(CLIFFS_BASE_DTB))
@@ -275,6 +278,11 @@ MONACO_LA_GVM_BASE_DTB += monaco-vm-la.dtb
 MONACO_LA_GVM_BOARDS += \
 		monaco-vm-la-overlay.dtbo
 
+MONACO_LV_GVM_BASE_DTB += monaco-vm-lv.dtb
+
+MONACO_LV_GVM_BOARDS += \
+                   monaco-vm-lv-overlay.dtbo
+
 autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
@@ -284,6 +292,7 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(LEMANS_LA_GVM_BOARDS),$(LEMANS_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_MULTI_GVM_BOARDS),$(LEMANS_MULTI_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_MULTI_LA_GVM_BOARDS),$(LEMANS_MULTI_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(MONACO_LV_GVM_BOARDS),$(MONACO_LV_GVM_BASE_DTB)) \
 	$(call add-overlays, $(MONACO_LA_GVM_BOARDS),$(MONACO_LA_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
@@ -295,6 +304,7 @@ autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(LEMANS_LA_GVM_BOARDS) $(LEMANS_LA_GVM_BASE_DTB) \
 	$(LEMANS_MULTI_GVM_BOARDS) $(LEMANS_MULTI_GVM_BASE_DTB) \
 	$(LEMANS_MULTI_LA_GVM_BOARDS) $(LEMANS_MULTI_LA_GVM_BASE_DTB) \
+	$(MONACO_LV_GVM_BOARDS) $(MONACO_LV_GVM_BASE_DTB) \
 	$(MONACO_LA_GVM_BOARDS) $(MONACO_LA_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
