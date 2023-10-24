@@ -22,7 +22,8 @@ SUN_BOARDS += \
 		 sun-mtp-kiwi-overlay.dtbo \
 		 sun-cdp-overlay.dtbo \
 		 sun-cdp-kiwi-overlay.dtbo \
-		 sun-qrd-overlay.dtbo
+		 sun-qrd-sku1-overlay.dtbo \
+		 sun-qrd-sku2-overlay.dtbo
 
 NOAPQ_SUN_BOARDS += \
 		 sun-rumi-overlay.dtbo
