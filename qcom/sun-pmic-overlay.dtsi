@@ -81,3 +81,30 @@
 		};
 	};
 };
+
+&soc {
+	pmic-pon-log {
+		compatible = "qcom,pmic-pon-log";
+		nvmem = <&pmk8550_sdam_5>, <&pmk8550_sdam_6>;
+		nvmem-names = "pon_log0", "pon_log1";
+	};
+
+	regulator_ocp_notifier: regulator-ocp-notifier {
+		compatible = "qcom,regulator-ocp-notifier";
+		interrupt-parent = <&spmi_bus>;
+		interrupts = <0x0 0x71 0x1 IRQ_TYPE_EDGE_RISING>,
+			     <0x0 0x85 0x1 IRQ_TYPE_EDGE_RISING>;
+		nvmem-cells = <&ocp_log>, <&alarm_log>;
+		nvmem-cell-names = "ocp_log", "alarm_log";
+	};
+
+	DBO3: regulator-dbo3 {
+		compatible = "qti-regulator-fixed";
+		regulator-name = "dbo3";
+		regulator-min-microvolt = <3600000>;
+		regulator-max-microvolt = <3600000>;
+		gpio = <&pm8550_gpios 9 GPIO_ACTIVE_HIGH>;
+		regulator-enable-ramp-delay = <1500>;
+		enable-active-high;
+	};
+};
