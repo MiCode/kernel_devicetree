@@ -1894,6 +1894,52 @@
 
 	thermal_zones: thermal-zones {
 	};
+
+	mmio_sram: mmio-sram@0x17b4e000 {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "mmio-sram";
+		reg = <0x0 0x17b4e000 0x0 0x400>;
+		ranges = <0x0 0x0 0x0 0x17b4e000 0x0 0x400>;
+
+		cpu_scp_lpri: scmi-shmem@0 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x0 0x17b4e000 0x0 0x400>;
+		};
+	};
+
+	cpucp: qcom,cpucp@0x17830000 {
+		compatible = "qcom,cpucp-v2";
+		reg =   <0x17830000 0x300>,
+			<0x16430000 0x4C08>;
+		#mbox-cells = <1>;
+		interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	scmi: qcom,scmi {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "arm,scmi";
+		mboxes = <&cpucp 0>;
+		mbox-names = "tx";
+		shmem = <&cpu_scp_lpri>;
+
+		scmi_perf: protocol@13 {
+			reg = <0x13>;
+			#clock-cells = <1>;
+		};
+
+		scmi_qcom: protocol@80 {
+			reg = <0x80>;
+			#clock-cells = <1>;
+		};
+	};
+
+	cpucp_log: qcom,cpucp_log@0x81210000 {
+		compatible = "qcom,cpucp-log";
+		reg = <0x81210000 0x10000>, <0x81220000 0x10000>;
+		mboxes = <&cpucp 1>;
+	};
 };
 
 &reserved_memory {
