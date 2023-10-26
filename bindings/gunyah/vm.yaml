@@ -2,7 +2,7 @@
 %YAML 1.2
 ---
 $id: http://devicetree.org/schemas/gunyah/vm.yaml#
-$schema: http://devicetree.org/meta-schemas/core.yaml#
+$schema: http://devicetree.org/meta-schemas/base.yaml#
 
 title: Virtual Machine (VM) Configuration
 
@@ -17,28 +17,23 @@ description: |+
 
 properties:
   compatible:
-    oneOf:
-      - const: qcom,vm-1.0
+    const: qcom,vm-1.0
 
   vm-type:
     description: type of virtual machine e.g aarch64, x86 etc
-    oneOf:
-      - const: aarch64-guest
+    const: aarch64-guest
 
   boot-config:
-    oneOf:
-      - const: fdt,unified
+    const: fdt,unified
 
   os-type:
-    description: Type of the operating system being used in virtual machine
-    oneOf:
-      - const: linux
+    const: linux
 
   kernel-entry-segment:
     $ref: /schemas/types.yaml#/definitions/string-array
 
   kernel-entry-offset:
-    $ref: '/schemas/types.yaml#/definitions/uint64'
+    $ref: /schemas/types.yaml#/definitions/uint64
 
   vendor:
     $ref: /schemas/types.yaml#/definitions/string-array
@@ -47,9 +42,11 @@ properties:
     $ref: /schemas/types.yaml#/definitions/string-array
 
   qcom,pasid:
-    $ref: '/schemas/types.yaml#/definitions/uint64'
+    $ref: /schemas/types.yaml#/definitions/uint64
+    description: PIL SW-ID, only for PIL VMs
 
   memory:
+    type: object
     properties:
       "#address-cells":
         const: 2
@@ -63,6 +60,7 @@ properties:
         maxItems: 2
 
   segments:
+    type: object
     properties:
       kernel:
         maxItems: 4
@@ -72,19 +70,60 @@ properties:
         description: Load location offset of devicetree
 
   vcpus:
+    type: object
     properties:
-      config
-      affinity
-      affinity-map
+      config:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: path to DT node where CPU configuration will be overlaid by RM
+      affinity:
+        enum:
+          - static
+          - sticky
+          - proxy
+      affinity-map:
+        $ref: /schemas/types.yaml#/definitions/uint32-array
+        description: |
+          Array where index is the vCPU id.
+          The value at the index is the physical cpu to affine that vcpu to.
 
   interrupts:
+    type: object
     properties:
-      config
+      config:
+        $ref: /schemas/types.yaml#/definitions/phandle
+        description: Phandle to the interrupt controller
 
   vdevices:
+    type: object
     properties:
-      peer-default
+      generate:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: path to DT node where vdevices configuration will be overlaid by RM
+    patternProperties:
+      ".*":
+        type: object
+        properties:
+          vdevice-type:
+            enum:
+              - rm-rpc
+              - doorbell-source
+              - doorbell
+              - message-queue
+              - shm
+              - shm-doorbell
+              - iomem
+          generate:
+            $ref: /schemas/types.yaml#/definitions/string
+            description: path to DT node where vdevices configuration will be overlaid by RM
+          push-compatible:
+            $ref: /schemas/types.yaml#/definitions/string-array
+            description: Additional compatible strings to apply to the vdevice DT node
+          qcom,label:
+            $ref: /schemas/types.yaml#/definitions/uint32
+            description: label provided by RM when providing the capability to VM
 
 required:
   - compatible
   - image_to_be_loaded
+
+additionalProperties: true
