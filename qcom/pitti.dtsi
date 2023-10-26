@@ -1094,17 +1094,79 @@
 		compatible = "qcom,mem-buf-msgq";
 	};
 
-
 	adsp_pas: remoteproc-adsp@a400000 {
 		compatible = "qcom,pitti-adsp-pas";
 		reg = <0xa400000 0x100>;
-		status = "disabled";
+		status = "ok";
+
+		vdd_lpi_cx-supply = <&VDD_LPI_CX_LEVEL>;
+		vdd_lpi_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		vdd_lpi_mx-supply = <&VDD_LPI_MX_LEVEL>;
+		vdd_lpi_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "vdd_lpi_cx", "vdd_lpi_mx";
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+
+		interconnects = <&bimc MASTER_AMPSS_M0 &bimc SLAVE_EBI_CH0>,
+				<&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI_CH0>;
+		interconnect-names = "rproc_ddr","crypto_ddr";
+
+		memory-region = <&adsp_mem>;
+
+		interrupts-extended = <&intc GIC_SPI 282 IRQ_TYPE_EDGE_RISING>,
+			<&adsp_smp2p_in 0 0>,
+			<&adsp_smp2p_in 2 0>,
+			<&adsp_smp2p_in 1 0>,
+			<&adsp_smp2p_in 3 0>;
+
+		interrupt-names = "wdog",
+			"fatal",
+			"handover",
+			"ready",
+			"stop-ack";
+
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
 	};
 
 	modem_pas: remoteproc-mss@6080000 {
 		compatible = "qcom,pitti-modem-pas";
-		reg = <0x6000000 0x100>;
-		status = "disabled";
+		reg = <0x6080000 0x100>;
+		status = "ok";
+
+		/* CX & MODEM are merged here */
+		cx-supply = <&VDD_MODEM_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MX_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
+		reg-names = "cx", "mx";
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+
+		interconnects = <&bimc MASTER_AMPSS_M0 &bimc SLAVE_EBI_CH0>,
+				<&system_noc MASTER_CRYPTO_CORE0 &bimc SLAVE_EBI_CH0>;
+		interconnect-names = "rproc_ddr","crypto_ddr";
+
+		memory-region = <&mpss_mem>;
+
+		interrupts-extended = <&intc GIC_SPI 307 IRQ_TYPE_EDGE_RISING>,
+			<&modem_smp2p_in 0 0>,
+			<&modem_smp2p_in 2 0>,
+			<&modem_smp2p_in 1 0>,
+			<&modem_smp2p_in 3 0>,
+			<&modem_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+			"fatal",
+			"handover",
+			"ready",
+			"stop-ack",
+			"shutdown-ack";
+
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
 	};
 
 	ufsphy_mem: ufsphy_mem@0x4807000 {
