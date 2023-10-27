@@ -29,3 +29,51 @@
 &CLUSTER_PWR_DN {
 	status = "nok";
 };
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L4A>;
+	vdda-phy-max-microamp = <88530>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L7A>;
+	vdda-pll-max-microamp = <18310>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+	limit-rate = <2>; /* HS Rate-B */
+
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L24A>;
+	vcc-max-microamp = <800000>;
+
+	/* Not enabling vccq-supply as it is gpio based eLDO and
+	 * is not controlled from PMIC LDO. So skip it for RUMI
+	 * assuming it to be enabled by default.
+	 */
+
+	vccq2-supply = <&L11A>;
+	vccq2-max-microamp = <750000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L7A>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S6A>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	qcom,disable-lpm;
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	qcom,iommu-dma = "bypass";
+
+	status = "ok";
+};
