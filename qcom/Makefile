@@ -21,8 +21,10 @@ SUN_APQ_BASE_DTB += sunp.dtb sunp-v2.dtb
 SUN_BOARDS += \
 		 sun-mtp-overlay.dtbo \
 		 sun-mtp-kiwi-overlay.dtbo \
+		 sun-mtp-nfc-overlay.dtbo \
 		 sun-cdp-overlay.dtbo \
 		 sun-cdp-kiwi-overlay.dtbo \
+		 sun-cdp-nfc-overlay.dtbo \
 		 sun-qrd-sku1-overlay.dtbo \
 		 sun-qrd-sku2-overlay.dtbo
 
