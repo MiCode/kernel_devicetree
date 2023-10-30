@@ -22,10 +22,13 @@ SUN_BOARDS += \
 		 sun-mtp-overlay.dtbo \
 		 sun-mtp-kiwi-overlay.dtbo \
 		 sun-mtp-nfc-overlay.dtbo \
+		 sun-mtp-v8-overlay.dtbo \
 		 sun-cdp-overlay.dtbo \
 		 sun-cdp-kiwi-overlay.dtbo \
 		 sun-cdp-nfc-overlay.dtbo \
+		 sun-cdp-v8-overlay.dtbo \
 		 sun-qrd-sku1-overlay.dtbo \
+		 sun-qrd-sku1-v8-overlay.dtbo \
 		 sun-qrd-sku2-overlay.dtbo
 
 NOAPQ_SUN_BOARDS += \
