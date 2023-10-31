@@ -77,24 +77,28 @@ properties:
 required:
   - compatible
   - "#dma-cells"
+  - num-channels
   - interrupts
   - qcom,ee
   - reg
+  - qcom,num-ees
 
 additionalProperties: false
 
 examples:
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-    #include <dt-bindings/clock/qcom,gcc-msm8974.h>
+    #include <dt-bindings/clock/qcom,gcc-sun.h>
 
-    dma-controller@f9944000 {
-        compatible = "qcom,bam-v1.4.0";
-        reg = <0xf9944000 0x19000>;
-        interrupts = <GIC_SPI 239 IRQ_TYPE_LEVEL_HIGH>;
-        clocks = <&gcc GCC_BLSP2_AHB_CLK>;
-        clock-names = "bam_clk";
+    slimbam: bamdma@6C04000 {
+        compatible = "qcom,bam-v1.7.0";
+        qcom,controlled-remotely;
+        reg = <0x6C04000 0x20000>, <0x6C8F000 0x1000>;
+        reg-names = "bam", "bam_remote_mem";
+        num-channels  = <31>;
+        interrupts = <0 164 IRQ_TYPE_LEVEL_HIGH>;
         #dma-cells = <1>;
-        qcom,ee = <0>;
+        qcom,ee = <1>;
+        qcom,num-ees = <2>;
     };
 ...
