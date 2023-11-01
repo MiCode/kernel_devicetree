@@ -1520,6 +1520,9 @@
 		phy-names = "ufsphy";
 		#reset-cells = <1>;
 
+		qcom,prime-mask = <0xc0>;
+		qcom,silver-mask = <0x3f>;
+
 		lanes-per-direction = <2>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
 		clock-names =
@@ -1620,22 +1623,26 @@
 
 		iommus = <&apps_smmu 0x60 0x0>;
 		qcom,iommu-dma = "fastmap";
+		qcom,iommu-dma-addr-pool = <0x1000 0xFFFFF000>;
 		shared-ice-cfg = <&ice_cfg>;
+		dma-coherent;
 
 		qcom,bypass-pbl-rst-wa;
 
 		status = "disabled";
 
 		qos0 {
-			mask = <0xfc>;
+			mask = <0xc0>;
 			vote = <44>;
 			perf;
-			cpu_freq_vote = <2 5 7>;
+			/* Set CPU6 to fmax, and CPU[6-7] will run at fmax */
+			cpu_freq_vote = <6>;
 		};
 
 		qos1 {
-			mask = <0x03>;
+			mask = <0x3f>;
 			vote = <44>;
+			/* Set CPU0 to fmax, and CPU[0-5] will run at fmax */
 			cpu_freq_vote = <0>;
 		};
 	};
