@@ -72,6 +72,90 @@
 			pcm-lane-config = <1>;
 		};
 	};
+
+	mtl_rx_setup: rx-queues-config {
+		snps,rx-queues-to-use = <1>;
+		snps,rx-sched-sp;
+
+		queue {
+			snps,dcb-algorithm;
+			snps,priority = <0x1>;
+		};
+	};
+
+	mtl_tx_setup: tx-queues-config {
+		snps,tx-queues-to-use = <1>;
+		snps,tx-sched-sp;
+		queue {
+			snps,dcb-algorithm;
+		};
+	};
+
+	emac0_hw: qcom,ethernet@23040000 {
+		compatible = "qcom,stmmac-ethqos-emac0";
+		emac-core-version = <0x30010000>;
+		qcom,arm-smmu;
+		reg = <0x23049000 0x1000>;
+		reg-names = "stmmaceth";
+		interrupts-extended = <&intc 0 945 4>, <&intc 0 946 4>,
+			<&intc 0 943 4>, <&intc 0 942 4>,
+			<&intc 0 941 4>, <&intc 0 940 4>,
+			<&intc 0 939 4>, <&intc 0 938 4>;
+		interrupt-names = "tx_rx_ch0_intr", "tx_rx_ch1_intr",
+			"tx_rx_ch2_intr", "tx_rx_ch3_intr",
+			"tx_rx_ch4_intr", "tx_rx_ch5_intr",
+			"tx_rx_ch6_intr", "tx_rx_ch7_intr";
+
+		snps,tso;
+		snps,pbl = <32>;
+		mac-address = [00 55 7B B5 7D f7];
+		rx-fifo-depth = <4096>;
+		tx-fifo-depth = <4096>;
+		snps,mtl-rx-config = <&mtl_rx_setup>;
+		snps,mtl-tx-config = <&mtl_tx_setup>;
+		queue = <1>;
+
+		emac0_emb_smmu: emac0_emb_smmu {
+			compatible = "qcom,emac-smmu-embedded";
+			iommus = <&apps_smmu 0x122 0x1>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
+		};
+	};
+
+	emac1_hw: qcom,ethernet@23000000 {
+		compatible = "qcom,stmmac-ethqos-emac1";
+		emac-core-version = <0x30000000>;
+		qcom,arm-smmu;
+		reg = <0x23000000 0x10000>;
+		reg-names = "stmmaceth";
+		interrupts-extended = <&intc 0 772 4>, <&intc 0 773 4>,
+			<&intc 0 774 4>, <&intc 0 775 4>,
+			<&intc 0 776 4>, <&intc 0 777 4>,
+			<&intc 0 778 4>, <&intc 0 937 4>;
+		interrupt-names = "tx_rx_ch0_intr", "tx_rx_ch1_intr",
+			"tx_rx_ch2_intr", "tx_rx_ch3_intr",
+			"tx_rx_ch4_intr", "tx_rx_ch5_intr",
+			"tx_rx_ch6_intr", "tx_rx_ch7_intr";
+
+		snps,tso;
+		snps,pbl = <32>;
+		mac-address = [00 55 7B B5 7D f7];
+		rx-fifo-depth = <4096>;
+		tx-fifo-depth = <4096>;
+		snps,mtl-rx-config = <&mtl_rx_setup>;
+		snps,mtl-tx-config = <&mtl_tx_setup>;
+		queue = <2>;
+		status = "disabled";
+
+		emac1_emb_smmu: emac1_emb_smmu {
+			compatible = "qcom,emac-smmu-embedded";
+			iommus = <&apps_smmu 0x44 0x1>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
+			status = "disabled";
+		};
+	};
 };
 
 &reserved_memory {
