@@ -2055,30 +2055,32 @@
 	};
 
 	hsi2s: qcom,hsi2s@3B40000 {
-		compatible = "qcom,sa8255-hsi2s", "qcom,hsi2s";
+		compatible = "qcom,sa7255-hsi2s", "qcom,hsi2s";
 		reg = <0x3B40000 0x29000>,
 			<0x3942000 0x6000>;
 		reg-names = "lpa_if", "lpass_core_cc_hs_if";
 		interrupts = <GIC_SPI 719 IRQ_TYPE_LEVEL_HIGH>;
 		number-of-rate-detectors = <2>;
 		rate-detector-interfaces = <0 1>;
-		number-of-interfaces = <3>;
+		number-of-interfaces = <5>;
 		qcom,smmu-version = <2>;
 		qcom,smmu-enabled;
-		iommus = <&apps_smmu 0x203A 0x4>;
+		iommus = <&apps_smmu 0x203c 0x1>,
+			<&apps_smmu 0x203a 0x4>,
+			<&apps_smmu 0x203b 0x0>;
 		qcom,iommu-dma-addr-pool = <0x0 0xFFFFFFFF>;
 		dma-coherent;
 
-		sdr2: qcom,hs2_i2s {
+		sdr4: qcom,hs4_i2s {
 			compatible = "qcom,hsi2s-interface";
-			minor-number = <2>;
+			minor-number = <4>;
 			pinctrl-names = "default", "sleep";
-			pinctrl-0 = <&hs2_i2s_sck_active
-				     &hs2_i2s_ws_active &hs2_i2s_data0_active
-				     &hs2_i2s_data1_active>;
-			pinctrl-1 = <&hs2_i2s_sck_sleep
-				     &hs2_i2s_ws_sleep &hs2_i2s_data0_sleep
-				     &hs2_i2s_data1_sleep>;
+			pinctrl-0 = <&tert_tdm_sck_active
+				     &tert_tdm_ws_active &tert_tdm_din_active
+				     &tert_tdm_dout_active>;
+			pinctrl-1 = <&tert_tdm_sck_sleep
+				     &tert_tdm_ws_sleep &tert_tdm_din_sleep
+				     &tert_tdm_dout_sleep>;
 			bit-clock-hz = <12288000>;
 			data-buffer-ms = <10>;
 			bit-depth = <32>;
