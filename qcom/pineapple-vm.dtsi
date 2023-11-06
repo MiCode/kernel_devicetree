@@ -199,6 +199,29 @@
 					allocate-base;
 				};
 			};
+
+			test-dbl-tuivm {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/test-dbl-tuivm";
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			test-dbl-tuivm-source {
+				vdevice-type = "doorbell-source";
+				generate = "/hypervisor/test-dbl-tuivm-source";
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			test-msgq-tuivm {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/test-msgq-tuivm-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x4>;
+				peer-default;
+			};
 		};
 	};
 
@@ -294,6 +317,26 @@
 		qcom,max-size = <0x0 0x10000000>;
 		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
 		qcom,block-size = <0x400000>;
+	};
+
+	qcom,test-dbl-tuivm {
+		compatible = "qcom,gh-dbl";
+		qcom,label = <0x4>;
+	};
+
+	qcom,test-msgq-tuivm {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <4>;
+		affinity = <0>;
+	};
+
+	qcom,gh-qtimer@17425000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x17425000 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,secondary;
 	};
 };
 
