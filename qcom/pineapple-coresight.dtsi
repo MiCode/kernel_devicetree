@@ -48,9 +48,9 @@
 
 		out-ports {
 			port {
-				tpdm_ddr_lpi_out_tpda_ddr_lpi: endpoint {
+				tpdm_ddr_lpi_out_funnel_ddr_lpi: endpoint {
 					remote-endpoint =
-					<&tpda_ddr_lpi_in_tpdm_ddr_lpi>;
+					<&funnel_ddr_lpi_in_tpdm_ddr_lpi>;
 				};
 			};
 		};
@@ -1426,72 +1426,19 @@
 		};
 	};
 
-
-	tpda_ddr_lpi: tpda@10d09000 {
-		compatible = "arm,primecell";
-		arm,primecell-periphid = <0x000bb969>;
-
-		reg = <0x10d09000 0x1000>;
-		reg-names = "tpda-base";
-
-		coresight-name = "coresight-tpda-ddr_lpi";
-
-		status = "disabled";
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
-		in-ports {
-
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				tpda_ddr_lpi_in_tpdm_ddr_lpi: endpoint {
-					remote-endpoint =
-					<&tpdm_ddr_lpi_out_tpda_ddr_lpi>;
-				};
-			};
-
-		};
-
-		out-ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				tpda_ddr_lpi_out_funnel_ddr_lpi: endpoint {
-					remote-endpoint =
-					<&funnel_ddr_lpi_in_tpda_ddr_lpi>;
-				};
-			};
-
-		};
-	};
-
 	funnel_ddr_lpi: funnel@10b33000 {
-		compatible = "arm,primecell";
-		arm,primecell-periphid = <0x000bb908>;
-
-		reg = <0x10b33000 0x1000>;
-		reg-names = "funnel-base";
-
+		compatible = "arm,coresight-static-funnel";
 		coresight-name = "coresight-funnel-ddr_lpi";
 
-		status = "disabled";
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
 		in-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
 
 			port@0 {
 				reg = <0>;
-				funnel_ddr_lpi_in_tpda_ddr_lpi: endpoint {
+				funnel_ddr_lpi_in_tpdm_ddr_lpi: endpoint {
 					remote-endpoint =
-					<&tpda_ddr_lpi_out_funnel_ddr_lpi>;
+					<&tpdm_ddr_lpi_out_funnel_ddr_lpi>;
 				};
 			};
 
