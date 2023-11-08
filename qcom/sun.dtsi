@@ -1899,8 +1899,9 @@
 		compatible = "qcom,ufshc";
 		reg = <0x1d84000 0x3000>,
 		      <0x1d88000 0x8000>,
-		      <0x1d90000 0x9800>;
-		reg-names = "ufs_mem", "ufs_ice", "ufs_ice_hwkm";
+		      <0x1d90000 0x9800>,
+		      <0x1da5000 0x2000>, <0x1da4000 0x10>;
+		reg-names = "ufs_mem", "ufs_ice", "ufs_ice_hwkm", "mcq_sqd", "mcq_vs";
 		interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
 		phys = <&ufsphy_mem>;
 		phy-names = "ufsphy";
@@ -1908,6 +1909,7 @@
 
 		qcom,prime-mask = <0xc0>;
 		qcom,silver-mask = <0x3f>;
+		qcom,esi-affinity-mask = <0xe0>;
 
 		lanes-per-direction = <2>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
@@ -2013,11 +2015,16 @@
 		iommus = <&apps_smmu 0x60 0x0>;
 		qcom,iommu-dma = "fastmap";
 		qcom,iommu-dma-addr-pool = <0x1000 0xFFFFF000>;
+		qcom,iommu-msi-size = <0x1000>;
+
 		shared-ice-cfg = <&ice_cfg>;
 		dma-coherent;
 
 		qcom,bypass-pbl-rst-wa;
 		qcom,disable-lpm;
+
+		msi-parent = <&gic_its 0x60>;
+
 		status = "disabled";
 
 		qos0 {
