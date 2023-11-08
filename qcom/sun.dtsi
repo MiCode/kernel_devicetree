@@ -34,7 +34,7 @@
 
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat mem-offline.bypass_send_msg=1";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat mem-offline.bypass_send_msg=1 cpuidle.off=1";
 		stdout-path = "/soc/qcom,qupv3_1_geni_se@ac0000/qcom,qup_uart@a9c000:115200n8";
 	};
 
@@ -956,6 +956,7 @@
 		apps_rsc_drv2: drv@2 {
 			qcom,drv-id = <2>;
 			qcom,tcs-offset = <0xd00>;
+			qcom,tcs-distance = <0x2a0>;
 			channel@0 {
 				qcom,tcs-config = <ACTIVE_TCS    3>,
 						  <SLEEP_TCS     2>,
@@ -977,6 +978,107 @@
 				compatible = "qcom,dcvs-fp";
 				qcom,ddr-bcm-name = "MC4";
 				qcom,llcc-bcm-name = "SH5";
+			};
+		};
+	};
+
+	cam_rsc: rsc@adc8000 {
+		label = "cam_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0xadc8000 0x1000>,
+		      <0xadc9000 0x1000>,
+		      <0xadca000 0x1000>;
+		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
+		qcom,hw-channel;
+		interrupts = <GIC_SPI 368 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 369 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 370 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&camcc CAM_CC_DRV_AHB_CLK>;
+
+		cam_rsc_drv0: drv@0 {
+			qcom,drv-id = <0>;
+			qcom,tcs-offset = <0x520>;
+			qcom,tcs-distance = <0x150>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			channel@1 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+
+		cam_rsc_drv1: drv@1 {
+			qcom,drv-id = <1>;
+			qcom,tcs-offset = <0x520>;
+			qcom,tcs-distance = <0x150>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			channel@1 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+
+		cam_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0x520>;
+			qcom,tcs-distance = <0x150>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+
+			channel@1 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <WAKE_TCS      1>,
+						  <SLEEP_TCS     1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+	};
+
+	disp_rsc: rsc@af20000 {
+		label = "disp_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0xaf20000 0x10000>;
+		reg-names = "drv-0";
+		qcom,drv-count = <1>;
+		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&dispcc DISP_CC_MDSS_RSCC_AHB_CLK>;
+
+		disp_rsc_drv0: drv@0 {
+			qcom,drv-id = <0>;
+			qcom,tcs-offset = <0x520>;
+			qcom,tcs-distance = <0x150>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <SLEEP_TCS     1>,
+						  <WAKE_TCS      1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
 			};
 		};
 	};
