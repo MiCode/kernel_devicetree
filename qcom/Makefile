@@ -55,6 +55,15 @@ pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(NOAPQ_CLIFFS_BOARDS),$(CLIFFS_BASE_DTB))
 pineapple-overlays-dtb-$(CONFIG_ARCH_CLIFFS) += $(NOAPQ_CLIFFS_BOARDS) $(CLIFFS_BASE_DTB)
 
+VOLCANO_BASE_DTB += volcano.dtb
+
+NOAPQ_VOLCANO_BOARDS += \
+		volcano-rumi-overlay.dtbo
+
+pineapple-dtb-$(CONFIG_ARCH_VOLCANO) += \
+	$(call add-overlays, $(NOAPQ_VOLCANO_BOARDS),$(VOLCANO_BASE_DTB))
+pineapple-overlays-dtb-$(CONFIG_ARCH_VOLCANO) += $(NOAPQ_VOLCANO_BOARDS) $(VOLCANO_BASE_DTB)
+
 dtb-y += $(pineapple-dtb-y)
 
 KALAMA_BASE_DTB += kalama.dtb kalama-v2.dtb
@@ -155,6 +164,7 @@ pitti-dtb-$(CONFIG_ARCH_PITTI) += \
 	$(call add-overlays, $(PITTI_BOARDS) $(APQ_PITTI_BOARDS),$(PITTI_APQ_BASE_DTB))
 pitti-overlays-dtb-$(CONFIG_ARCH_PITTI) += $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS) $(PITTI_BASE_DTB) $(PITTI_APQ_BASE_DTB)
 dtb-y += $(pitti-dtb-y)
+
 endif
 
 MONACO_AUTO_BASE_DTB	+= monaco_auto.dtb

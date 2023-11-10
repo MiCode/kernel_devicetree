@@ -160,7 +160,7 @@ _platform_map = {
                 "apq": False,
             },
         ],
-        "binary_compatible_with": ["cliffs"],
+        "binary_compatible_with": ["cliffs", "volcano"],
     },
     "niobe": {
         "dtb_list": [
@@ -304,6 +304,17 @@ _platform_map = {
         ],
         "dtbo_list": [
             {"name": "pitti-rumi-overlay.dtbo"},
+        ],
+    },
+    "volcano": {
+        "dtb_list": [
+            {"name": "volcano.dtb"},
+        ],
+        "dtbo_list": [
+            {
+                "name": "volcano-rumi-overlay.dtbo",
+                "apq": False,
+            },
         ],
     },
 }
