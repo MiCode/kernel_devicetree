@@ -16,10 +16,12 @@ _platform_map = {
         "dtbo_list": [
             # keep sorted
             {"name": "sun-cdp-kiwi-overlay.dtbo"},
+            {"name": "sun-cdp-kiwi-v8-overlay.dtbo"},
             {"name": "sun-cdp-nfc-overlay.dtbo"},
             {"name": "sun-cdp-overlay.dtbo"},
             {"name": "sun-cdp-v8-overlay.dtbo"},
             {"name": "sun-mtp-kiwi-overlay.dtbo"},
+            {"name": "sun-mtp-kiwi-v8-overlay.dtbo"},
             {"name": "sun-mtp-nfc-overlay.dtbo"},
             {"name": "sun-mtp-overlay.dtbo"},
             {"name": "sun-mtp-v8-overlay.dtbo"},
