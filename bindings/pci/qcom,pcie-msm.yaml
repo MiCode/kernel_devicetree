@@ -398,6 +398,11 @@ properties:
     description: Offset from PCIe PHY base to PCIe CESTA CLKREQ register.
     $ref: /schemas/types.yaml#/definitions/uint32
 
+  qcom,cesta-l1sub-timeout-ext-int:
+    description: Sets PARF_CESTA_L1SUB_TIMEOUT_EXT_INT_EN bit in
+                 PARF L1SUB_CESTA_CTRL register.
+    type: boolean
+
   qcom,core-preset:
     description: Determines how aggressive the PCIe PHY equalization is for
                 Gen3 cores. The following are recommended settings.
@@ -535,6 +540,7 @@ required:
   - cell-index
   - linux,pci-domain
   - ranges
+  - device_type
   - interrupts
   - interrupt-names
   - perst-gpio
@@ -549,7 +555,11 @@ required:
   - reset-names
   - dma-coherent
 
+dependencies:
+  qcom,cesta-l1sub-timeout-ext-int: [ 'qcom,pcie-sm-seq', 'qcom,pcie-clkreq-offset' ]
+
 allOf:
+  - $ref: "/schemas/pci/pci-bus.yaml#"
   - if:
       properties:
         reg-names:
@@ -576,7 +586,7 @@ allOf:
         qcom,pcie-sm-branch-seq: false
         qcom,pcie-sm-debug: false
 
-additionalProperties: false
+unevaluatedProperties: false
 
 examples:
   - |
@@ -587,8 +597,9 @@ examples:
     #include <dt-bindings/interconnect/qcom,pineapple.h>
     #include <dt-bindings/clock/qcom,rpmh.h>
     #include <dt-bindings/clock/qcom,tcsrcc-pineapple.h>
-    pcie0: qcom,pcie@1c00000 {
+    pcie0: pcie@1c00000 {
         compatible = "qcom,pci-msm";
+        device_type = "pci";
 
         reg = <0x01c00000 0x3000>,
           <0x01c06000 0x2000>,
@@ -851,8 +862,9 @@ examples:
     #include <dt-bindings/interconnect/qcom,pineapple.h>
     #include <dt-bindings/clock/qcom,rpmh.h>
     #include <dt-bindings/clock/qcom,tcsrcc-pineapple.h>
-    pcie1: qcom,pcie@1c08000 {
+    pcie1: pcie@1c08000 {
         compatible = "qcom,pci-msm";
+        device_type = "pci";
 
         reg = <0x01c08000 0x3000>,
           <0x01c0e000 0x2000>,
