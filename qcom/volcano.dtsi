@@ -1,4 +1,5 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/soc/qcom,rpmh-rsc.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Volcano";
@@ -182,6 +183,52 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
+	apps_rsc: rsc@17a00000 {
+		label = "apps_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0x17a00000 0x10000>,
+		      <0x17a10000 0x10000>,
+		      <0x17a20000 0x10000>;
+		reg-names = "drv-0", "drv-1", "drv-2";
+		qcom,drv-count = <3>;
+		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+
+		apps_rsc_drv2: drv@2 {
+			qcom,drv-id = <2>;
+			qcom,tcs-offset = <0xd00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    3>,
+						  <SLEEP_TCS     2>,
+						  <WAKE_TCS      2>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 1>;
+			};
+		};
+	};
+
+	disp_rsc: rsc@af20000 {
+		label = "disp_rsc";
+		compatible = "qcom,rpmh-rsc";
+		reg = <0xaf20000 0x10000>;
+		reg-names = "drv-0";
+		qcom,drv-count = <1>;
+		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
+
+		disp_rsc_drv0: drv@0 {
+			qcom,drv-id = <0>;
+			qcom,tcs-offset = <0x1c00>;
+			channel@0 {
+				qcom,tcs-config = <ACTIVE_TCS    0>,
+						  <SLEEP_TCS     1>,
+						  <WAKE_TCS      1>,
+						  <CONTROL_TCS   0>,
+						  <FAST_PATH_TCS 0>;
+			};
+		};
+	};
+
 	intc: interrupt-controller@17100000 {
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
@@ -191,6 +238,17 @@
 		reg = <0x17100000 0x10000>,       /* GICD */
 		      <0x17180000 0x200000>;      /* GICR * 8 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,volcano-pdc";
+		reg = <0xb220000 0x10000>, <0x174000f0 0x64>;
+		qcom,pdc-ranges = <0 480 40>, <40 140 11>, <51 527 47>,
+				  <98 609 31>, <129 63 1>, <130 716 12>,
+				  <142 251 5>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
 	};
 
 arch_timer: timer {
@@ -269,7 +327,20 @@ memtimer: timer@17420000 {
 		gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		/* TODO: Add qcom,gpios-reserved and pdc as wakeup parent*/
+		wakeup-parent = <&pdc>;
+		/* TODO: Add qcom,gpios-reserved */
+	};
+};
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	aop_cmd_db_mem: aop_cmd_db_region@81c60000 {
+		compatible = "qcom,cmd-db";
+		no-map;
+		reg = <0x0 0x81c60000 0x0 0x20000>;
 	};
 };
 
