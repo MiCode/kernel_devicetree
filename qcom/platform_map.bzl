@@ -3,13 +3,28 @@ _platform_map = {
         "dtb_list": [
             # keep sorted
             {"name": "sun.dtb"},
+            {
+                "name": "sunp.dtb",
+                "apq": True,
+            },
+            {
+                "name": "sunp-v2.dtb",
+                "apq": True,
+            },
             {"name": "sun-v2.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
+            {"name": "sun-cdp-kiwi-overlay.dtbo"},
+            {"name": "sun-cdp-nfc-overlay.dtbo"},
             {"name": "sun-cdp-overlay.dtbo"},
+            {"name": "sun-cdp-v8-overlay.dtbo"},
+            {"name": "sun-mtp-kiwi-overlay.dtbo"},
+            {"name": "sun-mtp-nfc-overlay.dtbo"},
             {"name": "sun-mtp-overlay.dtbo"},
+            {"name": "sun-mtp-v8-overlay.dtbo"},
             {"name": "sun-qrd-sku1-overlay.dtbo"},
+            {"name": "sun-qrd-sku1-v8-overlay.dtbo"},
             {"name": "sun-qrd-sku2-overlay.dtbo"},
             {"name": "sun-rumi-overlay.dtbo"},
         ],
