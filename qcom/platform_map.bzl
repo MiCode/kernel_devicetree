@@ -27,7 +27,7 @@ _platform_map = {
             {"name": "sun-mtp-v8-overlay.dtbo"},
             {"name": "sun-qrd-sku1-overlay.dtbo"},
             {"name": "sun-qrd-sku1-v8-overlay.dtbo"},
-            {"name": "sun-qrd-sku2-overlay.dtbo"},
+            {"name": "sun-qrd-sku2-v8-overlay.dtbo"},
             {"name": "sun-rumi-overlay.dtbo"},
         ],
     },
