@@ -4,6 +4,7 @@
  */
 
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/arm/msm/qti-smmu-proxy-dt-ids.h>
 
 / {
 	#address-cells = <0x2>;
@@ -239,6 +240,15 @@
 					allocate-base;
 				};
 			};
+
+			smmu-proxy-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/smmu-proxy-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label = <0xA>;
+			};
 		};
 	};
 
@@ -352,6 +362,34 @@
 			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
 			     <GIC_PPI 12 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
 		clock-frequency = <1000000000>;
+	};
+
+	qti,smmu-proxy-camera-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_CAMERA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x1810 0x20>,
+			 <&apps_smmu 0x1C10 0x0>,
+			 <&apps_smmu 0x18F0 0x0>;
+		dma-coherent;
+	};
+
+	qti,smmu-proxy-display-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_DISPLAY_CB>;
+		qcom,iommu-defer-smr-config;
+		qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+		iommus = <&apps_smmu 0x801 0x0>;
+		dma-coherent;
+	};
+
+	qti,smmu-proxy-eva-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_EVA_CB>;
+		qcom,iommu-defer-smr-config;
+		qcom,iommu-dma-addr-pool = <0x00000000 0xffffffff>;
+		iommus = <&apps_smmu 0x1927 0x0>;
+		dma-coherent;
 	};
 
 	qcom_smcinvoke {
