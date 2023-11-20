@@ -1,0 +1,49 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,ucsi-glink.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. UCSI GLINK
+
+maintainers:
+  - Uttkarsh Aggarwal <quic_uaggarwa@quicinc.com>
+
+description:
+  UCSI PMIC Glink aux driver that communicates with the aDSP firmware with the
+  UCSI protocol which handles the USB-C Port(s) Power Delivery.
+
+properties:
+  compatible:
+    const: qcom,ucsi-glink
+
+  connector:
+    type: object
+    $ref: /schemas/connector/usb-connector.yaml#
+    unevaluatedProperties: false
+
+  port:
+    $ref: /schemas/graph.yaml#/properties/port
+    description:
+      Contains a port which produces data-role switching messages.
+
+required:
+  - compatible
+  - connector
+
+additionalProperties: false
+
+examples:
+  - |
+
+    ucsi {
+         compatible = "qcom,ucsi-glink";
+         connector {
+           compatible = "usb-c-connector";
+           port {
+               usb_port0_connector: endpoint {
+                  remote-endpoint = <&usb_port0>;
+               };
+           };
+         };
+    };
+...
