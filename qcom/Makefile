@@ -84,7 +84,11 @@ endif
 ifeq ($(CONFIG_ARCH_SUN), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 sun_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += sun-vm-rumi.dtb \
-				sun-oemvm-rumi.dtb
+				sun-vm-mtp.dtb \
+				sun-vm-cdp.dtb \
+				sun-oemvm-rumi.dtb \
+				sun-oemvm-mtp.dtb \
+				sun-oemvm-cdp.dtb
 dtb-y += $(sun_tuivm-dtb-y)
 
 endif

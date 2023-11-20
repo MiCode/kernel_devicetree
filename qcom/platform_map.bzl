@@ -17,14 +17,22 @@ _platform_map = {
     "sun-tuivm": {
         "dtb_list": [
             # keep sorted
+            {"name": "sun-oemvm-cdp.dtb"},
+            {"name": "sun-oemvm-mtp.dtb"},
             {"name": "sun-oemvm-rumi.dtb"},
+            {"name": "sun-vm-cdp.dtb"},
+            {"name": "sun-vm-mtp.dtb"},
             {"name": "sun-vm-rumi.dtb"},
         ],
     },
     "sun-oemvm": {
         "dtb_list": [
             # keep sorted
+            {"name": "sun-oemvm-cdp.dtb"},
+            {"name": "sun-oemvm-mtp.dtb"},
             {"name": "sun-oemvm-rumi.dtb"},
+            {"name": "sun-vm-cdp.dtb"},
+            {"name": "sun-vm-mtp.dtb"},
             {"name": "sun-vm-rumi.dtb"},
         ],
     },
