@@ -271,3 +271,38 @@
 	dummy-supply = <&pmih010x_eusb2_repeater>;
 	usb-repeater = <&pmih010x_eusb2_repeater>;
 };
+
+&qupv3_se4_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "ok";
+	qcom,touch-active = "st,fts";
+
+	st_fts@49 {
+		compatible = "st,fts";
+		reg = <0x49>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <162 0x2008>;
+		vdd-supply = <&L4B>;
+		avdd-supply = <&L14B>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		st,irq-gpio = <&tlmm 162 0x2008>;
+		st,reset-gpio = <&tlmm 161 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
+
+		st,touch-type = "primary";
+		st,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <598>;
+		qts,trusted-touch-io-bases = <0xa90000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+						&tlmm 51 0 &tlmm 161 0 &tlmm 162 0x2008>;
+	};
+};
