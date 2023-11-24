@@ -604,12 +604,11 @@
 		};
 
 		/* HS UART Instance */
-		qupv3_se12_4uart: qcom,qup_uart@a90000 {
+		qupv3_se12_2uart: qcom,qup_uart@a90000 {
 			compatible = "qcom,msm-geni-serial-hs";
 			reg = <0xa90000 0x4000>;
 			reg-names = "se_phys";
-			interrupts-extended = <&intc GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>,
-					<&tlmm 48 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "se-clk";
 			clocks = <&gcc GCC_QUPV3_WRAP1_S4_CLK>;
 			interconnect-names = "qup-core", "qup-config", "qup-memory";
@@ -617,16 +616,9 @@
 			<&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
 			<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_1>,
 			<&aggre2_noc MASTER_QUP_1 &mc_virt SLAVE_EBI1>;
-			pinctrl-names = "default", "active", "sleep", "shutdown";
-			pinctrl-0 = <&qupv3_se12_default_cts>, <&qupv3_se12_default_rts>,
-			<&qupv3_se12_default_tx>, <&qupv3_se12_default_rx>;
-			pinctrl-1 = <&qupv3_se12_cts>, <&qupv3_se12_rts>,
-			<&qupv3_se12_tx>, <&qupv3_se12_rx>;
-			pinctrl-2 = <&qupv3_se12_cts>, <&qupv3_se12_rts>,
-			<&qupv3_se12_tx>, <&qupv3_se12_default_rx>;
-			pinctrl-3 = <&qupv3_se12_default_cts>, <&qupv3_se12_default_rts>,
-			<&qupv3_se12_default_tx>, <&qupv3_se12_default_rx>;
-			qcom,wakeup-byte = <0xFD>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se12_2uart_tx_active>, <&qupv3_se12_2uart_rx_active>;
+			pinctrl-1 = <&qupv3_se12_2uart_sleep>;
 			status = "disabled";
 		};
 
@@ -729,7 +721,7 @@
 			reg = <0xa98000 0x4000>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			interrupts = <GIC_SPI 836 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 835 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "se-clk";
 			clocks = <&gcc GCC_QUPV3_WRAP1_S6_CLK>;
 			interconnect-names = "qup-core", "qup-config", "qup-memory";
@@ -811,7 +803,7 @@
 			reg = <0xb80000 0x4000>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			interrupts = <GIC_SPI 831 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 830 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "se-clk";
 			clocks = <&gcc GCC_QUPV3_WRAP3_S0_CLK>;
 			interconnect-names = "qup-core", "qup-config", "qup-memory";
@@ -834,7 +826,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg-names = "se_phys";
-			interrupts = <GIC_SPI 831 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 830 IRQ_TYPE_LEVEL_HIGH>;
 			clock-names = "se-clk";
 			clocks = <&gcc GCC_QUPV3_WRAP3_S0_CLK>;
 			interconnect-names = "qup-core", "qup-config", "qup-memory";

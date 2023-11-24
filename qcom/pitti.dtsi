@@ -4,6 +4,7 @@
 #include <dt-bindings/clock/qcom,gcc-pitti.h>
 #include <dt-bindings/clock/qcom,gpucc-pitti.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
+#include <dt-bindings/gpio/gpio.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Pitti";
@@ -16,7 +17,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 slub_debug=-";
+		bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 slub_debug=-";
 	};
 
 	reserved_memory: reserved-memory {};
@@ -26,6 +27,7 @@
 	aliases {
 		serial0 = &qupv3_se8_2uart;
 		mmc1 = &sdhc_2; /* SDC2 SD card slot */
+		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
 	};
 
 	cpus {
@@ -417,6 +419,11 @@
 		};
 	};
 
+	cpu_pmu: cpu-pmu {
+		compatible = "arm,armv8-pmuv3";
+		interrupts = <GIC_PPI 5 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
 	tlmm: pinctrl@400000 {
 		compatible = "qcom,pitti-pinctrl";
 		reg = <0x400000 0x1000000>;
@@ -426,7 +433,20 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		wakeup-parent = <&mpm>;
-		/* TODO: Add qcom,gpios-reserved */
+		qcom,gpios-reserved = <36 37 38 39>;
+	};
+
+	qcom,chd {
+		compatible = "qcom,core-hang-detect";
+		label = "core";
+		qcom,chd-percpu-info = <&CPU0 0x0F800058 0x0F800060>,
+					<&CPU1 0x0F810058 0x0F810060>,
+					<&CPU2 0x0F820058 0x0F820060>,
+					<&CPU3 0x0F830058 0x0F830060>,
+					<&CPU4 0x0F840058 0x0F840060>,
+					<&CPU5 0x0F850058 0x0F850060>,
+					<&CPU6 0x0F860058 0x0F860060>,
+					<&CPU7 0x0F870058 0x0F870060>;
 	};
 
 	ipcc_mproc: qcom,ipcc@208000 {
@@ -438,7 +458,61 @@
 		#mbox-cells = <2>;
 	};
 
+	qcom,msm-imem@c125000 {
+		compatible = "qcom,msm-imem";
+		reg = <0xc125000 0x1000>;
+		ranges = <0x0 0xc125000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		mem_dump_table@10 {
+			compatible = "qcom,msm-imem-mem_dump_table";
+			reg = <0x10 0x8>;
+		};
+
+		dload_type@1c {
+			compatible = "qcom,msm-imem-dload-type";
+			reg = <0x1c 0x4>;
+		};
+
+		diag_dload@c8 {
+			compatible = "qcom,msm-imem-diag-dload";
+			reg = <0xc8 0xc8>;
+		};
+
+		restart_reason@65c {
+			compatible = "qcom,msm-imem-restart_reason";
+			reg = <0x65c 0x4>;
+		};
+
+		boot_stats@6b0 {
+			compatible = "qcom,msm-imem-boot_stats";
+			reg = <0x6b0 0x20>;
+		};
+
+		kaslr_offset@6d0 {
+			compatible = "qcom,msm-imem-kaslr_offset";
+			reg = <0x6d0 0xc>;
+		};
+
+		pil@6dc {
+			compatible = "qcom,msm-imem-pil-disable-timeout";
+			reg = <0x6dc 0x4>;
+		};
+
+		pil@94c {
+			compatible = "qcom,pil-reloc-info";
+			reg = <0x94c 0xc8>;
+		};
+	};
+
 	apps_smmu: smmu {};
+
+	qcom,mpm2-sleep-counter@0x4403000 {
+		compatible = "qcom,mpm2-sleep-counter";
+		reg = <0x4403000 0x1000>;
+		clock-frequency = <32768>;
+	};
 
 	clocks {
 		xo_board: xo_board {
@@ -697,6 +771,7 @@
 		reg = <0x0 0x280000>;
 		reg-names = "rmtfs";
 		qcom,client-id = <0x00000001>;
+		qcom,vm-nav-path;
 	};
 
 	qcom,secure-buffer {
@@ -714,8 +789,109 @@
 		compatible = "qcom,mem-buf-msgq";
 	};
 
+
+	adsp_pas: remoteproc-adsp@a400000 {
+		compatible = "qcom,pitti-adsp-pas";
+		reg = <0xa400000 0x100>;
+		status = "disabled";
+	};
+
+	modem_pas: remoteproc-mss@6080000 {
+		compatible = "qcom,pitti-modem-pas";
+		reg = <0x6000000 0x100>;
+		status = "disabled";
+	};
+
+	ufsphy_mem: ufsphy_mem@0x4807000 {
+		reg = <0x4807000 0xE10>;
+		reg-names = "phy_mem";
+		#phy-cells = <0>;
+
+		lanes-per-direction = <2>;
+		clock-names = "ref_clk_src",
+			"ref_aux_clk", "qref_clk",
+			"rx_sym0_mux_clk", "rx_sym1_mux_clk", "tx_sym0_mux_clk",
+			"rx_sym0_phy_clk", "rx_sym1_phy_clk", "tx_sym0_phy_clk";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			<&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
+			<&gcc GCC_UFS_CLKREF_EN>,
+			<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK_SRC>,
+			<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK_SRC>,
+			<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK_SRC>,
+			<&ufs_phy_rx_symbol_0_clk>,
+			<&ufs_phy_rx_symbol_1_clk>,
+			<&ufs_phy_tx_symbol_0_clk>;
+
+		resets = <&ufshc_mem 0>;
+		status = "disabled";
+	};
+
+	ufshc_mem: ufshc@0x4804000 {
+		compatible = "qcom,ufshc";
+		reg = <0x4804000 0x3000>;
+		reg-names = "ufs_mem";
+		interrupts = <GIC_SPI 356 IRQ_TYPE_LEVEL_HIGH>;
+		phys = <&ufsphy_mem>;
+		phy-names = "ufsphy";
+		#reset-cells = <1>;
+
+		lanes-per-direction = <2>;
+		clock-names =
+			"core_clk",
+			"bus_aggr_clk",
+			"iface_clk",
+			"core_clk_unipro",
+			"core_clk_ice",
+			"ref_clk",
+			"tx_lane0_sync_clk",
+			"rx_lane0_sync_clk",
+			"rx_lane1_sync_clk";
+		clocks =
+			<&gcc GCC_UFS_PHY_AXI_CLK>,
+			<&gcc GCC_SYS_NOC_UFS_PHY_AXI_CLK>,
+			<&gcc GCC_UFS_PHY_AHB_CLK>,
+			<&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
+			<&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
+			<&rpmcc RPM_SMD_XO_CLK_SRC>,
+			<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
+			<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
+			<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
+		freq-table-hz =
+			<75000000 300000000>,
+			<0 0>,
+			<0 0>,
+			<75000000 300000000>,
+			<100000000 403200000>,
+			<0 0>,
+			<0 0>,
+			<0 0>,
+			<0 0>;
+
+		iommus = <&apps_smmu 0x0180 0x0>;
+		qcom,iommu-dma = "fastmap";
+
+		reset-gpios = <&tlmm 122 GPIO_ACTIVE_LOW>;
+		resets = <&gcc GCC_UFS_PHY_BCR>;
+		reset-names = "rst";
+
+		status = "disabled";
+	};
+
+	qfprom: qfprom@1b40000 {
+		compatible = "qcom,pitti-qfprom", "qcom,qfprom";
+		reg = <0x1b40000 0x7000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		read-only;
+		ranges;
+	};
+
+	qfprom_sys: qfprom@0 {
+		compatible = "qcom,qfprom-sys";
+	};
 };
 
+#include "ipcc-test.dtsi"
 #include "pitti-pinctrl.dtsi"
 #include "pitti-qupv3.dtsi"
 
@@ -736,6 +912,12 @@
 		alignment = <0x0 0x400000>;
 		size = <0x0 0x2000000>;
 		linux,cma-default;
+	};
+};
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm";
 	};
 };
 
