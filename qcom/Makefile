@@ -46,10 +46,12 @@ NOAPQ_CLIFFS_BOARDS += \
 		 cliffs-mtp-overlay.dtbo \
 		 cliffs-qrd-overlay.dtbo \
 		 cliffs-rcm-overlay.dtbo \
-		 cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo \
+		 cliffs-mtp-kiwi-2s-nfc-wcd9395-overlay.dtbo \
 		 cliffs-mtp-pm8550b-overlay.dtbo \
-		 cliffs-mtp-hmt-2s-nfc-wcd9395-pm8550b-overlay.dtbo \
-		 cliffs-rcm-qhdp-overlay.dtbo
+		 cliffs-mtp-kiwi-2s-nfc-wcd9395-pm8550b-overlay.dtbo \
+		 cliffs-rcm-qhdp-overlay.dtbo \
+		 cliffs-rcm-fhdp-kiwi-overlay.dtbo \
+		 cliffs-rcm-qhdp-kiwi-overlay.dtbo
 
 pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(NOAPQ_CLIFFS_BOARDS),$(CLIFFS_BASE_DTB))
