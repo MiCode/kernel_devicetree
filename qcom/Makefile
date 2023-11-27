@@ -218,12 +218,20 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
 		cliffs-vm-mtp.dtb \
 		cliffs-vm-qrd.dtb \
 		cliffs-vm-rcm.dtb \
+		cliffs-vm-rcm-fhdp-kiwi.dtb \
+		cliffs-vm-rcm-qhdp.dtb \
+		cliffs-vm-rcm-qhdp-kiwi.dtb \
+		cliffs-vm-mtp-kiwi-2s-nfc-wcd9395.dtb \
 		cliffs-oemvm-atp.dtb \
 		cliffs-oemvm-cdp.dtb \
 		cliffs-oemvm-mtp.dtb \
 		cliffs-oemvm-qrd.dtb \
 		cliffs-oemvm-rcm.dtb \
-		cliffs-oemvm-rumi.dtb
+		cliffs-oemvm-rumi.dtb \
+		cliffs-oemvm-rcm-fhdp-kiwi.dtb \
+		cliffs-oemvm-rcm-qhdp.dtb \
+		cliffs-oemvm-rcm-qhdp-kiwi.dtb \
+		cliffs-oemvm-mtp-kiwi-2s-nfc-wcd9395.dtb
 
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif
