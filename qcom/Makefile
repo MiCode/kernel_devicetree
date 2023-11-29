@@ -16,7 +16,6 @@ add-overlays = $(foreach o,$1,$(foreach b,$2,$(eval $(basename $b)-$(basename $o
 ifneq ($(CONFIG_ARCH_QTI_VM), y)
 
 SUN_BASE_DTB += sun.dtb sun-v2.dtb
-SUN_APQ_BASE_DTB += sunp.dtb sunp-v2.dtb
 
 SUN_BOARDS += \
 		sun-mtp-kiwi-overlay.dtbo \

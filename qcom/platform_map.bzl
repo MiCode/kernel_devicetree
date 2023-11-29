@@ -3,14 +3,6 @@ _platform_map = {
         "dtb_list": [
             # keep sorted
             {"name": "sun.dtb"},
-            {
-                "name": "sunp.dtb",
-                "apq": True,
-            },
-            {
-                "name": "sunp-v2.dtb",
-                "apq": True,
-            },
             {"name": "sun-v2.dtb"},
         ],
         "dtbo_list": [
