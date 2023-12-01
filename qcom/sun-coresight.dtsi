@@ -3525,6 +3525,20 @@
 		};
 	};
 
+	gladiator {
+		compatible = "arm,coresight-dummy-source";
+		coresight-name = "coresight-gladiator";
+
+		out-ports {
+			port {
+				gladiator_out_tn_ddr: endpoint {
+					remote-endpoint =
+					<&tn_ddr_in_gladiator>;
+				};
+			};
+		};
+	};
+
 	ddr_tn: TN@10d00000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000f0c00>;
@@ -3539,6 +3553,14 @@
 		in-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
+
+			port@6 {
+				reg = <6>;
+				tn_ddr_in_gladiator: endpoint {
+					remote-endpoint =
+					<&gladiator_out_tn_ddr>;
+				};
+			};
 
 			port@8 {
 				reg = <8>;
