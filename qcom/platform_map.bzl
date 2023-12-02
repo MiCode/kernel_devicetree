@@ -7,6 +7,7 @@ _platform_map = {
         ],
         "dtbo_list": [
             # keep sorted
+            {"name": "sun-atp-overlay.dtbo"},
             {"name": "sun-cdp-kiwi-overlay.dtbo"},
             {"name": "sun-cdp-kiwi-v8-overlay.dtbo"},
             {"name": "sun-cdp-nfc-overlay.dtbo"},
