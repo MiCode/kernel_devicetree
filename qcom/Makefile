@@ -30,7 +30,8 @@ SUN_BOARDS += \
 		sun-cdp-v8-overlay.dtbo \
 		sun-qrd-sku1-overlay.dtbo \
 		sun-qrd-sku1-v8-overlay.dtbo \
-		sun-qrd-sku2-v8-overlay.dtbo
+		sun-qrd-sku2-v8-overlay.dtbo \
+		sun-rcm-overlay.dtbo
 
 NOAPQ_SUN_BOARDS += \
 		 sun-rumi-overlay.dtbo
