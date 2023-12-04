@@ -539,7 +539,7 @@
 		reg = <0x10980000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-turing_dsb";
+		coresight-name = "coresight-tpdm-turing";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -555,7 +555,7 @@
 	};
 
 	tpdm_turing_llm: tpdm@10981000 {
-		compatible = "arm,coresight-dummy-source";
+		compatible = "qcom,coresight-static-tpdm";
 		coresight-name = "coresight-tpdm-turing-llm";
 
 		out-ports {
@@ -569,7 +569,7 @@
 	};
 
 	tpdm_turing_llm2: tpdm@10982000 {
-		compatible = "arm,coresight-dummy-source";
+		compatible = "qcom,coresight-static-tpdm";
 		coresight-name = "coresight-tpdm-turing-llm2";
 
 		out-ports {
@@ -1143,7 +1143,7 @@
 		reg = <0x10cc0000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-tmess-rvss";
+		coresight-name = "coresight-tpdm-tmess-0";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -1167,7 +1167,7 @@
 		reg = <0x10cc1000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-tmess-dl";
+		coresight-name = "coresight-tpdm-tmess-1";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -1817,7 +1817,7 @@
 		reg = <0x12183000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-ext-cmb1";
+		coresight-name = "coresight-tpdm-ext_cmb1";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -1838,7 +1838,7 @@
 		reg = <0x12185000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-ext-cmb2";
+		coresight-name = "coresight-tpdm-ext_cmb2";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -1859,7 +1859,7 @@
 		reg = <0x12187000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-ext-cmb3";
+		coresight-name = "coresight-tpdm-ext_cmb3";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -2795,7 +2795,7 @@
 		};
 	};
 
-	replicator_uc0: replicator@134a0000 {
+	replicator_uc0: replicator@1340a000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb909>;
 		reg = <0x1340a000 0x1000>;
@@ -3216,7 +3216,6 @@
 		qcom,replicator-loses-context;
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
-		status = "disabled";
 
 		in-ports {
 			port {
@@ -3412,9 +3411,9 @@
 
 		out-ports {
 			port {
-				tpdm_ddr_shrm_out_tn_ddr: endpoint {
+				tpdm_ddr_llcc0_out_tn_ddr: endpoint {
 					remote-endpoint =
-					<&tn_ddr_in_tpdm_ddr_shrm>;
+					<&tn_ddr_in_tpdm_ddr_llcc0>;
 				};
 			};
 		};
@@ -3433,9 +3432,9 @@
 
 		out-ports {
 			port {
-				tpdm_ddr_dpm_out_tn_ddr: endpoint {
+				tpdm_ddr_llcc1_out_tn_ddr: endpoint {
 					remote-endpoint =
-					<&tn_ddr_in_tpdm_ddr_dpm>;
+					<&tn_ddr_in_tpdm_ddr_llcc1>;
 				};
 			};
 		};
@@ -3478,6 +3477,48 @@
 				tpdm_ddr_llcc3_out_tn_ddr: endpoint {
 					remote-endpoint =
 					<&tn_ddr_in_tpdm_ddr_llcc3>;
+				};
+			};
+		};
+	};
+
+	tpdm_ddr_dpm: tpdm@10d04000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x10d04000 0x1000>;
+		reg-names = "tpdm-base";
+
+		coresight-name = "coresight-tpdm-ddr-dpm";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_ddr_dpm_out_tn_ddr: endpoint {
+					remote-endpoint =
+					<&tn_ddr_in_tpdm_ddr_dpm>;
+				};
+			};
+		};
+	};
+
+	tpdm_ddr_shrm: tpdm@10d03000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb968>;
+		reg = <0x10d03000 0x1000>;
+		reg-names = "tpdm-base";
+
+		coresight-name = "coresight-tpdm-ddr-shrm";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				tpdm_ddr_shrm_out_tn_ddr: endpoint {
+					remote-endpoint =
+					<&tn_ddr_in_tpdm_ddr_shrm>;
 				};
 			};
 		};
@@ -3572,17 +3613,17 @@
 
 			port@9 {
 				reg = <9>;
-				tn_ddr_in_tpdm_ddr_shrm: endpoint {
+				tn_ddr_in_tpdm_ddr_llcc0: endpoint {
 					remote-endpoint =
-					<&tpdm_ddr_shrm_out_tn_ddr>;
+					<&tpdm_ddr_llcc0_out_tn_ddr>;
 				};
 			};
 
 			port@a {
 				reg = <10>;
-				tn_ddr_in_tpdm_ddr_dpm: endpoint {
+				tn_ddr_in_tpdm_ddr_llcc1: endpoint {
 					remote-endpoint =
-					<&tpdm_ddr_dpm_out_tn_ddr>;
+					<&tpdm_ddr_llcc1_out_tn_ddr>;
 				};
 			};
 
@@ -3599,6 +3640,22 @@
 				tn_ddr_in_tpdm_ddr_llcc3: endpoint {
 					remote-endpoint =
 					<&tpdm_ddr_llcc3_out_tn_ddr>;
+				};
+			};
+
+			port@d {
+				reg = <13>;
+				tn_ddr_in_tpdm_ddr_dpm: endpoint {
+					remote-endpoint =
+					<&tpdm_ddr_dpm_out_tn_ddr>;
+				};
+			};
+
+			port@e {
+				reg = <14>;
+				tn_ddr_in_tpdm_ddr_shrm: endpoint {
+					remote-endpoint =
+					<&tpdm_ddr_shrm_out_tn_ddr>;
 				};
 			};
 
@@ -4057,7 +4114,7 @@
 		reg = <0x1082c000 0x1000>;
 		reg-names = "tpdm-base";
 
-		coresight-name = "coresight-tpdm-qdss";
+		coresight-name = "coresight-tpdm-gcc";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
