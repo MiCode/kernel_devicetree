@@ -1,0 +1,29 @@
+Qualcomm Technologies, Inc. Bindings for the Maxim MAX31760 Intelligent Fan Controller
+==========================================================
+
+The Maxim MAX31760 is a i2c device providing closed-loop, multi-channel fan
+management with temperature. Various fan control features are provided,
+including PWM frequency control, temperature hysteresis, dual tachometer
+measurements, and fan health monitoring.
+
+Required properties:
+- compatible         : should be "maxim,max31760".
+- reg                : I2C address, 0xa0.
+
+Optional properties:
+- maxim,fan-num   : number of fan
+- maxim,vdd-supply   : regulator supplying the vdd pin
+- maxim,vcca-supply  : regulator supplying the vcca pin
+- maxim,pwr-en-gpio  : fan enable gpio
+
+Example:
+	max31760@50 {
+		compatible = "maxim,max31760";
+		reg = <0x50>;
+		#cooling-cells = <2>;
+		maxim,fan-num = <1>;
+		maxim,vdd-supply = <&some_reg>;
+		maxim,vcca-supply = <&some_reg>;
+		regulator-names = "maxim,vdd", "maxim,vcca";
+		maxim,pwr-en-gpio = <&some_gpio>;
+	};
