@@ -151,14 +151,16 @@ holi-overlays-dtb-$(CONFIG_ARCH_HOLI) += $(HOLI_BOARDS) $(HOLI_BASE_DTB)
 dtb-y += $(holi-dtb-y)
 
 # pitti-dtb
-PITTI_BASE_DTB += pitti.dtb
+PITTI_BASE_DTB += pitti.dtb pitti-3gb.dtb
 
 PITTI_BOARDS += \
 		 pitti-atp-overlay.dtbo \
 		 pitti-idp-overlay.dtbo \
 		 pitti-qrd-overlay.dtbo \
 		 pitti-idp-apache-overlay.dtbo \
-		 pitti-idp-amoled-overlay.dtbo
+		 pitti-idp-amoled-overlay.dtbo \
+		 pitti-idp-3gb-overlay.dtbo \
+		 pitti-qrd-3gb-overlay.dtbo
 
 NOAPQ_PITTI_BOARDS += \
 		 pitti-rumi-overlay.dtbo

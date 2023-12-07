@@ -327,6 +327,7 @@ _platform_map = {
     "pitti": {
         "dtb_list": [
             {"name": "pitti.dtb"},
+            {"name": "pitti-3gb.dtb"},
         ],
         "dtbo_list": [
             {"name": "pitti-atp-overlay.dtbo"},
@@ -334,6 +335,8 @@ _platform_map = {
             {"name": "pitti-qrd-overlay.dtbo"},
             {"name": "pitti-idp-apache-overlay.dtbo"},
             {"name": "pitti-idp-amoled-overlay.dtbo"},
+            {"name": "pitti-idp-3gb-overlay.dtbo"},
+            {"name": "pitti-qrd-3gb-overlay.dtbo"},
             {
                 "name": "pitti-rumi-overlay.dtbo",
                 "apq": False,
