@@ -156,7 +156,9 @@ PITTI_BASE_DTB += pitti.dtb
 PITTI_BOARDS += \
 		 pitti-atp-overlay.dtbo \
 		 pitti-idp-overlay.dtbo \
-		 pitti-qrd-overlay.dtbo
+		 pitti-qrd-overlay.dtbo \
+		 pitti-idp-apache-overlay.dtbo \
+		 pitti-idp-amoled-overlay.dtbo
 
 NOAPQ_PITTI_BOARDS += \
 		 pitti-rumi-overlay.dtbo
