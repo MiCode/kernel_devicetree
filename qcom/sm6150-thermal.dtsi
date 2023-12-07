@@ -1,5 +1,9 @@
 #include <dt-bindings/thermal/thermal_qti.h>
 
+&msm_gpu {
+	#cooling-cells = <2>;
+};
+
 &soc {
 	tsens0: tsens@c222000 {
 		compatible = "qcom,sm6150-tsens";
@@ -284,8 +288,18 @@
 				type = "passive";
 			};
 		};
-
 		cooling-maps {
+			gpu_cdev {
+				trip = <&gpu_trip>;
+				cooling-device = <&msm_gpu THERMAL_NO_LIMIT
+					THERMAL_NO_LIMIT>;
+			};
+
+			gpu-cx-cdev0 {
+				trip = <&gpu_cx_mon>;
+				cooling-device = <&msm_gpu 4 4>;
+			};
+
 			gpu-cx-cdev1 {
 				trip = <&gpu_cx_mon>;
 				cooling-device = <&modem_proc 3 3>;
@@ -294,6 +308,11 @@
 			gpu-cx-cdev2 {
 				trip = <&gpu_cx_mon>;
 				cooling-device = <&modem_pa 3 3>;
+			};
+
+			gpu-cx-cdev3 {
+				trip = <&gpu_cx_mon>;
+				cooling-device = <&msm_cdsp_rm 4 4>;
 			};
 		};
 	};
@@ -603,6 +622,16 @@
 		};
 
 		cooling-maps {
+			cdsp-cdev {
+				trip = <&q6_hvx_therm>;
+				cooling-device = <&msm_cdsp_rm THERMAL_NO_LIMIT 5>;
+			};
+
+			hvx-cx-cdev0 {
+				trip = <&q6_hvx_cx_mon>;
+				cooling-device = <&msm_gpu 4 4>;
+			};
+
 			hvx-cx-cdev1 {
 				trip = <&q6_hvx_cx_mon>;
 				cooling-device = <&modem_proc 3 3>;
@@ -611,6 +640,11 @@
 			hvx-cx-cdev2 {
 				trip = <&q6_hvx_cx_mon>;
 				cooling-device = <&modem_pa 3 3>;
+			};
+
+			hvx-cx-cdev3 {
+				trip = <&q6_hvx_cx_mon>;
+				cooling-device = <&msm_cdsp_rm 4 4>;
 			};
 		};
 	};
