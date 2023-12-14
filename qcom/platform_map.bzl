@@ -160,7 +160,7 @@ _platform_map = {
                 "apq": False,
             },
         ],
-        "binary_compatible_with": ["cliffs"],
+        "binary_compatible_with": ["cliffs", "volcano"],
     },
     "niobe": {
         "dtb_list": [
@@ -187,10 +187,12 @@ _platform_map = {
             {"name": "cliffs-mtp-overlay.dtbo"},
             {"name": "cliffs-qrd-overlay.dtbo"},
             {"name": "cliffs-rcm-overlay.dtbo"},
-            {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-overlay.dtbo"},
+            {"name": "cliffs-mtp-kiwi-2s-nfc-wcd9395-overlay.dtbo"},
             {"name": "cliffs-mtp-pm8550b-overlay.dtbo"},
-            {"name": "cliffs-mtp-hmt-2s-nfc-wcd9395-pm8550b-overlay.dtbo"},
+            {"name": "cliffs-mtp-kiwi-2s-nfc-wcd9395-pm8550b-overlay.dtbo"},
             {"name": "cliffs-rcm-qhdp-overlay.dtbo"},
+            {"name": "cliffs-rcm-fhdp-kiwi-overlay.dtbo"},
+            {"name": "cliffs-rcm-qhdp-kiwi-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {
@@ -235,12 +237,20 @@ _platform_map = {
             {"name": "cliffs-vm-mtp.dtb"},
             {"name": "cliffs-vm-qrd.dtb"},
             {"name": "cliffs-vm-rcm.dtb"},
+            {"name": "cliffs-vm-rcm-fhdp-kiwi.dtb"},
+            {"name": "cliffs-vm-rcm-qhdp.dtb"},
+            {"name": "cliffs-vm-rcm-qhdp-kiwi.dtb"},
+            {"name": "cliffs-vm-mtp-kiwi-2s-nfc-wcd9395.dtb"},
             {"name": "cliffs-oemvm-rumi.dtb"},
             {"name": "cliffs-oemvm-atp.dtb"},
             {"name": "cliffs-oemvm-cdp.dtb"},
             {"name": "cliffs-oemvm-mtp.dtb"},
             {"name": "cliffs-oemvm-qrd.dtb"},
             {"name": "cliffs-oemvm-rcm.dtb"},
+            {"name": "cliffs-oemvm-rcm-fhdp-kiwi.dtb"},
+            {"name": "cliffs-oemvm-rcm-qhdp.dtb"},
+            {"name": "cliffs-oemvm-rcm-qhdp-kiwi.dtb"},
+            {"name": "cliffs-oemvm-mtp-kiwi-2s-nfc-wcd9395.dtb"},
         ],
     },
     "cliffs-oemvm": {
@@ -304,6 +314,17 @@ _platform_map = {
         ],
         "dtbo_list": [
             {"name": "pitti-rumi-overlay.dtbo"},
+        ],
+    },
+    "volcano": {
+        "dtb_list": [
+            {"name": "volcano.dtb"},
+        ],
+        "dtbo_list": [
+            {
+                "name": "volcano-rumi-overlay.dtbo",
+                "apq": False,
+            },
         ],
     },
 }

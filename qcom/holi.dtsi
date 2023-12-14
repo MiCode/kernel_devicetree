@@ -54,6 +54,7 @@
 			capacity-dmips-mhz = <1024>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			#cooling-cells = <2>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x10000>;
@@ -82,6 +83,7 @@
 			capacity-dmips-mhz = <1024>;
 			next-level-cache = <&L2_1>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			#cooling-cells = <2>;
 			L2_1: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x10000>;
@@ -104,6 +106,7 @@
 			capacity-dmips-mhz = <1024>;
 			next-level-cache = <&L2_2>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			#cooling-cells = <2>;
 			L2_2: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x10000>;
@@ -126,6 +129,7 @@
 			capacity-dmips-mhz = <1024>;
 			next-level-cache = <&L2_3>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			#cooling-cells = <2>;
 			L2_3: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x10000>;
@@ -148,6 +152,7 @@
 			capacity-dmips-mhz = <1024>;
 			next-level-cache = <&L2_4>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			#cooling-cells = <2>;
 			L2_4: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x10000>;
@@ -170,6 +175,7 @@
 			capacity-dmips-mhz = <1024>;
 			next-level-cache = <&L2_5>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
+			#cooling-cells = <2>;
 			L2_5: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x10000>;
@@ -192,6 +198,7 @@
 			capacity-dmips-mhz = <1946>;
 			next-level-cache = <&L2_6>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
+			#cooling-cells = <2>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x40000>;
@@ -214,6 +221,7 @@
 			capacity-dmips-mhz = <1946>;
 			next-level-cache = <&L2_7>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
+			#cooling-cells = <2>;
 			L2_7: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-size = <0x40000>;
@@ -635,8 +643,6 @@
 		#interrupt-cells = <4>;
 		cell-index = <0>;
 	};
-
-	thermal_zones: thermal-zones {};
 
 	arch_timer: timer {
 		compatible = "arm,armv8-timer";
@@ -1282,13 +1288,13 @@
 			compatible = "qcom,dcvs-hw";
 			qcom,dcvs-hw-type = <2>;
 			qcom,bus-width = <32>;
-			reg = <0xFD91000 0x4000>, <0xFD90100 0xa0>;
+			reg = <0xFD90000 0x1000>, <0xFD90100 0xa0>;
 			reg-names = "l3-base", "l3tbl-base";
 
 			l3_dcvs_sp: sp {
 				compatible = "qcom,dcvs-path";
 				qcom,dcvs-path-type = <0>;
-				qcom,shared-offset = <0x0090>;
+				qcom,shared-offset = <0x0320>;
 			};
 		};
 	};
@@ -1661,9 +1667,6 @@
 		phy-names = "ufsphy";
 		#reset-cells = <1>;
 
-		qcom,prime-mask = <0xc0>;
-		qcom,silver-mask = <0x3f>;
-
 		limit-phy-submode = <0>;
 		lanes-per-direction = <1>;
 		nvmem-cells = <&boot_config>;
@@ -1737,8 +1740,8 @@
 
 		iommus = <&apps_smmu 0x60 0x0>;
 		qcom,iommu-dma = "fastmap";
-		qcom,iommu-dma-addr-pool = <0x40000000 0x20000000>;
-		qcom,iommu-geometry = <0x40000000 0x20000000>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
 
 		reset-gpios = <&tlmm 156 GPIO_ACTIVE_LOW>;
 		resets = <&gcc GCC_UFS_PHY_BCR>;
@@ -2013,6 +2016,7 @@
 		hyplog-size-offset = <0x414>;
 	};
 
+	thermal_zones: thermal-zones {};
 };
 
 
@@ -2042,6 +2046,7 @@
 #include "holi-usb.dtsi"
 #include "blair-coresight.dtsi"
 #include "blair-debug.dtsi"
+#include "holi-thermal.dtsi"
 
 &gcc_camss_top_gdsc {
 	status = "ok";
