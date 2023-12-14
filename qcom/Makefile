@@ -290,6 +290,11 @@ SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
 SA8155_LA_GVM_BOARDS += \
 		   sa8155-vm-la-overlay.dtbo
 
+SA6155P_LA_GVM_BASE_DTB += sa6155p-vm-la.dtb
+
+SA6155P_LA_GVM_BOARDS += \
+		sa6155p-vm-la-overlay.dtbo
+
 SA8195_LA_GVM_BASE_DTB += sa8195-vm-la.dtb
 
 SA8195_LA_GVM_BOARDS += \
@@ -307,6 +312,7 @@ MONACO_LV_GVM_BOARDS += \
 
 autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(SA8155_LA_GVM_BOARDS),$(SA8155_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(SA6155P_LA_GVM_BOARDS),$(SA6155P_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(SA8195_LA_GVM_BOARDS),$(SA8195_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LA_GVM_BOARDS),$(DIREWOLF_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(DIREWOLF_LV_GVM_BOARDS),$(DIREWOLF_LV_GVM_BASE_DTB)) \
@@ -319,6 +325,7 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) \
+	$(SA6155P_LA_GVM_BOARDS) $(SA6155P_LA_GVM_BASE_DTB) \
 	$(SA8195_LA_GVM_BOARDS) $(SA8195_LA_GVM_BASE_DTB) \
 	$(DIREWOLF_LA_GVM_BOARDS) $(DIREWOLF_LA_GVM_BASE_DTB) \
 	$(DIREWOLF_LV_GVM_BOARDS) $(DIREWOLF_LV_GVM_BASE_DTB) \
