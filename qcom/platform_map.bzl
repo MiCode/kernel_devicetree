@@ -30,9 +30,11 @@ _platform_map = {
             # keep sorted
             {"name": "sun-oemvm-cdp.dtb"},
             {"name": "sun-oemvm-mtp.dtb"},
+            {"name": "sun-oemvm-qrd.dtb"},
             {"name": "sun-oemvm-rumi.dtb"},
             {"name": "sun-vm-cdp.dtb"},
             {"name": "sun-vm-mtp.dtb"},
+            {"name": "sun-vm-qrd.dtb"},
             {"name": "sun-vm-rumi.dtb"},
         ],
     },
@@ -41,9 +43,11 @@ _platform_map = {
             # keep sorted
             {"name": "sun-oemvm-cdp.dtb"},
             {"name": "sun-oemvm-mtp.dtb"},
+            {"name": "sun-oemvm-qrd.dtb"},
             {"name": "sun-oemvm-rumi.dtb"},
             {"name": "sun-vm-cdp.dtb"},
             {"name": "sun-vm-mtp.dtb"},
+            {"name": "sun-vm-qrd.dtb"},
             {"name": "sun-vm-rumi.dtb"},
         ],
     },
