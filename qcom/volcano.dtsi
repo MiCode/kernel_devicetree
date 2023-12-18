@@ -20,6 +20,7 @@
 
 	chosen: chosen {
 		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7";
+		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
 	reserved_memory: reserved-memory {};
@@ -260,7 +261,7 @@
 		interrupt-controller;
 	};
 
-arch_timer: timer {
+	arch_timer: timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
 			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
@@ -269,7 +270,7 @@ arch_timer: timer {
 		clock-frequency = <19200000>;
 	};
 
-memtimer: timer@17420000 {
+	memtimer: timer@17420000 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
@@ -333,7 +334,7 @@ memtimer: timer@17420000 {
 		reg = <0x0F000000 0x1000000>;
 		interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
 		gpio-controller;
-		gpio-cells = <2>;
+		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
