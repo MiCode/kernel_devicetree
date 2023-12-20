@@ -97,13 +97,18 @@ dtb-y += $(kalama-dtb-y)
 
 NIOBE_BASE_DTB += niobe.dtb
 
+NIOBE_BOARDS += \
+		niobe-atp-overlay.dtbo \
+		niobe-idp-overlay.dtbo \
+		niobe-qxr-overlay.dtbo
+
 NOAPQ_NIOBE_BOARDS += \
 		 niobe-rumi-overlay.dtbo
 
 niobe-dtb-$(CONFIG_ARCH_NIOBE) += \
-	$(call add-overlays, $(NOAPQ_NIOBE_BOARDS),$(NIOBE_BASE_DTB))\
-	$(call add-overlays, $(APQ_NIOBE_BOARDS),$(NIOBE_APQ_BASE_DTB))
-niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
+	$(call add-overlays, $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS),$(NIOBE_BASE_DTB))\
+	$(call add-overlays, $(NIOBE_BOARDS) $(APQ_NIOBE_BOARDS),$(NIOBE_APQ_BASE_DTB))
+niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
 dtb-y += $(niobe-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
