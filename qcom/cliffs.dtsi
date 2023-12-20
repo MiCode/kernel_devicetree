@@ -2363,26 +2363,36 @@
 		qcom,client-id = <0x00000001>;
 	};
 
+	pcie_crm_hw_0_bcm_voter: bcm_voter@0 {
+		compatible = "qcom,bcm-voter";
+		qcom,crm-name = "pcie_crm";
+		qcom,crm-client-idx = <0>;
+		qcom,crm-pwr-states = <5>;
+	};
+
 	clk_virt: interconnect@0 {
 		compatible = "qcom,cliffs-clk_virt";
 		#interconnect-cells = <1>;
-		qcom,bcm-voter-names = "hlos";
-		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,bcm-voter-names = "hlos", "pcie_crm_hw_0";
+		qcom,bcm-voters = <&apps_bcm_voter>,
+				  <&pcie_crm_hw_0_bcm_voter>;
 	};
 
 	mc_virt: interconnect@1 {
 		compatible = "qcom,cliffs-mc_virt";
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos",
-				       "disp",
-				       "cam_ife_0",
-				       "cam_ife_1",
-				       "cam_ife_2";
+					"disp",
+					"cam_ife_0",
+					"cam_ife_1",
+					"cam_ife_2",
+					"pcie_crm_hw_0";
 		qcom,bcm-voters = <&apps_bcm_voter>,
 				  <&disp_bcm_voter>,
 				  <&cam_bcm_voter0>,
 				  <&cam_bcm_voter1>,
-				  <&cam_bcm_voter2>;
+				  <&cam_bcm_voter2>,
+				  <&pcie_crm_hw_0_bcm_voter>;
 	};
 
 	aggre1_noc: interconnect@16E0000 {
@@ -2425,15 +2435,17 @@
 		reg = <0x24100000 0xC3080>;
 		#interconnect-cells = <1>;
 		qcom,bcm-voter-names = "hlos",
-				       "disp",
-				       "cam_ife_0",
-				       "cam_ife_1",
-				       "cam_ife_2";
+					"disp",
+					"cam_ife_0",
+					"cam_ife_1",
+					"cam_ife_2",
+					"pcie_crm_hw_0";
 		qcom,bcm-voters = <&apps_bcm_voter>,
 				  <&disp_bcm_voter>,
 				  <&cam_bcm_voter0>,
 				  <&cam_bcm_voter1>,
-				  <&cam_bcm_voter2>;
+				  <&cam_bcm_voter2>,
+				  <&pcie_crm_hw_0_bcm_voter>;
 	};
 
 	lpass_ag_noc: interconnect@7E40000 {
@@ -2488,8 +2500,9 @@
 		compatible = "qcom,cliffs-pcie_anoc";
 		reg = <0x016C0000 0x12400>;
 		#interconnect-cells = <1>;
-		qcom,bcm-voter-names = "hlos";
-		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,bcm-voter-names = "hlos", "pcie_crm_hw_0";
+		qcom,bcm-voters = <&apps_bcm_voter>,
+				  <&pcie_crm_hw_0_bcm_voter>;
 		clocks = <&gcc GCC_AGGRE_NOC_PCIE_AXI_CLK>,
 			 <&gcc GCC_CFG_NOC_PCIE_ANOC_AHB_CLK>;
 	};
