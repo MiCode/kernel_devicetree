@@ -40,8 +40,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x0>;
-			enable-method = "spin-table"; /* TODO: Update to psci */
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
+			power-domains = <&CPU_PD0>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
@@ -59,8 +61,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x100>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
+			power-domains = <&CPU_PD1>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_0>;
 		};
 
@@ -68,8 +72,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x200>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
+			power-domains = <&CPU_PD2>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_2>;
 			L2_2: l2-cache {
 				compatible = "arm,arch-cache";
@@ -82,8 +88,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x300>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
+			power-domains = <&CPU_PD3>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_2>;
 		};
 
@@ -91,8 +99,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x400>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD4>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_4>;
 			L2_4: l2-cache {
 				compatible = "arm,arch-cache";
@@ -105,8 +115,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x500>;
-			enable-method = "spin-table";
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD5>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_5>;
 			L2_5: l2-cache {
 				compatible = "arm,arch-cache";
@@ -119,8 +131,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x600>;
-			enable-method = "spin-table"; /* TODO: Update to psci */
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
+			power-domains = <&CPU_PD6>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_6>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
@@ -133,8 +147,10 @@
 			device_type = "cpu";
 			compatible = "qcom,kryo";
 			reg = <0x0 0x700>;
-			enable-method = "spin-table"; /* TODO: Update to psci */
-			cpu-release-addr = <0x0 0x90000000>;
+			enable-method = "psci";
+			cpu-idle-states = <&GOLD_PLUS_RAIL_OFF>;
+			power-domains = <&CPU_PD7>;
+			power-domain-names = "psci";
 			next-level-cache = <&L2_7>;
 			L2_7: l2-cache {
 				compatible = "arm,arch-cache";
@@ -184,6 +200,78 @@
 		};
 	};
 
+	idle-states {
+		entry-method = "psci";
+
+		SILVER_OFF: silver-c3 { /* C3 */
+			compatible = "arm,idle-state";
+			idle-state-name = "pc";
+			entry-latency-us = <250>;
+			exit-latency-us = <900>;
+			min-residency-us = <3200>;
+			arm,psci-suspend-param = <0x40000003>;
+			local-timer-stop;
+		};
+
+		SILVER_RAIL_OFF: silver-cluster0-c4 { /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <550>;
+			exit-latency-us = <750>;
+			min-residency-us = <6700>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+
+		GOLD_OFF: gold-c3 { /* C3 */
+			compatible = "arm,idle-state";
+			idle-state-name = "pc";
+			entry-latency-us = <400>;
+			exit-latency-us = <1100>;
+			min-residency-us = <4011>;
+			arm,psci-suspend-param = <0x40000003>;
+			local-timer-stop;
+		};
+
+		GOLD_RAIL_OFF: gold-cluster1-c4 { /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <550>;
+			exit-latency-us = <1050>;
+			min-residency-us = <7951>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+
+		GOLD_PLUS_RAIL_OFF: gold-cluster2-c4 { /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <4294967295>;
+			exit-latency-us = <4294967295>;
+			min-residency-us = <4294967295>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+
+		CLUSTER_PWR_DN: cluster-d4 { /* D4 */
+			compatible = "domain-idle-state";
+			idle-state-name = "l3-off";
+			entry-latency-us = <750>;
+			exit-latency-us = <2350>;
+			min-residency-us = <9144>;
+			arm,psci-suspend-param = <0x41000044>;
+		};
+
+		CX_RET: cx-ret { /* Cx Ret */
+			compatible = "domain-idle-state";
+			idle-state-name = "cx-ret";
+			entry-latency-us = <2800>;
+			exit-latency-us = <4400>;
+			min-residency-us = <10150>;
+			arm,psci-suspend-param = <0x41003344>;
+		};
+	};
+
 	soc: soc { };
 };
 
@@ -193,6 +281,56 @@
 
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+
+		CPU_PD0: cpu-pd0 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD1: cpu-pd1 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD2: cpu-pd2 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD3: cpu-pd3 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD4: cpu-pd4 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD5: cpu-pd5 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD6: cpu-pd6 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CPU_PD7: cpu-pd7 {
+			#power-domain-cells = <0>;
+			power-domains = <&CLUSTER_PD>;
+		};
+
+		CLUSTER_PD: cluster-pd {
+			#power-domain-cells = <0>;
+			domain-idle-states = <&CLUSTER_PWR_DN &CX_RET>;
+		};
+	};
 
 	apps_rsc: rsc@17a00000 {
 		label = "apps_rsc";
@@ -205,6 +343,7 @@
 		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&CLUSTER_PD>;
 
 		apps_rsc_drv2: drv@2 {
 			qcom,drv-id = <2>;
@@ -226,6 +365,7 @@
 		reg-names = "drv-0";
 		qcom,drv-count = <1>;
 		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&dispcc DISP_CC_MDSS_RSCC_AHB_CLK>;
 
 		disp_rsc_drv0: drv@0 {
 			qcom,drv-id = <0>;
@@ -260,6 +400,37 @@
 		#interrupt-cells = <2>;
 		interrupt-parent = <&intc>;
 		interrupt-controller;
+	};
+
+	cluster-device {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD>;
+	};
+
+	sram@c3f0000 {
+		compatible = "qcom,rpmh-stats-v4";
+		reg = <0x0c3f0000 0x400>;
+		ss-name = "modem", "adsp", "adsp_island",
+			  "cdsp", "apss", "wpss";
+	};
+
+	cpuss-sleep-stats@17800054 {
+		compatible = "qcom,cpuss-sleep-stats";
+		reg = <0x17800054 0x4>, <0x17810054 0x4>, <0x17820054 0x4>,
+		      <0x17830054 0x4>, <0x17840054 0x4>, <0x17850054 0x4>,
+		      <0x17860054 0x4>, <0x17870054 0x4>, <0x178b0098 0x4>,
+		      <0x178c0000 0x10000>;
+		reg-names = "seq_lpm_cntr_cfg_cpu0", "seq_lpm_cntr_cfg_cpu1",
+			    "seq_lpm_cntr_cfg_cpu2", "seq_lpm_cntr_cfg_cpu3",
+			    "seq_lpm_cntr_cfg_cpu4", "seq_lpm_cntr_cfg_cpu5",
+			    "seq_lpm_cntr_cfg_cpu6", "seq_lpm_cntr_cfg_cpu7",
+			    "l3_seq_lpm_cntr_cfg", "apss_seq_mem_base";
+		num-cpus = <8>;
+	};
+
+	sys-pm-vx@c320000 {
+		compatible = "qcom,sys-pm-violators", "qcom,sys-pm-volcano";
+		reg = <0xc320000 0x400>;
 	};
 
 	arch_timer: timer {
