@@ -26,7 +26,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 firmware_class.path=/vendor/firmware_mnt/image slub_debug=-";
+		bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-5 firmware_class.path=/vendor/firmware_mnt/image slub_debug=-";
 		stdout-path = "serial0:115200n8";
 	};
 
@@ -353,6 +353,14 @@
 		reg = <0xf200000 0x10000>,     /* GICD */
 		      <0xf240000 0x100000>;    /* GICR * 8 */
 		interrupts = <GIC_PPI 8 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	gic-interrupt-router {
+		compatible = "qcom,gic-intr-routing";
+		/* keep silver core only to avoid wakeup of gold cores */
+		qcom,gic-class0-cpus = <0 1 2 3 4 5>;
+		/* keep gold cores in class1 */
+		qcom,gic-class1-cpus = <6 7>;
 	};
 
 	arch_timer: timer {
