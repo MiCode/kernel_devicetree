@@ -168,6 +168,9 @@ PITTI_BOARDS += \
 		 pitti-qrd-3gb-overlay.dtbo \
 		 pitti-atp-4gb-overlay.dtbo \
 		 pitti-idp-4gb-overlay.dtbo \
+		 pitti-idp-pmiv0104-3gb-overlay.dtbo \
+		 pitti-idp-pmiv0104-4gb-overlay.dtbo \
+		 pitti-idp-pmiv0104-apache-overlay.dtbo \
 		 pitti-qrd-4gb-overlay.dtbo
 
 NOAPQ_PITTI_BOARDS += \
