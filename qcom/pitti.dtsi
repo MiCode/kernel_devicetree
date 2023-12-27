@@ -27,7 +27,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-5 firmware_class.path=/vendor/firmware_mnt/image slub_debug=-";
+		bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-5 firmware_class.path=/vendor/firmware_mnt/image slub_debug=- cpufreq.default_governor=performance";
 		stdout-path = "serial0:115200n8";
 	};
 
@@ -49,6 +49,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -71,6 +72,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU2: cpu@200 {
@@ -83,6 +85,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU3: cpu@300 {
@@ -95,6 +98,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU4: cpu@400 {
@@ -107,6 +111,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU5: cpu@500 {
@@ -119,6 +124,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU6: cpu@600 {
@@ -131,6 +137,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_6>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -148,6 +155,7 @@
 			power-domain-names = "psci";
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_6>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 		};
 
 		cpu-map {
@@ -800,9 +808,7 @@
 	};
 
 	rpmcc: clock-controller {
-		compatible = "fixed-clock";
-		clock-output-names = "rpmcc_clocks";
-		clock-frequency = <19200000>;
+		compatible = "qcom,rpmcc-pitti";
 		#clock-cells = <1>;
 	};
 
@@ -858,6 +864,51 @@
 			      "gpll0_out_main_div";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@faa0000 {
+		compatible = "syscon";
+		reg = <0xfaa0000 0x1c>;
+	};
+
+	mccc: syscon@447d200 {
+		compatible = "syscon";
+		reg = <0x447d200 0x24>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,pitti-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,dispcc = <&dispcc>;
+		qcom,gcc = <&gcc>;
+		qcom,gpucc = <&gpucc>;
+		qcom,mccc = <&mccc>;
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&dispcc 0>,
+			 <&gcc 0>,
+			 <&gpucc 0>;
+		clock-names = "xo_clk_src",
+			      "dispcc",
+			      "gcc",
+			      "gpucc";
+		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x0fd91000 0x1000>, <0x0fd92000 0x1000>;
+		reg-names = "freq-domain0", "freq-domain1";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>, <&gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int", "dcvsh1_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>, <&cpufreq_hw 1>;
 	};
 
 	/* DISP_CC GDSCs */
