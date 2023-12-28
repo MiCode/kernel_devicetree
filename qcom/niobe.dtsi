@@ -873,8 +873,17 @@
 	};
 
 	gpucc: clock-controller@3d90000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gpucc_clocks";
+		compatible = "qcom,niobe-gpucc", "syscon";
+		reg = <0x3d90000 0xa000>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MXA_LEVEL>;
+		vdd_gfx-supply = <&VDD_GFX_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&rpmhcc RPMH_CXO_CLK_A>,
+			<&gcc GCC_GPU_GPLL0_CLK_SRC>, <&gcc GCC_GPU_GPLL0_DIV_CLK_SRC>;
+		clock-names = "bi_tcxo", "bi_tcxo_ao",
+			"gpll0_out_main", "gpll0_out_main_div";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -1735,8 +1744,20 @@
 };
 
 &gpu_cc_cx_gdsc {
-	compatible = "regulator-fixed";
 	reg = <0x3d99080 0x4>;
+	proxy-supply = <&gpu_cc_cx_gdsc>;
+	qcom,proxy-consumer-enable;
+	clocks = <&gcc GCC_GPU_CFG_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_CX_LEVEL>;
+	status = "ok";
+};
+
+&gx_clkctl_gx_gdsc {
+	clocks = <&gpucc GPU_CC_GX_AHB_FF_CLK>;
+	clock-names = "ahb_clk";
+	reg-supply = <&gpu_cc_cx_gdsc>;
+	parent-supply = <&VDD_GFX_GFX_MXC_VOTER_LEVEL>;
 	status = "ok";
 };
 
