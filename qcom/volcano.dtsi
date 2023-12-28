@@ -8,6 +8,8 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/soc/qcom,rpmh-rsc.h>
 #include <dt-bindings/soc/qcom,ipcc.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,volcano.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Volcano";
@@ -354,6 +356,10 @@
 						  <WAKE_TCS      2>,
 						  <CONTROL_TCS   0>,
 						  <FAST_PATH_TCS 1>;
+			};
+
+			apps_bcm_voter: bcm_voter {
+				compatible = "qcom,bcm-voter";
 			};
 		};
 	};
@@ -840,6 +846,110 @@
 
 	qcom,mem-buf-msgq {
 		compatible = "qcom,mem-buf-msgq";
+	};
+
+	clk_virt: interconnect@0 {
+		compatible = "qcom,volcano-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,volcano-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	aggre1_noc: interconnect@16E0000 {
+		compatible = "qcom,volcano-aggre1_noc";
+		reg = <0x016E0000 0x16400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	aggre2_noc: interconnect@1700000 {
+		compatible = "qcom,volcano-aggre2_noc";
+		reg = <0x01700000 0x1F400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	cnoc_cfg: interconnect@1600000 {
+		compatible = "qcom,volcano-cnoc_cfg";
+		reg = <0x01600000 0x6E00>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	cnoc_main: interconnect@1500000 {
+		compatible = "qcom,volcano-cnoc_main";
+		reg = <0x01500000 0x14400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	gem_noc: interconnect@24100000 {
+		compatible = "qcom,volcano-gem_noc";
+		reg = <0x24100000 0xFF080>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	lpass_ag_noc: interconnect@3C40000 {
+		compatible = "qcom,volcano-lpass_ag_noc";
+		reg = <0x03C40000 0x17200>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	mmss_noc: interconnect@1400000 {
+		compatible = "qcom,volcano-mmss_noc";
+		reg = <0x1400000 0xDB800>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	nsp_noc: interconnect@320C0000 {
+		compatible = "qcom,volcano-nsp_noc";
+		reg = <0x320C0000 0xE080>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	pcie_anoc: interconnect@16C0000 {
+		compatible = "qcom,volcano-pcie_anoc";
+		reg = <0x016C0000 0x12400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@1680000 {
+		compatible = "qcom,volcano-system_noc";
+		reg = <0x01680000 0x40000>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 };
 
