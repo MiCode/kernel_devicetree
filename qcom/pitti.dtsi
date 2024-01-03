@@ -1032,6 +1032,22 @@
 		qcom,support-cfg-gdscr;
 	};
 
+	sdhc1_opp_table: sdhc1-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-100000000 {
+			opp-hz = /bits/ 64 <100000000>;
+			opp-peak-kBps = <250000 133320>;
+			opp-avg-kBps = <104000 0>;
+		};
+
+		opp-384000000 {
+			opp-hz = /bits/ 64 <384000000>;
+			opp-peak-kBps = <800000 300000>;
+			opp-avg-kBps = <400000 0>;
+		};
+	};
+
 	sdhc_1: sdhci@4744000 {
 		status = "disabled";
 
@@ -1072,6 +1088,10 @@
 
 		qcom,ice-clk-rates = <300000000 100000000>;
 
+		interconnects = <&system_noc MASTER_SDCC_1 &bimc SLAVE_EBI_CH0>,
+			<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_SDCC_1>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc1_opp_table>;
 
 		/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
 		qcom,dll-hsr-list = <0x000f642c 0x0 0x01 0x2C010800 0x80040868>;
