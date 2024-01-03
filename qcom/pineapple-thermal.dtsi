@@ -967,7 +967,7 @@
 	};
 
 	cpu-1-2-1 {
-		polling-delay-passive = <10>;
+		polling-delay-passive = <250>;
 		polling-delay = <0>;
 		thermal-sensors = <&tsens1 2>;
 		trips {
@@ -980,6 +980,12 @@
 			thermal-hal-config {
 				temperature = <125000>;
 				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			cpu7_mon_trip1: cpu7-mon-trip {
+				temperature = <90000>;
+				hysteresis = <5000>;
 				type = "passive";
 			};
 
@@ -1011,6 +1017,11 @@
 			cpu121_cdev1 {
 				trip = <&cpu7_emerg1_1>;
 				cooling-device = <&cpu7_hotplug 1 1>;
+			};
+
+			cpu121_cdev2 {
+				trip = <&cpu7_mon_trip1>;
+				cooling-device = <&CPU7 1 1>;
 			};
 		};
 	};
