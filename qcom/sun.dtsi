@@ -2904,7 +2904,12 @@
 
 		cpu_scp_lpri: scmi-shmem@0 {
 			compatible = "arm,scmi-shmem";
-			reg = <0x0 0x17b4e000 0x0 0x400>;
+			reg = <0x0 0x17b4e000 0x0 0x200>;
+		};
+
+		cpucp_rx: scmi-shmem@1 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x0 0x17b4e200 0x0 0x200>;
 		};
 	};
 
@@ -2928,9 +2933,9 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "arm,scmi";
-		mboxes = <&cpucp 0>;
-		mbox-names = "tx";
-		shmem = <&cpu_scp_lpri>;
+		mboxes = <&cpucp 0>, <&cpucp 2>;
+		mbox-names = "tx", "rx";
+		shmem = <&cpu_scp_lpri>, <&cpucp_rx>;
 
 		scmi_perf: protocol@13 {
 			reg = <0x13>;
