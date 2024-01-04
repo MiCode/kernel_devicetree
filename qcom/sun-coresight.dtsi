@@ -106,13 +106,35 @@
 		};
 	};
 
-	funnel_gfx: funnel@10902000 {
+
+	funnel_gfx: funnel@10963000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb908>;
+		reg = <0x10963000 0x1000>;
+		reg-names = "funnel-base";
+
+		coresight-name = "coresight-funnel-gfx";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+
+		out-ports {
+			port {
+				funnel_gfx_out_funnel_gfx_dl: endpoint {
+				remote-endpoint =
+					<&funnel_gfx_dl_in_funnel_gfx>;
+				};
+			};
+		};
+	};
+
+	funnel_gfx_dl: funnel@10902000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb908>;
 		reg = <0x10902000 0x1000>;
 		reg-names = "funnel-base";
 
-		coresight-name = "coresight-funnel-gfx";
+		coresight-name = "coresight-funnel-gfx_dl";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -128,16 +150,61 @@
 					<&tpdm_gfx_out_funnel_gfx_dl>;
 				};
 			};
+
+			port@1 {
+				reg = <1>;
+				funnel_gfx_dl_in_funnel_gfx: endpoint {
+					remote-endpoint =
+					<&funnel_gfx_out_funnel_gfx_dl>;
+				};
+			};
 		};
 
 		out-ports {
 			port {
-				funnel_gfx_out_tpda_dlet: endpoint {
+				funnel_gfx_dl_out_replicator_dummy: endpoint {
 				remote-endpoint =
-					<&tpda_dlet_in_funnel_gfx>;
+					<&replicator_dummy_in_funnel_gfx_dl>;
 				};
 			};
 		};
+	};
+
+	gpu-replicator {
+		compatible = "arm,coresight-static-replicator";
+
+		coresight-name = "coresight-replicator-gpu";
+
+		in-ports {
+			port {
+				replicator_dummy_in_funnel_gfx_dl: endpoint {
+					remote-endpoint =
+					<&funnel_gfx_dl_out_replicator_dummy>;
+				};
+			};
+		};
+
+		out-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				replicator_dummy_out_tpda_dlet: endpoint {
+					remote-endpoint =
+					<&tpda_dlet_in_replicator_dummy>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				replicator_dummy_out_funnel_dlet: endpoint {
+					remote-endpoint =
+					<&funnel_dlet_in_replicator_dummy>;
+				};
+			};
+		};
+
 	};
 
 	tpda_dlet: tpda@10c38000 {
@@ -159,9 +226,9 @@
 
 			port@0 {
 				reg = <0>;
-				tpda_dlet_in_funnel_gfx: endpoint {
+				tpda_dlet_in_replicator_dummy: endpoint {
 					remote-endpoint =
-					<&funnel_gfx_out_tpda_dlet>;
+					<&replicator_dummy_out_tpda_dlet>;
 				};
 			};
 		};
@@ -195,7 +262,15 @@
 				reg = <0>;
 				funnel_dlet_in_tpda_dlet: endpoint {
 					remote-endpoint =
-					<&tpda_dlet_in_funnel_gfx>;
+					<&tpda_dlet_out_funnel_dlet>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				funnel_dlet_in_replicator_dummy: endpoint {
+					remote-endpoint =
+					<&replicator_dummy_out_funnel_dlet>;
 				};
 			};
 		};
