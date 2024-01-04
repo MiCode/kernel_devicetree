@@ -88,12 +88,16 @@ ifeq ($(CONFIG_ARCH_SUN), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 sun_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += sun-vm-rumi.dtb \
 				sun-vm-mtp.dtb \
+				sun-vm-mtp-v8.dtb \
 				sun-vm-cdp.dtb \
 				sun-vm-qrd.dtb \
+				sun-vm-rcm.dtb \
 				sun-oemvm-rumi.dtb \
 				sun-oemvm-mtp.dtb \
+				sun-oemvm-mtp-v8.dtb \
 				sun-oemvm-cdp.dtb \
-				sun-oemvm-qrd.dtb
+				sun-oemvm-qrd.dtb \
+				sun-oemvm-rcm.dtb
 dtb-y += $(sun_tuivm-dtb-y)
 
 endif
