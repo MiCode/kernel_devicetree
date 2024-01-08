@@ -192,6 +192,14 @@ _platform_map = {
         "dtb_list": [
             {"name": "cliffs.dtb"},
             {"name": "cliffs7.dtb"},
+            {
+                "name": "cliffsp.dtb",
+                "apq": True,
+            },
+            {
+                "name": "cliffs7p.dtb",
+                "apq": True,
+            },
         ],
         "dtbo_list": [
             {
