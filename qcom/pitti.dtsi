@@ -254,7 +254,22 @@
 	soc: soc { };
 };
 
-#include "pitti-stub-regulators.dtsi"
+&soc {
+
+	rpm_bus: qcom,rpm-smd {
+		compatible = "qcom,rpm-smd";
+		rpm-channel-name = "rpm_requests";
+		interrupt-parent = <&ipcc_mproc>;
+		interrupts = <IPCC_CLIENT_AOP
+			      IPCC_MPROC_SIGNAL_GLINK_QMP
+			      IRQ_TYPE_EDGE_RISING>;
+		rpm-channel-type = <15>; /* SMD_APPS_RPM */
+		power-domains = <&CLUSTER_PD>;
+	};
+
+};
+
+#include "pitti-regulators.dtsi"
 
 &soc {
 	#address-cells = <1>;
@@ -323,17 +338,6 @@
 		interrupt-controller;
 		interrupt-parent = <&intc>;
 		#interrupt-cells = <2>;
-	};
-
-	rpm_bus: qcom,rpm-smd {
-		compatible = "qcom,rpm-smd";
-		rpm-channel-name = "rpm_requests";
-		interrupt-parent = <&ipcc_mproc>;
-		interrupts = <IPCC_CLIENT_AOP
-			      IPCC_MPROC_SIGNAL_GLINK_QMP
-			      IRQ_TYPE_EDGE_RISING>;
-		rpm-channel-type = <15>; /* SMD_APPS_RPM */
-		power-domains = <&CLUSTER_PD>;
 	};
 
 	cluster-device {
@@ -1187,9 +1191,9 @@
 		status = "ok";
 
 		vdd_lpi_cx-supply = <&VDD_LPI_CX_LEVEL>;
-		vdd_lpi_cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		vdd_lpi_cx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 0>;
 		vdd_lpi_mx-supply = <&VDD_LPI_MX_LEVEL>;
-		vdd_lpi_mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		vdd_lpi_mx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 0>;
 		reg-names = "vdd_lpi_cx", "vdd_lpi_mx";
 
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
@@ -1224,9 +1228,9 @@
 
 		/* CX & MODEM are merged here */
 		cx-supply = <&VDD_MODEM_LEVEL>;
-		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		cx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
 		mx-supply = <&VDD_MX_LEVEL>;
-		mx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
+		mx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_NOM_PLUS 100000>;
 		reg-names = "cx", "mx";
 
 		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
