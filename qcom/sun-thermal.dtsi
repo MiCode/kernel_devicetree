@@ -204,6 +204,18 @@
 		};
 	};
 
+	thermal_ddr_freq_table: thermal-ddr-freq-table {
+		qcom,freq-tbl = < 2092800 >;
+	};
+
+	ddr_cdev: qcom,ddr-cdev {
+		compatible = "qcom,ddr-cooling-device";
+		#cooling-cells = <2>;
+		qcom,bus-width = <4>;
+		qcom,freq-table = <&thermal_ddr_freq_table>;
+		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
+	};
+
 	qcom,devfreq-cdev {
 		compatible = "qcom,devfreq-cdev";
 		qcom,devfreq = <&msm_gpu>;
@@ -1318,6 +1330,13 @@
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			ddr_cdev {
+				trip = <&ddr_config0>;
+				cooling-device = <&ddr_cdev 1 1>;
 			};
 		};
 	};
