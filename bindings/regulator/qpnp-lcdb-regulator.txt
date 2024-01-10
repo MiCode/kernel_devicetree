@@ -24,16 +24,12 @@ First Level Node - LCDB module
 			"qcom,lcdb-pm660"
 			"qcom,lcdb-pmi632"
 			"qcom,lcdb-pm6150l"
+			"qcom,lcdb-pm7325b"
 
 - reg
 	Usage:      required
 	Value type: <prop-encoded-array>
 	Definition:  Base address of the LCDB SPMI peripheral.
-
-- qcom,pmic-revid
-	Usage:      required
-	Value type: <phandle>
-	Definition:  Phandle to the PMIC's revid node
 
 - qcom,voltage-step-ramp
 	Usage:      optional
@@ -48,6 +44,23 @@ First Level Node - LCDB module
 	Value type: <u32>
 	Definition:  Required to control the LDO power down delay.
 		     Possible values are 0, 1, 4, 8.
+
+- qcom,pwrup-delay-ms
+	Usage:      optional
+	Value type: <u32>
+	Definition:  Required to control the LDO power up delay.
+		     Possible values are 0, 1, 4, 8.
+
+- qcom,pwrup-config
+	Usage:      optional
+	Value type: <u32>
+	Definition:  Controls the order of powering up BOOST, LDO AND NCP
+		     blocks. Appilcable for PM7325B. Possible values are: 0, 1, 2, 3, 4.
+		     0 - Boost, LDO, NCP
+		     1 - Boost, LDO
+		     2 - Boost, NCP
+		     3 - Boost only
+		     4 - Boost, NCP, LDO
 
 Touch-to-wake (TTW) properties:
 
@@ -141,15 +154,15 @@ Properties below are specific to LDO bias only.
 - qcom,ldo-ilim-ma
 	Usage:      optional
 	Value type:  <u32>
-	Definition:  Current limit (in mA) of the LDO bias.
-		     Possible values are 110, 160, 210, 260, 310, 360, 410, 460.
+	Definition:  Current limit (in mA) of the LDO bias. For PM7325B, possible
+		     values are 35, 175, 280, 420, 455, 595, 700, 840. For other PMICs,
+		     possible values are 110, 160, 210, 260, 310, 360, 410, 460.
 
 - qcom,ldo-soft-start-us
 	Usage:      optional
 	Value type:  <u32>
 	Definition:  Soft-start time (in uS) of the LDO bias.
 		     Possible values are 0, 500, 1000, 2000.
-
 
 NCP subnode properties:
 
@@ -180,8 +193,9 @@ Properties below are specific to NCP bias only.
 - qcom,ncp-ilim-ma
 	Usage:      optional
 	Value type:  <u32>
-	Definition:  Current limit (in mA) of the NCP bias.
-		     Possible values are 260, 460, 640, 810.
+	Definition:  Current limit (in mA) of the NCP bias. For PM7325B, possible
+		     values are 700, 80, 900, 1000. For other PMICs, possible values
+		     are 260, 460, 640, 810.
 
 - qcom,ncp-soft-start-us
 	Usage:      optional
@@ -221,11 +235,19 @@ Properties below are specific to BOOST subnode only.
 	Definition: Current threshold (in mA) at which pulse-skip is entered.
 		    Possible values are 50, 60, 70, 80.
 
+- qcom,bst-ps-threshold-mv
+	Usage:      optional
+	Value type:  <u32>
+	Definition: Current threshold (in mv) at which pulse-skip is entered.
+		    Applicable for PM7325B. Possible values are 360, 384, 408, 432,
+		    456, 480, 504, 528.
+
 - qcom,bst-ilim-ma
 	Usage:      optional
 	Value type:  <u32>
-	Definition:  Current limit (in mA) of the BOOST rail.
-		     Possible values are 200 to 1600mA in 200mA steps.
+	Definition:  Current limit (in mA) of the BOOST rail. For PM7325B, possible
+		     possible values are 1130 to 2250mA in 160mA steps. For other PMICs,
+		     possible values are 200 to 1600mA in 200mA steps.
 
 - qcom,bst-headroom-mv
 	Usage:      optional
