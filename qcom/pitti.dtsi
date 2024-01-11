@@ -1114,6 +1114,22 @@
 		};
 	};
 
+	sdhc2_opp_table: sdhc2-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-100000000 {
+			opp-hz = /bits/ 64 <100000000>;
+			opp-peak-kBps = <250000 133320>;
+			opp-avg-kBps = <50000 0>;
+		};
+
+		opp-202000000 {
+			opp-hz = /bits/ 64 <202000000>;
+			opp-peak-kBps = <800000 300000>;
+			opp-avg-kBps = <104000 0>;
+		};
+	};
+
 	sdhc_2: sdhci@4784000 {
 		status = "disabled";
 
@@ -1138,6 +1154,10 @@
 			<&gcc GCC_SDCC2_APPS_CLK>;
 		clock-names = "iface", "core";
 
+		interconnects = <&system_noc MASTER_SDCC_2 &bimc SLAVE_EBI_CH0>,
+			<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc2_opp_table>;
 		/*
 		 * DLL HSR settings. Refer go/hsr - <Target> DLL settings.
 		 * Note that the DLL_CONFIG_2 value is not passed from the
@@ -1148,6 +1168,9 @@
 
 		iommus = <&apps_smmu 0x140 0x0>;
 		qcom,iommu-dma = "fastmap";
+
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
 
 		qos0 {
 			mask = <0xc0>;
