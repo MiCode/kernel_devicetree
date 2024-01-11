@@ -37,3 +37,4 @@
 | diting-s-oss | Redmi K50 Ultra | Android S | qcom-S-LA.VENDOR.1.0.r1-13100-r1.0.r1_00037.0 |[diting-s-oss](https://github.com/MiCode/kernel_devicetree/tree/diting-s-oss) |
 | garnet-t-oss | Redmi Note 13 Pro | Android T | KERNEL.PLATFORM.1.0.r1-15100-kernel.0-1* | [garnet-t-oss](https://github.com/MiCode/kernel_devicetree/tree/garnet-t-oss) |
 | shennong-u-oss | Xiaomi 14, Xiaomi 14 Pro | Android U | KERNEL.PLATFORM.3.0.r1-03200-kernel.0-1 | [shennong-u-oss](https://github.com/MiCode/kernel_devicetree/tree/shennong-u-oss) |
+| bsp-vermeer-t-oss | Redmi K70 | Android U | LA.VENDOR.13.2.0.r1-14800-r1.0.r1_00043.0 | [bsp-vermeer-t-oss](https://github.com/MiCode/kernel_devicetree/tree/bsp-vermeer-t-oss) |
