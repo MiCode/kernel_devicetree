@@ -49,6 +49,7 @@ KALAMA_APQ_BASE_DTB += kalamap.dtb kalamap-v2.dtb kalamap-sg.dtb kalamap-qcs.dtb
 
 KALAMA_BOARDS += \
 		 kalama-mtp-overlay.dtbo \
+		 vermeer-sm8550-overlay.dtbo \
 		 kalama-mtp-nfc-overlay.dtbo \
 		 kalama-cdp-overlay.dtbo \
 		 kalama-cdp-wsa883x-overlay.dtbo \
@@ -71,6 +72,7 @@ kalama-dtb-$(CONFIG_ARCH_KALAMA) += \
 	$(call add-overlays, $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS),$(KALAMA_BASE_DTB))\
 	$(call add-overlays, $(KALAMA_BOARDS) $(APQ_KALAMA_BOARDS),$(KALAMA_APQ_BASE_DTB))
 kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
+vermeer-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 kalama_le-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOARDS) $(KALAMA_BASE_DTB) $(KALAMA_APQ_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
 
@@ -83,6 +85,7 @@ kalama-dtb-$(CONFIG_ARCH_CROW) += \
 	$(call add-overlays, $(CROW_BOARDS) ,$(CROW_BASE_DTB))
 kalama-overlays-dtb-$(CONFIG_ARCH_CROW) += $(CROW_BOARDS) $(CROW_BASE_DTB)
 dtb-y += $(kalama-dtb-y)
+dtb-y += $(vermeer-dtb-y)
 
 KHAJE_BASE_DTB += khaje.dtb khajep.dtb khajeq.dtb khajeg.dtb
 

@@ -1,0 +1,121 @@
+/*
+  this file is for charger
+*/
+
+#define SHENG_REGULATOR_OCP
+&soc {
+
+	virtual-FuelGauge{
+		compatible = "xiaomi,virtual-FuelGauge";
+		bq,ignore-digest-debug;
+		bq,shutdown-delay-enable;
+		bq,recharge-voltage = <4380>;
+		bq,soc_decimal_rate = <
+			0  38
+			10 35
+			20 33
+			30 33
+			40 33
+			50 33
+			60 33
+			70 30
+			80 25
+			90 20
+			95 10 >;
+
+	};
+
+	nanosic:nanosic {
+		compatible = "nanosic,platform";
+		status = "okay";
+	};
+
+	xm_battmngr {
+		status = "ok";
+		compatible = "xiaomi,battmngr";
+
+
+		/* charger */
+		xm,fv-max-uv = <4610000>;
+		xm,fcc-max-ua = <12300000>;
+		xm,fv-max-design-uv = <11000000>;
+		xm,icl-max-ua = <6200000>;
+		xm,step-chg-enable = <1>;
+		xm,sw-jeita-enable = <1>;
+		xm,non_ffc_iterm = <220000>;
+		xm,ffc_cv = <4480000>;
+		xm,non_ffc_cv = <4450000>;
+		xm,non_ffc_cc = <3000000>;
+
+
+		/* stepchg_jeita */
+		xm,taper-fcc;
+		xm,step-chg-normal-ranges = <3000000  4250000  12300000
+				      4251000  4300000  7850000
+				      4301000  4480000  6550000
+				      4481000  4530000  5230000>;
+		xm,step-chg-high-ranges = <3000000  4200000  12300000
+				      4201000  4250000  7850000
+				      4251000  4480000  6550000
+				      4481000  4530000  5230000>;
+		xm,cold-step-chg-ranges = <3000000  4200000  950000
+					4201000  4480000  639000>;
+		xm,jeita-fcc-ranges = <(-100) 0  950000
+					1   50   2100000
+					51  100  3000000
+					101 150  5230000
+					151 479  12300000
+					480 580  2100000>;
+		xm,jeita-fv-ranges = <(-100)  0  4480000
+					1   50   4480000
+					51  100  4480000
+					101 150  4480000
+					151 479  4610000
+					480 580  4480000>;
+		xm,step-jeita-hysteresis = <20 20>;
+		xm,jeita-too-hot = <580>;
+		xm,jeita-too-cold = <(-100)>;
+
+		/* thermal */
+		xm,thermal-mitigation-icl
+				= <2800000 2700000 2600000 2400000 2200000 2100000 2000000
+				   1800000 1600000 1500000 1400000 1300000 1200000 1100000
+				   950000 750000>;
+		xm,thermal-mitigation
+                		= <3000000 2800000 2600000 2400000 2200000 2100000 2000000
+				   1800000 1600000 1500000 1400000 1200000 1000000 900000
+				   800000 500000>;
+		xm,thermal-mitigation-dcp
+				= <1500000 1500000 1500000 1500000 1500000 1500000 1500000
+				   1500000 1500000 1500000 1500000 1400000 1200000 1100000
+				   1100000 1000000>;
+		xm,thermal-mitigation-qc2
+				= <1500000 1500000 1500000 1500000 1450000 1400000 1350000
+				   1300000 1150000 1100000 1000000 900000 850000 750000
+				   650000 500000>;
+		xm,thermal-mitigation-pd
+				= <3000000 2800000 2600000 2400000 2200000 2000000 1800000
+				   1600000 1600000 1400000 1200000 1100000 1050000 1000000
+				   950000 500000>;
+		xm,thermal-mitigation-pd-cp
+				= <12300000 9900000 8700000 7900000 6500000 5900000 5450000
+				   4950000 3950000 2970000 2570000 2110000 1880000 1480000
+				   490000 290000>;
+		};
+
+	xm_main_charge {
+		status = "ok";
+		compatible = "xiaomi,pogocharge";
+
+ 		ti,bq2589x,charge-voltage = <4610>;
+ 		ti,bq2589x,charge-current = <500>;
+ 		ti,bq2589x,term-current = <256>;
+
+ 		ti,bq2589x,enable-termination;
+ 		ti,bq2589x,otg_vol = <5300>;
+ 		ti,bq2589x,otg_current = <1800>;
+
+	};
+
+};
+
