@@ -17,22 +17,20 @@
 
 	L10C0: pm8540_c0_l10: regulator-pm8540_c0-l10 {
 		regulator-name = "ldoc10";
-		regulator-min-microvolt = <2400000>;
-		regulator-max-microvolt = <2960000>;
 		qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
 	};
 
 	L3C0: pm8540_c0_l3: regulator-pm8540_c0-l3 {
 		regulator-name = "ldoc3";
-		regulator-min-microvolt = <1080000>;
-		regulator-max-microvolt = <1304000>;
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
 		qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
 	};
 };
 
 &soc {
 	ufs2phy_mem: ufsphy_mem@1da7000 {
-		compatible = "qcom,ufs-phy-qmp-v4-direwolf";
+		compatible = "qcom,ufs-phy-qmp-v4-lahaina";
 
 		reg = <0x1da7000 0xe10>;
 		reg-names = "phy_mem";
@@ -73,7 +71,6 @@
 		vdd-hba-fixed-regulator;
 
 		vcc-supply = <&L10C0>;
-		vcc-voltage-level = <2504000 2504000>;
 		vcc-max-microamp = <800000>;
 
 		vccq-supply = <&L3C0>;
@@ -178,5 +175,15 @@
 		dma-coherent;
 
 		status = "disabled";
+
+		qos0 {
+			mask = <0xf0>;
+			vote = <44>;
+		};
+
+		qos1 {
+			mask = <0x0f>;
+			vote = <44>;
+		};
 	};
 };
