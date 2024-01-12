@@ -31,6 +31,7 @@ SUN_BOARDS += \
 		sun-qrd-sku1-overlay.dtbo \
 		sun-qrd-sku1-v8-overlay.dtbo \
 		sun-qrd-sku2-v8-overlay.dtbo \
+		sun-rcm-kiwi-overlay.dtbo \
 		sun-rcm-kiwi-v8-overlay.dtbo \
 		sun-rcm-overlay.dtbo \
 		sun-rcm-v8-overlay.dtbo \
