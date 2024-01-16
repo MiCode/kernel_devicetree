@@ -180,6 +180,25 @@ _platform_map = {
             {"name": "cliffs-rcm-overlay.dtbo"},
         ],
     },
+    "manet": {
+        "dtb_list": [
+            # keep sorted
+            {"name": "pineapple.dtb"},
+            {"name": "pineapple-v2.dtb"},
+            {
+                "name": "pineapplep.dtb",
+                "apq": True,
+            },
+            {
+                "name": "pineapplep-v2.dtb",
+                "apq": True,
+            },
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name": "manet-sm8650-overlay.dtbo"},
+        ],
+    },
     "pineapple-tuivm": {
         "dtb_list": [
             {"name": "pineapple-oemvm-cdp.dtb"},
