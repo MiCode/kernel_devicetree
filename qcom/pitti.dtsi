@@ -1403,6 +1403,43 @@
 		};
 	};
 
+	wpss_pas: remoteproc-wpss@05600000 {
+		compatible = "qcom,pitti-wpss-pas";
+		reg = <0x5600000 0x100>;
+		status = "ok";
+
+		memory-region = <&wlan_mem>;
+		firmware-name = "adrastea/wpss.mdt";
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MX_LEVEL>;
+		mx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx","mx";
+
+		/* Inputs from wpss */
+		interrupts-extended = <&intc GIC_SPI 587 IRQ_TYPE_EDGE_RISING>,
+				      <&wpss_smp2p_in 0 0>,
+				      <&wpss_smp2p_in 2 0>,
+				      <&wpss_smp2p_in 1 0>,
+				      <&wpss_smp2p_in 3 0>,
+				      <&wpss_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				   "fatal",
+				   "handover",
+				   "ready",
+				   "stop-ack",
+				   "shutdown-ack";
+
+		/* Outputs to wpss */
+		qcom,smem-states = <&wpss_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+	};
+
 	google,debug-kinfo {
 		compatible = "google,debug-kinfo";
 		memory-region = <&kinfo_mem>;
