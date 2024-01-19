@@ -23,7 +23,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-3";
 		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
@@ -744,6 +744,14 @@
 		compatible = "qcom,tcsr-mutex";
 		syscon = <&tcsr_mutex_block 0 0x1000>;
 		#hwlock-cells = <1>;
+	};
+
+	gic-interrupt-router {
+		compatible = "qcom,gic-intr-routing";
+		/* keep silver core only to avoid wakeup of gold cores */
+		qcom,gic-class0-cpus = <0 1 2 3>;
+		/* keep gold and gold+ cores in class1 */
+		qcom,gic-class1-cpus = <4 5 6 7>;
 	};
 
 	aoss_qmp: power-controller@c300000 {
