@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <dt-bindings/thermal/thermal_qti.h>
@@ -59,62 +59,61 @@
 
 		cpu0_pause: cpu0-pause {
 			qcom,cpus = <&CPU0>;
+			qcom,cdev-alias = "thermal-pause-1";
 			#cooling-cells = <2>;
 		};
 
 		cpu1_pause: cpu1-pause {
 			qcom,cpus = <&CPU1>;
+			qcom,cdev-alias = "thermal-pause-2";
 			#cooling-cells = <2>;
 		};
 
 		cpu2_pause: cpu2-pause {
 			qcom,cpus = <&CPU2>;
+			qcom,cdev-alias = "thermal-pause-4";
 			#cooling-cells = <2>;
 		};
 
 		cpu3_pause: cpu3-pause {
 			qcom,cpus = <&CPU3>;
+			qcom,cdev-alias = "thermal-pause-8";
 			#cooling-cells = <2>;
 		};
 
 		cpu4_pause: cpu4-pause {
 			qcom,cpus = <&CPU4>;
+			qcom,cdev-alias = "thermal-pause-10";
 			#cooling-cells = <2>;
 		};
 
 		cpu5_pause: cpu5-pause {
 			qcom,cpus = <&CPU5>;
+			qcom,cdev-alias = "thermal-pause-20";
 			#cooling-cells = <2>;
 		};
 
 		cpu6_pause: cpu6-pause {
 			qcom,cpus = <&CPU6>;
+			qcom,cdev-alias = "thermal-pause-40";
 			#cooling-cells = <2>;
 		};
 
 		cpu7_pause: cpu7-pause {
 			qcom,cpus = <&CPU7>;
+			qcom,cdev-alias = "thermal-pause-80";
 			#cooling-cells = <2>;
 		};
 
-		//TODO: what about core 0, we can't pause all?
 		APC0_MX_CX_PAUSE: apc0-mx-cx-pause {
-			qcom,cpus = <&CPU1 &CPU2 &CPU3 &CPU4 &CPU5>;
+			qcom,cpus = <&CPU2 &CPU3 &CPU4 &CPU5>;
+			qcom,cdev-alias = "thermal-pause-3C";
 			#cooling-cells = <2>;
 		};
 
 		APC1_MX_CX_PAUSE: apc1-mx-cx-pause {
 			qcom,cpus = <&CPU6 &CPU7>;
-			#cooling-cells = <2>;
-		};
-
-		cpu_1_2_3_4_5_pause: cpu-1-2-3-4-5-pause {
-			qcom,cpus = <&CPU1 &CPU2 &CPU3 &CPU4 &CPU5>;
-			#cooling-cells = <2>;
-		};
-
-		cpu_6_7_pause: cpu-6-7-pause {
-			qcom,cpus = <&CPU6 &CPU7>;
+			qcom,cdev-alias = "thermal-pause-C0";
 			#cooling-cells = <2>;
 		};
 
@@ -165,48 +164,114 @@
 
 		cpu0_hotplug: cpu0-hotplug {
 			qcom,cpu = <&CPU0>;
+			qcom,cdev-alias = "cpu-hotplug0";
 			#cooling-cells = <2>;
 		};
 
 		cpu1_hotplug: cpu1-hotplug {
 			qcom,cpu = <&CPU1>;
+			qcom,cdev-alias = "cpu-hotplug1";
 			#cooling-cells = <2>;
 		};
 
 		cpu2_hotplug: cpu2-hotplug {
 			qcom,cpu = <&CPU2>;
+			qcom,cdev-alias = "cpu-hotplug2";
 			#cooling-cells = <2>;
 		};
 
 		cpu3_hotplug: cpu3-hotplug {
 			qcom,cpu = <&CPU3>;
+			qcom,cdev-alias = "cpu-hotplug3";
 			#cooling-cells = <2>;
 		};
 
 		cpu4_hotplug: cpu4-hotplug {
 			qcom,cpu = <&CPU4>;
+			qcom,cdev-alias = "cpu-hotplug4";
 			#cooling-cells = <2>;
 		};
 
 		cpu5_hotplug: cpu5-hotplug {
 			qcom,cpu = <&CPU5>;
+			qcom,cdev-alias = "cpu-hotplug5";
 			#cooling-cells = <2>;
 		};
 
 		cpu6_hotplug: cpu6-hotplug {
 			qcom,cpu = <&CPU6>;
+			qcom,cdev-alias = "cpu-hotplug6";
 			#cooling-cells = <2>;
 		};
 
 		cpu7_hotplug: cpu7-hotplug {
 			qcom,cpu = <&CPU7>;
+			qcom,cdev-alias = "cpu-hotplug7";
 			#cooling-cells = <2>;
 		};
+	};
+
+	thermal_ddr_freq_table: thermal-ddr-freq-table {
+		qcom,freq-tbl = < 2092800 >;
+	};
+
+	ddr_cdev: qcom,ddr-cdev {
+		compatible = "qcom,ddr-cooling-device";
+		#cooling-cells = <2>;
+		qcom,bus-width = <4>;
+		qcom,freq-table = <&thermal_ddr_freq_table>;
+		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
 	};
 
 	qcom,devfreq-cdev {
 		compatible = "qcom,devfreq-cdev";
 		qcom,devfreq = <&msm_gpu>;
+	};
+
+	qcom,cpufreq-cdev {
+		compatible = "qcom,cpufreq-cdev";
+		cpu-cluster0 {
+			qcom,cpus = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5>;
+		};
+
+		cpu-cluster1 {
+			qcom,cpus = <&CPU6 &CPU7>;
+		};
+	};
+
+	qmi_tmd: qmi-tmd-devices {
+		cdsp {
+			qcom,instance-id = <QMI_CDSP_INST_ID>;
+
+			cdsp_sw: cdsp {
+				qcom,qmi-dev-name = "cdsp_sw";
+				#cooling-cells = <2>;
+			};
+
+			cdsp_sw_hvx: cdsp_sw_hvx {
+				qcom,qmi-dev-name = "cdsp_sw_hvx";
+				#cooling-cells = <2>;
+			};
+
+			cdsp_sw_hmx: cdsp_sw_hmx {
+				qcom,qmi-dev-name = "cdsp_sw_hmx";
+				#cooling-cells = <2>;
+			};
+
+			cdsp_hw: cdsp_hw {
+				qcom,qmi-dev-name = "cdsp_hw";
+				#cooling-cells = <2>;
+			};
+		};
+	};
+
+	qcom,userspace-cdev {
+		compatible = "qcom,userspace-cooling-devices";
+
+		display_fps: display-fps {
+			qcom,max-level = <16>;
+			#cooling-cells = <2>;
+		};
 	};
 };
 
@@ -1309,6 +1374,13 @@
 				type = "passive";
 			};
 		};
+
+		cooling-maps {
+			ddr_cdev {
+				trip = <&ddr_config0>;
+				cooling-device = <&ddr_cdev 1 1>;
+			};
+		};
 	};
 
 	aoss-2 {
@@ -1669,6 +1741,33 @@
 				type = "passive";
 			};
 		};
+
+		cooling-maps {
+			lte_cdev0 {
+				trip = <&mdmss0_config0>;
+				cooling-device = <&modem_lte_dsc 8 8>;
+			};
+
+			nr_scg_cdev0 {
+				trip = <&mdmss0_config0>;
+				cooling-device = <&modem_nr_scg_dsc 12 12>;
+			};
+
+			nr_cdev0 {
+				trip = <&mdmss0_config0>;
+				cooling-device = <&modem_nr_dsc 8 8>;
+			};
+
+			lte_cdev2 {
+				trip = <&mdmss0_config1>;
+				cooling-device = <&modem_lte_dsc 255 255>;
+			};
+
+			nr_cdev2 {
+				trip = <&mdmss0_config1>;
+				cooling-device = <&modem_nr_dsc 255 255>;
+			};
+		};
 	};
 
 	mdmss-1 {
@@ -1704,6 +1803,33 @@
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			lte_cdev0 {
+				trip = <&mdmss1_config0>;
+				cooling-device = <&modem_lte_dsc 8 8>;
+			};
+
+			nr_scg_cdev0 {
+				trip = <&mdmss1_config0>;
+				cooling-device = <&modem_nr_scg_dsc 12 12>;
+			};
+
+			nr_cdev0 {
+				trip = <&mdmss1_config0>;
+				cooling-device = <&modem_nr_dsc 8 8>;
+			};
+
+			lte_cdev2 {
+				trip = <&mdmss1_config1>;
+				cooling-device = <&modem_lte_dsc 255 255>;
+			};
+
+			nr_cdev2 {
+				trip = <&mdmss1_config1>;
+				cooling-device = <&modem_nr_dsc 255 255>;
 			};
 		};
 	};
@@ -1743,6 +1869,33 @@
 				type = "passive";
 			};
 		};
+
+		cooling-maps {
+			lte_cdev0 {
+				trip = <&mdmss2_config0>;
+				cooling-device = <&modem_lte_dsc 8 8>;
+			};
+
+			nr_scg_cdev0 {
+				trip = <&mdmss2_config0>;
+				cooling-device = <&modem_nr_scg_dsc 12 12>;
+			};
+
+			nr_cdev0 {
+				trip = <&mdmss2_config0>;
+				cooling-device = <&modem_nr_dsc 8 8>;
+			};
+
+			lte_cdev2 {
+				trip = <&mdmss2_config1>;
+				cooling-device = <&modem_lte_dsc 255 255>;
+			};
+
+			nr_cdev2 {
+				trip = <&mdmss2_config1>;
+				cooling-device = <&modem_nr_dsc 255 255>;
+			};
+		};
 	};
 
 	mdmss-3 {
@@ -1778,6 +1931,33 @@
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			lte_cdev0 {
+				trip = <&mdmss3_config0>;
+				cooling-device = <&modem_lte_dsc 8 8>;
+			};
+
+			nr_scg_cdev0 {
+				trip = <&mdmss3_config0>;
+				cooling-device = <&modem_nr_scg_dsc 12 12>;
+			};
+
+			nr_cdev0 {
+				trip = <&mdmss3_config0>;
+				cooling-device = <&modem_nr_dsc 8 8>;
+			};
+
+			lte_cdev2 {
+				trip = <&mdmss3_config1>;
+				cooling-device = <&modem_lte_dsc 255 255>;
+			};
+
+			nr_cdev2 {
+				trip = <&mdmss3_config1>;
+				cooling-device = <&modem_nr_dsc 255 255>;
 			};
 		};
 	};

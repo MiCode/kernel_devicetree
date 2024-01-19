@@ -43,6 +43,11 @@
 		qcom,core-clk-rate-hs = <66666667>;
 		qcom,core-clk-rate-disconnected = <133333333>;
 
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnects = <&aggre1_noc MASTER_USB3_0 &mc_virt SLAVE_EBI1>,
+				<&aggre1_noc MASTER_USB3_0 &config_noc SLAVE_IPA_CFG>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB3_0>;
+
 		qcom,num-gsi-evt-buffs = <0x3>;
 		qcom,gsi-reg-offset =
 			<0x0fc /* GSI_GENERAL_CFG */
@@ -314,5 +319,13 @@
 				USB3_DP_PCS_USB3_RXEQTRAINING_DFE_TIME_S2 0x07
 				USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_L 0x40
 				USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_H 0x00>;
+	};
+
+	usb_audio_qmi_dev {
+		compatible = "qcom,usb-audio-qmi-dev";
+		iommus = <&apps_smmu 0x100b 0x0>;
+		qcom,iommu-dma = "disabled";
+		qcom,usb-audio-stream-id = <0xb>;
+		qcom,usb-audio-intr-num = <2>;
 	};
 };

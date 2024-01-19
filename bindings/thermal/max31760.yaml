@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/max31760.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Maxim MAX31760 Intelligent Fan Controller
+
+maintainers:
+  - Minghao Zhang <quic_minghao@quicinc.com>
+
+description:
+  The Maxim MAX31760 is a i2c device providing closed-loop, multi-channel
+  fan management with temperature. Various fan control features are
+  provided, including PWM frequency control, temperature hysteresis, dual
+  tachometer measurements, and fan health monitoring.
+
+properties:
+  compatible:
+    enum:
+      - maxim,max31760
+
+  reg:
+    maxItems: 1
+
+  '#cooling-cells':
+    const: 2
+    description: |
+      Must be 2. Needed for of_thermal as cooling device identifier.
+      Please refer to <devicetree/bindings/thermal/thermal.txt> for
+      more details.
+
+  maxim,fan-num:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      The quantity of fans connecting to max31760. This chip maximum supports 2.
+
+  maxim,vdd-supply:
+    description: |
+      Regulator for VDD power.
+
+  maxim,vcca-supply:
+    description: |
+      Regulator for VCCA power.
+
+  regulator-names:
+    description: |
+      List of strings to use with the (.*)-supply property.
+
+  maxim,pwr-en-gpio:
+    description: |
+      Power enablement pin.
+
+required:
+  - compatible
+  - reg
+  - '#cooling-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+    max31760@50 {
+      compatible = "maxim,max31760";
+      reg = <0x50 0x1>;
+      #cooling-cells = <2>;
+      maxim,fan-num = <1>;
+      maxim,vdd-supply = <&some_reg>;
+      maxim,vcca-supply = <&some_reg>;
+      regulator-names = "maxim,vdd", "maxim,vcca";
+      maxim,pwr-en-gpio = <&some_gpio>;
+    };

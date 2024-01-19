@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
@@ -65,7 +65,8 @@
 		proxy-supply = <&VDD_MXA_LEVEL>;
 
 		VDD_MXA_LEVEL: VDD_MX_LEVEL: S6F_LEVEL:
-		pm_v6f_s6_level: regulator-vdd-mxa-level {
+		pm_v6f_s6_level: S8F_LEVEL: pm_v8f_s8_level:
+		regulator-vdd-mxa-level {
 			regulator-name = "pm_v6f_s6_level";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt =
@@ -81,7 +82,8 @@
 		};
 
 		VDD_MXA_LEVEL_AO: VDD_MX_LEVEL_AO: S6F_LEVEL_AO:
-		pm_v6f_s6_level_ao: regulator-vdd-mxa-level-ao {
+		pm_v6f_s6_level_ao: S8F_LEVEL_AO: pm_v8f_s8_level_ao:
+		regulator-vdd-mxa-level-ao {
 			regulator-name = "pm_v6f_s6_level_ao";
 			qcom,set = <RPMH_REGULATOR_SET_ACTIVE>;
 			regulator-min-microvolt =
@@ -514,6 +516,7 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
+		proxy-supply = <&L11B>;
 
 		L11B: pm_humu_l11: regulator-pm-humu-l11 {
 			regulator-name = "pm_humu_l11";
@@ -522,6 +525,7 @@
 			regulator-max-microvolt = <1292000>;
 			qcom,init-voltage = <1064000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,proxy-consumer-enable;
 		};
 	};
 
@@ -533,6 +537,7 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
+		proxy-supply = <&L12B>;
 
 		L12B: pm_humu_l12: regulator-pm-humu-l12 {
 			regulator-name = "pm_humu_l12";
@@ -541,6 +546,7 @@
 			regulator-max-microvolt = <1800000>;
 			qcom,init-voltage = <1800000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,proxy-consumer-enable;
 		};
 	};
 
@@ -552,6 +558,7 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 10000>;
+		proxy-supply = <&L13B>;
 
 		L13B: pm_humu_l13: regulator-pm-humu-l13 {
 			regulator-name = "pm_humu_l13";
@@ -560,6 +567,7 @@
 			regulator-max-microvolt = <3000000>;
 			qcom,init-voltage = <3000000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,proxy-consumer-enable;
 		};
 	};
 
@@ -785,7 +793,7 @@
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
 
-		L1F: pm_v6f_l1: regulator-pm-vxf-l1 {
+		L1F: pm_v6f_l1: pm_v8f_l1: regulator-pm-vxf-l1 {
 			regulator-name = "pm_v6f_l1";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt = <880000>;
@@ -804,13 +812,14 @@
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
 
-		L2F: pm_v6f_l2: regulator-pm-vxf-l2 {
+		L2F: pm_v6f_l2: pm_v8f_l2: regulator-pm-vxf-l2 {
 			regulator-name = "pm_v6f_l2";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt = <1200000>;
 			regulator-max-microvolt = <1200000>;
 			qcom,init-voltage = <1200000>;
-			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_LPM>;
+			regulator-always-on;
 		};
 	};
 
@@ -823,13 +832,14 @@
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
 
-		L3F: pm_v6f_l3: regulator-pm-vxf-l3 {
+		L3F: pm_v6f_l3: pm_v8f_l3: regulator-pm-vxf-l3 {
 			regulator-name = "pm_v6f_l3";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
 			qcom,init-voltage = <1800000>;
-			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_LPM>;
+			regulator-always-on;
 		};
 	};
 
@@ -918,6 +928,7 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
+		proxy-supply = <&L3G>;
 
 		L3G: pm_v8g_l3: regulator-pm-v8g-l3 {
 			regulator-name = "pm_v8g_l3";
@@ -926,6 +937,7 @@
 			regulator-max-microvolt = <1256000>;
 			qcom,init-voltage = <1200000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,proxy-consumer-enable;
 		};
 	};
 
@@ -1007,6 +1019,7 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
+		proxy-supply = <&L3I>;
 
 		L3I: pm_v8i_l3: regulator-pm-v8i-l3 {
 			regulator-name = "pm_v8i_l3";
@@ -1015,6 +1028,7 @@
 			regulator-max-microvolt = <912000>;
 			qcom,init-voltage = <880000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,proxy-consumer-enable;
 		};
 	};
 
