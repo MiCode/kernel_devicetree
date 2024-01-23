@@ -1,5 +1,9 @@
 #include <dt-bindings/thermal/thermal_qti.h>
 
+&msm_gpu {
+	#cooling-cells = <2>;
+};
+
 &soc {
 	tsens0: thermal-sensor@4411000 {
 		compatible = "qcom,tsens-v2";
@@ -194,6 +198,11 @@
 						"cpu-2-1", "gpuss", "camera",
 						"ddr", "aoss-1", "mdmss-0", "mdmss-1",
 						"mdmss-2";
+	};
+
+	qcom,devfreq-cdev {
+		compatible = "qcom,devfreq-cdev";
+		qcom,devfreq = <&msm_gpu>;
 	};
 };
 
@@ -638,6 +647,19 @@
 				temperature = <115000>;
 				hysteresis = <5000>;
 				type = "passive";
+			};
+
+			gpu_tj_cfg: tj_cfg {
+				temperature = <95000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			gpu_cdev {
+				trip = <&gpu_tj_cfg>;
+				cooling-device = <&msm_gpu 0 THERMAL_NO_LIMIT>;
 			};
 		};
 	};
