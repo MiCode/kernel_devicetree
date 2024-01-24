@@ -13,6 +13,26 @@
 	status = "disabled";
 };
 
+&SILVER_OFF {
+	status = "nok";
+};
+
+&SILVER_RAIL_OFF {
+	status = "nok";
+};
+
+&GOLD_OFF {
+	status = "nok";
+};
+
+&GOLD_RAIL_OFF {
+	status = "nok";
+};
+
+&GOLD_PLUS_RAIL_OFF {
+	status = "nok";
+};
+
 &soc {
 	usb_nop_phy: usb_nop_phy {
 		compatible = "usb-nop-xceiv";
@@ -31,6 +51,56 @@
 			0x0 0x3c
 			0x0 0x4>;
 	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L2B>;
+	vdda-phy-max-microamp = <140120>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4B>;
+	vdda-pll-max-microamp = <18340>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B>;
+	vdda-qref-max-microamp = <1750>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+	limit-rate = <2>; /* HS Rate-B */
+
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L12B>;
+	vcc-max-microamp = <800000>;
+
+	vccq-supply = <&L5F>;
+	vccq-max-microamp = <750000>;
+
+	vccq2-supply = <&L4F>;
+	vccq2-max-microamp = <750000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L5B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	qcom,disable-lpm;
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	qcom,iommu-dma = "bypass";
+
+	status = "ok";
 };
 
 &usb0 {

@@ -1,3 +1,7 @@
+&chosen {
+	bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-5 firmware_class.path=/vendor/firmware_mnt/image slub_debug=- cpufreq.default_governor=performance";
+};
+
 &arch_timer {
 	clock-frequency = <5000000>;
 };
@@ -79,10 +83,6 @@
 };
 
 &soc {
-	usb_nop_phy: usb_nop_phy {
-		compatible = "usb-nop-xceiv";
-	};
-
 	usb_emuphy: phy@4f84000 {
 		compatible = "qcom,usb-emu-phy";
 		reg = <0x04f84000 0x9500>;
@@ -104,4 +104,18 @@
 		dr_mode = "peripheral";
 		maximum-speed = "high-speed";
 	};
+};
+
+&rpmcc {
+	compatible = "fixed-clock";
+	clock-output-names = "rpmcc_clocks";
+	clock-frequency = <19200000>;
+};
+
+&tsens0 {
+	status = "disabled";
+};
+
+&tsens1 {
+	status = "disabled";
 };

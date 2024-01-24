@@ -335,9 +335,28 @@ _platform_map = {
     "pitti": {
         "dtb_list": [
             {"name": "pitti.dtb"},
+            {"name": "pitti-3gb.dtb"},
+            {"name": "pitti-4gb.dtb"},
         ],
         "dtbo_list": [
-            {"name": "pitti-rumi-overlay.dtbo"},
+            {"name": "pitti-atp-overlay.dtbo"},
+            {"name": "pitti-idp-overlay.dtbo"},
+            {"name": "pitti-qrd-overlay.dtbo"},
+            {"name": "pitti-idp-apache-overlay.dtbo"},
+            {"name": "pitti-idp-pmiv0104-apache-overlay.dtbo"},
+            {"name": "pitti-idp-amoled-overlay.dtbo"},
+            {"name": "pitti-idp-pmiv0104-overlay.dtbo"},
+            {"name": "pitti-idp-3gb-overlay.dtbo"},
+            {"name": "pitti-idp-pmiv0104-3gb-overlay.dtbo"},
+            {"name": "pitti-qrd-3gb-overlay.dtbo"},
+            {"name": "pitti-atp-4gb-overlay.dtbo"},
+            {"name": "pitti-idp-pmiv0104-4gb-overlay.dtbo"},
+            {"name": "pitti-idp-4gb-overlay.dtbo"},
+            {"name": "pitti-qrd-4gb-overlay.dtbo"},
+            {
+                "name": "pitti-rumi-overlay.dtbo",
+                "apq": False,
+            },
         ],
     },
     "volcano": {

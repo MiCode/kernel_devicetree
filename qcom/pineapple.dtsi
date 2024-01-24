@@ -874,8 +874,8 @@
 	cam_crm: crm@add7000 {
 		label = "cam_crm";
 		compatible = "qcom,cam-crm";
-		reg = <0xadd7000 0x2000>, <0xadd9800 0x800>, <0xadda000 0x2000>;
-		reg-names = "base", "crm_b", "crm_c";
+		reg = <0xadd7000 0x2000>, <0xadd9800 0x800>, <0xadda000 0x2000>, <0xadd9000 0x800>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v";
 		interrupts = <GIC_SPI 121 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "cam_crm";
 		clocks = <&camcc CAM_CC_DRV_AHB_CLK>;
@@ -886,8 +886,8 @@
 	pcie_crm: crm@1d01000 {
 		label = "pcie_crm";
 		compatible = "qcom,pcie-crm";
-		reg = <0x1d01000 0x3000>, <0x1d04800 0x800>, <0x1d05000 0x2000>;
-		reg-names = "base", "crm_b", "crm_c";
+		reg = <0x1d01000 0x3000>, <0x1d04800 0x800>, <0x1d05000 0x2000>, <0x1d04000 0x800>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v";
 		interrupts = <GIC_SPI 248 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "pcie_crm";
 		clocks = <&pcie_0_pipe_clk>;
@@ -950,6 +950,11 @@
 		modem_dsm@c98 {
 			compatible = "qcom,msm-imem-mss-dsm";
 			reg = <0xc98 0x10>;
+		};
+
+		sys_dbg@af8 {
+			compatible = "qcom,msm-imem-gpu-dump-skip";
+			reg = <0xb0c 0x4>;
 		};
 	};
 
@@ -3178,8 +3183,15 @@
 
 	qcom,qrtr-mhi-cnss {
 		compatible = "qcom,qrtr-mhi";
-		qcom,dev-id = <0x1107>;
+		qcom,dev-id = <0x1103>;
 		qcom,net-id = <0>;
+		qcom,low-latency;
+	};
+
+	qcom,qrtr-mhi-cnss {
+		compatible = "qcom,qrtr-mhi";
+		qcom,dev-id = <0x1107>;
+		qcom,net-id = <1>;
 		qcom,low-latency;
 	};
 

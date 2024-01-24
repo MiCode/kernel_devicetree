@@ -155,20 +155,30 @@ holi-overlays-dtb-$(CONFIG_ARCH_HOLI) += $(HOLI_BOARDS) $(HOLI_BASE_DTB)
 dtb-y += $(holi-dtb-y)
 
 # pitti-dtb
-PITTI_BASE_DTB += pitti.dtb
+PITTI_BASE_DTB += pitti.dtb pitti-3gb.dtb pitti-4gb.dtb
 
-#PITTI_BOARDS += \
+PITTI_BOARDS += \
 		 pitti-atp-overlay.dtbo \
 		 pitti-idp-overlay.dtbo \
-		 pitti-qrd-overlay.dtbo
+		 pitti-qrd-overlay.dtbo \
+		 pitti-idp-pmiv0104-overlay.dtbo \
+		 pitti-idp-apache-overlay.dtbo \
+		 pitti-idp-amoled-overlay.dtbo \
+		 pitti-idp-3gb-overlay.dtbo \
+		 pitti-qrd-3gb-overlay.dtbo \
+		 pitti-atp-4gb-overlay.dtbo \
+		 pitti-idp-4gb-overlay.dtbo \
+		 pitti-idp-pmiv0104-3gb-overlay.dtbo \
+		 pitti-idp-pmiv0104-4gb-overlay.dtbo \
+		 pitti-idp-pmiv0104-apache-overlay.dtbo \
+		 pitti-qrd-4gb-overlay.dtbo
 
 NOAPQ_PITTI_BOARDS += \
 		 pitti-rumi-overlay.dtbo
 
 pitti-dtb-$(CONFIG_ARCH_PITTI) += \
-	$(call add-overlays, $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS),$(PITTI_BASE_DTB))\
-	$(call add-overlays, $(PITTI_BOARDS) $(APQ_PITTI_BOARDS),$(PITTI_APQ_BASE_DTB))
-pitti-overlays-dtb-$(CONFIG_ARCH_PITTI) += $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS) $(PITTI_BASE_DTB) $(PITTI_APQ_BASE_DTB)
+	$(call add-overlays, $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS),$(PITTI_BASE_DTB))
+pitti-overlays-dtb-$(CONFIG_ARCH_PITTI) += $(PITTI_BOARDS) $(NOAPQ_PITTI_BOARDS) $(PITTI_BASE_DTB)
 dtb-y += $(pitti-dtb-y)
 
 endif

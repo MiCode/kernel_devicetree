@@ -13,6 +13,7 @@
 #include <dt-bindings/interconnect/qcom,niobe.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Niobe";
@@ -46,6 +47,8 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x0>;
 			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
@@ -64,6 +67,8 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x100>;
 			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 		};
 
@@ -72,6 +77,8 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x200>;
 			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 		};
 
@@ -80,6 +87,8 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x300>;
 			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 		};
 
@@ -88,6 +97,8 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x400>;
 			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 		};
 
@@ -96,6 +107,8 @@
 			compatible = "qcom,kryo";
 			reg = <0x0 0x500>;
 			enable-method = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
 		};
 
@@ -131,6 +144,18 @@
 	};
 
 	soc: soc { };
+
+	qcom,chd {
+		compatible = "qcom,core-hang-detect";
+		label = "core";
+		qcom,chd-percpu-info = <&CPU0 0x17800058 0x17800060>,
+					<&CPU1 0x17810058 0x17810060>,
+					<&CPU2 0x17820058 0x17820060>,
+					<&CPU3 0x17830058 0x17830060>,
+					<&CPU4 0x17840058 0x17840060>,
+					<&CPU5 0x17850058 0x17850060>;
+	};
+
 };
 
 &soc {
@@ -156,6 +181,11 @@
 		#hwlock-cells = <1>;
 	};
 
+	tcsr: syscon@1f40000 {
+		compatible = "syscon";
+		reg = <0x1f40000 0xc0000>;
+	};
+
 	smem: qcom,smem {
 		compatible = "qcom,smem";
 		memory-region = <&smem_mem>;
@@ -170,9 +200,9 @@
 		cap-based-alloc-and-pwr-collapse;
 	};
 
-	aoss_qmp: power-controller@c320000 {
+	aoss_qmp: power-controller@c300000 {
 		compatible = "qcom,aoss-qmp";
-		reg = <0xc320000 0x400>;
+		reg = <0xc300000 0x400>;
 		interrupt-parent = <&ipcc_mproc>;
 		interrupts = <IPCC_CLIENT_AOP
 			      IPCC_MPROC_SIGNAL_GLINK_QMP
@@ -843,8 +873,17 @@
 	};
 
 	gpucc: clock-controller@3d90000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "gpucc_clocks";
+		compatible = "qcom,niobe-gpucc", "syscon";
+		reg = <0x3d90000 0xa000>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MXA_LEVEL>;
+		vdd_gfx-supply = <&VDD_GFX_LEVEL>;
+		vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&rpmhcc RPMH_CXO_CLK_A>,
+			<&gcc GCC_GPU_GPLL0_CLK_SRC>, <&gcc GCC_GPU_GPLL0_DIV_CLK_SRC>;
+		clock-names = "bi_tcxo", "bi_tcxo_ao",
+			"gpll0_out_main", "gpll0_out_main_div";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -928,6 +967,64 @@
 			qcom,glink-label = "cdsp";
 
 			qcom,cdsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
+	};
+
+	soccp_pas: remoteproc-soccp@a1f80000 {
+		compatible = "qcom,niobe-soccp-pas";
+		reg = <0xa1f80000 0x10000>;
+		status = "ok";
+
+		cx-supply = <&VDD_LPI_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		mx-supply = <&VDD_LPI_MX_LEVEL>;
+		mx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 0>;
+		reg-names = "cx", "mx";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		memory-region = <&soccp_mem 0>;
+		soccp-config = <&tcsr 0x9d004>;
+
+		/* Inputs from SOCCP */
+		interrupts-extended = <&intc GIC_SPI 167 IRQ_TYPE_LEVEL_HIGH>,
+					<&soccp_smp2p_in 0 0>,
+					<&soccp_smp2p_in 1 0>,
+					<&soccp_smp2p_in 3 0>,
+					<&soccp_smp2p_in 2 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"ready",
+				"stop-ack",
+				"handover";
+
+		/* Outputs to soccp */
+		qcom,smem-states = <&soccp_smp2p_out 0>, <&soccp_smp2p_out 10>, <&soccp_smp2p_out 9>;
+
+		qcom,smem-state-names = "stop", "wakeup", "sleep";
+
+		glink-edge {
+			qcom,remote-pid = <19>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_SOCCP
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "soccp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_SOCCP
+				      IPCC_MPROC_SIGNAL_GLINK_QMP
+				      IRQ_TYPE_EDGE_RISING>;
+
+			label = "soccp";
+			qcom,glink-label = "soccp";
+
+			qcom,soccp_qrtr {
 				qcom,glink-channels = "IPCRTR";
 				qcom,intents = <0x800  5
 						0x2000 3
@@ -1020,6 +1117,11 @@
 		#size-cells = <1>;
 		read-only;
 		ranges;
+
+		gpu_speed_bin: gpu_speed_bin@139 {
+			reg = <0x139 0x2>;
+			bits = <2 9>;
+		};
 	};
 
 	qfprom_sys: qfprom@0 {
@@ -1428,6 +1530,21 @@
 		qcom,no-qrng-config;
 		qcom,no-clock-support;
 	};
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "supplier";
+		qcom,vmid = <3>;
+	};
+
+	qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+	};
+
+	qcom,secure-buffer {
+		compatible = "qcom,secure-buffer";
+		qcom,vmid-cp-camera-preview-ro;
+	};
 };
 
 &reserved_memory {
@@ -1480,6 +1597,7 @@
 &firmware {
 	qcom_scm {
 		compatible = "qcom,scm";
+		qcom,dload-mode = <&tcsr 0x99000>;
 	};
 
 	qcom_smcinvoke {
@@ -1641,8 +1759,20 @@
 };
 
 &gpu_cc_cx_gdsc {
-	compatible = "regulator-fixed";
 	reg = <0x3d99080 0x4>;
+	proxy-supply = <&gpu_cc_cx_gdsc>;
+	qcom,proxy-consumer-enable;
+	clocks = <&gcc GCC_GPU_CFG_AHB_CLK>;
+	clock-names = "ahb_clk";
+	parent-supply = <&VDD_CX_LEVEL>;
+	status = "ok";
+};
+
+&gx_clkctl_gx_gdsc {
+	clocks = <&gpucc GPU_CC_GX_AHB_FF_CLK>;
+	clock-names = "ahb_clk";
+	reg-supply = <&gpu_cc_cx_gdsc>;
+	parent-supply = <&VDD_GFX_GFX_MXC_VOTER_LEVEL>;
 	status = "ok";
 };
 

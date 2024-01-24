@@ -9,6 +9,7 @@
 		#address-cells = <1>; size-cells = <1>;
 		ranges;
 
+		USB3_GDSC-supply = <&gcc_usb30_prim_gdsc>;
 		clocks = <&gcc GCC_USB30_PRIM_MASTER_CLK>,
 			<&gcc GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
 			<&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
@@ -32,6 +33,11 @@
 		dwc3@a600000 {
 			compatible = "snps,dwc3";
 			reg = <0xa600000 0xd800>;
+
+			iommus = <&apps_smmu 0x040 0x0>;
+			qcom,iommu-dma = "atomic";
+			qcom,iommu-dma-addr-pool = <0x90000000 0x60000000>;
+			dma-coherent;
 
 			interrupts = <GIC_SPI 346 IRQ_TYPE_LEVEL_HIGH>;
 			snps,disable-clk-gating;
