@@ -10,7 +10,8 @@ maintainers:
   - Nurit Lichtenstein <quic_nuritl@quicinc.com>
 
 description:
-  This document defines the binding for a component that loads and boots firmware on the QTI Secure Processor.
+  This document defines the binding for a component that loads
+  and boots firmware on the QTI Secure Processor.
 
 properties:
   compatible:
@@ -29,6 +30,7 @@ properties:
       - description: RMB error register
       - description: RMB general purpose register
       - description: RMB error spare2 register
+      - description: SP PBL patch version register
 
   reg-names:
     items:
@@ -38,9 +40,9 @@ properties:
       - const: rmb_err
       - const: rmb_general_purpose
       - const: rmb_err_spare2
+      - const: sp_pbl_patch_ver
 
   interrupts:
-    minItems: 1
     items:
       - description: Generic interrupt
 
@@ -58,11 +60,11 @@ properties:
   px-supply:
     description: Phandle to the PX regulator
 
-memory-region:
+  memory-region:
     maxItems: 1
     description: Reference to the reserved-memory for the SPSS
 
-glink-edge:
+  glink-edge:
     $ref: /schemas/remoteproc/qcom,glink-edge.yaml#
     description:
       QTI G-Link subnode which represents communication edge, channels
@@ -78,8 +80,10 @@ required:
   - clock-names
   - memory-region
 
+additionalProperties: false
+
 examples:
-  #The following example represents the qcom,spss node on a sun device.
+  # The following example represents the qcom,spss node on a sun device.
   - |
     spss_pas: remoteproc-spss@1880000 {
         compatible = "qcom,sun-spss-pas";
@@ -89,9 +93,11 @@ examples:
               <0x1881028 0x4>,
               <0x188103c 0x4>,
               <0x1881100 0x4>,
-              <0x1882014 0x4>;
+              <0x1882014 0x4>,
+              <0x221C8490 0x4>;
         reg-names = "sp2soc_irq_status", "sp2soc_irq_clr", "sp2soc_irq_mask",
-                    "rmb_err", "rmb_general_purpose", "rmb_err_spare2";
+                    "rmb_err", "rmb_general_purpose", "rmb_err_spare2",
+                    "sp_pbl_patch_ver";
         interrupts = <0 352 1>;
 
         cx-supply = <&VDD_CX_LEVEL>;
