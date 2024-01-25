@@ -26,7 +26,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 cpufreq.default_governor=performance";
 	};
 
 	reserved_memory: reserved-memory {};
@@ -50,6 +50,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -70,6 +71,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU2: cpu@200 {
@@ -80,6 +82,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 		};
 
 		CPU3: cpu@300 {
@@ -90,6 +93,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 		};
 
 		CPU4: cpu@400 {
@@ -100,6 +104,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 		};
 
 		CPU5: cpu@500 {
@@ -110,6 +115,7 @@
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
 			next-level-cache = <&L2_0>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 		};
 
 		cpu-map {
@@ -370,6 +376,11 @@
 				qcom,ddr-bcm-name = "MC4";
 				qcom,llcc-bcm-name = "SH5";
 			};
+
+			rpmhcc: clock-controller {
+				compatible = "qcom,niobe-rpmh-clk";
+				#clock-cells = <1>;
+			};
 		};
 	};
 
@@ -380,7 +391,6 @@
 		reg-names = "drv-0";
 		qcom,drv-count = <1>;
 		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
-		clocks = <&dispcc0 MDSS_0_DISP_CC_MDSS_RSCC_AHB_CLK>;
 
 		disp_rsc_0_drv0: drv@0 {
 			qcom,drv-id = <0>;
@@ -401,7 +411,6 @@
 		reg = <0xa920000 0x10000>;
 		reg-names = "drv-0";
 		interrupts = <GIC_SPI 455 IRQ_TYPE_LEVEL_HIGH>;
-		clocks = <&dispcc1 MDSS_1_DISP_CC_MDSS_RSCC_AHB_CLK>;
 
 		disp_rsc_1_drv0: drv@0 {
 			qcom,tcs-offset = <0x1c00>;
@@ -788,13 +797,6 @@
 		compatible = "qcom,dload-mode";
 	};
 
-	rpmhcc: clock-controller {
-		compatible = "fixed-clock";
-		clock-output-names = "rpmh_clocks";
-		clock-frequency = <19200000>;
-		#clock-cells = <1>;
-	};
-
 	camcc: clock-controller@ade0000 {
 		compatible = "qcom,niobe-camcc", "syscon";
 		reg = <0xade0000 0x20000>;
@@ -889,8 +891,9 @@
 	};
 
 	tcsrcc: clock-controller@1f40000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "tcsrcc_clocks";
+		compatible = "qcom,niobe-tcsrcc", "syscon";
+		reg = <0x1f40000 0xc0000>;
+		reg-name = "cc_base";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -911,6 +914,52 @@
 			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
+	};
+
+	apsscc: syscon@17aa0000 {
+		compatible = "syscon";
+		reg = <0x17aa0000 0x1c>;
+	};
+
+	mccc: syscon@240ba000 {
+		compatible = "syscon";
+		reg = <0x240ba000 0x54>;
+	};
+
+	debugcc: clock-controller@0 {
+		compatible = "qcom,niobe-debugcc";
+		qcom,apsscc = <&apsscc>;
+		qcom,camcc = <&camcc>;
+		qcom,dispcc0 = <&dispcc0>;
+		qcom,dispcc1 = <&dispcc1>;
+		qcom,gcc = <&gcc>;
+		qcom,gpucc = <&gpucc>;
+		qcom,videocc = <&videocc>;
+		qcom,mccc = <&mccc>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&camcc 0>,
+			<&dispcc0 0>, <&dispcc1 0>, <&gcc 0>,
+			<&gpucc 0>, <&videocc 0>;
+		clock-names = "xo_clk_src", "camcc",
+			"dispcc0", "dispcc1", "gcc",
+			"gpucc", "videocc";
+		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17d91000 0x1000>, <0x17d92000 0x1000>;
+		reg-names = "freq-domain0", "freq-domain1";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int", "dcvsh1_int";
+		#freq-domain-cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>, <&cpufreq_hw 1>;
 	};
 
 	qcom,mpm2-sleep-counter@c221000 {
@@ -1777,7 +1826,7 @@
 };
 
 &gcc_pcie_0_phy_gdsc {
-	parent-supply = <&VDD_CX_LEVEL>;
+	parent-supply = <&VDD_MXA_LEVEL>;
 	status = "ok";
 };
 
@@ -1787,7 +1836,7 @@
 };
 
 &gcc_pcie_1_phy_gdsc {
-	parent-supply = <&VDD_CX_LEVEL>;
+	parent-supply = <&VDD_MXA_LEVEL>;
 	status = "ok";
 };
 
@@ -1797,12 +1846,12 @@
 };
 
 &gcc_pcie_2_phy_gdsc {
-	parent-supply = <&VDD_CX_LEVEL>;
+	parent-supply = <&VDD_MXA_LEVEL>;
 	status = "ok";
 };
 
 &gcc_ufs_mem_phy_gdsc {
-	parent-supply = <&VDD_CX_LEVEL>;
+	parent-supply = <&VDD_MXA_LEVEL>;
 	status = "ok";
 };
 
@@ -1822,13 +1871,13 @@
 };
 
 &gcc_usb3_phy_gdsc {
-	parent-supply = <&VDD_CX_LEVEL>;
+	parent-supply = <&VDD_MXA_LEVEL>;
 	reg = <0x15000c 0x4>;
 	status = "ok";
 };
 
 &gcc_usb3_sec_phy_gdsc {
-	parent-supply = <&VDD_CX_LEVEL>;
+	parent-supply = <&VDD_MXA_LEVEL>;
 	status = "ok";
 };
 
