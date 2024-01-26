@@ -19,6 +19,7 @@ _platform_map = {
             {"name": "sun-cdp-kiwi-overlay.dtbo"},
             {"name": "sun-cdp-kiwi-v8-overlay.dtbo"},
             {"name": "sun-cdp-nfc-overlay.dtbo"},
+            {"name": "sun-cdp-no-display-overlay.dtbo"},
             {"name": "sun-cdp-overlay.dtbo"},
             {"name": "sun-cdp-v8-overlay.dtbo"},
             {"name": "sun-mtp-kiwi-overlay.dtbo"},

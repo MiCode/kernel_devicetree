@@ -27,6 +27,7 @@ SUN_BOARDS += \
 		sun-cdp-kiwi-overlay.dtbo \
 		sun-cdp-kiwi-v8-overlay.dtbo \
 		sun-cdp-nfc-overlay.dtbo \
+		sun-cdp-no-display-overlay.dtbo \
 		sun-cdp-overlay.dtbo \
 		sun-cdp-v8-overlay.dtbo \
 		sun-qrd-sku1-overlay.dtbo \
