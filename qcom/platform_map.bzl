@@ -21,6 +21,7 @@ _platform_map = {
             {"name": "sun-cdp-nfc-overlay.dtbo"},
             {"name": "sun-cdp-overlay.dtbo"},
             {"name": "sun-cdp-v8-overlay.dtbo"},
+            {"name": "sun-mtp-3.5mm-overlay.dtbo"},
             {"name": "sun-mtp-kiwi-overlay.dtbo"},
             {"name": "sun-mtp-kiwi-v8-overlay.dtbo"},
             {"name": "sun-mtp-nfc-overlay.dtbo"},
