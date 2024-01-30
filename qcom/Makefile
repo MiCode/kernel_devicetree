@@ -19,6 +19,7 @@ SUN_BASE_DTB += sun.dtb sun-v2.dtb
 SUN_APQ_BASE_DTB += sunp.dtb sunp-v2.dtb
 
 SUN_BOARDS += \
+		sun-mtp-3.5mm-overlay.dtbo \
 		sun-mtp-kiwi-overlay.dtbo \
 		sun-mtp-kiwi-v8-overlay.dtbo \
 		sun-mtp-nfc-overlay.dtbo \
