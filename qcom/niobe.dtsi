@@ -26,7 +26,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 cpufreq.default_governor=performance";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat cpufreq.default_governor=performance";
 	};
 
 	reserved_memory: reserved-memory {};
@@ -346,11 +346,21 @@
 		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
 		interrupt-controller;
+		ranges;
 		#redistributor-regions = <1>;
 		redistributor-stride = <0x0 0x20000>;
 		reg = <0x17200000 0x10000>,       /* GICD */
 		     <0x17260000 0xC0000>;       /* GICR * 8 */
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		gic_its: msi-controller@17240000 {
+			compatible = "arm,gic-v3-its";
+			msi-controller;
+			#msi-cells = <1>;
+			reg = <0x17240000 0x20000>;
+		};
 	};
 
 	apps_rsc: rsc@17a00000 {
@@ -1961,3 +1971,4 @@
 #include "niobe-coresight.dtsi"
 #include "niobe-debug.dtsi"
 #include "niobe-thermal.dtsi"
+#include "niobe-pcie.dtsi"
