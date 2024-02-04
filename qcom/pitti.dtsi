@@ -28,11 +28,13 @@
 	};
 
 	chosen: chosen {
-		bootargs = "loglevel=6 log_buf_len=256K printk.console_no_auto_verbose=1 kpti=0 swiotlb=noforce loop.max_part=7 pcie_ports=compat irqaffinity=0-5 cpufreq.default_governor=performance kasan=off cgroup.memory=nokmem,nosocket disable_dma32=on rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kernel.panic_on_rcu_stall=1 no-steal-acc ftrace_dump_on_oops can.stats_timer=0 fw_devlink.strict=1 service_locator.enable=1 firmware_class.path=/vendor/firmware_mnt/image slub_debug=-";
+		bootargs = "loglevel=6 log_buf_len=256K printk.console_no_auto_verbose=1 kpti=0 swiotlb=noforce loop.max_part=7 pcie_ports=compat irqaffinity=0-5 cpufreq.default_governor=performance kasan=off cgroup.memory=nokmem,nosocket disable_dma32=on rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kernel.panic_on_rcu_stall=1 no-steal-acc ftrace_dump_on_oops can.stats_timer=0 fw_devlink.strict=1 service_locator.enable=1 firmware_class.path=/vendor/firmware_mnt/image,/vendor/firmware slub_debug=-";
 		stdout-path = "serial0:115200n8";
 	};
 
 	reserved_memory: reserved-memory {};
+
+	ddr-regions {};
 
 	firmware: firmware {};
 
@@ -48,6 +50,8 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD0>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
@@ -72,6 +76,8 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD1>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
@@ -86,6 +92,8 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD2>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
@@ -100,6 +108,8 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD3>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
@@ -114,6 +124,8 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD4>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
@@ -128,6 +140,8 @@
 			cpu-idle-states = <&SILVER_OFF &SILVER_RAIL_OFF>;
 			power-domains = <&CPU_PD5>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1024>;
+			dynamic-power-coefficient = <100>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_0>;
 			qcom,freq-domain = <&cpufreq_hw 0>;
@@ -142,6 +156,8 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD6>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1946>;
+			dynamic-power-coefficient = <489>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_6>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
@@ -161,6 +177,8 @@
 			cpu-idle-states = <&GOLD_OFF &GOLD_RAIL_OFF>;
 			power-domains = <&CPU_PD7>;
 			power-domain-names = "psci";
+			capacity-dmips-mhz = <1946>;
+			dynamic-power-coefficient = <489>;
 			cpu-release-addr = <0x0 0xE3940000>;
 			next-level-cache = <&L2_6>;
 			qcom,freq-domain = <&cpufreq_hw 1>;
@@ -385,7 +403,7 @@
 	qcom,rpm-master-stats@45f0150 {
 		compatible = "qcom,rpm-master-stats";
 		reg = <0x45f0150 0x5000>;
-		qcom,masters = "APSS", "MPSS", "ADSP", "CDSP", "TZ";
+		qcom,masters = "APSS", "MPSS", "ADSP";
 		qcom,master-stats-version = <2>;
 		qcom,master-offset = <4096>;
 	};
@@ -513,16 +531,6 @@
 					<&CPU7 0x0F870058 0x0F870060>;
 	};
 
-	gh-secure-vm-loader@0 {
-		compatible = "qcom,gh-secure-vm-loader";
-		qcom,pas-id = <35>;
-		qcom,vmid = <50>;
-		qcom,firmware-name = "cpusys_vm";
-		memory-region = <&cpusys_vm_mem>;
-		ext-region = <&chipinfo_mem>;
-		ext-label = <0x7>;
-	};
-
 	ipcc_mproc: qcom,ipcc@208000 {
 		compatible = "qcom,ipcc";
 		reg = <0x208000 0x1000>;
@@ -578,6 +586,12 @@
 			compatible = "qcom,pil-reloc-info";
 			reg = <0x94c 0xc8>;
 		};
+	};
+
+	restart@440b000 {
+		compatible = "qcom,pshold";
+		reg = <0x440b000 0x4>, <0x03d3000 0x4>;
+		reg-names = "pshold-base", "tcsr-boot-misc-detect";
 	};
 
 	dload_mode {
@@ -1403,6 +1417,66 @@
 		};
 	};
 
+	wpss_pas: remoteproc-wpss@05600000 {
+		compatible = "qcom,pitti-wpss-pas";
+		reg = <0x5600000 0x100>;
+		status = "ok";
+
+		memory-region = <&wlan_mem>;
+		firmware-name = "adrastea/wpss.mdt";
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
+		mx-supply = <&VDD_MX_LEVEL>;
+		mx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx","mx";
+
+		/* Inputs from wpss */
+		interrupts-extended = <&intc GIC_SPI 587 IRQ_TYPE_EDGE_RISING>,
+				      <&wpss_smp2p_in 0 0>,
+				      <&wpss_smp2p_in 2 0>,
+				      <&wpss_smp2p_in 1 0>,
+				      <&wpss_smp2p_in 3 0>,
+				      <&wpss_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				   "fatal",
+				   "handover",
+				   "ready",
+				   "stop-ack",
+				   "shutdown-ack";
+
+		/* Outputs to wpss */
+		qcom,smem-states = <&wpss_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		glink-edge {
+			qcom,remote-pid = <13>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_WPSS
+				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "wpss_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_WPSS
+					  IPCC_MPROC_SIGNAL_GLINK_QMP
+					  IRQ_TYPE_EDGE_RISING>;
+
+			label = "wpss";
+			qcom,glink-label = "wpss";
+
+			qcom,wpss_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+		};
+	};
+
 	google,debug-kinfo {
 		compatible = "google,debug-kinfo";
 		memory-region = <&kinfo_mem>;
@@ -1546,8 +1620,9 @@
 		iommus = <&apps_smmu 0x0180 0x0>;
 		qcom,iommu-dma = "bypass";
 
-		nvmem-cells = <&boot_config>;
-		nvmem-cell-names = "boot_conf";
+		ufs-dev-types = <2>;
+		nvmem-cells = <&ufs_dev>, <&boot_config>;
+		nvmem-cell-names = "ufs_dev", "boot_conf";
 		boot_device_type = <0x0>;
 		non-removable;
 
@@ -1586,6 +1661,16 @@
 		boot_config: boot_config@6070 {
 			reg = <0x6070 0x4>;
 		};
+
+		gpu_speed_bin: gpu_speed_bin@6006 {
+			reg = <0x6006 0x2>;
+			bits = <5 8>;
+		};
+
+		gpu_gaming_bin: gpu_gaming_bin@602d {
+			reg = <0x602d 0x1>;
+			bits = <5 1>;
+		};
 	};
 
 	qfprom_sys: qfprom@0 {
@@ -1594,6 +1679,8 @@
 		nvmem-cells = <&feat_conf10>;
 		nvmem-cell-names = "feat_conf10";
 	};
+
+	msm_gpu: qcom,kgsl-3d0@5900000 { };
 
 	qcom,glinkpkt {
 		compatible = "qcom,glinkpkt";
