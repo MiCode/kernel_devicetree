@@ -39,12 +39,14 @@ _platform_map = {
             {"name": "lemans-gunyah-vm-cob.dtb"},
             {"name": "lemans-gunyah-vm-qam.dtb"},
             {"name": "lemans-gunyah-vm-vp.dtb"},
+            {"name": "monaco-gunyah-vm-qam.dtb"},
         ],
         "dtbo_list": [
             # keep sorted
             {"name": "lemans-gunyah-vm-cob-overlay.dtbo"},
             {"name": "lemans-gunyah-vm-qam-overlay.dtbo"},
             {"name": "lemans-gunyah-vm-vp-overlay.dtbo"},
+            {"name": "monaco-gunyah-vm-qam-overlay.dtbo"},
         ],
     },
     "gen3auto": {

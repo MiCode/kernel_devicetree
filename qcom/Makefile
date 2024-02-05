@@ -442,6 +442,21 @@ dtb-y += $(autoghgvm-dtb-y)
 endif
 endif
 
+ifeq ($(CONFIG_ARCH_MONACO_AUTO), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+
+MONACO_GH_LA_GVM_QAM_BASE_DTB += monaco-gunyah-vm-qam.dtb
+MONACO_GH_LA_GVM_QAM_BOARDS += monaco-gunyah-vm-qam-overlay.dtbo
+
+autoghgvm-dtb-$(CONFIG_ARCH_QTI_VM) += \
+	$(call add-overlays, $(MONACO_GH_LA_GVM_QAM_BOARDS),$(MONACO_GH_LA_GVM_QAM_BASE_DTB))
+
+autoghgvm-overlays-dtb-$(CONFIG_ARCH_QTI_VM) += \
+	$(MONACO_GH_LA_GVM_QAM_BOARDS),$(MONACO_GH_LA_GVM_QAM_BASE_DTB)
+
+dtb-y += $(autoghgvm-dtb-y)
+endif
+endif
 
 SA8155_BASE_DTB += sa8155.dtb sa8155-v2.dtb
 SA8155P_BASE_DTB += sa8155p.dtb sa8155p-v2.dtb
