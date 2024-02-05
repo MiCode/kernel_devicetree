@@ -252,6 +252,13 @@ dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif
 
+ifeq ($(CONFIG_ARCH_VOLCANO), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += volcano-vm-rumi.dtb
+dtb-y += $(pineapple_tuivm-dtb-y)
+endif
+endif
+
 ifeq ($(CONFIG_ARCH_KALAMA), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 kalama_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += kalama-vm-rumi.dtb \
