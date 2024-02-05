@@ -369,6 +369,10 @@ _platform_map = {
                 "name": "volcano-rumi-overlay.dtbo",
                 "apq": False,
             },
+            {"name": "volcano-atp-overlay.dtbo"},
+            {"name": "volcano-idp-overlay.dtbo"},
+            {"name": "volcano-mtp-overlay.dtbo"},
+            {"name": "volcano-qrd-overlay.dtbo"},
         ],
     },
 }
