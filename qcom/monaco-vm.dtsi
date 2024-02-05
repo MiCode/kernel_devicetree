@@ -32,6 +32,16 @@
 		reg = <0x1fdd000 0x1000>;
 	};
 
+	tcsr_compute_signal_sender2: syscon@0x1ff0000 {
+		compatible = "syscon";
+		reg = <0x1ff0000 0x1000>;
+	};
+
+	tcsr_compute_signal_sender3: syscon@0x1ff4000 {
+		compatible = "syscon";
+		reg = <0x1ff4000 0x1000>;
+	};
+
 	tcsr_compute_signal_receiver0: syscon@0x1fdb000 {
 		compatible = "syscon";
 		reg = <0x1fdb000 0x1000>;
@@ -40,6 +50,16 @@
 	tcsr_compute_signal_receiver1: syscon@0x1fdf000 {
 		compatible = "syscon";
 		reg = <0x1fdf000 0x1000>;
+	};
+
+	tcsr_compute_signal_receiver2: syscon@0x1ff2000 {
+		compatible = "syscon";
+		reg = <0x1ff2000 0x1000>;
+	};
+
+	tcsr_compute_signal_receiver3: syscon@0x1ff6000 {
+		compatible = "syscon";
+		reg = <0x1ff6000 0x1000>;
 	};
 
 	hgsl_tcsr_sender0: hgsl_tcsr_sender0 {
@@ -51,6 +71,18 @@
 	hgsl_tcsr_sender1: hgsl_tcsr_sender1 {
 		compatible = "qcom,hgsl-tcsr-sender";
 		syscon = <&tcsr_compute_signal_sender1>;
+		syscon-glb = <&tcsr_compute_signal_glb>;
+	};
+
+	hgsl_tcsr_sender2: hgsl_tcsr_sender2 {
+		compatible = "qcom,hgsl-tcsr-sender";
+		syscon = <&tcsr_compute_signal_sender2>;
+		syscon-glb = <&tcsr_compute_signal_glb>;
+	};
+
+	hgsl_tcsr_sender3: hgsl_tcsr_sender3 {
+		compatible = "qcom,hgsl-tcsr-sender";
+		syscon = <&tcsr_compute_signal_sender3>;
 		syscon-glb = <&tcsr_compute_signal_glb>;
 	};
 
@@ -66,15 +98,31 @@
 		interrupts = <0 239 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+	hgsl_tcsr_receiver2: hgsl_tcsr_receiver2 {
+		compatible = "qcom,hgsl-tcsr-receiver";
+		syscon = <&tcsr_compute_signal_receiver2>;
+		interrupts = <0 788 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	hgsl_tcsr_receiver3: hgsl_tcsr_receiver3 {
+		compatible = "qcom,hgsl-tcsr-receiver";
+		syscon = <&tcsr_compute_signal_receiver3>;
+		interrupts = <0 785 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
 	msm_gpu_hyp: qcom,hgsl@0x2c00000 {
 		compatible = "qcom,hgsl";
 		reg = <0x2c00000 0x8>, <0x2c8f000 0x4>;
 		reg-names = "hgsl_reg_hwinf", "hgsl_reg_gmucx";
 
 		qcom,glb-db-senders = <&hgsl_tcsr_sender0
-					&hgsl_tcsr_sender1>;
+					&hgsl_tcsr_sender1
+					&hgsl_tcsr_sender2
+					&hgsl_tcsr_sender3>;
 		qcom,glb-db-receivers = <&hgsl_tcsr_receiver0
-					&hgsl_tcsr_receiver1>;
+					&hgsl_tcsr_receiver1
+					&hgsl_tcsr_receiver2
+					&hgsl_tcsr_receiver3>;
 	};
 
 	pdc: interrupt-controller@b220000 {
