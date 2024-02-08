@@ -184,8 +184,12 @@ _platform_map = {
             {"name": "niobe.dtb"},
         ],
         "dtbo_list": [
+            {"name": "niobe-atp-overlay.dtbo"},
+            {"name": "niobe-idp-overlay.dtbo"},
+            {"name": "niobe-qxr-overlay.dtbo"},
             {
                 "name": "niobe-rumi-overlay.dtbo",
+                "apq": False,
             },
         ],
     },
