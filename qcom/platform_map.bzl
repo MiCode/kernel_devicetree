@@ -224,6 +224,7 @@ _platform_map = {
             {"name": "cliffs-rcm-qhdp-overlay.dtbo"},
             {"name": "cliffs-rcm-fhdp-kiwi-overlay.dtbo"},
             {"name": "cliffs-rcm-qhdp-kiwi-overlay.dtbo"},
+            {"name": "cliffs-mtp-kiwi-overlay.dtbo"},
         ],
     },
     "pineapple-tuivm": {
@@ -266,6 +267,7 @@ _platform_map = {
             {"name": "cliffs-vm-atp.dtb"},
             {"name": "cliffs-vm-cdp.dtb"},
             {"name": "cliffs-vm-mtp.dtb"},
+            {"name": "cliffs-vm-mtp-kiwi.dtb"},
             {"name": "cliffs-vm-qrd.dtb"},
             {"name": "cliffs-vm-rcm.dtb"},
             {"name": "cliffs-vm-rcm-fhdp-kiwi.dtb"},
@@ -276,6 +278,7 @@ _platform_map = {
             {"name": "cliffs-oemvm-atp.dtb"},
             {"name": "cliffs-oemvm-cdp.dtb"},
             {"name": "cliffs-oemvm-mtp.dtb"},
+            {"name": "cliffs-oemvm-mtp-kiwi.dtb"},
             {"name": "cliffs-oemvm-qrd.dtb"},
             {"name": "cliffs-oemvm-rcm.dtb"},
             {"name": "cliffs-oemvm-rcm-fhdp-kiwi.dtb"},
