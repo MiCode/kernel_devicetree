@@ -24,7 +24,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-3 earlycon=qcom_geni,0x00a94000";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-3 earlycon=qcom_geni,0x00a94000 cpufreq.default_governor=performance";
 		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
@@ -54,6 +54,7 @@
 			next-level-cache = <&L2_0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_0: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -77,6 +78,7 @@
 			next-level-cache = <&L2_0>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU2: cpu@200 {
@@ -90,6 +92,7 @@
 			next-level-cache = <&L2_2>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 			L2_2: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -108,6 +111,7 @@
 			next-level-cache = <&L2_2>;
 			capacity-dmips-mhz = <1024>;
 			dynamic-power-coefficient = <100>;
+			qcom,freq-domain = <&cpufreq_hw 0>;
 		};
 
 		CPU4: cpu@400 {
@@ -121,6 +125,7 @@
 			next-level-cache = <&L2_4>;
 			capacity-dmips-mhz = <1670>;
 			dynamic-power-coefficient = <264>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			L2_4: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -139,6 +144,7 @@
 			next-level-cache = <&L2_5>;
 			capacity-dmips-mhz = <1670>;
 			dynamic-power-coefficient = <264>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			L2_5: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -157,6 +163,7 @@
 			next-level-cache = <&L2_6>;
 			capacity-dmips-mhz = <1670>;
 			dynamic-power-coefficient = <264>;
+			qcom,freq-domain = <&cpufreq_hw 1>;
 			L2_6: l2-cache {
 			      compatible = "arm,arch-cache";
 			      cache-level = <2>;
@@ -175,6 +182,7 @@
 			next-level-cache = <&L2_7>;
 			capacity-dmips-mhz = <1670>;
 			dynamic-power-coefficient = <287>;
+			qcom,freq-domain = <&cpufreq_hw 2>;
 			L2_7: l2-cache {
 				compatible = "arm,arch-cache";
 				cache-level = <2>;
@@ -641,6 +649,23 @@
 		};
 	};
 
+	cpufreq_hw: qcom,cpufreq-hw {
+		compatible = "qcom,cpufreq-epss";
+		reg = <0x17d91000 0x1000>, <0x17d92000 0x1000>, <0x17d93000 0x1000>;
+		reg-names = "freq-domain0", "freq-domain1", "freq-domain2";
+		clocks = <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+		clock-names = "xo", "alternate";
+		interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "dcvsh0_int", "dcvsh1_int", "dcvsh2_int";
+		#freq-domain_cells = <1>;
+	};
+
+	qcom,cpufreq-hw-debug {
+		compatible = "qcom,cpufreq-hw-epss-debug";
+		qcom,freq-hw-domain = <&cpufreq_hw 0>, <&cpufreq_hw 1>, <&cpufreq_hw 2>;
+	};
 
 	camcc: clock-controller@adb0000 {
 		compatible = "qcom,volcano-camcc", "syscon";
