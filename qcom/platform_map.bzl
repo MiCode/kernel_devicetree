@@ -372,6 +372,10 @@ _platform_map = {
     "volcano": {
         "dtb_list": [
             {"name": "volcano.dtb"},
+            {
+                "name": "volcano6p.dtb",
+                "apq": True,
+            },
         ],
         "dtbo_list": [
             {
