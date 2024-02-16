@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <dt-bindings/clock/qcom,camcc-pineapple.h>
@@ -1851,9 +1851,9 @@
 		compatible = "qcom,pineapple-llcc", "qcom,llcc-v50";
 		reg = <0x25000000 0x200000>, <0x25400000 0x200000>,
 			<0x25200000 0x200000>, <0x25600000 0x200000>,
-			<0x25800000 0x200000>;
+			<0x25800000 0x200000>, <0x25a00000 0x200000>;
 		reg-names = "llcc0_base", "llcc1_base", "llcc2_base",
-			"llcc3_base", "llcc_broadcast_base";
+			"llcc3_base", "llcc_broadcast_or_base", "llcc_broadcast_and_base";
 		interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
 		cap-based-alloc-and-pwr-collapse;
 
@@ -2220,12 +2220,6 @@
 						0xc00 3
 						0x2000 1>;
 			};
-
-			qcom,msm_fastrpc_rpmsg {
-				compatible = "qcom,msm-fastrpc-rpmsg";
-				qcom,glink-channels = "fastrpcglink-apps-dsp";
-				qcom,intents = <0x64 64>;
-			};
 		};
 	};
 
@@ -2345,7 +2339,7 @@
 		qcom,smem-states = <&cdsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
 
-		glink-edge {
+		remoteproc_cdsp_glink: glink-edge {
 			qcom,remote-pid = <5>;
 			transport = "smem";
 			mboxes = <&ipcc_mproc IPCC_CLIENT_CDSP
@@ -2377,12 +2371,6 @@
 					qcom,qos-latency-us = <70>;
 					qcom,qos-maxhold-ms = <20>;
 				};
-			};
-
-			qcom,msm_fastrpc_rpmsg {
-				compatible = "qcom,msm-fastrpc-rpmsg";
-				qcom,glink-channels = "fastrpcglink-apps-dsp";
-				qcom,intents = <0x64 64>;
 			};
 		};
 	};

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <dt-bindings/gpio/gpio.h>
@@ -8,6 +8,7 @@
 #include <dt-bindings/clock/qcom,gcc-sun.h>
 
 #include "sun-pmic-overlay.dtsi"
+#include "sun-thermal-overlay.dtsi"
 
 &soc {
 	gpio_keys {
@@ -66,6 +67,7 @@
 &battery_charger {
 	qcom,thermal-mitigation-step = <500000>;
 	#cooling-cells = <2>;
+	qcom,wireless-fw-name = "idt9418.bin";
 };
 
 &pmic_glink_debug {
@@ -279,6 +281,15 @@
 	qcom,uses_level_shifter;
 };
 
+&pmih010x_eusb2_repeater {
+	qcom,param-override-seq =
+		/* <value reg_offset> */
+		/* Adjust HS trasmit amplitude */
+		<0xa 0x51
+		/* Tx pre-emphasis tuning */
+		 0x3 0x57>;
+};
+
 &eusb2_phy0 {
 	dummy-supply = <&pmih010x_eusb2_repeater>;
 	usb-repeater = <&pmih010x_eusb2_repeater>;
@@ -311,7 +322,7 @@
 		qts,trusted-touch-mode = "vm_mode";
 		qts,touch-environment = "pvm";
 		qts,trusted-touch-type = "primary";
-		qts,trusted-touch-spi-irq = <598>;
+		qts,trusted-touch-spi-irq = <652>;
 		qts,trusted-touch-io-bases = <0xa90000>;
 		qts,trusted-touch-io-sizes = <0x1000>;
 		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
@@ -320,6 +331,8 @@
 };
 
 &usb0 {
+	qcom,wcd_usbss = <&wcd_usbss>;
+
 	usb-role-switch;
 	port {
 		usb_port0: endpoint {

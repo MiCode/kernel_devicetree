@@ -16,8 +16,10 @@ add-overlays = $(foreach o,$1,$(foreach b,$2,$(eval $(basename $b)-$(basename $o
 ifneq ($(CONFIG_ARCH_QTI_VM), y)
 
 SUN_BASE_DTB += sun.dtb sun-v2.dtb
+SUN_APQ_BASE_DTB += sunp.dtb sunp-v2.dtb
 
 SUN_BOARDS += \
+		sun-mtp-3.5mm-overlay.dtbo \
 		sun-mtp-kiwi-overlay.dtbo \
 		sun-mtp-kiwi-v8-overlay.dtbo \
 		sun-mtp-nfc-overlay.dtbo \
@@ -26,13 +28,16 @@ SUN_BOARDS += \
 		sun-cdp-kiwi-overlay.dtbo \
 		sun-cdp-kiwi-v8-overlay.dtbo \
 		sun-cdp-nfc-overlay.dtbo \
+		sun-cdp-no-display-overlay.dtbo \
 		sun-cdp-overlay.dtbo \
 		sun-cdp-v8-overlay.dtbo \
 		sun-qrd-sku1-overlay.dtbo \
 		sun-qrd-sku1-v8-overlay.dtbo \
 		sun-qrd-sku2-v8-overlay.dtbo \
-		sun-rcm-overlay.dtbo \
+		sun-rcm-kiwi-overlay.dtbo \
 		sun-rcm-kiwi-v8-overlay.dtbo \
+		sun-rcm-overlay.dtbo \
+		sun-rcm-v8-overlay.dtbo \
 		sun-atp-overlay.dtbo
 
 NOAPQ_SUN_BOARDS += \
@@ -89,12 +94,16 @@ ifeq ($(CONFIG_ARCH_SUN), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 sun_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += sun-vm-rumi.dtb \
 				sun-vm-mtp.dtb \
+				sun-vm-mtp-v8.dtb \
 				sun-vm-cdp.dtb \
 				sun-vm-qrd.dtb \
+				sun-vm-rcm.dtb \
 				sun-oemvm-rumi.dtb \
 				sun-oemvm-mtp.dtb \
+				sun-oemvm-mtp-v8.dtb \
 				sun-oemvm-cdp.dtb \
-				sun-oemvm-qrd.dtb
+				sun-oemvm-qrd.dtb \
+				sun-oemvm-rcm.dtb
 dtb-y += $(sun_tuivm-dtb-y)
 
 endif

@@ -21,6 +21,7 @@
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/power/qcom-aoss-qmp.h>
+#include <dt-bindings/clock/qcom,aop-qmp.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. Sun";
@@ -34,7 +35,7 @@
 
 
 	chosen: chosen {
-		bootargs = "log_buf_len=512K loglevel=6 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc kpti=0 swiotlb=0 loop.max_part=7 irqaffinity=0-1 pcie_ports=compat mem-offline.bypass_send_msg=1 printk.console_no_auto_verbose=1 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 can.stats_timer=0";
+		bootargs = "log_buf_len=512K loglevel=6 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc kpti=0 swiotlb=0 loop.max_part=7 irqaffinity=0-1 pcie_ports=compat mem-offline.bypass_send_msg=1 printk.console_no_auto_verbose=1 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 can.stats_timer=0 pci-msm-drv.pcie_sm_regs=0x1D07000,0x1040,0x1048,0x3000,0x1";
 		stdout-path = "/soc/qcom,qupv3_1_geni_se@ac0000/qcom,qup_uart@a9c000:115200n8";
 	};
 
@@ -314,6 +315,10 @@
 		compatible = "qcom,smcinvoke";
 	};
 
+	qcom_mem_object {
+		compatible = "qcom,mem-object";
+	};
+
 	qtee_shmbridge {
 		compatible = "qcom,tee-shared-memory-bridge";
 	};
@@ -568,6 +573,17 @@
 		/* ipa - inbound entry from mss */
 		smp2p_ipa_1_in: qcom,smp2p-ipa-1-in {
 			qcom,entry-name = "ipa";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		smp2p_smem_mailbox_1_out: qcom,smp2p-smem-mailbox-1-out {
+			qcom,entry-name = "smem-mailbox";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_smem_mailbox_1_in: qcom,smp2p-smem-mailbox-1-in {
+			qcom,entry-name = "smem-mailbox";
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
@@ -855,6 +871,8 @@
 
 		llcc_perfmon {
 			compatible = "qcom,llcc-perfmon";
+			clocks = <&aoss_qmp QDSS_CLK>;
+			clock-names = "qdss_clk";
 		};
 	};
 
@@ -1018,7 +1036,6 @@
 				       "pcie_crm_hw_0";
 		qcom,bcm-voters = <&apps_bcm_voter>,
 				  <&pcie_crm_hw_0_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	aggre1_noc: interconnect@16e0000 {
@@ -1029,7 +1046,6 @@
 			 <&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	aggre2_noc: interconnect@1700000 {
@@ -1039,7 +1055,6 @@
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 		clocks = <&rpmhcc RPMH_IPA_CLK>;
-		qcom,skip-qos;
 	};
 
 	mmss_noc: interconnect@1780000 {
@@ -1066,7 +1081,6 @@
 				  <&disp_crm_hw_3_bcm_voter>,
 				  <&disp_crm_hw_4_bcm_voter>,
 				  <&disp_crm_hw_5_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	gem_noc: interconnect@24100000 {
@@ -1095,7 +1109,6 @@
 				  <&disp_crm_hw_3_bcm_voter>,
 				  <&disp_crm_hw_4_bcm_voter>,
 				  <&disp_crm_hw_5_bcm_voter>;
-		qcom,skip-qos;
 	};
 
 	nsp_noc: interconnect@320c0000 {
@@ -1291,8 +1304,9 @@
 	disp_crm: crm@af21000 {
 		label = "disp_crm";
 		compatible = "qcom,disp-crm-v2";
-		reg = <0xaf21000 0x6000>, <0xaf27000 0x400>, <0xaf27800 0x2000>, <0xaf29f00 0x100>;
-		reg-names = "base", "crm_b", "crm_c", "common";
+		reg = <0xaf21000 0x6000>, <0xaf27000 0x400>, <0xaf27800 0x2000>,
+		      <0xaf29800 0x700>, <0xaf29f00 0x100>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v", "common";
 		interrupts = <GIC_SPI 703 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "disp_crm_drv0";
 		clocks = <&dispcc DISP_CC_MDSS_AHB_CLK>;
@@ -1303,8 +1317,9 @@
 	cam_crm: crm@adcb000 {
 		label = "cam_crm";
 		compatible = "qcom,cam-crm-v2";
-		reg = <0xadcb000 0x1e00>, <0xadcce00 0x400>, <0xadcd600 0x2000>, <0xadcfd00 0x100>;
-		reg-names = "base", "crm_b", "crm_c", "common";
+		reg = <0xadcb000 0x1e00>, <0xadcce00 0x400>, <0xadcd600 0x2000>,
+		      <0xadcf600 0x700>, <0xadcfd00 0x100>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v", "common";
 		interrupts = <GIC_SPI 121 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "cam_crm_drv0";
 		clocks = <&camcc CAM_CC_DRV_AHB_CLK>;
@@ -1315,8 +1330,9 @@
 	pcie_crm: crm@1d01000 {
 		label = "pcie_crm";
 		compatible = "qcom,pcie-crm-v2";
-		reg = <0x1d01000 0x2000>, <0x1d03000 0x400>, <0x1d03800 0x2000>, <0x1d05f00 0x100>;
-		reg-names = "base", "crm_b", "crm_c", "common";
+		reg = <0x1d01000 0x2000>, <0x1d03000 0x400>, <0x1d03800 0x2000>,
+		      <0x1d05800 0x700>, <0x1d05f00 0x100>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v", "common";
 		interrupts = <GIC_SPI 641 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "pcie_crm_drv0";
 		clocks = <&pcie_0_pipe_clk>;
@@ -1447,9 +1463,10 @@
 		      <0x1881028 0x4>,
 		      <0x188103c 0x4>,
 		      <0x1881100 0x4>,
-		      <0x1882014 0x4>;
+		      <0x1882014 0x4>,
+		      <0x221C8490 0x4>;
 		reg-names = "sp2soc_irq_status", "sp2soc_irq_clr", "sp2soc_irq_mask",
-			    "rmb_err", "rmb_general_purpose", "rmb_err_spare2";
+			    "rmb_err", "rmb_general_purpose", "rmb_err_spare2", "sp_pbl_patch_ver";
 		interrupts = <0 352 1>;
 
 		cx-supply = <&VDD_CX_LEVEL>;
@@ -2100,6 +2117,7 @@
 		qcom,pas-id = <28>;
 		qcom,vmid = <45>;
 		qcom,firmware-name = "trustedvm";
+		qcom,keep-running;
 		memory-region = <&trust_ui_vm_mem &vm_comm_mem>;
 		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
 	};
@@ -2216,7 +2234,7 @@
 			iommus = <&apps_smmu 0x0483 0x0>;
 			qcom,iommu-vmid = <0x9>;
 			qcom,secure-context-bank;
-			dma-coherent;
+			dma-noncoherent;
 		};
 	};
 
@@ -2651,7 +2669,7 @@
 		qcom,smem-states = <&adsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
 
-		glink_edge: glink-edge {
+		remoteproc_adsp_glink: glink-edge {
 			qcom,remote-pid = <2>;
 			transport = "smem";
 			mboxes = <&ipcc_mproc IPCC_CLIENT_LPASS
@@ -2684,12 +2702,6 @@
 				qcom,intents = <0x800 5
 						0xc00 3
 						0x2000 1>;
-			};
-
-			qcom,msm_fastrpc_rpmsg {
-				compatible = "qcom,msm-fastrpc-rpmsg";
-				qcom,glink-channels = "fastrpcglink-apps-dsp";
-				qcom,intents = <0x64 64>;
 			};
 		};
 	};
@@ -2809,7 +2821,7 @@
 		qcom,smem-states = <&cdsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
 
-		glink-edge {
+		remoteproc_cdsp_glink: glink-edge {
 			qcom,remote-pid = <5>;
 			transport = "smem";
 			mboxes = <&ipcc_mproc IPCC_CLIENT_CDSP
@@ -2842,12 +2854,6 @@
 					qcom,qos-latency-us = <70>;
 					qcom,qos-maxhold-ms = <20>;
 				};
-			};
-
-			qcom,msm_fastrpc_rpmsg {
-				compatible = "qcom,msm-fastrpc-rpmsg";
-				qcom,glink-channels = "fastrpcglink-apps-dsp";
-				qcom,intents = <0x64 64>;
 			};
 		};
 	};
@@ -2993,8 +2999,9 @@
 
 	cpucp: qcom,cpucp@0x17830000 {
 		compatible = "qcom,cpucp-v2";
-		reg =   <0x17830000 0x300>,
-			<0x16430000 0x4C08>;
+		reg =	<0x16430000 0x4C08>,
+			<0x17830000 0x300>;
+		reg-names = "rx", "tx";
 		#mbox-cells = <1>;
 		interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
 	};
@@ -3327,6 +3334,16 @@
 		qcom,low-latency;
 	};
 
+	qcom,health_monitor {
+		compatible = "qcom,system-health-monitor";
+
+		qcom,modem {
+			qcom,subsys-name = "msm_mpss";
+			qcom,ssrestart-string = "mpss";
+			qcom,rproc_phandle = <&modem_pas>;
+		};
+	};
+
 	soccp_pas: remoteproc-soccp@a3380000 {
 		compatible = "qcom,sun-soccp-pas";
 		reg = <0xa3380000 0x10000>;
@@ -3360,27 +3377,19 @@
 		/* Outputs to soccp */
 		qcom,smem-states = <&soccp_smp2p_out 0>, <&soccp_smp2p_out 10>, <&soccp_smp2p_out 9>;
 		qcom,smem-state-names = "stop", "wakeup", "sleep";
+	};
 
-		glink-edge {
-			qcom,remote-pid = <19>;
-			transport = "smem";
-			mboxes = <&ipcc_mproc IPCC_CLIENT_SOCCP
-				  IPCC_MPROC_SIGNAL_GLINK_QMP>;
-			mbox-names = "soccp_smem";
-			interrupt-parent = <&ipcc_mproc>;
-			interrupts = <IPCC_CLIENT_SOCCP
-				      IPCC_MPROC_SIGNAL_GLINK_QMP
-				      IRQ_TYPE_EDGE_RISING>;
+	qfprom: qfprom@221c8000 {
+		compatible = "qcom,qfprom";
+		reg = <0x221c8000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		read-only;
+		ranges;
 
-			label = "soccp";
-			qcom,glink-label = "soccp";
-
-			qcom,soccp_qrtr {
-				qcom,glink-channels = "IPCRTR";
-				qcom,intents = <0x800  5
-						0x2000 3
-						0x4400 2>;
-			};
+		ssip_config: ssip_config@13e {
+			reg = <0x13e 0x2>;
+			bits = <7 2>;
 		};
 	};
 };
@@ -3715,6 +3724,14 @@
 		reusable;
 		alignment = <0x0 0x400000>;
 		size = <0x0 0x1000000>;
+	};
+
+	cdsp_secure_heap_cma: secure_cdsp_region { /* Secure DSP */
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x4800000>;
 	};
 };
 
