@@ -181,6 +181,11 @@ _platform_map = {
         ],
         "binary_compatible_with": ["cliffs", "volcano"],
     },
+    "anorak": {
+        "dtb_list": [
+            {"name": "anorak.dtb"},
+        ],
+    },
     "niobe": {
         "dtb_list": [
             {"name": "niobe.dtb"},

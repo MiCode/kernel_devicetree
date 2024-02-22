@@ -132,6 +132,17 @@ niobe-dtb-$(CONFIG_ARCH_NIOBE) += \
 niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
 dtb-y += $(niobe-dtb-y)
 
+ANORAK_BASE_DTB += anorak.dtb
+
+ANORAK_BOARDS += \
+		anorak-idp-overlay.dtbo
+
+anorak-dtb-$(CONFIG_ARCH_ANORAK) += \
+	$(call add-overlays, $(ANORAK_BOARDS) ,$(ANORAK_BASE_DTB))
+
+anorak-overlays-dtb-$(CONFIG_ARCH_ANORAK) += $(ANORAK_BOARDS) ${ANORAK_BASE_DTB)
+dtb-y += $(anorak-dtb-y)
+
 BLAIR_BASE_DTB += blair.dtb
 BLAIR_APQ_BASE_DTB += blairp.dtb
 
