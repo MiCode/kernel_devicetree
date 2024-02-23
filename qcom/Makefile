@@ -50,6 +50,7 @@ CLIFFS_BOARDS += \
 		 cliffs-mtp-kiwi-2s-nfc-wcd9395-overlay.dtbo \
 		 cliffs-mtp-pm8550b-overlay.dtbo \
 		 cliffs-mtp-kiwi-2s-nfc-wcd9395-pm8550b-overlay.dtbo \
+		 cliffs-mtp-kiwi-overlay.dtbo \
 		 cliffs-rcm-qhdp-overlay.dtbo \
 		 cliffs-rcm-fhdp-kiwi-overlay.dtbo \
 		 cliffs-rcm-qhdp-kiwi-overlay.dtbo
@@ -64,12 +65,18 @@ pineapple-overlays-dtb-$(CONFIG_ARCH_CLIFFS) += $(CLIFFS_BOARDS) $(NOAPQ_CLIFFS_
 
 VOLCANO_BASE_DTB += volcano.dtb
 
+VOLCANO_BOARDS += \
+		volcano-atp-overlay.dtbo \
+		volcano-idp-overlay.dtbo \
+		volcano-mtp-overlay.dtbo \
+		volcano-qrd-overlay.dtbo
+
 NOAPQ_VOLCANO_BOARDS += \
 		volcano-rumi-overlay.dtbo
 
 pineapple-dtb-$(CONFIG_ARCH_VOLCANO) += \
-	$(call add-overlays, $(NOAPQ_VOLCANO_BOARDS),$(VOLCANO_BASE_DTB))
-pineapple-overlays-dtb-$(CONFIG_ARCH_VOLCANO) += $(NOAPQ_VOLCANO_BOARDS) $(VOLCANO_BASE_DTB)
+	$(call add-overlays, $(VOLCANO_BOARDS) $(NOAPQ_VOLCANO_BOARDS),$(VOLCANO_BASE_DTB))
+pineapple-overlays-dtb-$(CONFIG_ARCH_VOLCANO) += $(VOLCANO_BOARDS) $(NOAPQ_VOLCANO_BOARDS) $(VOLCANO_BASE_DTB)
 
 dtb-y += $(pineapple-dtb-y)
 
@@ -97,13 +104,18 @@ dtb-y += $(kalama-dtb-y)
 
 NIOBE_BASE_DTB += niobe.dtb
 
+NIOBE_BOARDS += \
+		niobe-atp-overlay.dtbo \
+		niobe-idp-overlay.dtbo \
+		niobe-qxr-overlay.dtbo
+
 NOAPQ_NIOBE_BOARDS += \
 		 niobe-rumi-overlay.dtbo
 
 niobe-dtb-$(CONFIG_ARCH_NIOBE) += \
-	$(call add-overlays, $(NOAPQ_NIOBE_BOARDS),$(NIOBE_BASE_DTB))\
-	$(call add-overlays, $(APQ_NIOBE_BOARDS),$(NIOBE_APQ_BASE_DTB))
-niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
+	$(call add-overlays, $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS),$(NIOBE_BASE_DTB))\
+	$(call add-overlays, $(NIOBE_BOARDS) $(APQ_NIOBE_BOARDS),$(NIOBE_APQ_BASE_DTB))
+niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
 dtb-y += $(niobe-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
@@ -231,6 +243,7 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
 		cliffs-vm-atp.dtb \
 		cliffs-vm-cdp.dtb \
 		cliffs-vm-mtp.dtb \
+		cliffs-vm-mtp-kiwi.dtb \
 		cliffs-vm-qrd.dtb \
 		cliffs-vm-rcm.dtb \
 		cliffs-vm-rcm-fhdp-kiwi.dtb \
@@ -240,6 +253,7 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
 		cliffs-oemvm-atp.dtb \
 		cliffs-oemvm-cdp.dtb \
 		cliffs-oemvm-mtp.dtb \
+		cliffs-oemvm-mtp-kiwi.dtb \
 		cliffs-oemvm-qrd.dtb \
 		cliffs-oemvm-rcm.dtb \
 		cliffs-oemvm-rumi.dtb \
@@ -300,6 +314,12 @@ DIREWOLF_LV_GVM_BASE_DTB += direwolf-vm-lv.dtb
 DIREWOLF_LV_GVM_BOARDS += \
                    direwolf-vm-lv-overlay.dtbo
 
+SA8155_MULTI_GVM_BASE_DTB += \
+		   sa8155-vm-la-mt.dtb
+
+SA8155_MULTI_GVM_BOARDS += \
+		   sa8155-vm-la-mt-overlay.dtbo
+
 SA8155_LA_GVM_BASE_DTB += sa8155-vm-la.dtb
 
 SA8155_LA_GVM_BOARDS += \
@@ -336,7 +356,8 @@ autogvm-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(call add-overlays, $(LEMANS_MULTI_GVM_BOARDS),$(LEMANS_MULTI_GVM_BASE_DTB)) \
 	$(call add-overlays, $(LEMANS_MULTI_LA_GVM_BOARDS),$(LEMANS_MULTI_LA_GVM_BASE_DTB)) \
 	$(call add-overlays, $(MONACO_LV_GVM_BOARDS),$(MONACO_LV_GVM_BASE_DTB)) \
-	$(call add-overlays, $(MONACO_LA_GVM_BOARDS),$(MONACO_LA_GVM_BASE_DTB))
+	$(call add-overlays, $(MONACO_LA_GVM_BOARDS),$(MONACO_LA_GVM_BASE_DTB)) \
+	$(call add-overlays, $(SA8155_MULTI_GVM_BOARDS),$(SA8155_MULTI_GVM_BASE_DTB))
 
 autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(SA8155_LA_GVM_BOARDS) $(SA8155_LA_GVM_BASE_DTB) \
@@ -349,7 +370,8 @@ autogvm-overlays-dtb-$(CONFIG_QTI_QUIN_GVM) += \
 	$(LEMANS_MULTI_GVM_BOARDS) $(LEMANS_MULTI_GVM_BASE_DTB) \
 	$(LEMANS_MULTI_LA_GVM_BOARDS) $(LEMANS_MULTI_LA_GVM_BASE_DTB) \
 	$(MONACO_LV_GVM_BOARDS) $(MONACO_LV_GVM_BASE_DTB) \
-	$(MONACO_LA_GVM_BOARDS) $(MONACO_LA_GVM_BASE_DTB)
+	$(MONACO_LA_GVM_BOARDS) $(MONACO_LA_GVM_BASE_DTB) \
+	$(SA8155_MULTI_GVM_BOARDS) $(SA8155_MULTI_GVM_BASE_DTB)
 
 dtb-y += $(autogvm-dtb-y)
 
