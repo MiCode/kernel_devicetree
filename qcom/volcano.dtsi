@@ -643,15 +643,33 @@
 	};
 
 	camcc: clock-controller@adb0000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "camcc_clocks";
+		compatible = "qcom,volcano-camcc", "syscon";
+		reg = <0xadb0000 0x40000>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>,
+			 <&gcc GCC_CAMERA_AHB_CLK>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
 
 	dispcc: clock-controller@af00000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "dispcc_clocks";
+		compatible = "qcom,volcano-dispcc", "syscon";
+		reg = <0xaf00000 0x20000>;
+		reg-name = "cc_base";
+		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_mx-supply = <&VDD_MX_LEVEL>;
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			 <&sleep_clk>,
+			 <&gcc GCC_DISP_AHB_CLK>;
+		clock-names = "bi_tcxo",
+			      "sleep_clk",
+			      "iface";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -687,6 +705,7 @@
 		reg = <0x3d90000 0x9800>;
 		reg-name = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
+		vdd_gfx-supply = <&VDD_GFX_LEVEL>;
 		vdd_mx-supply = <&VDD_MX_LEVEL>;
 		clocks = <&rpmhcc RPMH_CXO_CLK>,
 			 <&gcc GCC_GPU_GPLL0_CLK_SRC>,
@@ -699,8 +718,9 @@
 	};
 
 	tcsrcc: clock-controller@1f40000 {
-		compatible = "qcom,dummycc";
-		clock-output-names = "tcsrcc_clocks";
+		compatible = "qcom,volcano-tcsrcc", "syscon";
+		reg = <0x1f40000 0xc0000>;
+		reg-name = "cc_base";
 		#clock-cells = <1>;
 		#reset-cells = <1>;
 	};
@@ -1882,7 +1902,11 @@
 #include "msm-arm-smmu-volcano.dtsi"
 
 &cam_cc_camss_top_gdsc {
-	compatible = "regulator-fixed";
+	parent-supply = <&VDD_CX_LEVEL>;
+	clocks = <&gcc GCC_CAMERA_AHB_CLK>;
+	clock-names = "ahb_clk";
+	interconnects = <&mmss_noc MASTER_CAMNOC_HF &mmss_noc SLAVE_MNOC_HF_MEM_NOC>;
+	interconnect-names = "mmnoc";
 	status = "ok";
 };
 
