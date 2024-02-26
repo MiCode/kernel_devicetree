@@ -72,7 +72,9 @@ VOLCANO_APQ_BASE_DTB += volcano6p.dtb
 VOLCANO_BOARDS += \
 		volcano-atp-overlay.dtbo \
 		volcano-idp-overlay.dtbo \
+		volcano-idp-wcd9395-overlay.dtbo \
 		volcano-mtp-overlay.dtbo \
+		volcano-mtp-wcd9395-aatc-overlay.dtbo \
 		volcano-qrd-overlay.dtbo
 
 NOAPQ_VOLCANO_BOARDS += \
