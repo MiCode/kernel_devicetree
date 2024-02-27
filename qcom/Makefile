@@ -135,7 +135,8 @@ dtb-y += $(niobe-dtb-y)
 ANORAK_BASE_DTB += anorak.dtb
 
 ANORAK_BOARDS += \
-		anorak-idp-overlay.dtbo
+		anorak-idp-overlay.dtbo \
+		anorak-qxr-overlay.dtbo
 
 anorak-dtb-$(CONFIG_ARCH_ANORAK) += \
 	$(call add-overlays, $(ANORAK_BOARDS) ,$(ANORAK_BASE_DTB))
