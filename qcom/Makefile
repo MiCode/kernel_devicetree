@@ -279,7 +279,14 @@ endif
 
 ifeq ($(CONFIG_ARCH_VOLCANO), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
-pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += volcano-vm-rumi.dtb
+pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += volcano-vm-rumi.dtb \
+                volcano-vm-atp.dtb \
+                volcano-vm-idp.dtb \
+                volcano-vm-idp-wcd9395.dtb \
+                volcano-vm-mtp.dtb \
+                volcano-vm-mtp-wcd9395-aatc.dtb \
+                volcano-vm-qrd.dtb
+
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif
