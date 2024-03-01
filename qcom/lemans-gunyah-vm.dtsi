@@ -182,16 +182,20 @@
 		/* QUPv3 Tile 2 read-only region */
 		/* QUPv3 SE17 region */
 		/* QRNG region */
+		/* MPROC NS1 IPCC region */
 		iomemory-ranges = <0x0 0xF000000 0x0 0xF000000 0x0 0x1000000 0x0
 				0x0 0xAC0000 0x0 0xAC0000 0x0 0x6000 0x1
 				0x0 0x8C0000 0x0 0x8C0000 0x0 0x6000 0x1
 				0x0 0x88C000 0x0 0x88C000 0x0 0x4000 0x0
 				0x0 0x10dc000 0x0 0x10dc000 0x0 0x1000 0x0
+				0x0 0x421000 0x0 0x421000 0x0 0x1000 0x0
 				>;
 
 		/* Pass through IRQs */
 		/* QUPv3 SE17 GIC IRQ */
-		gic-irq-ranges = <617 617>;
+		/* MPROC NS1 IPCC GIC IRQ */
+		gic-irq-ranges = <617 617
+							591 591>;
 
 		memory {
 			#address-cells = <0x2>;
@@ -605,6 +609,16 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+	};
+
+	ipcc_mproc_apps_ns1: qcom,ipcc@421000 {
+		compatible = "qcom,ipcc";
+		reg = <0x421000 0x1000>;
+		interrupts = <GIC_SPI 559 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+		status = "ok";
 	};
 
 	qcom_rng_ee3: qrng@10dc000 {
