@@ -262,7 +262,7 @@ _platform_map = {
             {"name": "pineapple-vm-rumi.dtb"},
             {"name": "pineapplep-vm-hdk.dtb"},
         ],
-        "binary_compatible_with": ["cliffs-oemvm"],
+        "binary_compatible_with": ["cliffs-oemvm", "volcano-oemvm"],
     },
     "cliffs-tuivm": {
         "dtb_list": [
@@ -333,6 +333,13 @@ _platform_map = {
             {"name": "volcano-vm-mtp.dtb"},
             {"name": "volcano-vm-mtp-wcd9395-aatc.dtb"},
             {"name": "volcano-vm-qrd.dtb"},
+            {"name": "volcano-oemvm-rumi.dtb"},
+        ],
+    },
+    "volcano-oemvm": {
+        "dtb_list": [
+            {"name": "volcano-oemvm-rumi.dtb"},
+            {"name": "volcano-vm-rumi.dtb"},
         ],
     },
     "blair": {
