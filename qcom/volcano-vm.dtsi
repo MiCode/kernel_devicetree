@@ -279,6 +279,31 @@
 		msgq-label = <3>;
 	};
 
+	vm_tlmm_irq: vm-tlmm-irq@0 {
+		compatible = "qcom,tlmm-vm-irq";
+		reg = <0x0 0x0>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,cliffs-vm-pinctrl";
+		reg = <0x0F000000 0x1000000>;
+		interrupts-extended = <&vm_tlmm_irq 1 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		/* Valid pins */
+		gpios = /bits/ 16 <0 1 2 3 12 19 20 129>;
+	};
+
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		tlmm-vm-gpio-list = <&tlmm 0 0  &tlmm 1 0  &tlmm 2 0  &tlmm 3 0
+				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0>;
+	};
+
 	qcom_smcinvoke {
 		compatible = "qcom,smcinvoke";
 	};
