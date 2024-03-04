@@ -327,6 +327,12 @@ _platform_map = {
     "volcano-tuivm": {
         "dtb_list": [
             {"name": "volcano-vm-rumi.dtb"},
+            {"name": "volcano-vm-atp.dtb"},
+            {"name": "volcano-vm-idp.dtb"},
+            {"name": "volcano-vm-idp-wcd9395.dtb"},
+            {"name": "volcano-vm-mtp.dtb"},
+            {"name": "volcano-vm-mtp-wcd9395-aatc.dtb"},
+            {"name": "volcano-vm-qrd.dtb"},
         ],
     },
     "blair": {
