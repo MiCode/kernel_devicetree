@@ -286,7 +286,13 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += volcano-vm-rumi.dtb \
                 volcano-vm-mtp.dtb \
                 volcano-vm-mtp-wcd9395-aatc.dtb \
                 volcano-vm-qrd.dtb \
-                volcano-oemvm-rumi.dtb
+                volcano-oemvm-rumi.dtb \
+                volcano-oemvm-atp.dtb \
+                volcano-oemvm-idp.dtb \
+                volcano-oemvm-idp-wcd9395.dtb \
+                volcano-oemvm-mtp.dtb \
+                volcano-oemvm-mtp-wcd9395-aatc.dtb \
+                volcano-oemvm-qrd.dtb
 
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif
