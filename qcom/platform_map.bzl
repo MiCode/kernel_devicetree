@@ -273,6 +273,12 @@ _platform_map = {
         ],
         "binary_compatible_with": ["cliffs-oemvm", "volcano-oemvm"],
     },
+    "niobe-tuivm": {
+        "dtb_list": [
+            {"name": "niobe-vm-idp.dtb"},
+            {"name": "niobep-vm-idp.dtb"},
+        ],
+    },
     "cliffs-tuivm": {
         "dtb_list": [
             {"name": "cliffs-vm-rumi.dtb"},
