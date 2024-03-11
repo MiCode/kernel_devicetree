@@ -2355,6 +2355,44 @@
 				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0>;
 	};
 
+	oem_vm_vblk0_ring: oem_vm_vblk0_ring {
+		size = <0x4000>;
+		gunyah-label = <0x13>;
+	};
+
+	oem_vm_swiotlb: oem_vm_swiotlb {
+		size = <0x100000>;
+		gunyah-label = <0x14>;
+	};
+
+	oem_vm: qcom,oem_vm {
+		vm_name = "oemvm";
+		shared-buffers-size = <0x104000>;
+		shared-buffers = <&oem_vm_vblk0_ring &oem_vm_swiotlb>;
+	};
+
+	oem_vm_virt_be0: oem_vm_virt_be0@13 {
+		qcom,vm = <&oem_vm>;
+		qcom,label = <0x13>;
+	};
+
+	gh-secure-vm-loader@1 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <34>;
+		qcom,vmid = <49>;
+		qcom,firmware-name = "oemvm";
+		memory-region = <&oem_vm_mem &vm_comm_mem>;
+		virtio-backends = <&oem_vm_virt_be0>;
+	};
+
+	qcom,qrtr-gunyah-oemvm {
+		compatible = "qcom,qrtr-gunyah";
+		qcom,master;
+		gunyah-label = <8>;
+		peer-name = <4>;
+	};
+
+
 	gh-secure-vm-loader@2 {
 		compatible = "qcom,gh-secure-vm-loader";
 		qcom,pas-id = <35>;
@@ -2460,6 +2498,14 @@
 		reusable;
 		alignment = <0x0 0x400000>;
 		size = <0x0 0x4400000>;
+	};
+
+	oem_vm_mem: oem_vm_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x4c00000>;
 	};
 };
 
