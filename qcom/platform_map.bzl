@@ -269,7 +269,7 @@ _platform_map = {
             {"name": "pineapple-vm-rumi.dtb"},
             {"name": "pineapplep-vm-hdk.dtb"},
         ],
-        "binary_compatible_with": ["cliffs-oemvm"],
+        "binary_compatible_with": ["cliffs-oemvm", "volcano-oemvm"],
     },
     "cliffs-tuivm": {
         "dtb_list": [
@@ -333,6 +333,31 @@ _platform_map = {
     },
     "volcano-tuivm": {
         "dtb_list": [
+            {"name": "volcano-vm-rumi.dtb"},
+            {"name": "volcano-vm-atp.dtb"},
+            {"name": "volcano-vm-idp.dtb"},
+            {"name": "volcano-vm-idp-wcd9395.dtb"},
+            {"name": "volcano-vm-mtp.dtb"},
+            {"name": "volcano-vm-mtp-wcd9395-aatc.dtb"},
+            {"name": "volcano-vm-qrd.dtb"},
+            {"name": "volcano-oemvm-rumi.dtb"},
+            {"name": "volcano-oemvm-atp.dtb"},
+            {"name": "volcano-oemvm-idp.dtb"},
+            {"name": "volcano-oemvm-idp-wcd9395.dtb"},
+            {"name": "volcano-oemvm-mtp.dtb"},
+            {"name": "volcano-oemvm-mtp-wcd9395-aatc.dtb"},
+            {"name": "volcano-oemvm-qrd.dtb"},
+        ],
+    },
+    "volcano-oemvm": {
+        "dtb_list": [
+            {"name": "volcano-oemvm-rumi.dtb"},
+            {"name": "volcano-oemvm-atp.dtb"},
+            {"name": "volcano-oemvm-idp.dtb"},
+            {"name": "volcano-oemvm-idp-wcd9395.dtb"},
+            {"name": "volcano-oemvm-mtp.dtb"},
+            {"name": "volcano-oemvm-mtp-wcd9395-aatc.dtb"},
+            {"name": "volcano-oemvm-qrd.dtb"},
             {"name": "volcano-vm-rumi.dtb"},
             {"name": "volcano-vm-atp.dtb"},
             {"name": "volcano-vm-idp.dtb"},
