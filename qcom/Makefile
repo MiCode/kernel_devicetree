@@ -115,9 +115,11 @@ NIOBE_APQ_BASE_DTB += niobep.dtb
 NIOBE_BOARDS += \
 		niobe-atp-overlay.dtbo \
 		niobe-idp-overlay.dtbo \
+		niobe-idp-dpu-overlay.dtbo \
 		niobe-qxr-overlay.dtbo \
 		niobep-atp-overlay.dtbo \
 		niobep-idp-overlay.dtbo \
+		niobep-idp-dpu-overlay.dtbo \
 		niobep-qxr-overlay.dtbo
 
 NOAPQ_NIOBE_BOARDS += \
