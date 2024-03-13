@@ -75,6 +75,7 @@ VOLCANO_BOARDS += \
 		volcano-idp-wcd9395-overlay.dtbo \
 		volcano-mtp-overlay.dtbo \
 		volcano-mtp-wcd9395-aatc-overlay.dtbo \
+		volcano-mtp-pm7550ba-overlay.dtbo \
 		volcano-qrd-overlay.dtbo
 
 NOAPQ_VOLCANO_BOARDS += \
