@@ -39,7 +39,7 @@
 		status = "disabled";
 	};
 
-	aliases {
+	aliases: aliases {
 		serial0 = &qupv3_se5_2uart;
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
 		mmc1 = &sdhc_2; /* SDC2 SD card slot */
@@ -896,13 +896,18 @@
 		feat_conf11: feat_conf11@012c {
 			reg = <0x012c 0x4>;
 		};
+
+		adsp_variant: adsp_variant@128 {
+			reg = <0x128 0x4>;
+			bits = <25 6>;
+		};
 	};
 
 	qfprom_sys: qfprom@0 {
 		compatible = "qcom,qfprom-sys";
 
-		nvmem-cells = <&feat_conf11>;
-		nvmem-cell-names = "feat_conf11";
+		nvmem-cells = <&feat_conf11>, <&adsp_variant>;
+		nvmem-cell-names = "feat_conf11", "adsp_variant";
 	};
 
 	tcsr: syscon@1fc0000 {
@@ -2688,4 +2693,12 @@
 
 &qupv3_se5_2uart {
 	status = "ok";
+};
+
+&qupv3_se7_i2c {
+	status = "ok";
+	fsa4480: fsa4480@42 {
+		compatible = "qcom,fsa4480-i2c";
+		reg = <0x42>;
+	};
 };
