@@ -37,6 +37,7 @@
 		serial1 = &qupv3_se0_2uart;
 		hsuart1 = &qupv3_se14_4uart;
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
+		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 		i2c1 = &qupv3_se1_i2c;
 		i2c2 = &qupv3_se2_i2c;
 		i2c3 = &qupv3_se3_i2c;
@@ -1567,6 +1568,77 @@
 		reset-names = "rst";
 
 		status = "disabled";
+	};
+
+	sdhc2_opp_table: sdhc2-opp-table {
+		compatible = "operating-points-v2";
+
+		opp-100000000 {
+			opp-hz = /bits/ 64 <100000000>;
+			opp-peak-kBps = <1600000 280000>;
+			opp-avg-kBps = <50000 0>;
+		};
+
+		opp-202000000 {
+			opp-hz = /bits/ 64 <202000000>;
+			opp-peak-kBps = <5600000 1500000>;
+			opp-avg-kBps = <104000 0>;
+		};
+	};
+
+	sdhc_2: sdhci@8804000 {
+		status = "disabled";
+
+		compatible = "qcom,sdhci-msm-v5";
+
+		reg = <0x8804000 0x1000>;
+		reg-names = "hc";
+
+		interrupts = <GIC_SPI 207 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "hc_irq", "pwr_irq";
+
+		bus-width = <4>;
+		no-sdio;
+		no-mmc;
+
+		qcom,uses_level_shifter;
+
+		resets = <&gcc GCC_SDCC2_BCR>;
+		reset-names = "core_reset";
+
+		clocks = <&gcc GCC_SDCC2_AHB_CLK>,
+			<&gcc GCC_SDCC2_APPS_CLK>;
+		clock-names = "iface", "core";
+
+		interconnects = <&aggre1_noc MASTER_SDCC_2 &mc_virt SLAVE_EBI1>,
+			<&gem_noc MASTER_APPSS_PROC &cnoc_cfg SLAVE_SDCC_2>;
+		interconnect-names = "sdhc-ddr","cpu-sdhc";
+		operating-points-v2 = <&sdhc2_opp_table>;
+		/*
+		 * DLL HSR settings. Refer go/hsr - <Target> DLL settings.
+		 * Note that the DLL_CONFIG_2 value is not passed from the
+		 * device tree, but it is calculated in the driver.
+		 */
+		qcom,dll-hsr-list = <0x0007442C 0x0 0x10
+					0x090106C0 0x80040868>;
+
+		iommus = <&apps_smmu 0x140 0x0>;
+		dma-coherent;
+		qcom,iommu-dma = "fastmap";
+
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+
+		qos0 {
+			mask = <0xf0>;
+			vote = <44>;
+		};
+
+		qos1 {
+			mask = <0x03>;
+			vote = <44>;
+		};
 	};
 
 	qfprom: qfprom@221c8000 {
