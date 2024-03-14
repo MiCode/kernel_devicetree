@@ -93,3 +93,48 @@
 	qcom,thermal-mitigation-step = <500000>;
 	#cooling-cells = <2>;
 };
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-pineapple";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L3C>;
+	vdda-phy-max-microamp = <213030>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L1D>;
+	vdda-pll-max-microamp =	<18310>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L1F>;
+	vdda-qref-max-microamp = <4250>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L13B>;
+	vcc-max-microamp = <750000>;
+
+	vccq-supply = <&L1C>;
+	vccq-max-microamp = <560000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L3B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	status = "ok";
+};

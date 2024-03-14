@@ -27,7 +27,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat cpufreq.default_governor=performance";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 pcie_ports=compat cpufreq.default_governor=performance ufshcd-core.use_mcq_mode=n";
 	};
 
 	reserved_memory: reserved-memory {};
@@ -1580,6 +1580,26 @@
 		compatible = "qcom,logbuf-vendor-hooks";
 	};
 
+	ice_cfg: shared_ice {
+		alg1 {
+			alg-name = "alg1";
+			rx-alloc-percent = <60>;
+			status = "disabled";
+		};
+
+		alg2 {
+			alg-name = "alg2";
+			status = "disabled";
+
+		};
+
+		alg3 {
+			alg-name = "alg3";
+			num-core = <28 28 15 13>;
+			status = "ok";
+		};
+	};
+
 	ufsphy_mem: ufsphy_mem@1d80000 {
 		reg = <0x1d80000 0x2000>;
 		reg-names = "phy_mem";
@@ -1614,6 +1634,9 @@
 		phy-names = "ufsphy";
 		#reset-cells = <1>;
 
+		qcom,prime-mask = <0x3C>;
+		qcom,silver-mask = <0x03>;
+
 		lanes-per-direction = <2>;
 		clock-names =
 			"core_clk",
@@ -1646,10 +1669,77 @@
 			<0 0>,
 			<0 0>;
 
+		interconnects = <&aggre1_noc MASTER_UFS_MEM &mc_virt SLAVE_EBI1>,
+			<&gem_noc MASTER_APPSS_PROC &cnoc_cfg SLAVE_UFS_MEM_CFG>;
+		interconnect-names = "ufs-ddr", "cpu-ufs";
+
+		qcom,ufs-bus-bw,name = "ufshc_mem";
+		qcom,ufs-bus-bw,num-cases = <30>;
+		qcom,ufs-bus-bw,num-paths = <2>;
+		qcom,ufs-bus-bw,vectors-KBps =
+		/*
+		 * During HS G3 UFS runs at nominal voltage corner, vote
+		 * higher bandwidth to push other buses in the data path
+		 * to run at nominal to achieve max throughput.
+		 * 4GBps pushes BIMC to run at nominal.
+		 * 200MBps pushes CNOC to run at nominal.
+		 * Vote for half of this bandwidth for HS G3 1-lane.
+		 * For max bandwidth, vote high enough to push the buses
+		 * to run in turbo voltage corner.
+		 */
+		<0 0>, <0 0>,          /* No vote */
+		<922 0>, <1000 0>,     /* PWM G1 */
+		<1844 0>, <1000 0>,    /* PWM G2 */
+		<3688 0>, <1000 0>,    /* PWM G3 */
+		<7376 0>, <1000 0>,    /* PWM G4 */
+		<14752 0>, <1000 0>,   /* PWM G5 */
+		<1844 0>, <1000 0>,    /* PWM G1 L2 */
+		<3688 0>, <1000 0>,    /* PWM G2 L2 */
+		<7376 0>, <1000 0>,    /* PWM G3 L2 */
+		<14752 0>, <1000 0>,   /* PWM G4 L2 */
+		<29504 0>, <1000 0>,   /* PWM G5 L2 */
+		<127796 0>, <1000 0>,  /* HS G1 RA */
+		<255591 0>, <1000 0>,  /* HS G2 RA */
+		<1492582 0>, <102400 0>,  /* HS G3 RA */
+		<2915200 0>, <204800 0>,  /* HS G4 RA */
+		<255591 0>, <1000 0>,  /* HS G1 RA L2 */
+		<511181 0>, <1000 0>,  /* HS G2 RA L2 */
+		<1492582 0>, <204800 0>, /* HS G3 RA L2 */
+		<2915200 0>, <409600 0>, /* HS G4 RA L2 */
+		<149422 0>, <1000 0>,  /* HS G1 RB */
+		<298189 0>, <1000 0>,  /* HS G2 RB */
+		<1492582 0>, <102400 0>,  /* HS G3 RB */
+		<2915200 0>, <204800 0>,  /* HS G4 RB */
+		<298189 0>, <1000 0>,  /* HS G1 RB L2 */
+		<596378 0>, <1000 0>,  /* HS G2 RB L2 */
+		/* As UFS working in HS G3 RB L2 mode, aggregated
+		 * bandwidth (AB) should take care of providing
+		 * optimum throughput requested. However, as tested,
+		 * in order to scale up CNOC clock, instantaneous
+		 * bindwidth (IB) needs to be given a proper value too.
+		 */
+		<1492582 0>, <204800 409600>, /* HS G3 RB L2 KBPs */
+		<2915200 0>, <409600 409600>, /* HS G4 RB L2 */
+		<5836800 0>, <819200 0>,      /* HS G5 RA L2*/
+		<5836800 0>, <819200 0>,      /* HS G5 RB L2 */
+		<7643136 0>, <819200 0>;      /* Max. bandwidth */
+
+		qcom,bus-vector-names = "MIN",
+		"PWM_G1_L1", "PWM_G2_L1", "PWM_G3_L1", "PWM_G4_L1", "PWM_G5_L1",
+		"PWM_G1_L2", "PWM_G2_L2", "PWM_G3_L2", "PWM_G4_L2", "PWM_G5_L2",
+		"HS_RA_G1_L1", "HS_RA_G2_L1", "HS_RA_G3_L1", "HS_RA_G4_L1",
+		"HS_RA_G1_L2", "HS_RA_G2_L2", "HS_RA_G3_L2", "HS_RA_G4_L2",
+		"HS_RB_G1_L1", "HS_RB_G2_L1", "HS_RB_G3_L1", "HS_RB_G4_L1",
+		"HS_RB_G1_L2", "HS_RB_G2_L2", "HS_RB_G3_L2", "HS_RB_G4_L2",
+		"HS_RA_G5_L2", "HS_RB_G5_L2",
+		"MAX";
+
 		iommus = <&apps_smmu 0x60 0x0>;
 		qcom,iommu-dma = "fastmap";
+		shared-ice-cfg = <&ice_cfg>;
 		dma-coherent;
 
+		/* skip pbl wa as we have got this fixed in pbl */
 		qcom,bypass-pbl-rst-wa;
 
 		reset-gpios = <&tlmm 200 GPIO_ACTIVE_LOW>;
@@ -1657,6 +1747,19 @@
 		reset-names = "rst";
 
 		status = "disabled";
+
+		qos0 {
+			mask = <0x3C>;
+			vote = <44>;
+			perf;
+			cpu_freq_vote = <2>;
+		};
+
+		qos1 {
+			mask = <0x03>;
+			vote = <44>;
+			cpu_freq_vote = <0>;
+		};
 	};
 
 	sdhc2_opp_table: sdhc2-opp-table {
