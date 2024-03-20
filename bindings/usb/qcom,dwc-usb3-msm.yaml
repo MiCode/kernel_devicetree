@@ -1,0 +1,223 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,dwc-usb3-msm.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. SuperSpeed DWC3 USB SoC Controller Glue
+
+maintainers:
+  - Wesley Cheng <quic_wcheng@quicinc.com>
+
+properties:
+  compatible:
+    items:
+      - enum:
+          - qcom,dwc-usb3-msm
+
+  reg:
+    description: Address and length of the register set for the device.
+    minItems: 1
+    maxItems: 2
+
+  reg-names:
+    minItems: 1
+    items:
+      - const: core_base
+      - const: tcsr_dyn_en_dis
+
+  "#address-cells":
+    enum: [ 1, 2 ]
+
+  "#size-cells":
+    enum: [ 1, 2 ]
+
+  ranges: true
+
+  interrupts:
+    minItems: 1
+    maxItems: 4
+
+  interrupt-names:
+    minItems: 1
+    items:
+      - const: pwr_event_irq
+      - const: dp_hs_phy_irq
+      - const: dm_hs_phy_irq
+      - const: ss_phy_irq
+
+  clocks:
+    description: |
+      A list of phandles to the controller clocks::
+      - core_clk:: Master/Core Clock, >= 125 MHz for SS operation and
+                   >= 60MHz for HS operation.
+      - iface_clk:: System bus AXI clock.
+      - bus_aggr_clk:: Bus Aggregator clock.
+      - utmi_clk:: Mock utmi clocks needed for ITP/SOF generation in host mode.
+      - sleep_clk:: SLeep clock, used for wakeup when USB3 core goes to LPM(U3).
+    minItems: 1
+    maxItems: 9
+
+  USB3_GDSC-supply:
+    description: USB GDSC supply.
+
+  clock-names:
+    minItems: 1
+    items:
+      - const: core_clk
+      - const: iface_clk
+      - const: bus_aggr_clk
+      - const: utmi_clk
+      - const: sleep_clk
+
+  resets:
+    maxItems: 1
+
+  reset-names:
+    items:
+      - const: core_reset
+
+  interconnects:
+    maxItems: 3
+
+  interconnect-names:
+    items:
+      - const: usb-ddr
+      - const: usb-ipa
+      - const: ddr-usb
+
+  qcom,use-pdc-interrupts:
+    description: If present, interrupts used will be pdc based.
+    type: boolean
+
+  qcom,use-eusb2-phy:
+    description: Indication of platform using eusb2 phys.
+    type: boolean
+
+  extcon:
+    description: Phandles to external connector devices.
+                 Generally used to notify VBUS/ID/EUD state change.
+    minItems: 1
+    maxItems: 3
+
+  qcom,dis-sending-cm-l1-quirk:
+    description: disable cm l1.
+    type: boolean
+
+  qcom,core-clk-rate:
+    description: Core/Master clock rate.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,core-clk-rate-hs:
+    description: Core/Master clock rate in HS.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,core-clk-rate-disconnected:
+    description: Disconnected master/core clock rate.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,pm-qos-latency:
+    description: QOS voting for usb.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,num-gsi-evt-buffs:
+    description: Number of event buffers required for GSI.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,gsi-reg-offset:
+    description: GSI register offsets.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,hibernate-skip-thaw:
+    description: Skip thaw if hibernate is supported.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  usb-role-switch:
+    description: Indicator showing the Glue driver supports role switch.
+    type: boolean
+
+# Required child node:
+
+patternProperties:
+  "^usb@[0-9a-f]+$":
+    $ref: snps,dwc3.yaml#
+    unevaluatedProperties: false
+
+additionalProperties: false
+
+# Example MSM USB3.0 controller device node :
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    #include <dt-bindings/interrupt-controller/irq.h>
+    #include <dt-bindings/clock/qcom,gcc-kalama.h>
+    #include <dt-bindings/phy/qcom,usb3-4nm-qmp-combo.h>
+    #include <dt-bindings/interconnect/qcom,kalama.h>
+    soc {
+        #address-cells = <2>;
+        #size-cells = <2>;
+
+        ssusb@a600000 {
+          compatible = "qcom,dwc-usb3-msm";
+          reg = <0xa600000 0x100000>,
+                <0x1fc6000 0x4>;
+          reg-names = "core_base", "tcsr_dyn_en_dis";
+
+          #address-cells = <2>;
+          #size-cells = <2>;
+          ranges;
+
+          USB3_GDSC-supply = <&gcc_usb30_prim_gdsc>;
+          clocks = <&gcc GCC_USB30_PRIM_MASTER_CLK>,
+                   <&gcc GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
+                   <&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
+                   <&gcc GCC_USB30_PRIM_MOCK_UTMI_CLK>,
+                   <&gcc GCC_USB30_PRIM_SLEEP_CLK>;
+          clock-names = "core_clk", "iface_clk", "bus_aggr_clk",
+                        "utmi_clk", "sleep_clk";
+
+          resets = <&gcc GCC_USB30_PRIM_BCR>;
+          reset-names = "core_reset";
+
+          interrupts-extended = <&intc GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>,
+                                <&pdc 14 IRQ_TYPE_EDGE_RISING>,
+                                <&pdc 15 IRQ_TYPE_EDGE_RISING>,
+                                <&pdc 17 IRQ_TYPE_LEVEL_HIGH>;
+          interrupt-names = "pwr_event_irq", "dp_hs_phy_irq",
+                            "dm_hs_phy_irq", "ss_phy_irq";
+          qcom,use-pdc-interrupts;
+          qcom,use-eusb2-phy;
+
+          qcom,dis-sending-cm-l1-quirk;
+          qcom,core-clk-rate = <200000000>;
+          qcom,core-clk-rate-hs = <66666667>;
+          qcom,core-clk-rate-disconnected = <133333333>;
+          qcom,pm-qos-latency = <2>;
+          extcon = <&eud>;
+
+          qcom,num-gsi-evt-buffs = <0x3>;
+          qcom,gsi-reg-offset =
+               <0x0fc /* GSI_GENERAL_CFG */
+                0x110 /* GSI_DBL_ADDR_L */
+                0x120 /* GSI_DBL_ADDR_H */
+                0x130 /* GSI_RING_BASE_ADDR_L */
+                0x144 /* GSI_RING_BASE_ADDR_H */
+                0x1a4>; /* GSI_IF_STS */
+
+          interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+          interconnects = <&aggre1_noc MASTER_USB3_0 &mc_virt SLAVE_EBI1>,
+                          <&aggre1_noc MASTER_USB3_0 &config_noc SLAVE_IPA_CFG>,
+                          <&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB3_0>;
+
+
+            usb@a600000 {
+                compatible = "snps,dwc3";
+                reg = <0 0x0a600000 0 0xcd00>;
+                interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
+                iommus = <&apps_smmu 0x740 0>;
+                snps,dis_u2_susphy_quirk;
+                snps,dis_enblslpm_quirk;
+                phys = <&usb_1_hsphy>, <&usb_1_ssphy>;
+                phy-names = "usb2-phy", "usb3-phy";
+            };
+        };
+    };

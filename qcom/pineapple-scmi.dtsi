@@ -1,0 +1,28 @@
+/ {
+	scmi-vio-backend {
+		compatible = "arm,scmi-vio-backend";
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+
+	trust_ui_vm_vblk2_ring: trust_ui_vm_vblk2_ring {
+		size = <0x4000>;
+		gunyah-label = <0x15>;
+	};
+
+	trust_ui_vm_virt_be2: trust_ui_vm_virt_be2@15 {
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x15>;
+	};
+};
+
+&trust_ui_vm {
+	shared-buffers-size = <0x10c000>;
+	shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring
+			  &trust_ui_vm_vblk2_ring &trust_ui_vm_swiotlb>;
+};
+
+&gh_secure_vm_loader0 {
+	virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1
+			   &trust_ui_vm_virt_be2>;
+};

@@ -1,0 +1,92 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/iio/adc/qcom,glink-adc.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Glink PMIC ADC
+
+maintainers:
+  - David Collins <collinsd@quicinc.com>
+
+description: |
+  This device provides a mechanism for software to read multiple ADC channels of
+  Qualcomm Technologies, Inc. PMICs using the Glink interface to communicate
+  with charger firmware.  Channel value conversion is performed in firmware.
+  Both converted and raw ADC values can be read.  This device is useful in
+  situations where a charger PMIC is connected via I2C and only accessible to
+  charger firmware.
+
+properties:
+  compatible:
+    const: qcom,glink-adc
+
+  "#address-cells":
+    const: 1
+
+  "#size-cells":
+    const: 0
+
+  "#io-channel-cells":
+    const: 1
+
+required:
+  - compatible
+  - "#address-cells"
+  - "#size-cells"
+  - "#io-channel-cells"
+
+additionalProperties: false
+
+patternProperties:
+  "^.*$":
+    type: object
+    description: |
+      ADC channel node
+
+    properties:
+      reg:
+        maxItems: 1
+        description: |
+          ADC channel number of the form:
+          (bus_id << 16) | (pmic_id << 8) | adc_channel
+          where:
+          bus_id = which SPMI or I2C bus the PMIC is attached to
+          pmic_id = PMIC address on the bus
+          adc_channel = specific channel within the PMIC
+
+      label:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Name to use for the ADC channel.
+
+    required:
+      - reg
+
+    additionalProperties: false
+
+examples:
+  - |
+    qcom,pmic_glink_log {
+        qcom,glink-adc {
+            compatible = "qcom,glink-adc";
+            #address-cells = <1>;
+            #size-cells = <0>;
+            #io-channel-cells = <1>;
+
+            smb1502_iin {
+                reg = <0x1076801>;
+                label = "smb1502_iin";
+            };
+
+            smb1502_ichg {
+                reg = <0x1076802>;
+                label = "smb1502_ichg";
+            };
+
+            smb1502_die_temp {
+                reg = <0x1076803>;
+                label = "smb1502_die_temp";
+            };
+        };
+    };
+...

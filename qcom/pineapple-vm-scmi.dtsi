@@ -1,0 +1,33 @@
+&firmware {
+	scmi {
+		compatible = "arm,scmi-virtio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+};
+
+&qcom_vm_config {
+	vdevices {
+		virtio-mmio@2 {
+			vdevice-type = "virtio-mmio";
+			generate = "/virtio-mmio";
+			peer-default;
+			vqs-num = <0x2>;
+			push-compatible = "virtio,mmio";
+			dma-coherent;
+			dma_base = <0x0 0x8000>;
+			memory {
+				qcom,label = <0x15>;			//for vhost scmi
+				#address-cells = <0x2>;
+				base = <0x0 0xDA700000>;
+			};
+		};
+
+		swiotlb-shm {
+			dma_base = <0x0 0xc000>;
+			memory {
+				base = <0x0 0xDA704000>;
+			};
+		};
+	};
+};

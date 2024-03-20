@@ -1,0 +1,229 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,qusb2phy.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Qualcomm USB Phy
+
+maintainers:
+  - Udipto Goswami <quic_ugoswami@quicinc.com>
+
+properties:
+  compatible:
+    enum:
+      - qcom,qusb2phy
+      - qcom,qusb2phy-v2
+
+  reg:
+    description: Address and length of the registers set for the phy.
+    minItems: 1
+    maxItems: 7
+
+  reg-names:
+    minItems: 1
+    items:
+      - const: qusb_phy_base
+      - const: eud_enable_reg
+      - const: efuse_addr
+      - const: refgen_north_bg_reg_addr
+
+  qcom,efuse-bit-pos:
+    description: External fuse register bit required for phy functionality.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,efuse-num-bits:
+    description: External fuse register number of bit to be read.
+
+  vdd-supply:
+    description: vdd supply for HSPHY digital circuit operation.
+
+  vdda18-supply:
+    description: 1.8 V for HSPHY.
+
+  vdda33-supply:
+    description: 3.3 V for HSPHY.
+
+  refgen-supply:
+    description: Refgen regulator required for phy to work.
+
+  qcom,vdd-voltage-level:
+    description: Voltage level of the vdd supply.
+                 This is set to min value to vote from usb.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  clocks:
+    description: |
+      A list of phandles to the phy clocks::
+      - ref_clk_src:: Reference clk source required for enumeration.
+      - ref_clk:: Reference clk required for enumeration.
+    minItems: 1
+    maxItems: 3
+
+  clock-names:
+    minItems: 1
+    items:
+      - const: ref_clk_src
+      - const: ref_clk
+
+  resets:
+    maxItems: 1
+
+  reset-names:
+    items:
+      - const: phy_reset
+
+  phy_type:
+    oneOf:
+      - items:
+          - const: utmi
+      - items:
+          - const: ulpi
+
+  qcom,qusb-phy-init-seq:
+    description: Phy Initialization sequence required for init.
+    $ref: /schemas/types.yaml#/definitions/uint32-matrix
+    items:
+      items:
+        -
+          description: address
+        -
+          description: value
+
+  qcom,qusb-phy-reg-offset:
+    description: Phy Register offsets required for probe.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    items:
+      -
+        description: address
+
+  qcom,qusb-phy-host-init-seq:
+    description: Host mode phy initialization sequence required for init.
+    $ref: /schemas/types.yaml#/definitions/uint32-matrix
+    items:
+      items:
+        -
+          description: address
+        -
+          description: value
+
+if:
+  properties:
+    compatible:
+      contains:
+        enum:
+	  - qcom,qusb2phy-v2
+then:
+  required:
+    - qcom,qusb-phy-reg-offset
+    - qcom,qusb-phy-host-init-seq
+else:
+  properties:
+    qcom,qusb-phy-reg-offset: false
+    qcom,qusb-phy-host-init-seq: false
+
+additionalProperties: false
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+  - vdd-supply
+  - vdda18-supply
+  - vdda33-supply
+  - resets
+  - phy_type
+  - qcom,qusb-phy-init-seq
+
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmcc.h>
+    #include <dt-bindings/clock/qcom,gcc-holi.h>
+
+    qusb2_phy0: qusb@162b000 {
+       compatible = "qcom,qusb2phy-v2";
+       reg = <0x162B000 0x114>,
+             <0x0162A000 0x1000>,
+             <0x1b40268 0x4>,
+             <0x0162f014 0x4>;
+
+       reg-names = "qusb_phy_base",
+                   "eud_enable_reg",
+                   "efuse_addr",
+                   "refgen_north_bg_reg_addr";
+
+       qcom,efuse-bit-pos = <25>;
+       qcom,efuse-num-bits = <3>;
+
+       vdd-supply = <&L18A>;
+       vdda18-supply = <&L2A>;
+       vdda33-supply = <&L3A>;
+       refgen-supply = <&L22A>;
+       qcom,vdd-voltage-level = <0 880000 880000>;
+
+       clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+       <&gcc GCC_USB3_PRIM_CLKREF_CLK>;
+       clock-names = "ref_clk_src", "ref_clk";
+
+       resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+       reset-names = "phy_reset";
+
+       phy_type= "utmi";
+
+       qcom,qusb-phy-reg-offset =
+            <0x240 /* QUSB2PHY_PORT_TUNE1 */
+             0x1a0 /* QUSB2PHY_PLL_COMMON_STATUS_ONE */
+             0x210 /* QUSB2PHY_PWR_CTRL1 */
+             0x230 /* QUSB2PHY_INTR_CTRL */
+             0x0a8 /* QUSB2PHY_PLL_CORE_INPUT_OVERRIDE */
+             0x254 /* QUSB2PHY_TEST1 */
+             0x198 /* PLL_BIAS_CONTROL_2 */
+             0x27c /* QUSB2PHY_DEBUG_CTRL1 */
+             0x280 /* QUSB2PHY_DEBUG_CTRL2 */
+             0x284 /* QUSB2PHY_DEBUG_CTRL3 */
+             0x288 /* QUSB2PHY_DEBUG_CTRL4 */
+             0x2a0>; /* QUSB2PHY_STAT5 */
+
+       qcom,qusb-phy-init-seq =
+             /* <value reg_offset> */
+             <0x23 0x210 /* PWR_CTRL1 */
+             0x03 0x04  /* PLL_ANALOG_CONTROLS_TWO */
+             0x7c 0x18c /* PLL_CLOCK_INVERTERS */
+             0x80 0x2c  /* PLL_CMODE */
+             0x0a 0x184 /* PLL_LOCK_DELAY */
+             0x19 0xb4  /* PLL_DIGITAL_TIMERS_TWO */
+             0x40 0x194 /* PLL_BIAS_CONTROL_1 */
+             0x22 0x198 /* PLL_BIAS_CONTROL_2 */
+             0x21 0x214 /* PWR_CTRL2 */
+             0x08 0x220 /* IMP_CTRL1 */
+             0x58 0x224 /* IMP_CTRL2 */
+             0x45 0x240 /* TUNE1 */
+             0x29 0x244 /* TUNE2 */
+             0xca 0x248 /* TUNE3 */
+             0x04 0x24c /* TUNE4 */
+             0x03 0x250 /* TUNE5 */
+             0x30 0x23c /* CHG_CTRL2 */
+             0x22 0x210>; /* PWR_CTRL1 */
+
+       qcom,qusb-phy-host-init-seq =
+             /* <value reg_offset> */
+             <0x23 0x210 /* PWR_CTRL1 */
+             0x03 0x04  /* PLL_ANALOG_CONTROLS_TWO */
+             0x7c 0x18c /* PLL_CLOCK_INVERTERS */
+             0x80 0x2c  /* PLL_CMODE */
+             0x0a 0x184 /* PLL_LOCK_DELAY */
+             0x19 0xb4  /* PLL_DIGITAL_TIMERS_TWO */
+             0x40 0x194 /* PLL_BIAS_CONTROL_1 */
+             0x22 0x198 /* PLL_BIAS_CONTROL_2 */
+             0x21 0x214 /* PWR_CTRL2 */
+             0x08 0x220 /* IMP_CTRL1 */
+             0x58 0x224 /* IMP_CTRL2 */
+             0x45 0x240 /* TUNE1 */
+             0x29 0x244 /* TUNE2 */
+             0xca 0x248 /* TUNE3 */
+             0x04 0x24c /* TUNE4 */
+             0x03 0x250 /* TUNE5 */
+             0x30 0x23c /* CHG_CTRL2 */
+             0x22 0x210>; /* PWR_CTRL1 */
+    };

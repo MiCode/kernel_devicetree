@@ -1,0 +1,168 @@
+QPNP AMOLED Triple power supply regulator devices
+
+QPNP OLEDB module provides AVDD voltage rail output for bias and QPNP AB/IBB
+module provides ELVDD/ELVSS voltage rail output to power up AMOLED panels.
+
+For PM8150A, allowed voltage levels are as below:
+AVDD - Programmable output from 5 V to 8 V.
+ELVDD  - Programmable output from 4.6 V to 5.2 V.
+ELVSS  - Programmable output from -0.8 V to -5.4 V.
+
+For PM8350B, allowed voltage levels are as below:
+AVDD - Programmable output from 5 V to 8 V.
+ELVDD  - Programmable output from 4.6 V to 5.2 V.
+ELVSS  - Programmable output from -1.4 V to -6.6 V.
+
+This document describes the bindings for AMOLED regulator devices.
+
+=======================
+Required Node Structure
+=======================
+
+AMOLED regulator device must be described in two level of device nodes.
+
+- compatible:
+	Usage:      required
+	Value type: <string>
+	Definition: should be "qcom,qpnp-amoled-regulator"
+
+==========================================
+Second Level Nodes - OLEDB/AB/IBB specific
+==========================================
+
+Subnode common properties for OLEDB and AB/IBB regulator devices.
+
+- reg:
+	Usage:      required
+	Value type: <prop-encoded-array>
+	Definition: Register base for OLEDB, AB and IBB modules which are
+		    represented as child nodes.
+
+- reg-names:
+	Usage:      required
+	Value type: <string>
+	Definition: The name of the register defined in the reg property.
+
+- regulator-name:
+	Usage:      required
+	Value type: <string>
+	Definition: A string used to describe the regulator.
+
+- regulator-min-microvolt:
+	Usage:      required
+	Value type: <u32>
+	Definition: Minimum voltage (in uV) supported by the regulator.
+
+- regulator-max-microvolt:
+	Usage:      required
+	Value type: <u32>
+	Definition: Maximum voltage (in uV) supported by the regulator.
+
+- qcom,swire-control:
+	Usage:	    optional
+	Value type: <empty>
+	Definition: A boolean property to specify that the regulator output is
+		    controlled by SWIRE signal. When this is specified, output
+		    voltage of the regulator is not controlled by SW.
+
+- qcom,aod-pd-control:
+	Usage:      optional
+	Value type: <empty>
+	Definition: A boolean property to specify that the pull down control
+		    for AB/IBB needs to be configured during AOD mode.
+
+- qcom,ibb-single-phase:
+	Usage:      optional
+	Value type: <empty>
+	Definition: A boolean property to specify that IBB regulator needs to
+		    be configured in single phase always.
+
+- qcom,ibb-spur-mitigation-level
+	Usage:      optional
+	Value type: <u32>
+	Definition: IBB spur mitigation level selection options.
+			0 = IBB spur mitigation disabled
+			1 = IBB spur mitigation enabled without SQM mode
+			2 = IBB spur mitigation enabled with SQM mode.
+
+- qcom,ibb-spur-sqm-timer-ms
+	Usage:      optional
+	Value type: <u32>
+	Definition: A property to specify delay in ms for the SQM mode timeout.
+		    The is the time HW stays in SQM mode before re-evaluating the
+		    exit condition. This property is only valid when
+		    qcom,ibb-spur-mitigation-level is set to 2
+		    (IBB spur mitigation enabled with SQM mode). If not defined,
+		    1000ms will be used by default as SQM mode timeout delay.
+		    The range of values supported is from 100ms to 10000ms.
+		    Also, this value is stored in main PMIC's SDAM and an NVMEM cell
+		    referring to this SDAM location must be defined if
+		    this property is used.
+
+- qcom,ibb-spur-2khz-step-size
+	Usage:      optional
+	Value type: <empty>
+	Definition: A boolean property to specify 2khz step size, instead of the 1khz.
+		    if defined this doubles the frequency selection range from
+		    1-248khz to 2-496khz, for all the frequency band thresholds.
+
+
+-qcom,ibb-spur-freq-thresholds
+	Usage:      optional
+	Value type: <prop-encoded-array>
+	Definition: Property to specify a range of thresholds for 3 frequency bands
+		    with each tuple representing a high and low threshold. Valid
+		    ranges are from 1-248khz and 2-496khz(step size 2khz).
+		    To disable a frequency band set both High and Low
+                    thresholds to (-1).
+
+Example:
+
+amoled: oledb@e000 {
+	compatible = "qcom,qpnp-amoled-regulator";
+
+	/*
+	 * Optional NVMEM cell property, needed only if IBB spur
+	 * mitigation feature is enabled and SQM timer value
+	 * is defined.
+	 */
+	nvmem-cell-names ="ibb_spur_sqm_timer";
+	nvmem-cells = <&ibb_spur_sqm_timer>;
+
+	oledb_vreg: oledb@e000 {
+		reg = <0xe000>;
+		reg-names = "oledb_base";
+		regulator-name = "oledb_vreg";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <8000000>;
+		qcom,swire-control;
+	};
+
+	ab_vreg: ab@de00 {
+		reg = <0xde00>;
+		reg-names = "ab_base";
+		regulator-name = "ab_vreg";
+		regulator-min-microvolt = <4600000>;
+		regulator-max-microvolt = <5200000>;
+		qcom,swire-control;
+		qcom,aod-pd-control;
+	};
+
+	ibb_vreg: ibb@dc00 {
+		reg = <0xdc00>;
+		reg-names = "ibb_base";
+		regulator-name = "ibb_vreg";
+		regulator-min-microvolt = <800000>;
+		regulator-max-microvolt = <5400000>;
+		qcom,swire-control;
+		qcom,aod-pd-control;
+
+		/* IBB spur mitigation properties (optional feature) */
+		qcom,ibb-spur-mitigation-level = <0>; /* Spur mitigation disabled(0) */
+		qcom,ibb-spur-sqm-timer-ms = <1000>;
+		qcom,ibb-spur-2khz-step-size;
+		qcom,ibb-spur-freq-thresholds = <100 120>,
+						<150 170>,
+						<(-1) (-1)>;
+	};
+};
