@@ -759,3 +759,33 @@
 		enable-gpio = <&pm8550ve_gpios 6 GPIO_ACTIVE_HIGH>;
 	};
 };
+
+&pm8550ve_gpios {
+	pwr_en_gpio {
+		pwr_en_gpio_default: pwr_en_gpio_default {
+			pins = "gpio6";
+			function = "normal";
+			power-source = <0>;
+			output-low;
+			input-disable;
+		};
+	};
+};
+
+&qupv3_se10_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+
+	fancontroller: max31760@50 {
+		compatible = "maxim,max31760";
+		reg = <0x50>;
+		#cooling-cells = <2>;
+		maxim,fan-num = <2>;
+		maxim,vdd-supply = <&BOB1>;
+		maxim,vcca-supply = <&L7B>;
+		regulator-name = "maxim,vdd", "maxim,vcca";
+		maxim,pwr-en-gpio = <&pm8550ve_gpios 6 GPIO_ACTIVE_LOW>;
+		status = "ok";
+	};
+};
