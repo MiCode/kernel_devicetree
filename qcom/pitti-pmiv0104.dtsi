@@ -16,9 +16,21 @@
 	qcom,fs-current-limit = <22500>;
 };
 
-&pmiv0104_vadc {
+&pmiv0104_gpios {
 	charger_skin_therm {
-		reg = <ADC5_AMUX_THM1_100K_PU>;
+		charger_skin_therm_default: charger_skin_therm_default {
+			pins = "gpio6";
+			bias-high-impedence;
+		};
+	};
+};
+
+&pmiv0104_vadc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&charger_skin_therm_default>;
+
+	charger_skin_therm {
+		reg = <ADC5_GEN3_AMUX6_THM_100K_PU>;
 		label = "charger_skin_therm";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -26,7 +38,7 @@
 	};
 
 	conn_therm {
-		reg = <ADC5_AMUX_THM3_100K_PU>;
+		reg = <ADC5_GEN3_AMUX4_THM_100K_PU>;
 		label = "conn_therm";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -45,14 +57,14 @@
 
 			charger_skin_therm {
 				reg = <0>;
-				io-channels = <&pmiv0104_vadc ADC5_AMUX_THM1_100K_PU>;
+				io-channels = <&pmiv0104_vadc ADC5_GEN3_AMUX6_THM_100K_PU>;
 				qcom,ratiometric;
 				qcom,hw-settle-time-us = <200>;
 			};
 
 			conn_therm {
 				reg = <1>;
-				io-channels = <&pmiv0104_vadc ADC5_AMUX_THM3_100K_PU>;
+				io-channels = <&pmiv0104_vadc ADC5_GEN3_AMUX4_THM_100K_PU>;
 				qcom,ratiometric;
 				qcom,hw-settle-time-us = <200>;
 			};

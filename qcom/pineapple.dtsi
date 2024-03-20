@@ -1475,7 +1475,6 @@
 
 		qcom,prime-mask = <0x80>;
 		qcom,silver-mask = <0x0f>;
-		qcom,esi-affinity-mask = <0xe0>;
 
 		lanes-per-direction = <2>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
@@ -2063,6 +2062,18 @@
 			qcom,glinkpkt-edge = "mpss";
 			qcom,glinkpkt-ch-name = "DS";
 			qcom,glinkpkt-dev-name = "at_mdm0";
+		};
+
+		qcom,glinkpkt-ctrl-cdsp {
+			qcom,glinkpkt-edge = "cdsp";
+			qcom,glinkpkt-ch-name = "LOOPBACK_CTL_CDSP";
+			qcom,glinkpkt-dev-name = "glink_pkt_ctrl_cdsp";
+		};
+
+		qcom,glinkpkt-data-cdsp {
+			qcom,glinkpkt-edge = "cdsp";
+			qcom,glinkpkt-ch-name = "LOOPBACK_DATA_CDSP";
+			qcom,glinkpkt-dev-name = "glink_pkt_data_cdsp";
 		};
 
 		qcom,glinkpkt-apr-apps2 {
@@ -2891,20 +2902,6 @@
 						 &mc_virt SLAVE_EBI1>;
 			};
 		};
-
-		qcom_ubwcp_dcvs_hw: ubwcp {
-			compatible = "qcom,dcvs-hw";
-			qcom,dcvs-hw-type = <4>;
-			qcom,bus-width = <4>;
-			qcom,freq-tbl = <&ddr_freq_table>;
-
-			ubwcp_dcvs_sp: sp {
-				compatible = "qcom,dcvs-path";
-				qcom,dcvs-path-type = <0>;
-				interconnects = <&gem_noc MASTER_UBWC_P
-						 &mc_virt SLAVE_EBI1>;
-			};
-		};
 	};
 
 	qcom_memlat: qcom,memlat {
@@ -3149,17 +3146,6 @@
 		qcom,hw-timer-hz = <19200000>;
 		qcom,count-unit = <0x10000>;
 		qcom,target-dev = <&qcom_ddr_dcvs_hw>;
-	};
-
-	bwmon_ubwcp: qcom,bwmon-ubwcp@240B5200 {
-		compatible = "qcom,bwmon4";
-		reg = <0x240B5300 0x300>, <0x240B5200 0x200>;
-		reg-names = "base", "global_base";
-		interrupts = <GIC_SPI 226 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,mport = <0>;
-		qcom,hw-timer-hz = <19200000>;
-		qcom,count-unit = <0x10000>;
-		qcom,target-dev = <&qcom_ubwcp_dcvs_hw>;
 	};
 
 	google,debug-kinfo {

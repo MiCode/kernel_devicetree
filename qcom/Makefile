@@ -51,6 +51,9 @@ CLIFFS_BOARDS += \
 		 cliffs-mtp-pm8550b-overlay.dtbo \
 		 cliffs-mtp-kiwi-2s-nfc-wcd9395-pm8550b-overlay.dtbo \
 		 cliffs-mtp-kiwi-overlay.dtbo \
+		 cliffs-mtp-peach-2s-nfc-wcd9395-overlay.dtbo \
+		 cliffs-mtp-peach-2s-nfc-wcd9395-pm8550b-overlay.dtbo \
+		 cliffs-mtp-peach-overlay.dtbo \
 		 cliffs-rcm-qhdp-overlay.dtbo \
 		 cliffs-rcm-fhdp-kiwi-overlay.dtbo \
 		 cliffs-rcm-qhdp-kiwi-overlay.dtbo
@@ -63,20 +66,25 @@ pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(CLIFFS_BOARDS),$(CLIFFS_APQ_BASE_DTB))
 pineapple-overlays-dtb-$(CONFIG_ARCH_CLIFFS) += $(CLIFFS_BOARDS) $(NOAPQ_CLIFFS_BOARDS) $(CLIFFS_BASE_DTB) $(CLIFFS_APQ_BASE_DTB)
 
-VOLCANO_BASE_DTB += volcano.dtb
+VOLCANO_BASE_DTB += volcano.dtb volcano6.dtb
+VOLCANO_APQ_BASE_DTB += volcano6p.dtb
 
 VOLCANO_BOARDS += \
 		volcano-atp-overlay.dtbo \
 		volcano-idp-overlay.dtbo \
+		volcano-idp-wcd9395-overlay.dtbo \
 		volcano-mtp-overlay.dtbo \
+		volcano-mtp-wcd9395-aatc-overlay.dtbo \
+		volcano-mtp-pm7550ba-overlay.dtbo \
 		volcano-qrd-overlay.dtbo
 
 NOAPQ_VOLCANO_BOARDS += \
 		volcano-rumi-overlay.dtbo
 
 pineapple-dtb-$(CONFIG_ARCH_VOLCANO) += \
-	$(call add-overlays, $(VOLCANO_BOARDS) $(NOAPQ_VOLCANO_BOARDS),$(VOLCANO_BASE_DTB))
-pineapple-overlays-dtb-$(CONFIG_ARCH_VOLCANO) += $(VOLCANO_BOARDS) $(NOAPQ_VOLCANO_BOARDS) $(VOLCANO_BASE_DTB)
+	$(call add-overlays, $(VOLCANO_BOARDS) $(NOAPQ_VOLCANO_BOARDS),$(VOLCANO_BASE_DTB))\
+	$(call add-overlays, $(VOLCANO_BOARDS), $(VOLCANO_APQ_BASE_DTB))
+pineapple-overlays-dtb-$(CONFIG_ARCH_VOLCANO) += $(VOLCANO_BOARDS) $(NOAPQ_VOLCANO_BOARDS) $(VOLCANO_BASE_DTB) $(VOLCANO_APQ_BASE_DTB)
 
 dtb-y += $(pineapple-dtb-y)
 
@@ -103,11 +111,15 @@ kalama-overlays-dtb-$(CONFIG_ARCH_KALAMA) += $(KALAMA_BOARDS) $(NOAPQ_KALAMA_BOA
 dtb-y += $(kalama-dtb-y)
 
 NIOBE_BASE_DTB += niobe.dtb
+NIOBE_APQ_BASE_DTB += niobep.dtb
 
 NIOBE_BOARDS += \
 		niobe-atp-overlay.dtbo \
 		niobe-idp-overlay.dtbo \
-		niobe-qxr-overlay.dtbo
+		niobe-qxr-overlay.dtbo \
+		niobep-atp-overlay.dtbo \
+		niobep-idp-overlay.dtbo \
+		niobep-qxr-overlay.dtbo
 
 NOAPQ_NIOBE_BOARDS += \
 		 niobe-rumi-overlay.dtbo
@@ -244,23 +256,48 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
 		cliffs-vm-cdp.dtb \
 		cliffs-vm-mtp.dtb \
 		cliffs-vm-mtp-kiwi.dtb \
+		cliffs-vm-mtp-peach.dtb \
 		cliffs-vm-qrd.dtb \
 		cliffs-vm-rcm.dtb \
 		cliffs-vm-rcm-fhdp-kiwi.dtb \
 		cliffs-vm-rcm-qhdp.dtb \
 		cliffs-vm-rcm-qhdp-kiwi.dtb \
 		cliffs-vm-mtp-kiwi-2s-nfc-wcd9395.dtb \
+		cliffs-vm-mtp-peach-2s-nfc-wcd9395.dtb \
 		cliffs-oemvm-atp.dtb \
 		cliffs-oemvm-cdp.dtb \
 		cliffs-oemvm-mtp.dtb \
 		cliffs-oemvm-mtp-kiwi.dtb \
+		cliffs-oemvm-mtp-peach.dtb \
 		cliffs-oemvm-qrd.dtb \
 		cliffs-oemvm-rcm.dtb \
 		cliffs-oemvm-rumi.dtb \
 		cliffs-oemvm-rcm-fhdp-kiwi.dtb \
 		cliffs-oemvm-rcm-qhdp.dtb \
 		cliffs-oemvm-rcm-qhdp-kiwi.dtb \
-		cliffs-oemvm-mtp-kiwi-2s-nfc-wcd9395.dtb
+		cliffs-oemvm-mtp-kiwi-2s-nfc-wcd9395.dtb \
+		cliffs-oemvm-mtp-peach-2s-nfc-wcd9395.dtb
+
+dtb-y += $(pineapple_tuivm-dtb-y)
+endif
+endif
+
+ifeq ($(CONFIG_ARCH_VOLCANO), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += volcano-vm-rumi.dtb \
+                volcano-vm-atp.dtb \
+                volcano-vm-idp.dtb \
+                volcano-vm-idp-wcd9395.dtb \
+                volcano-vm-mtp.dtb \
+                volcano-vm-mtp-wcd9395-aatc.dtb \
+                volcano-vm-qrd.dtb \
+                volcano-oemvm-rumi.dtb \
+                volcano-oemvm-atp.dtb \
+                volcano-oemvm-idp.dtb \
+                volcano-oemvm-idp-wcd9395.dtb \
+                volcano-oemvm-mtp.dtb \
+                volcano-oemvm-mtp-wcd9395-aatc.dtb \
+                volcano-oemvm-qrd.dtb
 
 dtb-y += $(pineapple_tuivm-dtb-y)
 endif

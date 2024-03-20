@@ -18,6 +18,7 @@ VADC node:
                 Should contain "qcom,pms405-adc" for PMS405 PMIC
                 Should contain "qcom,spmi-adc5-lite" for PMIC5 ADC-lite.
                 Should contain "qcom,spmi-adc7-sw-calib" for PMIC7 SW-calibrated ADC.
+                Should contain "qcom,spmi-adc5-shared" for PMIC5 Gen3 shared ADC.
 - reg:
     Usage: required
     Value type: <prop-encoded-array>
@@ -325,4 +326,28 @@ Example3:
 	pmr735a_tz {
 		io-channels = <&pmr735a_vadc ADC7_DIE_TEMP>;
 		io-channel-names = "thermal";
+	};
+
+Example 4:
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
+/* ... */
+
+	/* VADC node */
+	pmiv0104_vadc:vadc@3600 {
+		compatible = "qcom,spmi-adc5-shared";
+		reg = <0x3600>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <0x8 0x36 0x0 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "eoc-int-en-set";
+		#io-channel-cells = <1>;
+
+		/* Channel node */
+		die_temp {
+			reg = <ADC5_GEN3_DIE_TEMP>;
+			label = "die_temp";
+			qcom,pre-scaling = <1 1>;
+		};
 	};

@@ -42,6 +42,19 @@
 			 0x144 /* GSI_RING_BASE_ADDR_H */
 			 0x1a4>; /* GSI_IF_STS */
 
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnects = <&system_noc MASTER_USB3 &bimc SLAVE_EBI_CH0>,
+				<&system_noc MASTER_USB3 &config_noc SLAVE_IPA_CFG>,
+				<&bimc MASTER_AMPSS_M0 &config_noc SLAVE_USB3>;
+
+		extcon = <&eud>;
+
+		/*
+		 * Establish dependency on smmu driver so that depopulate path of
+		 * deferred probe doesn't run into existing bug in smmu driver.
+		 */
+		dummy-supply = <&apps_smmu>;
+
 		dwc3@4e00000 {
 			compatible = "snps,dwc3";
 			reg = <0x4e00000 0xe000>;
@@ -59,9 +72,12 @@
 			snps,dis-u1-entry-quirk;
 			snps,dis-u2-entry-quirk;
 			snps,dis_u2_susphy_quirk;
+			snps,dis_u3_susphy_quirk;
 			snps,ssp-u3-u0-quirk;
 			tx-fifo-resize;
-			dr_mode = "peripheral";
+			/* set host mode interrupt moderation to 1 us */
+			imod-interval-ns = <1000>;
+			dr_mode = "otg";
 			maximum-speed = "super-speed";
 			usb-role-switch;
 		};
@@ -87,6 +103,9 @@
 
 		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
 		reset-names = "phy_reset";
+
+		qcom,param-override-seq = <0xc8 0x70>,  /* PARAMETER_OVERRIDE_X1 */
+					  <0x17 0x74>;  /* PARAMETER_OVERRIDE_X2 */
 	};
 
 	/* USB port related QMP USB DP Combo PHY */
