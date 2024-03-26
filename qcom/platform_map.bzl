@@ -429,6 +429,8 @@ _platform_map = {
             {"name": "pitti-idp-pmiv0104-4gb-overlay.dtbo"},
             {"name": "pitti-idp-4gb-overlay.dtbo"},
             {"name": "pitti-qrd-4gb-overlay.dtbo"},
+            {"name": "pitti-idp-90fps-overlay.dtbo"},
+            {"name": "pitti-qrd-90fps-overlay.dtbo"},
             {
                 "name": "pitti-rumi-overlay.dtbo",
                 "apq": False,
