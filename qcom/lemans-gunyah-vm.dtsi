@@ -190,19 +190,23 @@
 		/* QUPv3 SE17 region */
 		/* QRNG region */
 		/* MPROC NS1 IPCC region */
+		/* Compute L0 IPCC region */
 		iomemory-ranges = <0x0 0xF000000 0x0 0xF000000 0x0 0x1000000 0x0
 				0x0 0xAC0000 0x0 0xAC0000 0x0 0x6000 0x1
 				0x0 0x8C0000 0x0 0x8C0000 0x0 0x6000 0x1
 				0x0 0x88C000 0x0 0x88C000 0x0 0x4000 0x0
 				0x0 0x10dc000 0x0 0x10dc000 0x0 0x1000 0x0
 				0x0 0x421000 0x0 0x421000 0x0 0x1000 0x0
+				0x0 0x461000 0x0 0x461000 0x0 0x1000 0x0
 				>;
 
 		/* Pass through IRQs */
 		/* QUPv3 SE17 GIC IRQ */
 		/* MPROC NS1 IPCC GIC IRQ */
+		/* Compute L0 IPCC GIC IRQ */
 		gic-irq-ranges = <617 617
-							591 591>;
+			591 591
+			588 588>;
 
 		memory {
 			#address-cells = <0x2>;
@@ -622,6 +626,16 @@
 		compatible = "qcom,ipcc";
 		reg = <0x421000 0x1000>;
 		interrupts = <GIC_SPI 559 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+		status = "ok";
+	};
+
+	ipcc_compute_l0_apps_ns1: qcom,ipcc@461000 {
+		compatible = "qcom,ipcc";
+		reg = <0x461000 0x1000>;
+		interrupts = <GIC_SPI 556 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-controller;
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
