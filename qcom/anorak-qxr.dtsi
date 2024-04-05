@@ -1,4 +1,6 @@
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/qcom,gcc-anorak.h>
 
 &soc {
 };
@@ -9,5 +11,32 @@
 
 &itof_level {
 	enable-gpio = <&tlmm 87 GPIO_ACTIVE_HIGH>;
+	status = "ok";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-waipio";
+
+	vdda-phy-supply = <&L2F>;
+	vdda-pll-supply = <&L2C>;
+	vdda-phy-max-microamp = <138000>;
+	vdda-pll-max-microamp = <18300>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L13B>;
+	vcc-max-microamp = <1300000>;
+
+	vccq-supply = <&L3B>;
+	vccq-max-microamp = <1200000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L3B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
 	status = "ok";
 };
