@@ -40,3 +40,5 @@
 | bsp-vermeer-t-oss | Redmi K70 | Android U | LA.VENDOR.13.2.0.r1-14800-r1.0.r1_00043.0 | [bsp-vermeer-t-oss](https://github.com/MiCode/kernel_devicetree/tree/bsp-vermeer-t-oss) |
 | bsp-manet-u-oss | Redmi K70Pro | Android U | LA.VENDOR.14.3.0.r1-04800-r1.0.r1_00016.0 |[bsp-manet-u-oss](https://github.com/MiCode/kernel_devicetree/tree/bsp-manet-u-oss) |
 | aurora-u-oss | Xiaomi 14 Ultra| Android U | LA.VENDOR.14.3.0.r1-06800-lanai.0-1 | [aurora-u-oss](https://github.com/MiCode/kernel_devicetree/tree/aurora-u-oss) |
+| sheng-u-oss | Xiaomi Pad 6S Pro 12.4 | Android U | LA.VENDOR.13.2.0.r1-14800-KAILUA.0-1.36233.3 | [sheng-u-oss](https://github.com/MiCode/kernel_devicetree/tree/sheng-u-oss) |
+
