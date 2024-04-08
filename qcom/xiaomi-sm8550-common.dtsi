@@ -6,7 +6,7 @@
 #include "kalama-thermal-overlay.dtsi"
 
 &sdhc_2 {
-	status = "ok";
+	status = "disabled";
 	vdd-supply = <&pm_humu_l9>;
 	qcom,vdd-voltage-level = <2950000 2960000>;
 	qcom,vdd-current-level = <0 800000>;
@@ -42,9 +42,36 @@
 			linux,input-type = <1>;
 			linux,code = <KEY_VOLUMEUP>;
 			gpio-key,wakeup;
-			debounce-interval = <15>;
+			debounce-interval = <32>;
 			linux,can-disable;
 		};
+	};
+
+	mtdoops_pmsg@0xa7000000 {
+		compatible = "mtdoops_pmsg";
+		reg = <0xa7000000 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	hardwareinfo {
+		compatible = "xiaomi,hardware-info";
+		status = "ok";
+	};
+
+	dump_display_mem: dump_display_region@a4a80000 {
+		compatible = "xiaomi,dump_display";
+		reg = <0xa4a80000  0x800>;
+	};
+};
+
+&qupv3_se9_spi {
+	status = "ok";
+	ir-spi@0 {
+		compatible = "ir-spi";
+		reg = <0>;
+		spi-max-frequency = <19200000>;
+		status = "ok";
 	};
 };
 
@@ -120,7 +147,7 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	status = "ok";
+	status = "disabled";
 	qcom,i2c-touch-active = "goodix,gt9916";
 
 	goodix-berlin@5d {
@@ -195,7 +222,144 @@
 	qcom,thermal-mitigation = <3000000 1500000 1000000 500000>;
 };
 
-#if defined(SOCRATES_REGULATOR_OCP)
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	ramoops@0xa7000000 {
+		compatible = "ramoops";
+		reg = <0x0 0xa7000000 0x0 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	// xiami splits xbl_dt_log_merged_mem into the following
+	// 3 regions, just like older days
+	xbl_dt_log_mem: xbl_dt_log@81a00000 {
+	       no-map;
+	       reg = <0x0 0x81a00000 0x0 0x40000>;
+	};
+
+	aop_image_mem: aop_image_region@81c00000 {
+	       no-map;
+	       reg = <0x0 0x81c00000 0x0 0x60000>;
+	};
+
+	xbl_ramdump_mem: xbl_ramdump_region@81200000 {
+		no-map;
+		reg = <0x0 0x81200000 0x0 0x280000>;
+	};
+};
+#if defined(ISHTAR_REGULATOR_OCP)
+&regulator_ocp_notifier {
+        periph-1c1-supply = <&L1B>;
+        periph-1c2-supply = <&L2B>;
+        periph-1c5-supply = <&L5B>;
+        periph-1c6-supply = <&L6B>;
+        periph-1c7-supply = <&L7B>;
+        periph-1c8-supply = <&L8B>;
+        periph-1c9-supply = <&L9B>;
+        periph-1ca-supply = <&L10B>;
+        periph-1cb-supply = <&L11B>;
+        periph-1cc-supply = <&L12B>;
+        periph-1ce-supply = <&L14B>;
+        periph-1cf-supply = <&L15B>;
+        periph-1d0-supply = <&L16B>;
+        periph-1d1-supply = <&L17B>;
+        periph-2c1-supply = <&L1C>;
+        periph-3c1-supply = <&L1D>;
+        periph-3c2-supply = <&L2D_LEVEL>;
+        periph-4c1-supply = <&L1E>;
+        periph-4c2-supply = <&L2E>;
+        periph-4c3-supply = <&L3E>;
+        periph-5c1-supply = <&L1F>;
+        periph-5c2-supply = <&L2F>;
+        periph-5c3-supply = <&L3F>;
+        periph-6c1-supply = <&L1G>;
+        periph-6c2-supply = <&L2G>;
+        periph-6c3-supply = <&L3G>;
+        periph-ac1-supply = <&L1K>;
+        periph-ac2-supply = <&L2K>;
+        periph-ac3-supply = <&L3K>;
+        periph-ac4-supply = <&L4K>;
+        periph-ac5-supply = <&L5K>;
+        periph-ac6-supply = <&L6K>;
+        periph-ac7-supply = <&L7K>;
+};
+#elif defined(VERMEER_REGULATOR_OCP)
+&regulator_ocp_notifier {
+        periph-1c1-supply = <&L1B>;
+        periph-1c2-supply = <&L2B>;
+        periph-1c5-supply = <&L5B>;
+        periph-1c6-supply = <&L6B>;
+        periph-1c7-supply = <&L7B>;
+        periph-1c8-supply = <&L8B>;
+        periph-1c9-supply = <&L9B>;
+        periph-1ca-supply = <&L10B>;
+        periph-1cb-supply = <&L11B>;
+        periph-1cc-supply = <&L12B>;
+        periph-1ce-supply = <&L14B>;
+        periph-1cf-supply = <&L15B>;
+        periph-1d0-supply = <&L16B>;
+        periph-1d1-supply = <&L17B>;
+        periph-2c1-supply = <&L1C>;
+        periph-3c1-supply = <&L1D>;
+        periph-3c2-supply = <&L2D_LEVEL>;
+        periph-4c1-supply = <&L1E>;
+        periph-4c2-supply = <&L2E>;
+        periph-4c3-supply = <&L3E>;
+        periph-5c1-supply = <&L1F>;
+        periph-5c2-supply = <&L2F>;
+        periph-5c3-supply = <&L3F>;
+        periph-6c1-supply = <&L1G>;
+        periph-6c2-supply = <&L2G>;
+        periph-6c3-supply = <&L3G>;
+        periph-ac1-supply = <&L1K>;
+        periph-ac2-supply = <&L2K>;
+        periph-ac3-supply = <&L3K>;
+        periph-ac4-supply = <&L4K>;
+        periph-ac5-supply = <&L5K>;
+        periph-ac6-supply = <&L6K>;
+        periph-ac7-supply = <&L7K>;
+};
+#elif defined(BABYLON_REGULATOR_OCP)
+&regulator_ocp_notifier {
+        periph-1c1-supply = <&L1B>;
+        periph-1c2-supply = <&L2B>;
+        periph-1c5-supply = <&L5B>;
+        periph-1c6-supply = <&L6B>;
+        periph-1c7-supply = <&L7B>;
+        periph-1c8-supply = <&L8B>;
+        periph-1c9-supply = <&L9B>;
+        periph-1ca-supply = <&L10B>;
+        periph-1cb-supply = <&L11B>;
+        periph-1cc-supply = <&L12B>;
+        periph-1ce-supply = <&L14B>;
+        periph-1cf-supply = <&L15B>;
+        periph-1d0-supply = <&L16B>;
+        periph-1d1-supply = <&L17B>;
+        periph-2c1-supply = <&L1C>;
+        periph-3c1-supply = <&L1D>;
+        periph-3c2-supply = <&L2D_LEVEL>;
+        periph-4c1-supply = <&L1E>;
+        periph-4c2-supply = <&L2E>;
+        periph-4c3-supply = <&L3E>;
+        periph-5c1-supply = <&L1F>;
+        periph-5c2-supply = <&L2F>;
+        periph-5c3-supply = <&L3F>;
+        periph-6c1-supply = <&L1G>;
+        periph-6c2-supply = <&L2G>;
+        periph-6c3-supply = <&L3G>;
+        periph-ac1-supply = <&L1K>;
+        periph-ac2-supply = <&L2K>;
+        periph-ac3-supply = <&L3K>;
+        periph-ac4-supply = <&L4K>;
+        periph-ac5-supply = <&L5K>;
+        periph-ac6-supply = <&L6K>;
+        periph-ac7-supply = <&L7K>;
+};
+#elif defined(SOCRATES_REGULATOR_OCP)
 &regulator_ocp_notifier {
 	periph-1c1-supply = <&L1B>;
 	periph-1c2-supply = <&L2B>;
@@ -213,7 +377,6 @@
 	periph-1d0-supply = <&L16B>;
 	periph-1d1-supply = <&L17B>;
 	periph-2c1-supply = <&L1C>;
-	periph-2c3-supply = <&L3C>;
 	periph-3c1-supply = <&L1D>;
 	periph-3c2-supply = <&L2D_LEVEL>;
 	periph-4c1-supply = <&L1E>;
@@ -251,7 +414,6 @@
         periph-1d0-supply = <&L16B>;
         periph-1d1-supply = <&L17B>;
         periph-2c1-supply = <&L1C>;
-        periph-2c3-supply = <&L3C>;
         periph-3c1-supply = <&L1D>;
         periph-3c2-supply = <&L2D_LEVEL>;
         periph-4c1-supply = <&L1E>;
@@ -336,7 +498,6 @@
 	periph-d46-supply = <&L7N>;
 };
 #endif/*SOCRATES_REGULATOR_OCP*/
-
 
 &pcie1 {
 		qcom,pcie-phy-ver = <104>;

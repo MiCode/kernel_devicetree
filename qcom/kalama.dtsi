@@ -28,23 +28,20 @@
 
 
 	chosen: chosen {
-			bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc cgroup.memory=nokmem,nosocket";
+			bootargs = "console=ttyMSM0,115200n8 kpti=0 kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=0 kasan=off sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc cgroup.memory=nokmem,nosocket";
 	};
 
 	reserved_memory: reserved-memory { };
-
-	mem-offline {
-		compatible = "qcom,mem-offline";
-		offline-sizes = <0x2 0xc0000000 0x1 0x00000000>;
-		granule = <512>;
-		mboxes = <&qmp_aop 0>;
-	};
 
 	aliases: aliases {
 		serial0 = &qupv3_se7_2uart;
 		hsuart0 = &qupv3_se14_4uart;
 		mmc1 = &sdhc_2; /* SD card slot */
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
+		i2c0 = &qupv3_hub_i2c2;
+		i2c1 = &qupv3_se0_i2c;
+		i2c2 = &qupv3_se8_i2c;
+		i2c3 = &qupv3_se5_i2c;
 	};
 
 	sram: sram@17D09400 {
@@ -356,7 +353,8 @@
 	/* merged xbl_dt_log, xbl_ramdump, aop_image */
 	xbl_dt_log_merged_mem: xbl_dt_log_merged@81a00000 {
 		no-map;
-		reg = <0x0 0x81a00000 0x0 0x260000>;
+		// xiami splits this region into 3 regions, in xiaomi-sm8550-common.dtsi
+		//reg = <0x0 0x81a00000 0x0 0x260000>;
 	};
 
 	aop_cmd_db_mem: aop_cmd_db_region@81c60000 {
@@ -467,7 +465,12 @@
 
 	adspslpi_mem: adspslpi_region@9ea00000 {
 		no-map;
-		reg = <0x0 0x9ea00000 0x0 0x4080000>;
+		reg = <0x0 0x9ea00000 0x0 0x4680000>;
+	};
+
+	dump_display_mem: dump_display_region@a4a80000 {
+		no-map;
+		reg = <0x0 0xa4a80000 0x0 0x800>;
 	};
 
 	/* uefi region can be reused by apps */
@@ -511,52 +514,52 @@
 
 	trust_ui_vm_mem: trust_ui_vm_region@f3800000 {
 		no-map;
-		reg = <0x0 0xf3800000 0x0 0x40ee000>;
+		//reg = <0x0 0xf3800000 0x0 0x4aee000>;
 	};
 
 	trust_ui_vm_dump: trust_ui_vm_dump@0xf78ee000 {
 		no-map;
-		reg = <0x0 0xf78ee000 0x0 0x1000>;
+		//reg = <0x0 0xf82ee000 0x0 0x1000>;
 	};
 
 	trust_ui_vm_qrtr: trust_ui_vm_qrtr@0xf78ef000 {
 		no-map;
-		reg = <0x0 0xf78ef000 0x0 0x9000>;
+		//reg = <0x0 0xf82ef000 0x0 0x9000>;
 	};
 
 	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring@0xf78f8000 {
 		no-map;
-		reg = <0x0 0xf78f8000 0x0 0x4000>;
+		//reg = <0x0 0xf82f8000 0x0 0x4000>;
 		gunyah-label = <0x11>;					//for persist.img
 	};
 
 	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring@0xf78fc000 {
 		no-map;
-		reg = <0x0 0xf78fc000 0x0 0x4000>;
+		//reg = <0x0 0xf82fc000 0x0 0x4000>;
 		gunyah-label = <0x10>;					//for system.img
 	};
 
 	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb@0xf7900000 {
 		no-map;
-		reg = <0x0 0xf7900000 0x0 0x100000>;
+		//reg = <0x0 0xf8300000 0x0 0x100000>;
 		gunyah-label = <0x12>;
 	};
 
 	oem_vm_vblk0_ring: oem_vm_vblk0_ring@f7afc000 {
 		no-map;
-		reg = <0x0 0xf7afc000 0x0 0x4000>;
+		// reg = <0x0 0xf7afc000 0x0 0x4000>;
 		gunyah-label = <0x13>;
 	};
 
 	oem_vm_swiotlb: oem_vm_swiotlb@f7b00000 {
 		no-map;
-		reg = <0x0 0xf7b00000 0x0 0x100000>;
+		// reg = <0x0 0xf7b00000 0x0 0x100000>;
 		gunyah-label = <0x14>;
 	};
 
 	oem_vm_mem: oem_vm_region@f7c00000 {
 		compatible = "shared-dma-pool";
-		reg = <0x0 0xf7c00000 0x0 0x4800000>;
+		// reg = <0x0 0xf7c00000 0x0 0x4800000>;
 		reusable;
 		alignment = <0x0 0x400000>;
 	};
@@ -610,7 +613,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x1400000>;
+		size = <0x0 0x3600000>;
 	};
 
 	cdsp_secure_heap: secure_cdsp_region { /* Secure DSP */
@@ -656,8 +659,6 @@
 	ramoops_mem: ramoops_region {
 		compatible = "ramoops";
 		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
-		size = <0x0 0x200000>;
-		pmsg-size = <0x200000>;
 		mem-type = <2>;
 	};
 
@@ -1088,7 +1089,7 @@
 		qcom,primary-vm;
 		gunyah-label = <7>;
 		peer-name = <2>;
-		shared-buffer = <&trust_ui_vm_dump>;
+		//shared-buffer = <&trust_ui_vm_dump>;
 	};
 
 	clk_virt: interconnect@0 {
@@ -1383,7 +1384,7 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo";
 		qcom,proxy-clock-names = "xo";
-		status = "ok";
+		status = "disabled";
 
 		memory-region = <&spss_region_mem>;
 		qcom,spss-scsr-bits = <24 25>;
@@ -1426,7 +1427,7 @@
 		/* soc2sp rmb shared register physical address */
 		qcom,spcom-soc2sp-rmb-reg-addr = <0x01881030>;
 		qcom,spcom-soc2sp-rmb-sp-ssr-bit = <0>;
-		status = "ok";
+		status = "disabled";
 	};
 
 	spss_utils: qcom,spss_utils {
@@ -1446,7 +1447,7 @@
 		qcom,spss-emul-type-reg-addr = <0x01fc8004>;
 		pil-mem = <&spss_region_mem>;
 		qcom,pil-size = <0x0F0000>; // padding to 960KB
-		status = "ok";
+		status = "disabled";
 	};
 
 	qcom,msm-rtb {
@@ -2314,7 +2315,7 @@
 		qcom,master;
 		gunyah-label = <3>;
 		peer-name = <2>;
-		shared-buffer = <&trust_ui_vm_qrtr>;
+		//shared-buffer = <&trust_ui_vm_qrtr>;
 	};
 
 	qrtr-gunyah-oemvm {
@@ -2406,6 +2407,12 @@
 		interrupt-controller;
 		#interrupt-cells = <3>;
 		#mbox-cells = <2>;
+	};
+
+	adsp_sleepmon: adsp-sleepmon {
+		compatible = "qcom,adsp-sleepmon";
+		qcom,wait_time_lpm = <45>;
+		qcom,wait_time_lpi = <45>;
 	};
 
 	qcom,msm-cdsp-loader {
@@ -2881,7 +2888,7 @@
 		qcom,firmware-name = "trustedvm";
 		qcom,reserved-cpus = <0x5>, <0x6>;
 		qcom,unisolate-timeout-ms = <12000>;
-		memory-region = <&trust_ui_vm_mem>;
+		//memory-region = <&trust_ui_vm_mem>;
 	};
 
 	qcom,guestvm_loader@80a00000 {
@@ -2916,10 +2923,10 @@
 				&tlmm 57 0 &tlmm 58 0 &tlmm 59 0 &tlmm 13 0 &tlmm 48 0>;
 	};
 
-	trust_ui_vm: qcom,trust_ui_vm@0xf78f8000 {
-		reg = <0xf78f8000 0x108000>;
+	trust_ui_vm: qcom,trust_ui_vm@0xf82f8000 {
+		//reg = <0xf82f8000 0x108000>;
 		vm_name = "trustedvm";
-		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
+		//shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
 	};
 
 	oem_vm: qcom,oem_vm@f7afc000 {
@@ -2943,7 +2950,7 @@
 		qcom,pas-id = <28>;
 		qcom,vmid = <45>;
 		qcom,firmware-name = "trustedvm";
-		memory-region = <&trust_ui_vm_mem>;
+		//memory-region = <&trust_ui_vm_mem>;
 		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
 	};
 
@@ -2984,6 +2991,7 @@
 			< 0x0008 0xFF 0x02 0x02 >,
 			< 0x0011 0xFF 0x01 0x00 >,
 			< 0x0017 0xFF 0xFF 0x04 >,
+			< 0x0024 0xFF 0x03 0x03 >,
 			< 0x0037 0xFF 0xFF 0x06 >,
 			< 0x1000 0xFF 0xFF 0x08 >;
 	};
@@ -3300,6 +3308,17 @@
 		};
 	};
 
+	qcom_llcc_l3_vote: qcom,llcc-l3-vote {
+		qcom,target-dev = <&qcom_l3_dcvs_hw>;
+		qcom,secondary-map =
+			<  300000  300000 >,
+			<  466000  499200 >,
+			<  600000  614400 >,
+			<  806000  729600 >,
+			<  933000  844800 >,
+			< 1066000  940800 >;
+	};
+
 	bwmon_llcc: qcom,bwmon-llcc@240B6300 {
 		compatible = "qcom,bwmon4";
 		reg = <0x240B6400 0x300>, <0x240B6300 0x200>;
@@ -3309,6 +3328,7 @@
 		qcom,hw-timer-hz = <19200000>;
 		qcom,count-unit = <0x10000>;
 		qcom,target-dev = <&qcom_llcc_dcvs_hw>;
+		qcom,second-vote = <&qcom_llcc_l3_vote>;
 	};
 
 	bwmon_ddr: qcom,bwmon-ddr@24091000 {
@@ -3326,9 +3346,6 @@
 
 	qcom_qbt: qcom,qbt_handler {
 		compatible = "qcom,qbt-handler";
-		qcom,ipc-gpio = <&tlmm 40 0>;
-		qcom,finger-detect-gpio = <&tlmm 41 0>;
-		qcom,intr2-gpio = <&tlmm 42 0>;
 	};
 
 	spmi_bus: spmi0_bus: qcom,spmi@c42d000 {
