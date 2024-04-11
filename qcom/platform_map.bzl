@@ -192,9 +192,11 @@ _platform_map = {
         "dtbo_list": [
             {"name": "niobe-atp-overlay.dtbo"},
             {"name": "niobe-idp-overlay.dtbo"},
+            {"name": "niobe-idp-dpu-overlay.dtbo"},
             {"name": "niobe-qxr-overlay.dtbo"},
             {"name": "niobep-atp-overlay.dtbo"},
             {"name": "niobep-idp-overlay.dtbo"},
+            {"name": "niobep-idp-dpu-overlay.dtbo"},
             {"name": "niobep-qxr-overlay.dtbo"},
             {
                 "name": "niobe-rumi-overlay.dtbo",
@@ -427,6 +429,8 @@ _platform_map = {
             {"name": "pitti-idp-pmiv0104-4gb-overlay.dtbo"},
             {"name": "pitti-idp-4gb-overlay.dtbo"},
             {"name": "pitti-qrd-4gb-overlay.dtbo"},
+            {"name": "pitti-idp-90fps-overlay.dtbo"},
+            {"name": "pitti-qrd-90fps-overlay.dtbo"},
             {
                 "name": "pitti-rumi-overlay.dtbo",
                 "apq": False,

@@ -116,9 +116,11 @@ NIOBE_APQ_BASE_DTB += niobep.dtb
 NIOBE_BOARDS += \
 		niobe-atp-overlay.dtbo \
 		niobe-idp-overlay.dtbo \
+		niobe-idp-dpu-overlay.dtbo \
 		niobe-qxr-overlay.dtbo \
 		niobep-atp-overlay.dtbo \
 		niobep-idp-overlay.dtbo \
+		niobep-idp-dpu-overlay.dtbo \
 		niobep-qxr-overlay.dtbo
 
 NOAPQ_NIOBE_BOARDS += \
@@ -196,7 +198,9 @@ PITTI_BOARDS += \
 		 pitti-idp-pmiv0104-3gb-overlay.dtbo \
 		 pitti-idp-pmiv0104-4gb-overlay.dtbo \
 		 pitti-idp-pmiv0104-apache-overlay.dtbo \
-		 pitti-qrd-4gb-overlay.dtbo
+		 pitti-qrd-4gb-overlay.dtbo \
+		 pitti-idp-90fps-overlay.dtbo \
+		 pitti-qrd-90fps-overlay.dtbo
 
 NOAPQ_PITTI_BOARDS += \
 		 pitti-rumi-overlay.dtbo

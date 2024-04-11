@@ -64,10 +64,13 @@
 		vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
 		qcom,sensitive;
 
+		iomemory-ranges = <0x0 0x408000 0x0 0x408000 0x0 0x1000 0x0
+				   0x0 0xae8f000 0x0 0xae8f000 0x0 0x1000 0x0>;
 		/* For LEVM pored use cases is SE0(QUP0_SE0), for SE0 we used gpii6(QUPV3_0_GPII6)
 		 * and irq no is 471.
 		 */
-		gic-irq-ranges = <471 471>; /* PVM->SVM IRQ transfer */
+		gic-irq-ranges = <101 101
+				  471 471>; /* PVM->SVM IRQ transfer */
 
 		vm-attrs = "crash-fatal", "context-dump";
 
@@ -243,6 +246,13 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
+	gcc: clock-controller@100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
@@ -256,6 +266,15 @@
 		redistributor-stride = <0x0 0x40000>;
 		reg = <0x17100000 0x10000>,     /* GICD */
 		      <0x17180000 0x100000>;    /* GICR * 8 */
+	};
+
+	ipcc_mproc_ns1: qcom,ipcc@408000 {
+		compatible = "qcom,ipcc";
+		reg = <0x408000 0x1000>;
+		interrupts = <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
 	};
 
 	arch_timer: timer {
@@ -295,13 +314,14 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		/* Valid pins */
-		gpios = /bits/ 16 <0 1 2 3 12 19 20 129>;
+		gpios = /bits/ 16 <0 1 2 3 12 19 20 129 161>;
 	};
 
 	tlmm-vm-mem-access {
 		compatible = "qcom,tlmm-vm-mem-access";
 		tlmm-vm-gpio-list = <&tlmm 0 0  &tlmm 1 0  &tlmm 2 0  &tlmm 3 0
-				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0>;
+				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0
+				     &tlmm 161 0>;
 	};
 
 	qcom_smcinvoke {

@@ -123,6 +123,12 @@
 		};
 	};
 
+	emac_mdio_fe: emac_mdio_drv@0x1e000000 {
+		compatible = "virtio,mmio";
+		reg =<0x1e000000 0x1000>;
+		interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
 	emac1_hw: qcom,ethernet@23000000 {
 		compatible = "qcom,stmmac-ethqos-emac1";
 		emac-core-version = <0x30000000>;
@@ -192,6 +198,12 @@
 		reusable;
 		alignment = <0x0 0x400000>;
 		size = <0x0 0xA000000>;
+	};
+
+	kinfo_mem: debug_kinfo_region {
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x1000>;
+		no-map;
 	};
 };
 
@@ -290,4 +302,11 @@
 
 &qupv3_se17_4uart {
 	status = "ok";
+};
+
+&soc {
+	google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
+	};
 };

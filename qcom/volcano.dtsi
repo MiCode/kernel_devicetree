@@ -25,7 +25,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=noforce loop.max_part=7 irqaffinity=0-3 earlycon=qcom_geni,0x00a94000 cpufreq.default_governor=performance kasan=off cgroup.memory=nokmem,nosocket disable_dma32=on kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 service_locator.enable=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 no-steal-acc printk.console_no_auto_verbose=1 can.stats_timer=0 ftrace_dump_on_oops firmware_class.path=/vendor/firmware_mnt/image,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware";
+		bootargs = "nokaslr kpti=0 log_buf_len=256K swiotlb=noforce loop.max_part=7 irqaffinity=0-3 earlycon=qcom_geni,0x00a94000 cpufreq.default_governor=performance kasan=off cgroup.memory=nokmem,nosocket disable_dma32=on kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 service_locator.enable=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 no-steal-acc printk.console_no_auto_verbose=1 can.stats_timer=0 ftrace_dump_on_oops ufshcd-core.use_mcq_mode=n firmware_class.path=/vendor/firmware_mnt/image,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware";
 		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
@@ -1087,6 +1087,17 @@
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
+
+		smp2p_rdbg2_out: qcom,smp2p-rdbg2-out {
+			qcom,entry-name = "rdbg";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_rdbg2_in: qcom,smp2p-rdbg2-in {
+			qcom,entry-name = "rdbg";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
 	};
 
 	msm_gpu: qcom,kgsl-3d0@3d00000 { };
@@ -1108,6 +1119,17 @@
 
 		cdsp_smp2p_in: slave-kernel {
 			qcom,entry-name = "slave-kernel";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		smp2p_rdbg5_out: qcom,smp2p-rdbg5-out {
+			qcom,entry-name = "rdbg";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		smp2p_rdbg5_in: qcom,smp2p-rdbg5-in {
+			qcom,entry-name = "rdbg";
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
@@ -1856,6 +1878,9 @@
 		qcom,iommu-dma = "fastmap";
 		dma-coherent;
 
+		/* skip pbl wa as we have got this fixed in pbl */
+		qcom,bypass-pbl-rst-wa;
+
 		status = "disabled";
 
 		qos0 {
@@ -2492,7 +2517,8 @@
 		compatible = "qcom,tlmm-vm-mem-access";
 		qcom,master;
 		tlmm-vm-gpio-list = <&tlmm 0 0  &tlmm 1 0  &tlmm 2 0  &tlmm 3 0
-				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0>;
+				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0
+				     &tlmm 161 0>;
 
 	};
 
@@ -2500,7 +2526,8 @@
 		compatible = "qcom,tlmm-vm-test";
 		qcom,master;
 		tlmm-vm-gpio-list = <&tlmm 0 0  &tlmm 1 0  &tlmm 2 0  &tlmm 3 0
-				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0>;
+				     &tlmm 12 0 &tlmm 19 0 &tlmm 20 0 &tlmm 129 0
+				     &tlmm 161 0>;
 	};
 
 	oem_vm_vblk0_ring: oem_vm_vblk0_ring {
@@ -2624,6 +2651,14 @@
 		size = <0x0 0xC00000>;
 	};
 
+	non_secure_display_memory: non_secure_display_region {
+		compatible = "shared-dma-pool";
+		reusable;
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		size = <0x0 0xa400000>;
+		alignment = <0x0 0x400000>;
+	};
+
 	cdsp_secure_heap_cma: secure_cdsp_region { /* Secure DSP */
 		compatible = "shared-dma-pool";
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
@@ -2640,20 +2675,18 @@
 		size = <0x0 0x400000>;
 	};
 
-	trust_ui_vm_mem: trust_ui_vm_region {
+	trust_ui_vm_mem: trust_ui_vm_region@f3800000 {
 		compatible = "shared-dma-pool";
-		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reg = <0x0 0xf3800000 0x0 0x4400000>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x4400000>;
 	};
 
-	oem_vm_mem: oem_vm_region {
+	oem_vm_mem: oem_vm_region@f7c00000 {
 		compatible = "shared-dma-pool";
-		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reg = <0x0 0xf7c00000 0x0 0x4c00000>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x4c00000>;
 	};
 };
 
@@ -2667,6 +2700,8 @@
 #include "ipcc-test.dtsi"
 #include "msm-arm-smmu-volcano.dtsi"
 #include "volcano-pmic-overlay.dtsi"
+#include "volcano-debug.dtsi"
+#include "volcano-coresight.dtsi"
 
 &cam_cc_camss_top_gdsc {
 	parent-supply = <&VDD_CX_LEVEL>;
@@ -2784,3 +2819,4 @@
 	};
 };
 #include "volcano-thermal.dtsi"
+#include "msm-rdbg.dtsi"

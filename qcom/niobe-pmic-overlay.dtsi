@@ -373,17 +373,17 @@
 
 	pm8550b_i_chg_temp {
 		reg = <PM8550B_I_ADC5_GEN3_CHG_TEMP>;
-		label = "pm8550b_chg_temp";
+		label = "pm8550b_i_chg_temp";
 	};
 
 	pm8550b_i_iin_fb {
 		reg = <PM8550B_I_ADC5_GEN3_IIN_FB>;
-		label = "pm8550b_iin_fb";
+		label = "pm8550b_i_iin_fb";
 	};
 
 	pm8550b_i_ichg_fb {
 		reg = <PM8550B_I_ADC5_GEN3_ICHG_FB>;
-		label = "pm8550b_ichg_fb";
+		label = "pm8550b_i_ichg_fb";
 	};
 };
 
@@ -747,7 +747,7 @@
 	};
 };
 
-&qupv3_se6_i2c {
+&qupv3_se10_i2c {
 	status = "ok";
 
 	itof_level: ap72200-regulator@43 {
@@ -757,5 +757,35 @@
 		regulator-min-microvolt = <4300000>;
 		regulator-max-microvolt = <4300000>;
 		enable-gpio = <&pm8550ve_gpios 6 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&pm8550ve_gpios {
+	pwr_en_gpio {
+		pwr_en_gpio_default: pwr_en_gpio_default {
+			pins = "gpio6";
+			function = "normal";
+			power-source = <0>;
+			output-low;
+			input-disable;
+		};
+	};
+};
+
+&qupv3_se10_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+
+	fancontroller: max31760@50 {
+		compatible = "maxim,max31760";
+		reg = <0x50>;
+		#cooling-cells = <2>;
+		maxim,fan-num = <2>;
+		maxim,vdd-supply = <&BOB1>;
+		maxim,vcca-supply = <&L7B>;
+		regulator-name = "maxim,vdd", "maxim,vcca";
+		maxim,pwr-en-gpio = <&pm8550ve_gpios 6 GPIO_ACTIVE_LOW>;
+		status = "ok";
 	};
 };
