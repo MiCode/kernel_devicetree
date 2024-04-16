@@ -52,6 +52,24 @@ key_vol_up {
 	};
 };
 
+&soc {
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmxr2230_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
 &pmk8550_gpios {
 	pinctrl-0 = <&alt_sleep_clk_default>;
 	pinctrl-names = "default";
@@ -144,6 +162,15 @@ key_vol_up {
 &pmk8550_vadc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&sys_therm_6_gpio7_default>;
+
+	/delete-node/ pm8550_offset_ref;
+	/delete-node/ pm8550_vref_1p25;
+	/delete-node/ pm8550_die_temp;
+	/delete-node/ pm8550_vph_pwr;
+
+	/delete-node/ pm8550vs_d_die_temp;
+	/delete-node/ pm8550vs_e_die_temp;
+	/delete-node/ pm8550vs_g_die_temp;
 
 	/* PMXR2230 Channel nodes */
 	pmxr2230_offset_ref {
