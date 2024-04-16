@@ -97,14 +97,22 @@
 		qcom,arm-smmu;
 		reg = <0x23049000 0x1000>;
 		reg-names = "stmmaceth";
-		interrupts-extended = <&intc 0 945 4>, <&intc 0 946 4>,
+		interrupts-extended = <&intc 0 945 4>, <&intc 0 944 4>,
 			<&intc 0 943 4>, <&intc 0 942 4>,
 			<&intc 0 941 4>, <&intc 0 940 4>,
-			<&intc 0 939 4>, <&intc 0 938 4>;
-		interrupt-names = "tx_rx_ch0_intr", "tx_rx_ch1_intr",
-			"tx_rx_ch2_intr", "tx_rx_ch3_intr",
-			"tx_rx_ch4_intr", "tx_rx_ch5_intr",
-			"tx_rx_ch6_intr", "tx_rx_ch7_intr";
+			<&intc 0 939 4>, <&intc 0 938 4>,
+			<&intc 0 859 4>,<&intc 0 863 4>,
+			<&intc 0 866 4>,<&intc 0 869 4>,
+			<&intc 0 870 4>,<&intc 0 871 4>,
+			<&intc 0 872 4>,<&intc 0 858 4>;
+		interrupt-names = "tx_ch0_intr", "tx_ch1_intr",
+			"tx_ch2_intr", "tx_ch3_intr",
+			"tx_ch4_intr", "tx_ch5_intr",
+			"tx_ch6_intr", "tx_ch7_intr",
+			"rx_ch0_intr","rx_ch1_intr",
+			"rx_ch2_intr","rx_ch3_intr",
+			"rx_ch4_intr","rx_ch5_intr",
+			"rx_ch6_intr","rx_ch7_intr";
 
 		snps,tso;
 		snps,pbl = <32>;
@@ -127,40 +135,6 @@
 		compatible = "virtio,mmio";
 		reg =<0x1e000000 0x1000>;
 		interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
-	};
-
-	emac1_hw: qcom,ethernet@23000000 {
-		compatible = "qcom,stmmac-ethqos-emac1";
-		emac-core-version = <0x30000000>;
-		qcom,arm-smmu;
-		reg = <0x23000000 0x10000>;
-		reg-names = "stmmaceth";
-		interrupts-extended = <&intc 0 772 4>, <&intc 0 773 4>,
-			<&intc 0 774 4>, <&intc 0 775 4>,
-			<&intc 0 776 4>, <&intc 0 777 4>,
-			<&intc 0 778 4>, <&intc 0 937 4>;
-		interrupt-names = "tx_rx_ch0_intr", "tx_rx_ch1_intr",
-			"tx_rx_ch2_intr", "tx_rx_ch3_intr",
-			"tx_rx_ch4_intr", "tx_rx_ch5_intr",
-			"tx_rx_ch6_intr", "tx_rx_ch7_intr";
-
-		snps,tso;
-		snps,pbl = <32>;
-		mac-address = [00 55 7B B5 7D f7];
-		rx-fifo-depth = <4096>;
-		tx-fifo-depth = <4096>;
-		snps,mtl-rx-config = <&mtl_rx_setup>;
-		snps,mtl-tx-config = <&mtl_tx_setup>;
-		queue = <2>;
-		status = "disabled";
-
-		emac1_emb_smmu: emac1_emb_smmu {
-			compatible = "qcom,emac-smmu-embedded";
-			iommus = <&apps_smmu 0x44 0x1>;
-			qcom,iommu-dma = "fastmap";
-			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
-			status = "disabled";
-		};
 	};
 
 	ipcc_mproc_apps_ns1: qcom,ipcc@421000 {
