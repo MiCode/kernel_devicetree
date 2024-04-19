@@ -265,6 +265,15 @@ dtb-y += $(pineapple_tuivm-dtb-y)
 endif
 endif
 
+ifeq ($(CONFIG_ARCH_NIOBE), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+niobe_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += niobe-vm-idp.dtb \
+				niobep-vm-idp.dtb
+
+dtb-y += $(niobe_tuivm-dtb-y)
+endif
+endif
+
 ifeq ($(CONFIG_ARCH_CLIFFS), y)
 ifeq ($(CONFIG_ARCH_QTI_VM), y)
 pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += cliffs-vm-rumi.dtb \
