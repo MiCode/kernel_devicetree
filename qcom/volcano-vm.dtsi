@@ -1,5 +1,6 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-volcano.h>
+#include <dt-bindings/arm/msm/qti-smmu-proxy-dt-ids.h>
 
 / {
 	#address-cells = <0x2>;
@@ -429,6 +430,45 @@
 		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "qcom,qtmr-intr";
 		qcom,secondary;
+	};
+
+	qti,smmu-proxy {
+		compatible = "smmu-proxy-receiver";
+	};
+
+	qti,smmu-proxy-camera-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_CAMERA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x18c2 0x00>,
+			<&apps_smmu 0x1801 0x60>,
+			<&apps_smmu 0x1821 0x60>,
+			<&apps_smmu 0x1841 0x60>,
+			<&apps_smmu 0x1861 0x60>,
+			<&apps_smmu 0x18E1 0x00>,
+			<&apps_smmu 0x1901 0x20>,
+			<&apps_smmu 0x1921 0x20>,
+			<&apps_smmu 0x1941 0x00>,
+			<&apps_smmu 0x08A1 0x20>,
+			<&apps_smmu 0x0881 0x20>;
+		dma-coherent;
+	};
+
+	qti,smmu-proxy-display-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_DISPLAY_CB>;
+		qcom,iommu-defer-smr-config;
+		qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+		iommus = <&apps_smmu 0x1c01 0x0>;
+		dma-coherent;
+	};
+
+	qti,smmu-proxy-eva-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_EVA_CB>;
+		qcom,iommu-defer-smr-config;
+		qcom,iommu-dma-addr-pool = <0x00000000 0xffffffff>;
+		dma-coherent;
 	};
 
 	qcom,mem-buf {
