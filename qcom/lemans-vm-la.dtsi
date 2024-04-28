@@ -1,0 +1,293 @@
+&soc {
+	hsi2s: qcom,hsi2s@3B40000 {
+		compatible = "qcom,sa8255-hsi2s", "qcom,hsi2s";
+		reg = <0x3B40000 0x29000>,
+			<0x3942000 0x6000>;
+		reg-names = "lpa_if", "lpass_core_cc_hs_if";
+		interrupts = <GIC_SPI 719 IRQ_TYPE_LEVEL_HIGH>;
+		number-of-rate-detectors = <2>;
+		rate-detector-interfaces = <0 1>;
+		number-of-interfaces = <2>;
+		qcom,smmu-version = <2>;
+		qcom,smmu-enabled;
+		iommus = <&apps_smmu 0x303C 0x1>;
+		qcom,iommu-dma-addr-pool = <0x0 0xFFFFFFFF>;
+		dma-coherent;
+
+		sdr0: qcom,hs0_i2s {
+			compatible = "qcom,hsi2s-interface";
+			minor-number = <0>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&hs0_i2s_sck_active
+				     &hs0_i2s_ws_active &hs0_i2s_data0_active
+				     &hs0_i2s_data1_active>;
+			pinctrl-1 = <&hs0_i2s_sck_sleep
+				     &hs0_i2s_ws_sleep &hs0_i2s_data0_sleep
+				     &hs0_i2s_data1_sleep>;
+			bit-clock-hz = <12288000>;
+			data-buffer-ms = <10>;
+			bit-depth = <32>;
+			spkr-channel-count = <2>;
+			mic-channel-count = <2>;
+			pcm-rate = <2>;
+			pcm-sync-src = <0>;
+			aux-mode = <0>;
+			rpcm-width = <1>;
+			tpcm-width = <1>;
+			enable-tdm = <1>;
+			tdm-rate = <32>;
+			tdm-rpcm-width = <16>;
+			tdm-tpcm-width = <16>;
+			tdm-sync-delay = <2>;
+			tdm-inv-sync = <0>;
+			pcm-lane-config = <1>;
+		};
+
+		sdr1: qcom,hs1_i2s {
+			compatible = "qcom,hsi2s-interface";
+			minor-number = <1>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&hs1_i2s_sck_active
+				     &hs1_i2s_ws_active &hs1_i2s_data0_active
+				     &hs1_i2s_data1_active>;
+			pinctrl-1 = <&hs1_i2s_sck_sleep
+				     &hs1_i2s_ws_sleep &hs1_i2s_data0_sleep
+				     &hs1_i2s_data1_sleep>;
+			bit-clock-hz = <12288000>;
+			data-buffer-ms = <10>;
+			bit-depth = <32>;
+			spkr-channel-count = <2>;
+			mic-channel-count = <2>;
+			pcm-rate = <2>;
+			pcm-sync-src = <0>;
+			aux-mode = <0>;
+			rpcm-width = <1>;
+			tpcm-width = <1>;
+			enable-tdm = <1>;
+			tdm-rate = <32>;
+			tdm-rpcm-width = <16>;
+			tdm-tpcm-width = <16>;
+			tdm-sync-delay = <2>;
+			tdm-inv-sync = <0>;
+			pcm-lane-config = <1>;
+		};
+	};
+
+	mtl_rx_setup: rx-queues-config {
+		snps,rx-queues-to-use = <1>;
+		snps,rx-sched-sp;
+
+		queue {
+			snps,dcb-algorithm;
+			snps,priority = <0x1>;
+		};
+	};
+
+	mtl_tx_setup: tx-queues-config {
+		snps,tx-queues-to-use = <1>;
+		snps,tx-sched-sp;
+		queue {
+			snps,dcb-algorithm;
+		};
+	};
+
+	emac0_hw: qcom,ethernet@23040000 {
+		compatible = "qcom,stmmac-ethqos-emac0";
+		emac-core-version = <0x30010000>;
+		qcom,arm-smmu;
+		reg = <0x23049000 0x1000>;
+		reg-names = "stmmaceth";
+		interrupts-extended = <&intc 0 945 4>, <&intc 0 946 4>,
+			<&intc 0 943 4>, <&intc 0 942 4>,
+			<&intc 0 941 4>, <&intc 0 940 4>,
+			<&intc 0 939 4>, <&intc 0 938 4>;
+		interrupt-names = "tx_rx_ch0_intr", "tx_rx_ch1_intr",
+			"tx_rx_ch2_intr", "tx_rx_ch3_intr",
+			"tx_rx_ch4_intr", "tx_rx_ch5_intr",
+			"tx_rx_ch6_intr", "tx_rx_ch7_intr";
+
+		snps,tso;
+		snps,pbl = <32>;
+		mac-address = [00 55 7B B5 7D f7];
+		rx-fifo-depth = <4096>;
+		tx-fifo-depth = <4096>;
+		snps,mtl-rx-config = <&mtl_rx_setup>;
+		snps,mtl-tx-config = <&mtl_tx_setup>;
+		queue = <1>;
+
+		emac0_emb_smmu: emac0_emb_smmu {
+			compatible = "qcom,emac-smmu-embedded";
+			iommus = <&apps_smmu 0x122 0x1>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
+		};
+	};
+
+	emac1_hw: qcom,ethernet@23000000 {
+		compatible = "qcom,stmmac-ethqos-emac1";
+		emac-core-version = <0x30000000>;
+		qcom,arm-smmu;
+		reg = <0x23000000 0x10000>;
+		reg-names = "stmmaceth";
+		interrupts-extended = <&intc 0 772 4>, <&intc 0 773 4>,
+			<&intc 0 774 4>, <&intc 0 775 4>,
+			<&intc 0 776 4>, <&intc 0 777 4>,
+			<&intc 0 778 4>, <&intc 0 937 4>;
+		interrupt-names = "tx_rx_ch0_intr", "tx_rx_ch1_intr",
+			"tx_rx_ch2_intr", "tx_rx_ch3_intr",
+			"tx_rx_ch4_intr", "tx_rx_ch5_intr",
+			"tx_rx_ch6_intr", "tx_rx_ch7_intr";
+
+		snps,tso;
+		snps,pbl = <32>;
+		mac-address = [00 55 7B B5 7D f7];
+		rx-fifo-depth = <4096>;
+		tx-fifo-depth = <4096>;
+		snps,mtl-rx-config = <&mtl_rx_setup>;
+		snps,mtl-tx-config = <&mtl_tx_setup>;
+		queue = <2>;
+		status = "disabled";
+
+		emac1_emb_smmu: emac1_emb_smmu {
+			compatible = "qcom,emac-smmu-embedded";
+			iommus = <&apps_smmu 0x44 0x1>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
+			status = "disabled";
+		};
+	};
+
+	ipcc_mproc_apps_ns1: qcom,ipcc@421000 {
+		compatible = "qcom,ipcc";
+		reg = <0x421000 0x1000>;
+		interrupts = <GIC_SPI 559 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+	};
+
+	virtio_glink_cma: virtio-glink-cma@2e000000 {
+		compatible = "virtio,mmio";
+		reg = <0x2e000000 0x1000>;
+		interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+
+		glink_bridge: virtio-glink-bridge {
+			compatible = "virtio,device49162"; /* VIRTIO_ID: 0xC00A */
+
+			glink-edge {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_CLIENT_CDSP 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_CLIENT_CDSP 0>;
+				label = "cdsp";
+				qcom,glink-label = "cdsp";
+			};
+		};
+	};
+};
+
+&reserved_memory {
+	secure_display_memory: secure_display_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0xA000000>;
+	};
+};
+
+&qcom_dma_heaps {
+	qcom,display {
+		qcom,dma-heap-name = "system-secure";
+		qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+		qcom,max-align = <9>;
+		memory-region = <&secure_display_memory>;
+	};
+};
+
+/ {
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup.memory=nokmem,nosocket kpti=0 qcom_dma_heaps.enable_bitstream_contig_heap=y arm64.nopauth kasan=off msm_show_resume_irq.debug_mask=1 ";
+		bootconfig = "androidboot.usbcontroller=a600000.dwc3 androidboot.fstab_suffix=gen4.qcom";
+	};
+
+	rename_devices: rename_devices {
+		compatible = "qcom,rename-devices";
+		rename_blk: rename_blk {
+			device-type = "block";
+			actual-dev = "vda", "vdb", "vdc",
+					"vdd", "vde", "vdf",
+					"vdg", "vdh", "vdi",
+					"vdj", "vdk", "vdl",
+					"vdm", "vdn", "vdo",
+					"vdp", "vdq", "vdr",
+					"vds", "vdt", "vdu";
+			rename-dev = "super", "userdata", "metadata",
+					"persist", "modem_a","bluetooth_a",
+					"misc", "vbmeta_a", "vbmeta_b",
+					"boot_a", "dtbo_a", "dsp_a",
+					"modem_b", "bluetooth_b", "boot_b",
+					"dtbo_b", "dsp_b", "vendor_boot_b",
+					"vendor_boot_a", "init_boot_b", "init_boot_a";
+		};
+	};
+};
+
+&hab {
+	vmid = <2>;
+};
+
+&pcie0 {
+	status = "okay";
+};
+
+&pcie0_msi_snps {
+	status = "okay";
+};
+
+&qcom_rng_ee3 {
+	status = "okay";
+};
+
+&usb0 {
+	status = "ok";
+};
+
+&usb2_phy0 {
+	status = "ok";
+};
+
+&usb_qmp_phy0 {
+	status = "ok";
+};
+
+&usb1 {
+	status = "ok";
+};
+
+&usb2_phy1 {
+	status = "ok";
+};
+
+&usb_qmp_phy1 {
+	status = "ok";
+};
+
+&usb2 {
+	status = "ok";
+};
+
+&usb2_phy2 {
+	status = "ok";
+};
+
+&ufs2phy_mem {
+	status = "ok";
+};
+
+&ufshc2_mem {
+	status = "ok";
+};
+
+&qupv3_se17_4uart {
+	status = "ok";
+};

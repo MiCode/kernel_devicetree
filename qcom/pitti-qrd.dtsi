@@ -1,0 +1,101 @@
+#include <dt-bindings/gpio/gpio.h>
+#include "pitti-pm7250b.dtsi"
+
+&pm6125_gpios {
+	eldo9_pin {
+		ufs_eldo1:gpio@c000 {
+			pins = "gpio1";
+			function = "normal";
+			qcom,drive-strength = <2>;
+			power-source = <0>;
+			bias-disable;
+			output-high;
+		};
+	};
+};
+
+&soc {
+	ufs_vccq: ufs_vccq {
+		compatible = "regulator-fixed";
+		regulator-name = "vccq_supply";
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
+		enable-active-high;
+		gpio = <&pm6125_gpios 1 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&ufs_eldo1>;
+	};
+};
+
+&sdhc_1 {
+	status = "disabled";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	vdd-supply = <&L24A>;
+	qcom,vdd-voltage-level = <2952000 2952000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L11A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+};
+
+&sdhc_2 {
+	status = "disabled";
+
+	vdd-supply = <&L22A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L5A>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 92 GPIO_ACTIVE_LOW>;
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-pitti";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L4A>;
+	vdda-phy-max-microamp = <88530>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L7A>;
+	vdda-pll-max-microamp = <18310>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L24A>;
+	vcc-max-microamp = <800000>;
+
+	/* vccq-supply is gpio based eLDO and is not controlled from PMIC LDO. */
+	vccq-supply = <&ufs_vccq>;
+	vccq-max-microamp = <750000>;
+
+	vccq2-supply = <&L11A>;
+	vccq2-max-microamp = <750000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L7A>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S6A>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	status = "ok";
+};

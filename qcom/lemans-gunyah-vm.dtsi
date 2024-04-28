@@ -1,0 +1,663 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,gcc-lemans.h>
+#include <dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h>
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+	qcom,msm-id = <532 0x10000>, <533 0x10000>, <534 0x10000>, <619 0x10000>, <532 0x20000>, <533 0x20000>, <534 0x20000>, <619 0x20000>;
+	interrupt-parent = <&intc>;
+
+	chosen {
+		bootargs = "nokaslr log_buf_len=1M console=hvc0 loglevel=8 androidboot.first_stage_console=1 androidboot.hardware=qcom androidboot.slot_suffix=_a androidboot.selinux=permissive androidboot.verifiedbootstate=orange";
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		system_cma: linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x0 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x2000000>;
+			linux,cma-default;
+		};
+
+		qseecom_mem: qseecom_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1400000>;
+		};
+
+		qseecom_ta_mem: qseecom_ta_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1000000>;
+		};
+	};
+
+	cpus {
+		#address-cells = <0x2>;
+		#size-cells = <0x0>;
+
+		CPU0: cpu@0 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x0>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU1: cpu@100 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x100>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU2: cpu@200 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x200>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU3: cpu@300 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x300>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU4: cpu@10000 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x10000>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU5: cpu@10100 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x10100>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU6: cpu@10200 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x10200>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU7: cpu@10300 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x10300>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&CPU0>;
+				};
+
+				core1 {
+					cpu = <&CPU1>;
+				};
+
+				core2 {
+					cpu = <&CPU2>;
+				};
+
+				core3 {
+					cpu = <&CPU3>;
+				};
+			};
+
+			cluster1 {
+				core0 {
+					cpu = <&CPU4>;
+				};
+
+				core1 {
+					cpu = <&CPU5>;
+				};
+
+				core2 {
+					cpu = <&CPU6>;
+				};
+
+				core3 {
+					cpu = <&CPU7>;
+				};
+			};
+		};
+	};
+
+	idle-states {
+		CPU_PWR_DWN: c4 { /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <702>;
+			exit-latency-us = <1061>;
+			min-residency-us = <4488>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+	};
+
+	qcom,vm-config {
+		compatible = "qcom,vm-1.0";
+		vm-type = "aarch64-guest";
+		boot-config = "fdt,unified";
+		os-type = "linux";
+		kernel-entry-segment = "kernel";
+		kernel-entry-offset = <0x0 0x0>;
+		vendor = "QTI";
+		image-name = "qcom,autoghgvm";
+		qcom,pasid = <0x0 0x2c>;
+		qcom,qtee-config-info = "p=3,57,77,78,7C,8F,97,159,199,47E,7F1;";
+		qcom,secdomain-ids = <52>;
+		qcom,primary-vm-index = <0>;
+
+		/* Pass through regions */
+		/* TLMM region */
+		/* QUPv3 Tile 1 read-only region */
+		/* QUPv3 Tile 2 read-only region */
+		/* QUPv3 SE17 region */
+		/* QRNG region */
+		iomemory-ranges = <0x0 0xF000000 0x0 0xF000000 0x0 0x1000000 0x0
+				0x0 0xAC0000 0x0 0xAC0000 0x0 0x6000 0x1
+				0x0 0x8C0000 0x0 0x8C0000 0x0 0x6000 0x1
+				0x0 0x88C000 0x0 0x88C000 0x0 0x4000 0x0
+				0x0 0x10dc000 0x0 0x10dc000 0x0 0x1000 0x0
+				>;
+
+		/* Pass through IRQs */
+		/* QUPv3 SE17 GIC IRQ */
+		gic-irq-ranges = <617 617>;
+
+		memory {
+			#address-cells = <0x2>;
+			#size-cells = <0x0>;
+
+			/* The IPA of the Guest regions is placed as IPA=PA */
+			is-direct;
+		};
+
+		segments {
+			ramdisk = <2>;
+		};
+
+		vcpus {
+			config = "/cpus";
+			affinity = "static";
+			affinity-map = <0x7 0x6 0x5 0x4 0x3 0x2 0x1 0x0>;
+			sched-priority = <0>;       /* relative to PVM */
+			sched-timeslice = <5000>;   /* in ms */
+		};
+
+		interrupts {
+			config = &intc;
+		};
+
+		vdevices {
+			generate = "/hypervisor";
+			rm-rpc {
+				vdevice-type = "rm-rpc";
+				generate = "/hypervisor/qcom,resource-mgr";
+				console-dev;
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				qcom,label = <0x1>;
+			};
+
+			virtio-mmio@0 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x0>;
+				memory {
+					qcom,label = <0x10>;			/* misc.img */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@1 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x4000>;
+				memory {
+					qcom,label = <0x11>;			/* persist.img */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@2 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x8000>;
+				memory {
+					qcom,label = <0x15>;			/* metadate.img */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@3 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0xC000>;
+				memory {
+					qcom,label = <0x16>;			/* userdata.img */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@4 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x10000>;
+				memory {
+					qcom,label = <0x17>;			/* super.img */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@5 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x3>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x14000>;
+				memory {
+					qcom,label = <0x13>;			/* Net device */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@6 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x4>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x20000>;
+				memory {
+					qcom,label = <0x14>;			/* HAB device 0 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@7 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x4>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x40000>;
+				memory {
+					qcom,label = <0x18>;			/* HAB device 1 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@8 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x8>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x60000>;
+				memory {
+					qcom,label = <0x19>;			/* HAB device 2 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@9 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0xA>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0xE0000>;
+				memory {
+					qcom,label = <0x1a>;			/* HAB device 3 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@10 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x6>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x180000>;
+				memory {
+					qcom,label = <0x1b>;			/* HAB device 4 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@11 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x6>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x1E0000>;
+				memory {
+					qcom,label = <0x1c>;			/* HAB device 5 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@12 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				virtio,device-type = <18>;		/* VirtIO Input ID */
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x240000>;
+				memory {
+					qcom,label = <0x1d>;			/* Input device 0 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@13 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x248000>;
+				memory {
+					qcom,label = <0x1e>;			/* SCMI device */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@14 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x250000>;
+				memory {
+					qcom,label = <0x1f>;			/* Console device */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@15 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				virtio,device-type = <18>;		/* VirtIO Input ID */
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x258000>;
+				memory {
+					qcom,label = <0x20>;			/* Input device 1 */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@16 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x260000>;
+				memory {
+					qcom,label = <0x21>;		/* Reserved devices */
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			swiotlb-shm {
+				vdevice-type = "shm";
+				generate = "/swiotlb";
+				push-compatible = "swiotlb";
+				peer-default;
+				dma_base = <0x0 0x300000>;
+				memory {
+					qcom,label = <0x12>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			vsmmu@15000000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15000000>;
+				num-cbs = <0x4>;
+				num-smrs = <0x4>;
+				patch = "/soc/apps-smmu@15000000";
+			};
+		};
+	};
+
+	firmware: firmware {
+		scm {
+			compatible = "qcom,scm";
+		};
+
+		qcom_smcinvoke {
+			compatible = "qcom,smcinvoke";
+		};
+
+		android {
+			compatible = "android,firmware";
+			boot_devices = "70001000.virtio-mmio,70002000.virtio-mmio,70003000.virtio-mmio,70004000.virtio-mmio,70005000.virtio-mmio";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,system,vendor";
+			};
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev="/dev/block/platform/vdevs/1c0f0000.virtio_blk/vdc";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "disabled";
+				};
+			};
+		};
+	};
+
+	soc: soc { };
+};
+
+&soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	ranges = <0 0 0 0xffffffff>;
+	compatible = "simple-bus";
+
+	gcc: clock-controller@100000 {
+		compatible = "qcom,dummycc";
+		clock-output-names = "gcc_clocks";
+		#clock-cells = <1>;
+		#reset-cells = <1>;
+	};
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	intc: interrupt-controller@17a00000 {
+		compatible = "arm,gic-v3";
+		interrupt-controller;
+		#interrupt-cells = <0x3>;
+		#redistributor-regions = <1>;
+		redistributor-stride = <0x0 0x20000>;
+		reg = <0x17a00000 0x10000>,     /* GICD */
+		      <0x17a60000 0x100000>;    /* GICR * 8 */
+	};
+
+	arch_timer: timer {
+		compatible = "arm,armv8-timer";
+		always-on;
+		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 12 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
+		clock-frequency = <19200000>;
+	};
+
+	qcom_dma_heaps: qcom,dma-heaps {
+		compatible = "qcom,dma-heaps";
+
+		qcom,qseecom {
+			qcom,dma-heap-name = "qcom,qseecom";
+			qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+			memory-region = <&qseecom_mem>;
+		};
+
+		qcom,qseecom_ta {
+			qcom,dma-heap-name = "qcom,qseecom-ta";
+			qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+			memory-region = <&qseecom_ta_mem>;
+		};
+	};
+
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,lemans-pinctrl";
+		reg = <0xf000000 0x1000000>;
+		interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	qcom_rng_ee3: qrng@10dc000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x10dc000 0x1000>;
+		qcom,no-qrng-config;
+		qcom,no-clock-support;
+		status = "ok";
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+		//qcom,support-hypervisor;
+		qcom,disable-shmbridge-support;
+	};
+
+	apps_smmu: apps-smmu@15000000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+	};
+
+	dma_dev@0x0 {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
+	};
+};
+
+/ {
+	rename_devices: rename_devices {
+		compatible = "qcom,rename-devices";
+		rename_blk: rename_blk {
+			device-type = "block";
+			actual-dev = "vda", "vdb", "vdc", "vdd", "vde";
+			rename-dev = "super", "userdata", "metadata", "persist", "misc";
+		};
+	};
+};
+
+#include "lemans-pinctrl.dtsi"
+#include "lemans-vm-qupv3.dtsi"
+
+&qupv3_1 {
+	iommus = <&apps_smmu 0x458 0x0>;
+	qcom,iommu-dma = "default";
+};
+
+&qupv3_2 {
+	iommus = <&apps_smmu 0x5b8 0x0>;
+	qcom,iommu-dma = "default";
+};

@@ -1,0 +1,40 @@
+SYSTEM PM VIOLATORS
+
+System PM Violoators is a virtual device sends a QMP message to AOP to start
+recording subsystems that are preventing system low power modes - AOSS sleep,
+CX PC, DDR low power from happening during a test duration. The stats are
+saved in MSGRAM and are read and displayed from Linux in debugfs.
+
+PROPERTIES
+
+- compatible:
+	Usage: required
+	Value type: <string>
+	Definition: must have "qcom,sys-pm-violators". Additionally, one of the
+		    below SoC specific compatible must be specified.
+		    - "qcom,sys-pm-lahaina"
+		    - "qcom,sys-pm-waipio"
+		    - "qcom,sys-pm-kalama"
+		    - "qcom,sys-pm-pineapple"
+		    - "qcom,sys-pm-monaco-auto"
+		    - "qcom,sys-pm-volcano"
+		    - "qcom,sys-pm-cliffs"
+
+- reg:
+	Usage: required
+	Value type: <prop-encoded-array>
+	Definition: The address on the AOP Message RAM from where the stats
+		    are read.
+
+- qcom,qmp:
+	Usage: required
+	Value type: <phandle>
+	Definition: handle to the QMP mailbox.
+
+EXAMPLE
+
+	sys-pm-vx@c320000 {
+		compatible = "qcom,sys-pm-violators", "qcom,sys-pm-lahaina";
+		reg = <0xc320000 0x0400>;
+		qcom,qmp = <&aoss_qmp>;
+	};
