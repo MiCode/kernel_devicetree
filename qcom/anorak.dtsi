@@ -672,6 +672,29 @@
 		qcom,smem-state-names = "stop";
 
 		status = "ok";
+
+		glink_edge: glink-edge {
+			qcom,remote-pid = <2>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_LPASS
+			IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "adsp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_LPASS
+					IPCC_MPROC_SIGNAL_GLINK_QMP
+					IRQ_TYPE_EDGE_RISING>;
+
+			label = "adsp";
+			qcom,glink-label = "lpass";
+
+			qcom,adsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+				qcom,no-wake-svc = <0x190>;
+			};
+		};
 	};
 
 	qcom,msm-adsprpc-mem {
@@ -722,6 +745,28 @@
 		qcom,smem-states = <&cdsp_smp2p_out 0>;
 		qcom,smem-state-names = "stop";
 		status = "ok";
+
+		glink-edge {
+			qcom,remote-pid = <5>;
+			transport = "smem";
+			mboxes = <&ipcc_mproc IPCC_CLIENT_CDSP
+					  IPCC_MPROC_SIGNAL_GLINK_QMP>;
+			mbox-names = "cdsp_smem";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_CDSP
+				  IPCC_MPROC_SIGNAL_GLINK_QMP
+				  IRQ_TYPE_EDGE_RISING>;
+
+			label = "cdsp";
+			qcom,glink-label = "cdsp";
+
+			qcom,cdsp_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+		};
 	};
 
 	qcom,msm-cdsp-loader {
