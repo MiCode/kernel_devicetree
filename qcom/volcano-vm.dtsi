@@ -1,5 +1,6 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-volcano.h>
+#include <dt-bindings/arm/msm/qti-smmu-proxy-dt-ids.h>
 
 / {
 	#address-cells = <0x2>;
@@ -65,7 +66,8 @@
 		qcom,sensitive;
 
 		iomemory-ranges = <0x0 0x408000 0x0 0x408000 0x0 0x1000 0x0
-				   0x0 0xae8f000 0x0 0xae8f000 0x0 0x1000 0x0>;
+				   0x0 0xae8f000 0x0 0xae8f000 0x0 0x1000 0x0
+				   0x0 0xa28000 0x0 0xa28000 0x0 0x4000 0x0>;
 		/* For LEVM pored use cases is SE0(QUP0_SE0), for SE0 we used gpii6(QUPV3_0_GPII6)
 		 * and irq no is 471.
 		 */
@@ -220,6 +222,38 @@
 				qcom,label = <0x3>;
 			};
 
+			test-dbl-tuivm {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/test-dbl-tuivm";
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			test-dbl-tuivm-source {
+				vdevice-type = "doorbell-source";
+				generate = "/hypervisor/test-dbl-tuivm-source";
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			test-msgq-tuivm {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/test-msgq-tuivm-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			vcpu-sched-test-msgq {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/sched-test-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x8>;
+				peer-default;
+			};
+
 			smmu-proxy-message-queue-pair {
 				vdevice-type = "message-queue-pair";
 				generate = "/hypervisor/smmu-proxy-msgq-pair";
@@ -306,7 +340,7 @@
 	};
 
 	tlmm: pinctrl@f000000 {
-		compatible = "qcom,cliffs-vm-pinctrl";
+		compatible = "qcom,volcano-vm-pinctrl";
 		reg = <0x0F000000 0x1000000>;
 		interrupts-extended = <&vm_tlmm_irq 1 IRQ_TYPE_LEVEL_HIGH>;
 		gpio-controller;
@@ -378,6 +412,65 @@
 		compatible = "qcom,logbuf-vendor-hooks";
 	};
 
+	qcom,test-dbl-tuivm {
+		compatible = "qcom,gh-dbl";
+		qcom,label = <0x4>;
+	};
+
+	qcom,test-msgq-tuivm {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <4>;
+		affinity = <0>;
+	};
+
+	qcom,gh-qtimer@17425000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x17425000 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,secondary;
+	};
+
+	qti,smmu-proxy {
+		compatible = "smmu-proxy-receiver";
+	};
+
+	qti,smmu-proxy-camera-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_CAMERA_CB>;
+		qcom,iommu-defer-smr-config;
+		iommus = <&apps_smmu 0x18c2 0x00>,
+			<&apps_smmu 0x1801 0x60>,
+			<&apps_smmu 0x1821 0x60>,
+			<&apps_smmu 0x1841 0x60>,
+			<&apps_smmu 0x1861 0x60>,
+			<&apps_smmu 0x18E1 0x00>,
+			<&apps_smmu 0x1901 0x20>,
+			<&apps_smmu 0x1921 0x20>,
+			<&apps_smmu 0x1941 0x00>,
+			<&apps_smmu 0x08A1 0x20>,
+			<&apps_smmu 0x0881 0x20>;
+		dma-coherent;
+	};
+
+	qti,smmu-proxy-display-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_DISPLAY_CB>;
+		qcom,iommu-defer-smr-config;
+		qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+		iommus = <&apps_smmu 0x1c01 0x0>;
+		dma-coherent;
+	};
+
+	qti,smmu-proxy-eva-cb {
+		compatible = "smmu-proxy-cb";
+		qti,cb-id = <QTI_SMMU_PROXY_EVA_CB>;
+		qcom,iommu-defer-smr-config;
+		qcom,iommu-dma-addr-pool = <0x00000000 0xffffffff>;
+		dma-coherent;
+	};
+
 	qcom,mem-buf {
 		compatible = "qcom,mem-buf";
 		qcom,mem-buf-capabilities = "consumer";
@@ -394,6 +487,82 @@
 		qcom,max-size = <0x0 0x10000000>;
 		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
 		qcom,block-size = <0x400000>;
+	};
+
+	qup_iommu_group: qup_common_iommu_group {
+			qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+	};
+
+	/* GPI Instance */
+	gpi_dma0: qcom,gpi-dma@a00000 {
+		compatible = "qcom,gpi-dma";
+		#dma-cells = <5>;
+		reg = <0xa00000 0x60000>;
+		reg-names = "gpi-top";
+		iommus = <&apps_smmu 0x578 0x0>;
+		qcom,iommu-group = <&qup_iommu_group>;
+		dma-coherent;
+		qcom,max-num-gpii = <12>;
+		interrupts = <GIC_SPI 433 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 434 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 435 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 436 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 437 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 438 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 439 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 595 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 596 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 597 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 598 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 599 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,static-gpii-mask = <0x40>;
+		qcom,gpii-mask = <0x0>;
+		qcom,ev-factor = <1>;
+		qcom,gpi-ee-offset = <0x10000>;
+		qcom,le-vm;
+		status = "ok";
+	};
+
+	/* QUPv3_0 wrapper instance */
+	qupv3_0: qcom,qupv3_0_geni_se@ac0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0xac0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x578 0x0>;
+		qcom,iommu-group = <&qup_iommu_group>;
+		dma-coherent;
+		ranges;
+		status = "ok";
+
+		qupv3_se0_i2c: i2c@a80000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0xa80000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			dmas = <&gpi_dma0 0 0 3 64 0xe>,
+				<&gpi_dma0 1 0 3 64 0xe>;
+			dma-names = "tx", "rx";
+			qcom,le-vm;
+			status = "disabled";
+		};
+
+		qupv3_se0_spi: spi@a80000 {
+			compatible = "qcom,spi-geni";
+			reg = <0xa80000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg-names = "se_phys";
+			dmas = <&gpi_dma0 0 0 1 64 0xe>,
+				<&gpi_dma0 1 0 1 64 0xe>;
+			dma-names = "tx", "rx";
+			spi-max-frequency = <50000000>;
+			qcom,le-vm;
+			status = "disabled";
+		};
 	};
 };
 

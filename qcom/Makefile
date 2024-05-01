@@ -66,8 +66,8 @@ pineapple-dtb-$(CONFIG_ARCH_CLIFFS) += \
 	$(call add-overlays, $(CLIFFS_BOARDS),$(CLIFFS_APQ_BASE_DTB))
 pineapple-overlays-dtb-$(CONFIG_ARCH_CLIFFS) += $(CLIFFS_BOARDS) $(NOAPQ_CLIFFS_BOARDS) $(CLIFFS_BASE_DTB) $(CLIFFS_APQ_BASE_DTB)
 
-VOLCANO_BASE_DTB += volcano.dtb volcano6.dtb
-VOLCANO_APQ_BASE_DTB += volcano6p.dtb
+VOLCANO_BASE_DTB += volcano.dtb volcano6.dtb volcano6i.dtb
+VOLCANO_APQ_BASE_DTB += volcano6p.dtb volcano6ip.dtb
 
 VOLCANO_BOARDS += \
 		volcano-atp-overlay.dtbo \
@@ -131,6 +131,19 @@ niobe-dtb-$(CONFIG_ARCH_NIOBE) += \
 	$(call add-overlays, $(NIOBE_BOARDS) $(APQ_NIOBE_BOARDS),$(NIOBE_APQ_BASE_DTB))
 niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
 dtb-y += $(niobe-dtb-y)
+
+ANORAK_BASE_DTB += anorak.dtb
+
+ANORAK_BOARDS += \
+		anorak-idp-overlay.dtbo \
+		anorak-qxr-overlay.dtbo \
+		anorak-atp-overlay.dtbo
+
+anorak-dtb-$(CONFIG_ARCH_ANORAK) += \
+	$(call add-overlays, $(ANORAK_BOARDS) ,$(ANORAK_BASE_DTB))
+
+anorak-overlays-dtb-$(CONFIG_ARCH_ANORAK) += $(ANORAK_BOARDS) ${ANORAK_BASE_DTB)
+dtb-y += $(anorak-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
 BLAIR_APQ_BASE_DTB += blairp.dtb
@@ -198,6 +211,7 @@ PITTI_BOARDS += \
 		 pitti-idp-pmiv0104-3gb-overlay.dtbo \
 		 pitti-idp-pmiv0104-4gb-overlay.dtbo \
 		 pitti-idp-pmiv0104-apache-overlay.dtbo \
+		 pitti-idp-pmiv0104-90fps-overlay.dtbo \
 		 pitti-qrd-4gb-overlay.dtbo \
 		 pitti-idp-90fps-overlay.dtbo \
 		 pitti-qrd-90fps-overlay.dtbo
@@ -250,6 +264,15 @@ pineapple_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += pineapple-vm-rumi.dtb \
 				pineapplep-oemvm-hdk.dtb
 dtb-y += $(pineapple_tuivm-dtb-y)
 
+endif
+endif
+
+ifeq ($(CONFIG_ARCH_NIOBE), y)
+ifeq ($(CONFIG_ARCH_QTI_VM), y)
+niobe_tuivm-dtb-$(CONFIG_ARCH_QTI_VM) += niobe-vm-idp.dtb \
+				niobep-vm-idp.dtb
+
+dtb-y += $(niobe_tuivm-dtb-y)
 endif
 endif
 

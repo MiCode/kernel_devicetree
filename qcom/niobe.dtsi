@@ -34,8 +34,8 @@
 
 	aliases: aliases {
 		serial0 = &qupv3_se5_2uart;
-		serial1 = &qupv3_se0_2uart;
-		hsuart1 = &qupv3_se14_4uart;
+		hsuart0 = &qupv3_se14_4uart;
+		hsuart1 = &qupv3_se0_2uart;
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
 		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 		i2c1 = &qupv3_se1_i2c;
@@ -627,6 +627,7 @@
 		compatible = "qcom,rpmh-rsc";
 		reg = <0xa920000 0x10000>;
 		reg-names = "drv-0";
+		qcom,drv-count = <1>;
 		interrupts = <GIC_SPI 455 IRQ_TYPE_LEVEL_HIGH>;
 
 		disp_rsc_1_drv0: drv@0 {
@@ -1042,25 +1043,26 @@
 		compatible = "qcom,niobe-aggre1_noc";
 		reg = <0x16E0000 0x18100>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_SEC_AXI_CLK>,
+			<&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>;
 	};
 
 	aggre2_noc: interconnect@1700000 {
 		compatible = "qcom,niobe-aggre2_noc";
 		reg = <0x1700000 0x1F200>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&rpmhcc RPMH_IPA_CLK>;
 	};
 
 	cnoc_cfg: interconnect@1600000 {
 		compatible = "qcom,niobe-cnoc_cfg";
 		reg = <0x1600000 0x7200>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1069,7 +1071,6 @@
 		compatible = "qcom,niobe-cnoc_main";
 		reg = <0x1500000 0x17A00>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1078,7 +1079,6 @@
 		compatible = "qcom,niobe-gem_noc";
 		reg = <0x24100000 0xC1080>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1087,7 +1087,6 @@
 		compatible = "qcom,niobe-lpass_ag_noc";
 		reg = <0x3C40000 0x17200>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1096,7 +1095,6 @@
 		compatible = "qcom,niobe-mmss_noc";
 		reg = <0x1780000 0x7F000>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1105,7 +1103,6 @@
 		compatible = "qcom,niobe-nsp_noc";
 		reg = <0x320C0000 0x13080>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1114,34 +1111,46 @@
 		compatible = "qcom,niobe-pcie_anoc";
 		reg = <0x16C0000 0x14200>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+		clocks = <&gcc GCC_AGGRE_NOC_PCIE_AXI_CLK>,
+			 <&gcc GCC_CFG_NOC_PCIE_ANOC_AHB_CLK>;
 	};
 
 	system_noc: interconnect@1680000 {
 		compatible = "qcom,niobe-system_noc";
 		reg = <0x1680000 0x40000>;
 		#interconnect-cells = <1>;
-		qcom,skip-qos;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	qcom,qsee_ipc_irq_bridge {
+		compatible = "qcom,qsee-ipc-irq-bridge";
+
+		qcom,qsee-ipc-irq-spss {
+			qcom,dev-name = "qsee_ipc_irq_spss";
+			interrupt-parent = <&ipcc_mproc>;
+			interrupts = <IPCC_CLIENT_SPSS
+				      IPCC_MPROC_SIGNAL_TZ
+				      IRQ_TYPE_EDGE_RISING>;
+			label = "spss";
+		};
 	};
 
 	sys-pm-vx@c320000 {
 		compatible = "qcom,sys-pm-violators", "qcom,sys-pm-niobe";
 		reg = <0xc320000 0x0400>;
-		mboxes = <&qmp_aop 0>;
-		mbox-names = "aop";
+		qcom,qmp = <&aoss_qmp>;
 	};
 
 	sram@c3f0000 {
 		compatible = "qcom,rpmh-stats-v3";
 		reg = <0xc3f0000 0x400>;
+		qcom,qmp = <&aoss_qmp>;
 		ss-name = "modem", "adsp", "adsp_island",
 			  "cdsp", "slpi", "slpi_island",
 			  "apss";
-		mboxes = <&qmp_aop 0>;
 	};
 
 	cpuss-sleep-stats@17800054 {
@@ -1165,6 +1174,47 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
+	};
+
+	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring {
+		size = <0x4000>;
+		gunyah-label = <0x11>;
+	};
+
+	trust_ui_vm_vblk1_ring: trust_ui_vm_vblk1_ring {
+		size = <0x4000>;
+		gunyah-label = <0x10>;
+	};
+
+	trust_ui_vm_swiotlb: trust_ui_vm_swiotlb {
+		size = <0x100000>;
+		gunyah-label = <0x12>;
+	};
+
+	trust_ui_vm: qcom,trust_ui_vm {
+		vm_name = "trustedvm";
+		shared-buffers-size = <0x108000>;
+		shared-buffers = <&trust_ui_vm_vblk0_ring &trust_ui_vm_vblk1_ring &trust_ui_vm_swiotlb>;
+	};
+
+	trust_ui_vm_virt_be0: trust_ui_vm_virt_be0@11 {
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x11>;
+	};
+
+	trust_ui_vm_virt_be1: trust_ui_vm_virt_be1@10 {
+		qcom,vm = <&trust_ui_vm>;
+		qcom,label = <0x10>;
+	};
+
+	gh_secure_vm_loader0: gh-secure-vm-loader@0 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <28>;
+		qcom,vmid = <45>;
+		qcom,firmware-name = "trustedvm";
+		qcom,keep-running;
+		memory-region = <&trust_ui_vm_mem &vm_comm_mem>;
+		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
 	};
 
 	gh-secure-vm-loader@2 {
@@ -1267,6 +1317,11 @@
 
 	mini_dump_mode {
 		compatible = "qcom,minidump";
+	};
+
+	va_mini_dump {
+		compatible = "qcom,va-minidump";
+		memory-region = <&va_md_mem>;
 	};
 
 	eud: qcom,msm-eud@88e0000 {
@@ -1639,13 +1694,15 @@
 					<&soccp_smp2p_in 0 0>,
 					<&soccp_smp2p_in 1 0>,
 					<&soccp_smp2p_in 3 0>,
-					<&soccp_smp2p_in 2 0>;
+					<&soccp_smp2p_in 2 0>,
+					<&soccp_smp2p_in 9 0>;
 
 		interrupt-names = "wdog",
 				"fatal",
 				"ready",
 				"stop-ack",
-				"handover";
+				"handover",
+				"pong";
 
 		/* Outputs to soccp */
 		qcom,smem-states = <&soccp_smp2p_out 0>, <&soccp_smp2p_out 10>, <&soccp_smp2p_out 9>;
@@ -2604,6 +2661,12 @@
 			qcom,iommu-group = <>;
 		};
 	};
+
+	google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
+	};
+
 };
 
 &reserved_memory {
@@ -2673,12 +2736,25 @@
 		reg = <0x0 0xd4e23000 0x0 0x2dd000>;
 	};
 
+	kinfo_mem: debug_kinfo_region {
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x1000>;
+		no-map;
+	};
+
 	ramoops_mem: ramoops_region {
 		compatible = "ramoops";
 		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
 		size = <0x0 0x200000>;
 		pmsg-size = <0x200000>;
 		mem-type = <2>;
+	};
+
+	va_md_mem: va_md_mem_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x1000000>;
 	};
 };
 

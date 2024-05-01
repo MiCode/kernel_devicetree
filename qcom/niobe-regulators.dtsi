@@ -256,6 +256,7 @@
 	rpmh-regulator-dcxlvl {
 		compatible = "qcom,rpmh-arc-regulator";
 		qcom,resource-name = "dcx.lvl";
+		proxy-supply = <&VDD_DISP_CX_LEVEL>;
 
 		VDD_DISP_CX_LEVEL:
 		S6B_LEVEL:
@@ -263,10 +264,14 @@
 			regulator-name = "pmxr2230_s6_level";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt =
-				<RPMH_REGULATOR_LEVEL_RETENTION>;
+				<RPMH_REGULATOR_LEVEL_LOW_SVS_D1>;
 			regulator-max-microvolt = <RPMH_REGULATOR_LEVEL_MAX>;
 			qcom,init-voltage-level =
-				<RPMH_REGULATOR_LEVEL_RETENTION>;
+				<RPMH_REGULATOR_LEVEL_LOW_SVS_D1>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-voltage =
+				<RPMH_REGULATOR_LEVEL_LOW_SVS_D1
+				 RPMH_REGULATOR_LEVEL_MAX>;
 		};
 	};
 
@@ -750,32 +755,15 @@
 			<RPMH_REGULATOR_MODE_LPM
 			RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
+		proxy-supply = <&L1C>;
 
 		L1C:
 		pm_v6c_l1: vreg-pm-v6c-l1 {
 			regulator-name = "pm_v6c_l1";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
-		};
-	};
-
-	rpmh-regulator-ldoc2 {
-		compatible = "qcom,rpmh-vrm-regulator";
-		qcom,resource-name = "ldoc2";
-		qcom,regulator-type = "pmic5-ldo";
-		qcom,supported-modes =
-			<RPMH_REGULATOR_MODE_LPM
-			RPMH_REGULATOR_MODE_HPM>;
-		qcom,mode-threshold-currents = <0 30000>;
-
-		L2C:
-		pm_v6c_l2: vreg-pm-v6c-l2 {
-			regulator-name = "pm_v6c_l2";
-			qcom,set = <RPMH_REGULATOR_SET_ALL>;
-			regulator-min-microvolt = <904000>;
-			regulator-max-microvolt = <904000>;
-			qcom,init-voltage = <904000>;
-			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-current = <31000>;
 		};
 	};
 

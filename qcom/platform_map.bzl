@@ -181,6 +181,11 @@ _platform_map = {
         ],
         "binary_compatible_with": ["cliffs", "volcano"],
     },
+    "anorak": {
+        "dtb_list": [
+            {"name": "anorak.dtb"},
+        ],
+    },
     "niobe": {
         "dtb_list": [
             {"name": "niobe.dtb"},
@@ -272,6 +277,12 @@ _platform_map = {
             {"name": "pineapplep-vm-hdk.dtb"},
         ],
         "binary_compatible_with": ["cliffs-oemvm", "volcano-oemvm"],
+    },
+    "niobe-tuivm": {
+        "dtb_list": [
+            {"name": "niobe-vm-idp.dtb"},
+            {"name": "niobep-vm-idp.dtb"},
+        ],
     },
     "cliffs-tuivm": {
         "dtb_list": [
@@ -431,6 +442,7 @@ _platform_map = {
             {"name": "pitti-qrd-4gb-overlay.dtbo"},
             {"name": "pitti-idp-90fps-overlay.dtbo"},
             {"name": "pitti-qrd-90fps-overlay.dtbo"},
+            {"name": "pitti-idp-pmiv0104-90fps-overlay.dtbo"},
             {
                 "name": "pitti-rumi-overlay.dtbo",
                 "apq": False,

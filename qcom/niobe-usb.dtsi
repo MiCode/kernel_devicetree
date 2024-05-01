@@ -39,18 +39,8 @@
 		qcom,core-clk-rate-disconnected = <133333333>;
 		qcom,pm-qos-latency = <2>;
 
-		qcom,num-gsi-evt-buffs = <0x3>;
-		qcom,gsi-reg-offset =
-			<0x0fc /* GSI_GENERAL_CFG */
-			0x110 /* GSI_DBL_ADDR_L */
-			0x120 /* GSI_DBL_ADDR_H */
-			0x130 /* GSI_RING_BASE_ADDR_L */
-			0x144 /* GSI_RING_BASE_ADDR_H */
-			0x1a4>; /* GSI_IF_STS */
-
-		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnect-names = "usb-ddr", "ddr-usb";
 		interconnects = <&aggre1_noc MASTER_USB3_0 &mc_virt SLAVE_EBI1>,
-				<&aggre1_noc MASTER_USB3_0 &cnoc_cfg SLAVE_IPA_CFG>,
 				<&gem_noc MASTER_APPSS_PROC &cnoc_cfg SLAVE_USB3_0>;
 
 		dwc3@a600000 {
@@ -73,8 +63,9 @@
 			snps,dis_u2_susphy_quirk;
 			snps,ssp-u3-u0-quirk;
 			tx-fifo-resize;
-			dr_mode = "peripheral";
+			dr_mode = "otg";
 			maximum-speed = "super-speed-plus";
+			usb-role-switch;
 		};
 	};
 
@@ -98,6 +89,11 @@
 
 		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
 		reset-names = "phy_reset";
+
+		/* eUSB2 HPG version 1.0.2 update */
+		qcom,param-override-seq =
+			<0x00 0x58>;
+
 	};
 
 	/* Primary USB port related QMP USB DP Combo PHY */
@@ -350,18 +346,8 @@
 		qcom,core-clk-rate-disconnected = <133333333>;
 		qcom,pm-qos-latency = <2>;
 
-		qcom,num-gsi-evt-buffs = <0x3>;
-		qcom,gsi-reg-offset =
-			<0x0fc /* GSI_GENERAL_CFG */
-			0x110 /* GSI_DBL_ADDR_L */
-			0x120 /* GSI_DBL_ADDR_H */
-			0x130 /* GSI_RING_BASE_ADDR_L */
-			0x144 /* GSI_RING_BASE_ADDR_H */
-			0x1a4>; /* GSI_IF_STS */
-
-		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnect-names = "usb-ddr", "ddr-usb";
 		interconnects = <&aggre1_noc MASTER_USB3_1 &mc_virt SLAVE_EBI1>,
-				<&aggre1_noc MASTER_USB3_1 &cnoc_cfg SLAVE_IPA_CFG>,
 				<&gem_noc MASTER_APPSS_PROC &cnoc_cfg SLAVE_USB3_1>;
 
 		status = "disabled";
@@ -407,6 +393,8 @@
 
 		resets = <&gcc GCC_QUSB2PHY_SEC_BCR>;
 		reset-names = "phy_reset";
+		status = "disabled";
+
 	};
 
 	/* Secondary USB port related QMP USB DP Combo PHY */
@@ -620,6 +608,9 @@
 				USB3_DP_PCS_USB3_RXEQTRAINING_DFE_TIME_S2 0x07
 				USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_L 0x40
 				USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_H 0x00>;
+
+		status = "disabled";
+
 	};
 
 	usb_audio_qmi_dev {
