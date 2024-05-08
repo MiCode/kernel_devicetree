@@ -220,6 +220,16 @@ _platform_map = {
             {"name": "cliffs-rcm-qhdp-kiwi-overlay.dtbo"},
         ],
     },
+    "chenfeng": {
+        "dtb_list": [
+            {"name": "cliffs.dtb"},
+            {"name": "cliffs7.dtb"},
+        ],
+        "dtbo_list": [
+            # keep sorted
+            {"name": "chenfeng-sm8635-overlay.dtbo"},
+        ],
+    },
     "pineapple-tuivm": {
         "dtb_list": [
             {"name": "pineapple-oemvm-rcm.dtb"},

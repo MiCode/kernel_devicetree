@@ -27,7 +27,7 @@
 
 
 	chosen: chosen {
-		bootargs = "loglevel=6 kpti=0 log_buf_len=256K swiotlb=noforce kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 service_locator.enable=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 irqaffinity=0-1 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc cgroup.memory=nokmem,nosocket printk.console_no_auto_verbose=1 kasan=off service_locator.enable=1 loop.max_part=7 no-steal-acc can.stats_timer=0 ufs_qcom.crash_on_ber=n ftrace_dump_on_oops firmware_class.path=/vendor/firmware_mnt/image,/vendor/firmware_mnt/image/kiwi,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware,/vendor/firmware/wlan/qca_cld/kiwi_v2 pcie_ports=compat disable_dma32=on pci-msm-drv.pcie_sm_regs=0x1D07000,0x1040,0x1048,0x3000,0x2 slub_debug=-";
+		bootargs = "kpti=0 swiotlb=noforce kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 service_locator.enable=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 irqaffinity=0-1 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc cgroup.memory=nokmem,nosocket printk.console_no_auto_verbose=0 kasan=off service_locator.enable=1 loop.max_part=7 no-steal-acc can.stats_timer=0 ufs_qcom.crash_on_ber=n ftrace_dump_on_oops firmware_class.path=/vendor/firmware_mnt/image,/vendor/firmware_mnt/image/kiwi,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware,/vendor/firmware/wlan/qca_cld/kiwi_v2 pcie_ports=compat disable_dma32=on pci-msm-drv.pcie_sm_regs=0x1D07000,0x1040,0x1048,0x3000,0x2 slub_debug=-";
 		stdout-path = "/soc/qcom,qupv3_2_geni_se@8c0000/qcom,qup_uart@89c000:115200n8";
 	};
 
@@ -36,6 +36,12 @@
 		hsuart0	= &qupv3_se14_4uart;
 		mmc1 = &sdhc_2; /* SDC2 SD card slot */
 		ufshc1 = &ufshc_mem; /* Embedded UFS Slot */
+		i2c2 = &qupv3_se8_i2c;
+		i2c3 = &qupv3_hub_i2c4;
+		i2c4 = &qupv3_hub_i2c1;
+		i2c5 = &qupv3_se2_i2c;
+		spi0 = &qupv3_se0_spi;
+		spi1 = &qupv3_se11_spi;
 	};
 
 	reserved_memory: reserved-memory { };
@@ -320,7 +326,7 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
-	disp_rdump_region@d5100000 {
+	disp_rdump_region@fc400000 {
 	};
 
 	psci {
@@ -682,7 +688,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
-		qcom,gpios-reserved = <36 37 38 39 74>;
+		qcom,gpios-reserved = <8 9 10 11 36 37 38 39 42 74>;
 	};
 
 	show_resume_irqs@17100000 {
@@ -1894,6 +1900,12 @@
 		#mbox-cells = <2>;
 	};
 
+	adsp_sleepmon: adsp-sleepmon {
+		compatible = "qcom,adsp-sleepmon";
+		qcom,wait_time_lpm = <45>;
+		qcom,wait_time_lpi = <45>;
+	};
+
 	aoss_qmp: power-controller@c300000 {
 		compatible = "qcom,aoss-qmp";
 		reg = <0xc300000 0x400>;
@@ -2790,8 +2802,12 @@
 			< 0x0008 0xFF 0x02 0x02 >,
 			< 0x0011 0xFF 0x01 0x00 >,
 			< 0x0017 0xFF 0xFF 0x04 >,
+			< 0x0024 0xFF 0x03 0x03 >,
 			< 0x0037 0xFF 0xFF 0x06 >,
-			< 0x1000 0xFF 0xFF 0x08 >;
+			< 0x1000 0xFF 0xFF 0x08 >,
+			// MIUI ADD: Camera_CamSched
+			< 0x4005 0xFF 0x03 0x03 >;
+			// END Camera_CamSched
 	};
 
 	ddr_freq_table: ddr-freq-table {
@@ -3273,6 +3289,11 @@
 		reg = <0x0 0x80e00000 0x0 0x400000>;
 	};
 
+	dump_display_mem: dump_display_region@816e0000 {
+		no-map;
+		reg = <0x0 0x816e0000 0x0 0x800>;
+	};
+
 	/*
 	 * hyp_tags_mem is dynamically removed from the RAM
 	 * partition tables before boot occurs. Size of region
@@ -3282,9 +3303,19 @@
 	/* hyp_reserved_mem doesn't correspond to an actual region. */
 
 	/* merged xbl_dtlog, xbl_ramdump and aop_image regions */
-	xbl_aop_merged_mem: xbl_aop_merged_region@81a00000 {
+	xbl_dtlog_mem: xbl_dtlog_region@81a00000 {
 		no-map;
-		reg = <0x0 0x81a00000 0x0 0x260000>;
+		reg = <0x0 0x81a00000 0x0 0x40000>;
+	};
+
+        xbl_md_mem: xbl_md_region@81bff000 {
+		no-map;
+		reg = <0x0 0x81bff000 0x0 0x1000>;
+	};
+
+	xbl_aop_image_mem: xbl_aop_image_region@81c00000 {
+		no-map;
+		reg = <0x0 0x81c00000 0x0 0x60000>;
 	};
 
 	aop_cmd_db_mem: aop_cmd_db_region@81c60000 {
@@ -3351,6 +3382,11 @@
 		reg = <0x0 0x86b00000 0x0 0x4900000>;
 	};
 
+	xbl_ramdump_mem: xbl_ramdump_region@84a00000 {
+		no-map;
+		reg = <0x0 0x84a00000 0x0 0x200000>;
+	};
+
 	mpss_dsm_mem_2: mpss_dsm_region_2@8b400000 {
 		no-map;
 		reg = <0x0 0x8b400000 0x0 0x800000>;
@@ -3381,7 +3417,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x1400000>;
+		size = <0x0 0x1800000>;
 	};
 
 	qseecom_ta_mem: qseecom_ta_region {
@@ -3389,7 +3425,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x1000000>;
+		size = <0x0 0x3400000>;
 	};
 
 	qmc_dma_mem: qmc_dma_region {
@@ -3483,7 +3519,7 @@
 
 	hwfence_shbuf: hwfence-shmem {
 		no-map;
-		reg = <0x0 0xd4e23000 0x0 0x2dd000>;
+		reg = <0x0 0xFF100000 0x0 0x2dd000>;
 	};
 
 	vm_comm_mem: vm_comm_mem_region {
@@ -3502,9 +3538,10 @@
 	};
 
 	oem_vm_mem: oem_vm_region@f7c00000 {
-		compatible = "shared-dma-pool";
-		reg = <0x0 0xf7c00000 0x0 0x4c00000>;
-		reusable;
+		//compatible = "shared-dma-pool";
+		//reg = <0x0 0xf7c00000 0x0 0x4c00000>;
+		//reusable;
+		no-map;
 		alignment = <0x0 0x400000>;
 	};
 
@@ -3549,7 +3586,7 @@
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
 		reusable;
 		alignment = <0x0 0x400000>;
-		size = <0x0 0x2000000>;
+		size = <0x0 0x2800000>;
 		linux,cma-default;
 	};
 
@@ -3569,8 +3606,8 @@
 
 	ramoops_mem: ramoops_region {
 		compatible = "ramoops";
-		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
-		size = <0x0 0x200000>;
+		reg = <0x0 0xa7000000 0x0 0x400000>;
+		console-size = <0x200000>;
 		pmsg-size = <0x200000>;
 		mem-type = <2>;
 	};

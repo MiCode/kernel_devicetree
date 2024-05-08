@@ -3,9 +3,10 @@
 #include <dt-bindings/clock/qcom,gcc-pineapple.h>
 #include "pineapple-pmic-overlay.dtsi"
 #include "pineapple-thermal-overlay.dtsi"
+#include <dt-bindings/phy/qcom,usb3-4nm-qmp-combo.h>
 
 &sdhc_2 {
-	status = "ok";
+	status = "disabled";
 	vdd-supply = <&pm_humu_l9>;
 	qcom,vdd-voltage-level = <2950000 2960000>;
 	qcom,vdd-current-level = <0 800000>;
@@ -54,9 +55,9 @@
 	vdda-phy-supply = <&pm_v6d_l1>;
 	vdda-phy-max-microamp = <211000>;
 	/*
-	 * Platforms supporting Gear 5 && Rate B require a different
-	 * voltage supply. Check the Power Grid document.
-	 */
+	* Platforms supporting Gear 5 && Rate B require a different
+	* voltage supply. Check the Power Grid document.
+	*/
 	vdda-phy-min-microvolt = <912000>;
 
 	/* VDDA_UFS_0_1P2 */
@@ -206,46 +207,90 @@
 	};
 };
 
-&qupv3_se4_spi {
-	#address-cells = <1>;
-	#size-cells = <0>;
-
-	status = "ok";
-	qcom,touch-active = "goodix,gt9916S";
-	qcom,la-vm;
-
-	goodix-berlin@0 {
-		compatible = "goodix,gt9916S";
-		reg = <0>;
-		spi-max-frequency = <1000000>;
-		interrupt-parent = <&tlmm>;
-		interrupts = <162 0x2008>;
-		goodix,reset-gpio = <&tlmm 161 0x00>;
-		goodix,irq-gpio = <&tlmm 162 0x2008>;
-		goodix,irq-flags = <2>;
-		goodix,panel-max-x = <1080>;
-		goodix,panel-max-y = <2400>;
-		goodix,panel-max-w = <255>;
-		goodix,panel-max-p = <4096>;
-		goodix,firmware-name = "goodix_firmware_spi.bin";
-		goodix,config-name = "goodix_cfg_group_spi.bin";
-		goodix,avdd-name = "avdd";
-		goodix,iovdd-name = "iovdd";
-		avdd-supply = <&L14B>;
-		iovdd-supply = <&L12B>;
-		goodix,touch-type = "primary";
-		goodix,qts_en;
-		qts,trusted-touch-mode = "vm_mode";
-		qts,touch-environment = "pvm";
-		qts,trusted-touch-type = "primary";
-		qts,trusted-touch-spi-irq = <598>;
-		qts,trusted-touch-io-bases = <0xa90000>;
-		qts,trusted-touch-io-sizes = <0x1000>;
-		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
-						&tlmm 51 0 &tlmm 161 0 &tlmm 162 0x2008>;
-	};
+#if defined(SHENNONG_HOUJI_REGULATOR_OCP)
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c6-supply = <&L6B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1ce-supply = <&L14B>;
+	periph-1cf-supply = <&L15B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d1-supply = <&L17B>;
+	periph-2c1-supply = <&L1C>;
+	periph-2c2-supply = <&L2C>;
+	periph-2c3-supply = <&L3C>;
+	periph-3c1-supply = <&L1D>;
+	periph-3c2-supply = <&L2D_LEVEL>;
+	periph-3c3-supply = <&L3D>;
+	periph-4c2-supply = <&L2E>;
+	periph-4c3-supply = <&L3E>;
+	periph-6c1-supply = <&L1G>;
+	periph-6c2-supply = <&L2G>;
+	periph-6c3-supply = <&L3G>;
+	periph-ac1-supply = <&L1K>;
+	periph-ac2-supply = <&L2K>;
+	periph-ac3-supply = <&L3K>;
+	periph-ac4-supply = <&L4K>;
+	periph-ac5-supply = <&L5K>;
+	periph-ac6-supply = <&L6K>;
+	periph-ac7-supply = <&L7K>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c44-supply = <&L5M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
 };
-
+#elif defined(MANET_REGULATOR_OCP)
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c6-supply = <&L6B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1ce-supply = <&L14B>;
+	periph-1cf-supply = <&L15B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d1-supply = <&L17B>;
+	periph-2c1-supply = <&L1C>;
+	periph-2c2-supply = <&L2C>;
+	periph-2c3-supply = <&L3C>;
+	periph-3c1-supply = <&L1D>;
+	periph-3c2-supply = <&L2D_LEVEL>;
+	periph-3c3-supply = <&L3D>;
+	periph-4c2-supply = <&L2E>;
+	periph-4c3-supply = <&L3E>;
+	periph-6c1-supply = <&L1G>;
+	periph-6c2-supply = <&L2G>;
+	periph-6c3-supply = <&L3G>;
+	periph-ac1-supply = <&L1K>;
+	periph-ac2-supply = <&L2K>;
+	periph-ac3-supply = <&L3K>;
+	periph-ac4-supply = <&L4K>;
+	periph-ac5-supply = <&L5K>;
+	periph-ac6-supply = <&L6K>;
+	periph-ac7-supply = <&L7K>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c44-supply = <&L5M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
+};
+#else
 &regulator_ocp_notifier {
 	periph-1c1-supply = <&L1B>;
 	periph-1c2-supply = <&L2B>;
@@ -319,6 +364,7 @@
 	periph-d45-supply = <&L6N>;
 	periph-d46-supply = <&L7N>;
 };
+#endif
 
 &wcd_usbss {
 	interrupt-parent = <&spmi_bus>;
