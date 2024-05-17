@@ -36,7 +36,6 @@
 		offline-sizes = <0x2 0xc0000000 0x1 0x0>;
 		granule = <512>;
 		mboxes = <&qmp_aop 0>;
-		status = "disabled";
 	};
 
 	aliases: aliases {
@@ -1495,6 +1494,10 @@
 		};
 	};
 
+	qcom_dynpf: qcom,dynpf {
+		compatible = "qcom,dynpf";
+	};
+
 	qcom_pmu: qcom,pmu {
 		compatible = "qcom,pmu";
 		qcom,pmu-events-tbl =
@@ -1819,7 +1822,7 @@
 		};
 	};
 
-	bwmon_ddr: qcom,bwmon-ddr@19091000 {
+	bwmon_ddr: qcom,bwmon-ddr@24091000 {
 		compatible = "qcom,bwmon5";
 		reg = <0x24091000 0x1000>;
 		reg-names = "base";
@@ -2660,6 +2663,33 @@
 		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "qcom,qtmr-intr";
 		qcom,primary;
+	};
+
+	qcom,memshare {
+		compatible = "qcom,memshare";
+
+		qcom,client_1 {
+			compatible = "qcom,memshare-peripheral";
+			qcom,peripheral-size = <0x0>;
+			qcom,client-id = <0>;
+			qcom,allocate-boot-time;
+			label = "modem";
+		};
+
+		qcom,client_2 {
+			compatible = "qcom,memshare-peripheral";
+			qcom,peripheral-size = <0x0>;
+			qcom,client-id = <2>;
+			label = "modem";
+		};
+
+		qcom,client_3 {
+			compatible = "qcom,memshare-peripheral";
+			qcom,peripheral-size = <0x500000>;
+			qcom,client-id = <1>;
+			qcom,allocate-on-request;
+			label = "modem";
+		};
 	};
 
 	oem_vm_vblk0_ring: oem_vm_vblk0_ring {

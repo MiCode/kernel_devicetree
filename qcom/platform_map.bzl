@@ -184,6 +184,26 @@ _platform_map = {
     "anorak": {
         "dtb_list": [
             {"name": "anorak.dtb"},
+            #TODO: Need to add anorakp
+            #{
+            #    "name": "anorakp.dtb",
+            #    "apq": True,
+            #},
+        ],
+        "dtbo_list": [
+            {"name": "anorak-idp-overlay.dtbo"},
+            {"name": "anorak-atp-overlay.dtbo"},
+            {"name": "anorak-qxr-overlay.dtbo"},
+            {"name": "anorak-idp-4kdisp-hmt-overlay.dtbo"},
+            {"name": "anorak-idp-4kdisp-hsp-overlay.dtbo"},
+            {"name": "anorak-idp-hmt-overlay.dtbo"},
+            {"name": "anorak-idp-hsp-nodisplay-overlay.dtbo"},
+            {"name": "anorak-idp-sd-overlay.dtbo"},
+            {"name": "anorak-idp-top-hmt-overlay.dtbo"},
+            {"name": "anorak-idp-top-hsp-overlay.dtbo"},
+            {"name": "anorak-qxr-4kdisp-hmt-ufs-ref-overlay.dtbo"},
+            {"name": "anorak-qxr-hmt-overlay.dtbo"},
+            {"name": "anorak-qxr-hmt-ufs-ref-overlay.dtbo"},
         ],
     },
     "niobe": {
@@ -443,6 +463,7 @@ _platform_map = {
             {"name": "pitti-idp-90fps-overlay.dtbo"},
             {"name": "pitti-qrd-90fps-overlay.dtbo"},
             {"name": "pitti-idp-pmiv0104-90fps-overlay.dtbo"},
+            {"name": "pitti-idp-pmiv0104-amoled-overlay.dtbo"},
             {
                 "name": "pitti-rumi-overlay.dtbo",
                 "apq": False,

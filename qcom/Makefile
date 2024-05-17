@@ -132,17 +132,30 @@ niobe-dtb-$(CONFIG_ARCH_NIOBE) += \
 niobe-overlays-dtb-$(CONFIG_ARCH_NIOBE) += $(NIOBE_BOARDS) $(NOAPQ_NIOBE_BOARDS) $(NIOBE_BASE_DTB) $(NIOBE_APQ_BASE_DTB)
 dtb-y += $(niobe-dtb-y)
 
+### Added for Anorak ###
 ANORAK_BASE_DTB += anorak.dtb
+ANORAK_APQ_BASE_DTB += anorakp.dtb
 
 ANORAK_BOARDS += \
 		anorak-idp-overlay.dtbo \
 		anorak-qxr-overlay.dtbo \
-		anorak-atp-overlay.dtbo
+		anorak-atp-overlay.dtbo \
+		anorak-idp-hmt-overlay.dtbo \
+		anorak-qxr-hmt-ufs-ref-overlay.dtbo \
+		anorak-qxr-4kdisp-hmt-ufs-ref-overlay.dtbo \
+		anorak-qxr-hmt-overlay.dtbo \
+		anorak-idp-sd-overlay.dtbo \
+		anorak-idp-top-hmt-overlay.dtbo \
+		anorak-idp-top-hsp-overlay.dtbo \
+		anorak-idp-4kdisp-hsp-overlay.dtbo \
+		anorak-idp-4kdisp-hmt-overlay.dtbo \
+		anorak-idp-hsp-nodisplay-overlay.dtbo
 
 anorak-dtb-$(CONFIG_ARCH_ANORAK) += \
-	$(call add-overlays, $(ANORAK_BOARDS) ,$(ANORAK_BASE_DTB))
+	$(call add-overlays, $(ANORAK_BOARDS) ,$(ANORAK_BASE_DTB))\
+	$(call add-overlays, $(ANORAK_BOARDS) ,$(ANORAK_APQ_BASE_DTB))
 
-anorak-overlays-dtb-$(CONFIG_ARCH_ANORAK) += $(ANORAK_BOARDS) ${ANORAK_BASE_DTB)
+anorak-overlays-dtb-$(CONFIG_ARCH_ANORAK) += $(ANORAK_BOARDS) $(ANORAK_BASE_DTB) $(ANORAK_APQ_BASE_DTB)
 dtb-y += $(anorak-dtb-y)
 
 BLAIR_BASE_DTB += blair.dtb
@@ -212,6 +225,7 @@ PITTI_BOARDS += \
 		 pitti-idp-pmiv0104-4gb-overlay.dtbo \
 		 pitti-idp-pmiv0104-apache-overlay.dtbo \
 		 pitti-idp-pmiv0104-90fps-overlay.dtbo \
+		 pitti-idp-pmiv0104-amoled-overlay.dtbo \
 		 pitti-qrd-4gb-overlay.dtbo \
 		 pitti-idp-90fps-overlay.dtbo \
 		 pitti-qrd-90fps-overlay.dtbo
