@@ -64,10 +64,12 @@
 		vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
 		qcom,sensitive;
 
-		/* For LEVM pored use cases is SE0(QUP0_SE0), for SE0 we used gpii6(QUPV3_0_GPII6)
-		 * and irq no is 471.
+		/* For LEVM pored usecases is SE4 and SE7, for SE4 we used gpii4
+		 * and irq no is 315, for SE7 we used gpii5 and irq no is 316.
 		 */
-		gic-irq-ranges = <471 471>; /* PVM->SVM IRQ transfer */
+		gic-irq-ranges = <101 101
+				  315 315
+				  316 316>; /* PVM->SVM IRQ transfer */
 
 		vm-attrs = "crash-fatal", "context-dump";
 
@@ -170,6 +172,56 @@
 				};
 			};
 
+			mem-buf-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/membuf-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label = <0x0000001>;
+			};
+
+			eva-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/eva-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label =<0x7>;
+			};
+
+			test-dbl-tuivm {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/test-dbl-tuivm";
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			test-dbl-tuivm-source {
+				vdevice-type = "doorbell-source";
+				generate = "/hypervisor/test-dbl-tuivm-source";
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			test-msgq-tuivm {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/test-msgq-tuivm-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x4>;
+				peer-default;
+			};
+
+			vcpu-sched-test-msgq {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/sched-test-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x8>;
+				peer-default;
+			};
+
 		};
 	};
 
@@ -193,14 +245,14 @@
 		method = "smc";
 	};
 
-	vgic: interrupt-controller@17100000 {
+	vgic: interrupt-controller@17200000 {
 		compatible = "arm,gic-v3";
 		interrupt-controller;
 		#interrupt-cells = <0x3>;
 		#redistributor-regions = <1>;
-		redistributor-stride = <0x0 0x40000>;
-		reg = <0x17100000 0x10000>,     /* GICD */
-		      <0x17180000 0x100000>;    /* GICR * 8 */
+		redistributor-stride = <0x0 0x20000>;
+		reg = <0x17200000 0x10000>,     /* GICD */
+		      <0x17260000 0xC0000>;    /* GICR * 8 */
 	};
 
 	arch_timer: timer {
@@ -273,6 +325,26 @@
 				};
 			};
 		};
+	};
+
+	qcom,test-dbl-tuivm {
+		compatible = "qcom,gh-dbl";
+		qcom,label = <0x4>;
+	};
+
+	qcom,test-msgq-tuivm {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <4>;
+		affinity = <0>;
+	};
+
+	qcom,gh-qtimer@1742b000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x1742b000 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,secondary;
 	};
 
 	qcom_smcinvoke {
