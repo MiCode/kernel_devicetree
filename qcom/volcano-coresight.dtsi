@@ -506,32 +506,6 @@
 		};
 	};
 
-	tmc_modem: tmc_modem {
-		compatible = "qcom,coresight-secure-etr";
-		coresight-name = "coresight-modem-etr1";
-
-		real-name = "coresight-tmc-etr1";
-		qdss,support-remote-etm = <2>;
-		memory-region = <&qdss_apps_mem>;
-		qdss,buffer-size = <0x2000000>;
-
-		qcom,secure-component;
-		coresight-csr = <&csr>;
-		csr-atid-offset = <0x108>;
-		csr-irqctrl-offset = <0x70>;
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
-		in-ports {
-			port {
-				tmc_modem_in_replicator_dummy: endpoint {
-					remote-endpoint =
-					<&replicator_dummy_out_tmc_modem>;
-				};
-			};
-		};
-	};
-
 	stm: stm@10002000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb962>;
@@ -861,14 +835,6 @@
 		out-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				replicator_dummy_out_tmc_modem: endpoint {
-					remote-endpoint =
-					<&tmc_modem_in_replicator_dummy>;
-				};
-			};
 
 			port@1 {
 				reg = <1>;
