@@ -347,6 +347,12 @@
 		size = <0x0 0x1000000>;
 	};
 
+	kinfo_mem: debug_kinfo_region {
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x1000>;
+		no-map;
+	};
+
 	ramoops_mem: ramoops_region {
 		compatible = "ramoops";
 		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
@@ -685,6 +691,26 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+	};
+
+	dload_mode {
+		compatible = "qcom,dload-mode";
+	};
+
+	mini_dump_mode {
+		compatible = "qcom,minidump";
+		status = "ok";
+	};
+
+	va_mini_dump {
+		compatible = "qcom,va-minidump";
+		memory-region = <&va_md_mem>;
+		status = "ok";
+	};
+
+	google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
 	};
 
 	tcsr: syscon@1fc0000 {
@@ -1528,6 +1554,17 @@
 		qcom,ee = <0>;
 		qcom,bus-id = <1>;
 		depends-on-supply = <&spmi0_bus>;
+	};
+
+	msm_sdexpress: qcom,msm-sdexpress {
+		compatible = "qcom,msm-sdexpress";
+		qcom,pcie-nvme-instance = <2>;
+
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&pcie2_clkreq_default>;
+		pinctrl-1 = <&pcie2_clkreq_sleep>;
+
+		status = "disabled";
 	};
 };
 
