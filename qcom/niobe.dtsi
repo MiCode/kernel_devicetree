@@ -2606,12 +2606,10 @@
 		qcom,ulso-ip-id-max-linux-val = <0xffff>;
 		qcom,ulso-ip-id-min-windows-val = <0>;
 		qcom,ulso-ip-id-max-windows-val = <0x7fff>;
-		qcom,max_num_smmu_cb = <4>;
+		qcom,max_num_smmu_cb = <5>;
 		clock-names = "core_clk";
 		clocks = <&rpmhcc RPMH_IPA_CLK>;
 		qcom,throughput-threshold = <2000 4000 8000>;
-		/* Map IPCC Region to uC CB */
-		qcom,ipcc-mapping = <0x00400000 0x00400000 0x000F0000>;
 		qcom,ipa-wdi-opt-dpath;
 		qcom,scaling-exceptions = <>;
 		qcom,interconnect,num-cases = <5>;
@@ -2664,6 +2662,16 @@
 		ipa_smmu_uc: ipa_smmu_uc {
 			compatible = "qcom,ipa-smmu-uc-cb";
 			iommus = <&apps_smmu 0x4A2 0x0>;
+			qcom,iommu-dma-addr-pool = <0x20000000 0x20000000>;
+			/* Map IPCC Fence Protocol Region to uC CB */
+			qcom,ipcc-mapping = <0x500000 0x500000 0x40000>;
+			qcom,iommu-dma = "atomic";
+			dma-coherent;
+		};
+
+		ipa_smmu_rtp: ipa_smmu_rtp {
+			compatible = "qcom,ipa-smmu-rtp-cb";
+			iommus = <&apps_smmu 0x4A3 0x0>;
 			qcom,iommu-dma-addr-pool = <0x20000000 0x20000000>;
 			qcom,iommu-dma = "atomic";
 			dma-coherent;
