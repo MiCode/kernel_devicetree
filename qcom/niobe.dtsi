@@ -1198,6 +1198,38 @@
 		wakeup-parent = <&pdc>;
 	};
 
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		qcom,master;
+		tlmm-vm-gpio-list = <&tlmm 12 0>;
+	};
+
+	tlmm-vm-test {
+		compatible = "qcom,tlmm-vm-test";
+		qcom,master;
+		tlmm-vm-gpio-list = <&tlmm 12 0>;
+	};
+
+	qcom,test-dbl-tuivm {
+		compatible = "qcom,gh-dbl";
+		qcom,label = <0x4>;
+	};
+
+	qcom,test-msgq-tuivm {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <4>;
+		qcom,primary;
+	};
+
+	qcom,gh-qtimer@1742b000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x1742b000 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,primary;
+	};
+
 	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring {
 		size = <0x4000>;
 		gunyah-label = <0x11>;
@@ -2680,6 +2712,24 @@
 	google,debug-kinfo {
 		compatible = "google,debug-kinfo";
 		memory-region = <&kinfo_mem>;
+	};
+
+	dmesg-dump {
+		compatible = "qcom,dmesg-dump";
+		qcom,primary-vm;
+		gunyah-label = <7>;
+		peer-name = <2>;
+		memory-region = <&vm_comm_mem>;
+		shared-buffer-size = <0x1000>;
+	};
+
+	qcom,gunyah-panic-notifier {
+		compatible = "qcom,gh-panic-notifier";
+		qcom,primary-vm;
+		gunyah-label = <9>;
+		peer-name = <2>;
+		memory-region = <&vm_comm_mem>;
+		shared-buffer-size = <0x1000>;
 	};
 
 };
