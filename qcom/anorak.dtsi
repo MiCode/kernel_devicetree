@@ -493,6 +493,11 @@
 		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
 	};
 
+	cluster-device {
+		compatible = "qcom,lpm-cluster-dev";
+		power-domains = <&CLUSTER_PD>;
+	};
+
 	cpu_pmu: cpu-pmu {
 		compatible = "arm,armv8-pmuv3";
 		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_LOW>;
@@ -509,6 +514,25 @@
 		interrupt-controller;
 	};
 
+	soc-sleep-stats@c3f0000 {
+		compatible = "qcom,rpmh-stats-v4";
+		reg = <0x0c3f0000 0x400>;
+		qcom,qmp = <&aoss_qmp>;
+		ss-name = "modem", "adsp", "adsp_island",
+			  "cdsp", "slpi", "slpi_island", "apss";
+	};
+
+	cpuss-sleep-stats@17800054 {
+		compatible = "qcom,cpuss-sleep-stats-v3";
+		reg = <0x17800054 0x4>, <0x17810054 0x4>, <0x17820054 0x4>,
+		      <0x17830054 0x4>, <0x17840054 0x4>, <0x17850054 0x4>,
+		      <0x17880098 0x4>, <0x178C0000 0x10000>;
+		reg-names = "seq_lpm_cntr_cfg_cpu0", "seq_lpm_cntr_cfg_cpu1",
+			    "seq_lpm_cntr_cfg_cpu2", "seq_lpm_cntr_cfg_cpu3",
+			    "seq_lpm_cntr_cfg_cpu4", "seq_lpm_cntr_cfg_cpu5",
+			    "l3_seq_lpm_cntr_cfg", "apss_seq_mem_base";
+		num-cpus = <6>;
+	};
 
 	arch_timer: timer {
 		compatible = "arm,armv8-timer";
@@ -640,6 +664,12 @@
 			compatible = "qcom,msm-imem-diag-dload";
 			reg = <0xc8 0xc8>;
 		};
+	};
+
+	qcom,mpm2-sleep-counter@c221000 {
+		compatible = "qcom,mpm2-sleep-counter";
+		reg = <0xc221000 0x1000>;
+		clock-frequency = <32768>;
 	};
 
 	adsp_pas: remoteproc-adsp@03000000 {
@@ -1608,6 +1638,13 @@
 		mboxes = <&cpucp 0>;
 		mbox-names = "tx";
 		shmem = <&cpu_scp_lpri>;
+	};
+
+	qcom,chd {
+		compatible = "qcom,core-hang-detect";
+		label = "core";
+		qcom,threshold-arr = <0x17800058 0x17810058 0x17820058 0x17830058 0x17840058 0x17850058>;
+		qcom,config-arr =<0x17800060 0x17810060 0x17820060 0x17830060 0x17840060 0x17850060>;
 	};
 
 	clk_virt: interconnect@0 {
