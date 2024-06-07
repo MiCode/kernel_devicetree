@@ -1,6 +1,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm8550vx.h>
 #include <dt-bindings/iio/qcom,spmi-adc5-gen3-pmxr2230.h>
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
 
 #include "pmk8550.dtsi"		/* SID 0 */
 #include "pmxr2230.dtsi"	/* SID 1 */
@@ -106,6 +107,26 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
+		};
+	};
+
+	qcom,pmk8550@0 {
+		qti_epm: qcom,epm-device {
+			compatible = "qcom,epm-devices";
+			nvmem = <&pmk8550_sdam_49>,
+				<&pmk8550_sdam_53>;
+			nvmem-names = "epm-config-sdam",
+				"epm-10s-avg-sdam";
+
+			qcom,reg-ppid-ids = /bits/ 16 <0x19e 0x1a1 0x1aa
+					0x29e 0x2a1 0x2a4 0x2aa 0x3a1 0x3a4 0x3a7 0x3aa
+					0x3ad 0x59b 0x5a1 0x5a4 0x5aa 0x5ad 0x5a7>;
+
+			qcom,reg-ppid-names = "mv_sub_reg",
+					"mm", "dpu", "ebi", "vddq", "nsp2", "nsp1",
+					"gfx_mx", "mxc", "wlan_cx", "lv_sub_reg",
+					"gfx", "apc0", "mxa", "vdd2h", "cx", "apc1",
+					"vdd2l";
 		};
 	};
 };
@@ -333,7 +354,7 @@
 		reg = <PMK8550_ADC5_GEN3_AMUX_THM1_XO_THERM_100K_PU>;
 		label = "pmk8550_xo_therm";
 		qcom,ratiometric;
-		qcom,hw-settle-time = <200>;
+		qcom,hw-settle-time = <1000>;
 		qcom,pre-scaling = <1 1>;
 		qcom,adc-tm-type = <1>;
 	};
@@ -354,6 +375,14 @@
 		qcom,hw-settle-time = <200>;
 		qcom,pre-scaling = <1 1>;
 		qcom,adc-tm-type = <1>;
+	};
+
+	pmxr2230_ipd_pot_res {
+		reg = <PMXR2230_ADC5_GEN3_AMUX_THM5>;
+		label = "pmxr2230_ipd_pot_res";
+		qcom,pre-scaling = <1 1>;
+		qcom,hw-settle-time = <500>;
+		qcom,scale-fn-type = <ADC_SCALE_HW_CALIB_DEFAULT>;
 	};
 
 	pm8550b_chg_temp {

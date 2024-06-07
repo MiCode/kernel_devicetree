@@ -48,6 +48,23 @@
 		qcom,blk-size = <1>;
 	};
 
+	lpass_stm: lpass_stm {
+		compatible = "qcom,coresight-dummy";
+		coresight-name = "coresight-lpass-stm";
+		qcom,dummy-source;
+
+		atid = <25>;
+
+		out-ports {
+			port {
+				lpass_stm_out_funnel_lpass_lpi: endpoint {
+					remote-endpoint =
+					<&funnel_lpass_lpi_in_lpass_stm>;
+				};
+			};
+		};
+	};
+
 	funnel_lpass_lpi_0: funnel@10b44000 {
 		compatible = "arm,coresight-static-funnel";
 		coresight-name = "coresight-funnel-lpass_lpi_0";
@@ -61,6 +78,14 @@
 				funnel_lpass_lpi_in_audio_etm0: endpoint {
 					remote-endpoint =
 					<&audio_etm0_out_funnel_lpass_lpi>;
+				};
+			};
+
+			port@4 {
+				reg = <4>;
+				funnel_lpass_lpi_in_lpass_stm: endpoint {
+					remote-endpoint =
+					<&lpass_stm_out_funnel_lpass_lpi>;
 				};
 			};
 
@@ -481,32 +506,6 @@
 		};
 	};
 
-	tmc_modem: tmc_modem {
-		compatible = "qcom,coresight-secure-etr";
-		coresight-name = "coresight-modem-etr1";
-
-		real-name = "coresight-tmc-etr1";
-		qdss,support-remote-etm = <2>;
-		memory-region = <&qdss_apps_mem>;
-		qdss,buffer-size = <0x2000000>;
-
-		qcom,secure-component;
-		coresight-csr = <&csr>;
-		csr-atid-offset = <0x108>;
-		csr-irqctrl-offset = <0x70>;
-		clocks = <&aoss_qmp>;
-		clock-names = "apb_pclk";
-
-		in-ports {
-			port {
-				tmc_modem_in_replicator_dummy: endpoint {
-					remote-endpoint =
-					<&replicator_dummy_out_tmc_modem>;
-				};
-			};
-		};
-	};
-
 	stm: stm@10002000 {
 		compatible = "arm,primecell";
 		arm,primecell-periphid = <0x000bb962>;
@@ -836,14 +835,6 @@
 		out-ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				replicator_dummy_out_tmc_modem: endpoint {
-					remote-endpoint =
-					<&tmc_modem_in_replicator_dummy>;
-				};
-			};
 
 			port@1 {
 				reg = <1>;
@@ -3812,7 +3803,7 @@
 		reg = <0x10b00000 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-swao-cti";
+		coresight-name = "coresight-cti-swao_cti";
 		qcom,extended_cti;
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -3845,7 +3836,7 @@
 		reg = <0x1098b000 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-turnung-cti";
+		coresight-name = "coresight-cti-turing_cti";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -3856,7 +3847,7 @@
 		reg = <0x10d02f00 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-ddr-dl0-cti";
+		coresight-name = "coresight-cti-ddr_dl0_cti";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -3867,7 +3858,7 @@
 		reg = <0x10d08f00 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-ddr-dl1-cti";
+		coresight-name = "coresight-cti-ddr_dl1_cti";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -3878,7 +3869,7 @@
 		reg = <0x109b2000 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-dlct2-cti";
+		coresight-name = "coresight-cti-dlct2_cti";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -3889,7 +3880,7 @@
 		reg = <0x109a2000 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-wpss-cti0";
+		coresight-name = "coresight-cti-wpss_cti0";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
@@ -3900,11 +3891,62 @@
 		reg = <0x109ab000 0x1000>;
 
 		arm,primecell-periphid = <0x000bb922>;
-		coresight-name = "coresight-wpss-cti1";
+		coresight-name = "coresight-cti-wps_cti1";
 
 		clocks = <&aoss_qmp>;
 		clock-names = "apb_pclk";
 	};
 
+	ipcb_tgu: tgu@10b0e000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb999>;
+		reg = <0x10b0e000 0x1000>;
+		reg-names = "tgu-base";
+		tgu-steps = <3>;
+		tgu-conditions = <4>;
+		tgu-regs = <4>;
+		tgu-timer-counters = <8>;
+
+		coresight-name = "coresight-tgu-ipcb";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	spmi_tgu0: tgu@10b0f000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb999>;
+
+		reg = <0x10b0f000 0x1000>;
+		reg-names = "tgu-base";
+
+		tgu-steps = <3>;
+		tgu-conditions = <4>;
+		tgu-regs = <9>;
+		tgu-timer-counters = <8>;
+
+		coresight-name = "coresight-tgu-spmi0";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
+
+	spmi_tgu1: tgu@10b10000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x000bb999>;
+
+		reg = <0x10b10000 0x1000>;
+		reg-names = "tgu-base";
+
+		tgu-steps = <3>;
+		tgu-conditions = <4>;
+		tgu-regs = <9>;
+		tgu-timer-counters = <8>;
+
+		coresight-name = "coresight-tgu-spmi1";
+
+		clocks = <&aoss_qmp>;
+		clock-names = "apb_pclk";
+	};
 };
 

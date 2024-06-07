@@ -190,7 +190,7 @@
 		vendor = "QTI";
 		image-name = "qcom,autoghgvm";
 		qcom,pasid = <0x0 0x2c>;
-		qcom,qtee-config-info = "p=3,57,77,78,7A,7C,8F,97,159,199,47E,7F1;";
+		qcom,qtee-config-info = "p=3,57,77,78,7A,7C,8F,97,159,199,47E,7F1,10C;";
 		qcom,secdomain-ids = <52>;
 		qcom,primary-vm-index = <0>;
 		vm-attrs = "guest-ram-dump";
@@ -204,9 +204,6 @@
 		/* MPROC NS1 IPCC region */
 		/* Compute L0 IPCC region */
 		iomemory-ranges = <0x0 0xF000000 0x0 0xF000000 0x0 0x1000000 0x0
-				0x0 0xAC0000 0x0 0xAC0000 0x0 0x6000 0x1
-				0x0 0x8C0000 0x0 0x8C0000 0x0 0x6000 0x1
-				0x0 0x88C000 0x0 0x88C000 0x0 0x4000 0x0
 				0x0 0x10dc000 0x0 0x10dc000 0x0 0x1000 0x0
 				0x0 0x421000 0x0 0x421000 0x0 0x1000 0x0
 				0x0 0x461000 0x0 0x461000 0x0 0x1000 0x0
@@ -221,7 +218,7 @@
 		/* QUPv3 SE17 GIC IRQ */
 		/* MPROC NS1 IPCC GIC IRQ */
 		/* Compute L0 IPCC GIC IRQ */
-		gic-irq-ranges = <617 617
+		gic-irq-ranges = <
 			591 591
 			588 588
 			270 270
@@ -889,7 +886,7 @@
 
 		android {
 			compatible = "android,firmware";
-			boot_devices = "70013000.virtio-mmio,70014000.virtio-mmio,70015000.virtio-mmio,70016000.virtio-mmio,70017000.virtio-mmio";
+			boot_devices = "70009000.virtio-mmio,7000A000.virtio-mmio,7000B000.virtio-mmio,7000C000.virtio-mmio,70013000.virtio-mmio,70014000.virtio-mmio,70015000.virtio-mmio,70016000.virtio-mmio,70017000.virtio-mmio";
 
 			vbmeta {
 				compatible = "android,vbmeta";
@@ -1131,8 +1128,8 @@
 		compatible = "qcom,rename-devices";
 		rename_blk: rename_blk {
 			device-type = "block";
-			actual-dev = "vda", "vdb", "vdc", "vdd", "vde";
-			rename-dev = "super", "userdata", "metadata", "persist", "misc";
+			actual-dev = "vda", "vdb", "vdc", "vdd", "vde", "vdf", "vdg", "vdh", "vdi";
+			rename-dev = "super", "userdata", "metadata", "persist", "misc", "boot_b", "boot_a", "dtbo_b", "dtbo_a";
 		};
 	};
 };
@@ -1143,9 +1140,11 @@
 &qupv3_1 {
 	iommus = <&apps_smmu 0x458 0x0>;
 	qcom,iommu-dma = "default";
+	status = "disabled";
 };
 
 &qupv3_2 {
 	iommus = <&apps_smmu 0x5b8 0x0>;
 	qcom,iommu-dma = "default";
+	status = "disabled";
 };
