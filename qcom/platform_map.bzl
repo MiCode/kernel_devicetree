@@ -476,8 +476,13 @@ _platform_map = {
         "dtb_list": [
             {"name": "volcano.dtb"},
             {"name": "volcano6.dtb"},
+            {"name": "volcano6i.dtb"},
             {
                 "name": "volcano6p.dtb",
+                "apq": True,
+            },
+            {
+                "name": "volcano6ip.dtb",
                 "apq": True,
             },
         ],
@@ -489,9 +494,19 @@ _platform_map = {
             {"name": "volcano-atp-overlay.dtbo"},
             {"name": "volcano-idp-overlay.dtbo"},
             {"name": "volcano-idp-wcd9395-overlay.dtbo"},
+            {"name": "volcano6i-idp-wcd9395-ganges-overlay.dtbo"},
+            {"name": "volcano6i-idp-wcd9395-brahma-overlay.dtbo"},
             {"name": "volcano-mtp-overlay.dtbo"},
             {"name": "volcano-mtp-wcd9395-aatc-overlay.dtbo"},
+            {"name": "volcano6i-mtp-wcd9395-ganges-overlay.dtbo"},
+            {"name": "volcano6i-mtp-ganges-overlay.dtbo"},
+            {"name": "volcano6i-mtp-wcd9395-ganges-hac2019-overlay.dtbo"},
+            {"name": "volcano6i-mtp-wcd9395-brahma-overlay.dtbo"},
+            {"name": "volcano6i-mtp-brahma-overlay.dtbo"},
+            {"name": "volcano6i-mtp-wcd9395-moselle-overlay.dtbo"},
+            {"name": "volcano6i-mtp-moselle-wingmate-overlay.dtbo"},
             {"name": "volcano-qrd-overlay.dtbo"},
+            {"name": "volcano6i-qrd-moselle-overlay.dtbo"},
         ],
     },
 }

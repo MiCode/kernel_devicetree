@@ -73,10 +73,20 @@ VOLCANO_BOARDS += \
 		volcano-atp-overlay.dtbo \
 		volcano-idp-overlay.dtbo \
 		volcano-idp-wcd9395-overlay.dtbo \
+		volcano6i-idp-wcd9395-ganges-overlay.dtbo \
+		volcano6i-idp-wcd9395-brahma-overlay.dtbo \
 		volcano-mtp-overlay.dtbo \
 		volcano-mtp-wcd9395-aatc-overlay.dtbo \
 		volcano-mtp-pm7550ba-overlay.dtbo \
-		volcano-qrd-overlay.dtbo
+		volcano6i-mtp-wcd9395-ganges-overlay.dtbo \
+		volcano6i-mtp-ganges-overlay.dtbo \
+		volcano6i-mtp-wcd9395-ganges-hac2019-overlay.dtbo \
+		volcano6i-mtp-wcd9395-brahma-overlay.dtbo \
+		volcano6i-mtp-brahma-overlay.dtbo \
+		volcano6i-mtp-wcd9395-moselle-overlay.dtbo \
+		volcano6i-mtp-moselle-wingmate-overlay.dtbo \
+		volcano-qrd-overlay.dtbo \
+		volcano6i-qrd-moselle-overlay.dtbo
 
 NOAPQ_VOLCANO_BOARDS += \
 		volcano-rumi-overlay.dtbo

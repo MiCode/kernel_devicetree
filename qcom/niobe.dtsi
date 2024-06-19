@@ -382,6 +382,38 @@
 		};
 	};
 
+	qcom,glinkpkt {
+		compatible = "qcom,glinkpkt";
+
+		qcom,glinkpkt-ctrl-cdsp {
+			qcom,glinkpkt-edge = "cdsp";
+			qcom,glinkpkt-ch-name = "LOOPBACK_CTL_CDSP";
+			qcom,glinkpkt-dev-name = "glink_pkt_ctrl_cdsp";
+		};
+
+		qcom,glinkpkt-data-cdsp {
+			qcom,glinkpkt-edge = "cdsp";
+			qcom,glinkpkt-ch-name = "LOOPBACK_DATA_CDSP";
+			qcom,glinkpkt-dev-name = "glink_pkt_data_cdsp";
+		};
+
+		qcom,glinkpkt-apr-apps2 {
+			qcom,glinkpkt-edge = "adsp";
+			qcom,glinkpkt-ch-name = "apr_apps2";
+			qcom,glinkpkt-dev-name = "apr_apps2";
+		};
+
+		qcom,glinkpkt-xpan_control {
+			qcom,glinkpkt-edge = "adsp";
+			qcom,glinkpkt-ch-name = "bt_cp_ctrl";
+			qcom,glinkpkt-dev-name = "bt_cp_ctrl";
+		};
+	};
+
+	qcom,glink {
+		compatible = "qcom,glink";
+	};
+
 	aoss_qmp: power-controller@c320000 {
 		compatible = "qcom,aoss-qmp";
 		reg = <0xc300000 0x400>;
@@ -1196,6 +1228,38 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		wakeup-parent = <&pdc>;
+	};
+
+	tlmm-vm-mem-access {
+		compatible = "qcom,tlmm-vm-mem-access";
+		qcom,master;
+		tlmm-vm-gpio-list = <&tlmm 12 0>;
+	};
+
+	tlmm-vm-test {
+		compatible = "qcom,tlmm-vm-test";
+		qcom,master;
+		tlmm-vm-gpio-list = <&tlmm 12 0>;
+	};
+
+	qcom,test-dbl-tuivm {
+		compatible = "qcom,gh-dbl";
+		qcom,label = <0x4>;
+	};
+
+	qcom,test-msgq-tuivm {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <4>;
+		qcom,primary;
+	};
+
+	qcom,gh-qtimer@1742b000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x1742b000 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,primary;
 	};
 
 	trust_ui_vm_vblk0_ring: trust_ui_vm_vblk0_ring {
@@ -2606,12 +2670,10 @@
 		qcom,ulso-ip-id-max-linux-val = <0xffff>;
 		qcom,ulso-ip-id-min-windows-val = <0>;
 		qcom,ulso-ip-id-max-windows-val = <0x7fff>;
-		qcom,max_num_smmu_cb = <4>;
+		qcom,max_num_smmu_cb = <5>;
 		clock-names = "core_clk";
 		clocks = <&rpmhcc RPMH_IPA_CLK>;
 		qcom,throughput-threshold = <2000 4000 8000>;
-		/* Map IPCC Region to uC CB */
-		qcom,ipcc-mapping = <0x00400000 0x00400000 0x000F0000>;
 		qcom,ipa-wdi-opt-dpath;
 		qcom,scaling-exceptions = <>;
 		qcom,interconnect,num-cases = <5>;
@@ -2665,6 +2727,16 @@
 			compatible = "qcom,ipa-smmu-uc-cb";
 			iommus = <&apps_smmu 0x4A2 0x0>;
 			qcom,iommu-dma-addr-pool = <0x20000000 0x20000000>;
+			/* Map IPCC Fence Protocol Region to uC CB */
+			qcom,ipcc-mapping = <0x500000 0x500000 0x40000>;
+			qcom,iommu-dma = "atomic";
+			dma-coherent;
+		};
+
+		ipa_smmu_rtp: ipa_smmu_rtp {
+			compatible = "qcom,ipa-smmu-rtp-cb";
+			iommus = <&apps_smmu 0x4A3 0x0>;
+			qcom,iommu-dma-addr-pool = <0x20000000 0x20000000>;
 			qcom,iommu-dma = "atomic";
 			dma-coherent;
 		};
@@ -2680,6 +2752,24 @@
 	google,debug-kinfo {
 		compatible = "google,debug-kinfo";
 		memory-region = <&kinfo_mem>;
+	};
+
+	dmesg-dump {
+		compatible = "qcom,dmesg-dump";
+		qcom,primary-vm;
+		gunyah-label = <7>;
+		peer-name = <2>;
+		memory-region = <&vm_comm_mem>;
+		shared-buffer-size = <0x1000>;
+	};
+
+	qcom,gunyah-panic-notifier {
+		compatible = "qcom,gh-panic-notifier";
+		qcom,primary-vm;
+		gunyah-label = <9>;
+		peer-name = <2>;
+		memory-region = <&vm_comm_mem>;
+		shared-buffer-size = <0x1000>;
 	};
 
 };
