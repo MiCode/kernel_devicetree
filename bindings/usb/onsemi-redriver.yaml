@@ -1,0 +1,115 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/onsemi-redriver.yaml##
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: ON Semiconductor USB Type-C and display port 10Gbps Linear Re-Driver
+
+maintainers:
+  - Manish Nagar <quic_mnagar@quicinc.com>
+
+properties:
+  compatible:
+    const: onnn,redriver
+
+  reg:
+    description: I2C address on the selected bus
+    minItems: 1
+
+  extcon:
+    description: |
+      phandles to external connector devices. The first phandle should point to
+      the external connector which provides both "USB" cable events and
+      "USB-HOST" cable events. An optional second phandle may be specified for
+      DP lane events.
+    minItems: 2
+
+  vdd-supply:
+    description: phandle to the Vdd supply for Linear Re-Driver
+
+  eq:
+    description: |
+      Equalization value of re-driver channel A/B/C/D, 8 bit::
+       - eq[0] to eq[3]:: Channel A-D parameter for USB.
+       - eq[4] to eq[7]:: Channel A-D parameter for DP.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  flat-gain:
+    description: |
+      Flat gain control value of re-driver channel A/B/C/D, 8 bit::
+       - flat_gain[0] to flat_gain[3]:: Channel A-D parameter for USB.
+       - flat_gain[4] to flat_gain[7]:: Channel A-D parameter for DP.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  output-comp:
+    description: |
+      Output compression value of re-driver channel A/B/C/D, 8 bit::
+       - output_comp[0] to output_comp[3]:: Channel A-D parameter for USB.
+       - output_comp[4] to output_comp[7]:: Channel A-D parameter for DP.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  loss-match:
+    description: |
+      Loss profile matching control value of re-driver channel A/B/C/D, 8 bit::
+       - loss_match[0] to loss_match[3]:: Channel A-D parameter for USB.
+       - loss_match[4] to loss_match[7]:: Channel A-D parameter for DP.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  lane-channel-swap:
+    description: |
+      Most of the designs use this configuration::
+       - channel A:: RX1
+       - channel B:: TX1
+       - channel C:: TX0
+       - channel D:: RX0
+      Enable this property if the design uses this configuration::
+       - channel A:: RX0
+       - channel B:: TX0
+       - channel C:: TX1
+       - channel D:: RX1
+    type: boolean
+
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    i2c@988000 {
+      #address-cells = <1>;
+      #size-cells = <0>;
+      reg=<0x10 0>;
+
+      redriver@19 {
+        compatible = "onnn,redriver";
+        reg = <0x19>;
+
+        vdd-supply = <&L15B>;
+        lane-channel-swap;
+
+        eq = /bits/ 8 <
+              /* Parameters for USB */
+              0x4 0x4 0x4 0x4
+              /* Parameters for DP */
+              0x6 0x4 0x4 0x6>;
+        flat-gain = /bits/ 8 <
+              /* Parameters for USB */
+              0x3 0x1 0x1 0x3
+              /* Parameters for DP */
+              0x2 0x1 0x1 0x2>;
+        output-comp = /bits/ 8 <
+              /* Parameters for USB */
+              0x3 0x3 0x3 0x3
+              /* Parameters for DP */
+              0x3 0x3 0x3 0x3>;
+        loss-match = /bits/ 8 <
+              /* Parameters for USB */
+              0x1 0x3 0x3 0x1
+              /* Parameters for DP */
+              0x3 0x3 0x3 0x3>;
+      };
+    };
+...

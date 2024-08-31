@@ -1,0 +1,332 @@
+#include <dt-bindings/gpio/gpio.h>
+#include "cliffs-pmic-overlay.dtsi"
+#include "cliffs-thermal-overlay.dtsi"
+/*
+&sdhc_2 {
+	status = "ok";
+
+	vdd-supply = <&L13B>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L23B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
+};
+*/
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-cliffs";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L1D>;
+	vdda-phy-max-microamp = <213030>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4B>;
+	vdda-pll-max-microamp =	<18340>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B>;
+	vdda-qref-max-microamp = <64500>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L12B>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L3D>;
+	vccq-max-microamp = <1200000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L5B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	qcom,vccq-shutdown-supply = <&L3D>;
+	qcom,vccq-shutdown-max-microamp = <1200000>;
+
+	status = "ok";
+};
+
+&soc {
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmxr2230_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
+&pmxr2230_switch0 {
+	qcom,led-mask = <9>; /* Channels 1 & 4 */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_switch1 {
+	qcom,led-mask = <6>; /* Channels 2 & 3 */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_switch2 {
+	qcom,led-mask = <15>; /* All Channels */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_flash {
+	status = "ok";
+};
+
+&battery_charger {
+	#cooling-cells = <2>;
+	qcom,thermal-mitigation-step = <500000>;
+};
+
+#if defined(PERIDOT_REGULATOR_OCP)
+&regulator_ocp_notifier {
+        periph-1c1-supply = <&L1B>;
+        periph-1c2-supply = <&L2B>;
+        periph-1c3-supply = <&L3B>;
+        periph-1c4-supply = <&L4B>;
+        periph-1c5-supply = <&L5B>;
+        periph-1c7-supply = <&L7B>;
+        periph-1c8-supply = <&L8B>;
+        periph-1c9-supply = <&L9B>;
+        periph-1ca-supply = <&L10B>;
+        periph-1cb-supply = <&L11B>;
+        periph-1cc-supply = <&L12B>;
+        periph-1cd-supply = <&L13B>;
+        periph-1d0-supply = <&L16B>;
+        periph-1d1-supply = <&L17B>;
+        periph-1d3-supply = <&L19B>;
+        periph-1d4-supply = <&L20B>;
+        periph-1d5-supply = <&L21B>;
+        periph-1d7-supply = <&L23B>;
+        periph-19b-supply = <&S1B>;
+        periph-19e-supply = <&S2B>;
+        periph-1a1-supply = <&S3B>;
+        periph-1a4-supply = <&S4B_LEVEL>;
+        periph-1e4-supply = <&BOB>;
+        periph-2c1-supply = <&L1C>;
+        periph-2c2-supply = <&L2C_LEVEL>;
+        periph-29b-supply = <&S1C_LEVEL>;
+        periph-29e-supply = <&S2C_LEVEL>;
+        periph-2a4-supply = <&S4C_LEVEL>;
+        periph-2aa-supply = <&S6C_LEVEL>;
+        periph-2c1-supply = <&L1D>;
+        periph-2c2-supply = <&L2D_LEVEL>;
+        periph-2c3-supply = <&L3D>;
+        periph-3aa-supply = <&S6D_LEVEL>;
+        periph-3b0-supply = <&S8D_LEVEL>;
+        periph-4c1-supply = <&L1E>;
+        periph-4c2-supply = <&L2E>;
+        periph-4c3-supply = <&L3E>;
+        periph-4c4-supply = <&L4E>;
+        periph-4c5-supply = <&L5E>;
+        periph-4c6-supply = <&L6E>;
+        periph-49b-supply = <&S1E>;
+        periph-49e-supply = <&S2E>;
+        periph-4a1-supply = <&S3E>;
+        periph-89b-supply = <&S1I_LEVEL>;
+};
+#elif defined(PERIDOT_REGULATOR_OCP_CHENFENG)
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c3-supply = <&L3B>;
+	periph-1c4-supply = <&L4B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1cd-supply = <&L13B>;
+	periph-1ce-supply = <&L14B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d1-supply = <&L17B>;
+	periph-1d2-supply = <&L18B>;
+	periph-1d3-supply = <&L19B>;
+	periph-1d4-supply = <&L20B>;
+	periph-1d5-supply = <&L21B>;
+	periph-1d7-supply = <&L23B>;
+	periph-19b-supply = <&S1B>;
+	periph-19e-supply = <&S2B>;
+	periph-1a1-supply = <&S3B>;
+	periph-1a4-supply = <&S4B_LEVEL>;
+	periph-1e4-supply = <&BOB>;
+	periph-2c1-supply = <&L1C>;
+	periph-2c2-supply = <&L2C_LEVEL>;
+	periph-29b-supply = <&S1C_LEVEL>;
+	periph-29e-supply = <&S2C_LEVEL>;
+	periph-2a4-supply = <&S4C_LEVEL>;
+	periph-2aa-supply = <&S6C_LEVEL>;
+	periph-2c1-supply = <&L1D>;
+	periph-2c2-supply = <&L2D_LEVEL>;
+	periph-2c3-supply = <&L3D>;
+	periph-3aa-supply = <&S6D_LEVEL>;
+	periph-3b0-supply = <&S8D_LEVEL>;
+	periph-4c1-supply = <&L1E>;
+	periph-4c2-supply = <&L2E>;
+	periph-4c3-supply = <&L3E>;
+	periph-4c4-supply = <&L4E>;
+	periph-4c5-supply = <&L5E>;
+	periph-4c6-supply = <&L6E>;
+	periph-49b-supply = <&S1E>;
+	periph-49e-supply = <&S2E>;
+	periph-4a1-supply = <&S3E>;
+	periph-89b-supply = <&S1I_LEVEL>;
+};
+#else
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c3-supply = <&L3B>;
+	periph-1c4-supply = <&L4B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1cd-supply = <&L13B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d1-supply = <&L17B>;
+	periph-1d2-supply = <&L18B>;
+	periph-1d3-supply = <&L19B>;
+	periph-1d4-supply = <&L20B>;
+	periph-1d5-supply = <&L21B>;
+	periph-1d6-supply = <&L22B>;
+	periph-1d7-supply = <&L23B>;
+	periph-19b-supply = <&S1B>;
+	periph-19e-supply = <&S2B>;
+	periph-1a1-supply = <&S3B>;
+	periph-1a4-supply = <&S4B_LEVEL>;
+	periph-1e4-supply = <&BOB>;
+	periph-2c1-supply = <&L1C>;
+	periph-2c2-supply = <&L2C_LEVEL>;
+	periph-2c3-supply = <&L3C>;
+	periph-29b-supply = <&S1C_LEVEL>;
+	periph-29e-supply = <&S2C_LEVEL>;
+	periph-2a4-supply = <&S4C_LEVEL>;
+	periph-2aa-supply = <&S6C_LEVEL>;
+	periph-2c1-supply = <&L1D>;
+	periph-2c2-supply = <&L2D_LEVEL>;
+	periph-2c3-supply = <&L3D>;
+	periph-3aa-supply = <&S6D_LEVEL>;
+	periph-3b0-supply = <&S8D_LEVEL>;
+	periph-4c1-supply = <&L1E>;
+	periph-4c2-supply = <&L2E>;
+	periph-4c3-supply = <&L3E>;
+	periph-4c4-supply = <&L4E>;
+	periph-4c5-supply = <&L5E>;
+	periph-4c6-supply = <&L6E>;
+	periph-4c7-supply = <&L7E>;
+	periph-49b-supply = <&S1E>;
+	periph-49e-supply = <&S2E>;
+	periph-4a1-supply = <&S3E>;
+	periph-89b-supply = <&S1I_LEVEL>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
+	periph-d40-supply = <&L1N>;
+	periph-d41-supply = <&L2N>;
+	periph-d42-supply = <&L3N>;
+	periph-d43-supply = <&L4N>;
+	periph-d44-supply = <&L5N>;
+	periph-d45-supply = <&L6N>;
+	periph-d46-supply = <&L7N>;
+};
+#endif
+
+&pmic_glink_debug {
+	i2c@101 {
+		reg = <0x101>; /* I2C instance 1 in ADSP for SE0 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1393@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+
+		qcom,smb1393@35 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x35>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1393_1_iin {
+		reg = <0x1013401>;
+		label = "smb1393_1_iin";
+	};
+
+	smb1393_1_ichg {
+		reg = <0x1013402>;
+		label = "smb1393_1_ichg";
+	};
+
+	smb1393_1_die_temp {
+		reg = <0x1013403>;
+		label = "smb1393_1_die_temp";
+	};
+
+	smb1393_2_iin {
+		reg = <0x1013501>;
+		label = "smb1393_2_iin";
+	};
+
+	smb1393_2_ichg {
+		reg = <0x1013502>;
+		label = "smb1393_2_ichg";
+	};
+
+	smb1393_2_die_temp {
+		reg = <0x1013503>;
+		label = "smb1393_2_die_temp";
+	};
+};
+
+&wcd_usbss {
+	status = "disabled";
+};

@@ -1,0 +1,28 @@
+* Paravirtualized ARM SMMUv3
+
+The Parvirt smmu-v3 driver communicates with the underlying
+hypervisor to provide S1 translation context descriptor and
+other properties which is set by the client. The backend SMMUv3
+driver in hypervisor is supposed to program the SMMUv3 hardware
+with the information from the paravirt SMMUv3 driver.
+
+** Paravirt SMMUv3 required properties:
+
+- compatible        : Should include:
+
+			"arm,virt-smmu-v3"
+
+
+- #iommu-cells      : See the generic IOMMU binding described in
+                      devicetree/bindings/pci/pci-iommu.txt
+                      for details. For Paravirt SMMUv3, must be 1,
+		      with each cell describing a single stream ID.
+		      All possible stream IDs which a device may
+		      emit must be described.
+
+** Example
+
+	virt_smmuv3: qcom,virt-smmuv3 {
+		#iommu-cells = <1>;
+		compatible = "arm,virt-smmu-v3";
+	};

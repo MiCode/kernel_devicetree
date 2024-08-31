@@ -1,0 +1,111 @@
+&reserved_memory {
+	secure_display_memory: secure_display_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x0a000000>;
+	};
+};
+
+&qcom_dma_heaps {
+	qcom,display {
+		qcom,dma-heap-name = "system-secure";
+		qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+		qcom,max-align = <9>;
+		memory-region = <&secure_display_memory>;
+	};
+};
+
+&system_cma {
+	size = <0x0 0x3c00000>;
+};
+
+&soc {
+	ipcc_mproc_apps_ns2: qcom,ipcc@422000 {
+		compatible = "qcom,ipcc";
+		reg = <0x422000 0x1000>;
+		interrupts = <GIC_SPI 560 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+	};
+
+	virtio_glink_cma: virtio-glink-cma@2e000000 {
+		compatible = "virtio,mmio";
+		reg = <0x2e000000 0x1000>;
+		interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+
+		glink_bridge: virtio-glink-bridge {
+			compatible = "virtio,device49162"; /* VIRTIO_ID: 0xC00A */
+
+			glink-edge {
+				interrupt-parent = <&ipcc_mproc_apps_ns2>;
+				interrupts = <IPCC_CLIENT_CDSP 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns2 IPCC_CLIENT_CDSP 0>;
+				label = "cdsp";
+				qcom,glink-label = "cdsp";
+			};
+		};
+	};
+};
+
+&hab {
+	vmid = <3>;
+};
+
+&qupv3_se17_4uart {
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+};
+
+&usb2_phy0 {
+	status = "okay";
+};
+
+&usb_qmp_phy0 {
+	status = "okay";
+};
+
+&usb1 {
+	status = "okay";
+};
+
+&usb2_phy1 {
+	status = "okay";
+};
+
+&usb_qmp_phy1 {
+	status = "okay";
+};
+
+&usb2 {
+	status = "okay";
+};
+
+&usb2_phy2 {
+	status = "okay";
+};
+
+&qcom_rng_ee3 {
+	status = "okay";
+};
+
+&pcie0 {
+	status = "ok";
+};
+
+&pcie0_msi_snps {
+	status = "ok";
+};
+
+&ufs2phy_mem {
+	status = "ok";
+};
+
+&ufshc2_mem {
+	status = "ok";
+};

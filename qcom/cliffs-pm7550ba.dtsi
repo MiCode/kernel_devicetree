@@ -1,0 +1,225 @@
+#include "pm7550ba.dtsi"
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm7550ba.h>
+#include <dt-bindings/spmi/spmi.h>
+
+/ {
+	qcom,pmic-id-size = <8>;
+	qcom,pmic-id = <0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x4C>;
+};
+
+&pm7550ba_vib {
+	status = "okay";
+};
+
+&pm7550ba_amoled {
+	status = "okay";
+};
+
+&pmk8550_vadc {
+	pinctrl-0 = <&sys_therm_2_gpio7_default &sys_therm_8_gpio10_default>;
+
+	/delete-node/ pm8550b_offset_ref;
+	/delete-node/ pm8550b_vref_1p25;
+	/delete-node/ pm8550b_die_temp;
+	/delete-node/ pm8550b_lite_die_temp;
+	/delete-node/ pm8550b_vph_pwr;
+	/delete-node/ pm8550b_vbat_sns_qbg;
+
+	/* PM7550BA Channel nodes */
+	pm7550ba_offset_ref {
+		reg = <PM7550BA_ADC5_GEN3_OFFSET_REF>;
+		label = "pm7550ba_offset_ref";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm7550ba_vref_1p25 {
+		reg = <PM7550BA_ADC5_GEN3_1P25VREF>;
+		label = "pm7550ba_vref_1p25";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm7550ba_die_temp {
+		reg = <PM7550BA_ADC5_GEN3_DIE_TEMP>;
+		label = "pm7550ba_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm7550ba_vph_pwr {
+		reg = <PM7550BA_ADC5_GEN3_VPH_PWR>;
+		label = "pm7550ba_vph_pwr";
+		qcom,pre-scaling = <1 3>;
+	};
+
+	pm7550ba_chg_temp {
+		reg = <PM7550BA_ADC5_GEN3_CHG_TEMP_V>;
+		label = "pm7550ba_chg_temp";
+	};
+
+	pm7550ba_iin_fb {
+		reg = <PM7550BA_ADC5_GEN3_IIN_FB>;
+		label = "pm7550ba_iin_fb";
+	};
+
+	pm7550ba_ichg_fb {
+		reg = <PM7550BA_ADC5_GEN3_ICHG_FB>;
+		label = "pm7550ba_ichg_fb";
+	};
+
+	pm7550ba_batt_therm {
+		reg = <PM7550BA_ADC5_GEN3_AMUX_THM1_BATT_THERM_100K_PU>;
+		label = "pm7550ba_batt_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,scale-fn-type = <ADC_SCALE_HW_CALIB_PM5_GEN3_BATT_THERM_100K>;
+	};
+};
+
+&pm7550ba_tz {
+	io-channels = <&pmk8550_vadc PM7550BA_ADC5_GEN3_DIE_TEMP>;
+	io-channel-names = "thermal";
+};
+
+&spmi0_debug_bus {
+	qcom,pm7550ba-debug@7 {
+		compatible = "qcom,spmi-pmic";
+		reg = <7 SPMI_USID>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,can-sleep;
+	};
+};
+
+&pmic_glink_debug {
+	/* Primary SPMI bus */
+	glink_debug_spmi0:
+	spmi@0 {
+		reg = <0>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		qcom,pm7550ba-debug@7 {
+			compatible = "qcom,spmi-pmic";
+			reg = <7 SPMI_USID>;
+			qcom,can-sleep;
+			};
+	};
+};
+
+&pm7550ba_bcl {
+	nvmem-cells = <&smb1510_present>;
+	nvmem-cell-names = "smb1510_present";
+};
+
+&thermal_zones {
+	pm7550ba-2s-ibat-0 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pm7550ba_bcl 8>;
+
+		trips {
+			ibat_2s_lvl0: ibat-2s-lvl0 {
+				temperature = <5000>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm7550ba-2s-ibat-1 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pm7550ba_bcl 9>;
+
+		trips {
+			ibat_2s_lvl1: ibat-2s-lvl1 {
+				temperature = <7000>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm7550ba-bcl-lvl0 {
+		cooling-maps {
+			lbat_modem0 {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&modem_bcl 1 1>;
+			};
+
+			lbat_cdsp0 {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&cdsp_sw 2 2>;
+			};
+
+			lbat_gpu0 {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&msm_gpu 2 2>;
+			};
+		};
+	};
+
+	pm7550ba-bcl-lvl1 {
+		cooling-maps {
+			lbat_modem1 {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&modem_bcl 2 2>;
+			};
+
+			lbat_cdsp1 {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&cdsp_sw 4 4>;
+			};
+
+			lbat_gpu1 {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&msm_gpu 3 3>;
+			};
+		};
+	};
+
+	pm7550ba-bcl-lvl2 {
+		cooling-maps {
+			lbat_cdsp2 {
+				trip = <&b_bcl_lvl2>;
+				cooling-device = <&cdsp_sw 7 7>;
+			};
+
+			lbat_gpu2 {
+				trip = <&b_bcl_lvl2>;
+				cooling-device = <&msm_gpu 7 7>;
+			};
+		};
+	};
+};
+
+&pm7550ba_eusb2_repeater {
+	status = "ok";
+	vdd18-supply = <&L7B>;
+	vdd3-supply = <&L17B>;
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pm7550ba_eusb2_repeater>;
+	usb-repeater = <&pm7550ba_eusb2_repeater>;
+};
+
+&usb0 {
+	usb-role-switch;
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		port {
+			usb_port0_connector: endpoint {
+				remote-endpoint = <&usb_port0>;
+			};
+		};
+	};
+};

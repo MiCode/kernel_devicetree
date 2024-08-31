@@ -1,0 +1,121 @@
+&chosen {
+	bootargs = "printk.devkmsg=on loglevel=8 cpuidle.off=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 nokaslr kpti=0 log_buf_len=256K swiotlb=0 loop.max_part=7 irqaffinity=0-5 firmware_class.path=/vendor/firmware_mnt/image,/vendor/firmware slub_debug=- cpufreq.default_governor=performance";
+};
+
+&arch_timer {
+	clock-frequency = <5000000>;
+};
+
+&memtimer {
+	clock-frequency = <5000000>;
+};
+
+&qupv3_se8_2uart {
+	qcom,rumi_platform;
+};
+
+&SILVER_OFF {
+	status = "nok";
+};
+
+&SILVER_RAIL_OFF {
+	status = "nok";
+};
+
+&GOLD_OFF {
+	status = "nok";
+};
+
+&GOLD_RAIL_OFF {
+	status = "nok";
+};
+
+&CLUSTER_PWR_DN {
+	status = "nok";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L4A>;
+	vdda-phy-max-microamp = <88530>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L7A>;
+	vdda-pll-max-microamp = <18310>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+	limit-rate = <2>; /* HS Rate-B */
+
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L24A>;
+	vcc-max-microamp = <800000>;
+
+	/* Not enabling vccq-supply as it is gpio based eLDO and
+	 * is not controlled from PMIC LDO. So skip it for RUMI
+	 * assuming it to be enabled by default.
+	 */
+
+	vccq2-supply = <&L11A>;
+	vccq2-max-microamp = <750000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L7A>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S6A>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	qcom,disable-lpm;
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	qcom,iommu-dma = "bypass";
+
+	status = "ok";
+};
+
+&soc {
+	usb_emuphy: phy@4f84000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x04f84000 0x9500>;
+
+		qcom,emu-init-seq = <0xfffff 0x4
+			0xffff0 0x4
+			0x100000 0x20
+			0x0 0x20
+			0x000101F0 0x20
+			0x00100000 0x3c
+			0x0 0x3c
+			0x0 0x4>;
+	};
+};
+
+&usb0 {
+	dwc3@4e00000 {
+		usb-phy = <&usb_emuphy>, <&usb_nop_phy>;
+		dr_mode = "peripheral";
+		maximum-speed = "high-speed";
+	};
+};
+
+&rpmcc {
+	compatible = "fixed-clock";
+	clock-output-names = "rpmcc_clocks";
+	clock-frequency = <19200000>;
+};
+
+&tsens0 {
+	status = "disabled";
+};
+
+&tsens1 {
+	status = "disabled";
+};

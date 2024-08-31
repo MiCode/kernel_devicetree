@@ -1,0 +1,340 @@
+#include <dt-bindings/gpio/gpio.h>
+#include "cliffs-pmic-overlay.dtsi"
+#include "cliffs-thermal-overlay.dtsi"
+/*
+&sdhc_2 {
+	status = "ok";
+
+	vdd-supply = <&L13B>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L23B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
+};
+*/
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-cliffs";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L1D>;
+	vdda-phy-max-microamp = <213030>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4B>;
+	vdda-pll-max-microamp =	<18340>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B>;
+	vdda-qref-max-microamp = <64500>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L12B>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L3D>;
+	vccq-max-microamp = <1200000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L5B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	qcom,vccq-shutdown-supply = <&L3D>;
+	qcom,vccq-shutdown-max-microamp = <1200000>;
+
+	status = "ok";
+};
+
+&soc {
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmxr2230_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
+&pmxr2230_switch0 {
+	qcom,led-mask = <9>; /* Channels 1 & 4 */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_switch1 {
+	qcom,led-mask = <6>; /* Channels 2 & 3 */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_switch2 {
+	qcom,led-mask = <15>; /* All Channels */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_flash {
+	status = "ok";
+};
+
+&battery_charger {
+	#cooling-cells = <2>;
+	qcom,thermal-mitigation-step = <500000>;
+};
+
+&pmk8550_vadc {
+	/delete-node/ pmxr2230_sys_therm_10;
+};
+
+&thermal_zones {
+	/delete-node/ sys-therm-10;
+};
+/*
+&qupv3_se4_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+	qcom,touch-active = "goodix,gt9916S";
+	qcom,la-vm;
+
+	goodix-berlin@0 {
+		compatible = "goodix,gt9916S";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+
+		goodix,avdd-name = "avdd";
+		avdd-supply = <&L22B>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <129 0x2008>;
+		goodix,reset-gpio = <&tlmm 128 0x00>;
+		goodix,irq-gpio = <&tlmm 129 0x2008>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <1080>;
+		goodix,panel-max-y = <2400>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,firmware-name = "goodix_firmware_spi.bin";
+		goodix,config-name = "goodix_cfg_group_spi.bin";
+
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend", "pmx_ts_release";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+
+		goodix,touch-type = "primary";
+		goodix,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <668>;
+		qts,trusted-touch-io-bases = <0xa90000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 16 0 &tlmm 17 0 &tlmm 18 0
+						&tlmm 19 0 &tlmm 128 0 &tlmm 129 0x2008>;
+	};
+};
+*/
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c3-supply = <&L3B>;
+	periph-1c4-supply = <&L4B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1cd-supply = <&L13B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d1-supply = <&L17B>;
+	periph-1d2-supply = <&L18B>;
+	periph-1d3-supply = <&L19B>;
+	periph-1d4-supply = <&L20B>;
+	periph-1d5-supply = <&L21B>;
+	periph-1d6-supply = <&L22B>;
+	periph-1d7-supply = <&L23B>;
+	periph-19b-supply = <&S1B>;
+	periph-19e-supply = <&S2B>;
+	periph-1a1-supply = <&S3B>;
+	periph-1a4-supply = <&S4B_LEVEL>;
+	periph-1e4-supply = <&BOB>;
+	periph-2c1-supply = <&L1C>;
+	periph-2c2-supply = <&L2C_LEVEL>;
+	periph-2c3-supply = <&L3C>;
+	periph-29b-supply = <&S1C_LEVEL>;
+	periph-29e-supply = <&S2C_LEVEL>;
+	periph-2a4-supply = <&S4C_LEVEL>;
+	periph-2aa-supply = <&S6C_LEVEL>;
+	periph-2c1-supply = <&L1D>;
+	periph-2c2-supply = <&L2D_LEVEL>;
+	periph-2c3-supply = <&L3D>;
+	periph-3aa-supply = <&S6D_LEVEL>;
+	periph-3b0-supply = <&S8D_LEVEL>;
+	periph-4c1-supply = <&L1E>;
+	periph-4c2-supply = <&L2E>;
+	periph-4c3-supply = <&L3E>;
+	periph-4c4-supply = <&L4E>;
+	periph-4c5-supply = <&L5E>;
+	periph-4c6-supply = <&L6E>;
+	periph-4c7-supply = <&L7E>;
+	periph-49b-supply = <&S1E>;
+	periph-49e-supply = <&S2E>;
+	periph-4a1-supply = <&S3E>;
+	periph-89b-supply = <&S1I_LEVEL>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
+	periph-d40-supply = <&L1N>;
+	periph-d41-supply = <&L2N>;
+	periph-d42-supply = <&L3N>;
+	periph-d43-supply = <&L4N>;
+	periph-d44-supply = <&L5N>;
+	periph-d45-supply = <&L6N>;
+	periph-d46-supply = <&L7N>;
+};
+
+&pmic_glink_debug {
+	i2c@101 {
+		reg = <0x101>; /* I2C instance 1 in ADSP for SE0 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1501@68 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x68>;
+			qcom,can-sleep;
+		};
+
+		qcom,smb1501@69 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x69>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1501_1_iin {
+		reg = <0x1016801>;
+		label = "smb1501_1_iin";
+	};
+
+	smb1501_1_ichg {
+		reg = <0x1016802>;
+		label = "smb1501_1_ichg";
+	};
+
+	smb1501_1_die_temp {
+		reg = <0x1016803>;
+		label = "smb1501_1_die_temp";
+	};
+
+	smb1501_2_iin {
+		reg = <0x1016901>;
+		label = "smb1501_2_iin";
+	};
+
+	smb1501_2_ichg {
+		reg = <0x1016902>;
+		label = "smb1501_2_ichg";
+	};
+
+	smb1501_2_die_temp {
+		reg = <0x1016903>;
+		label = "smb1501_2_die_temp";
+	};
+};
+
+&wcd_usbss {
+	interrupt-parent = <&spmi_bus>;
+	interrupts = <0x0 0xb6 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "usb_wcd";
+	nvmem-cells = <&usb_mode>;
+	nvmem-cell-names = "usb_mode";
+};
+
+&qupv3_se0_i2c {
+	status = "ok";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	redriver: redriver@1c {
+		compatible = "onnn,redriver";
+		reg = <0x1c>;
+
+		vdd-supply = <&L7B>;
+
+		lane-channel-swap;
+
+		eq = /bits/ 8 <
+				/* Parameters for USB */
+				0x4 0x6 0x6 0x4
+				/* Parameters for DP */
+				0x4 0x6 0x6 0x4>;
+		flat-gain = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x3 0x3 0x3
+				/* Parameters for DP */
+				0x0 0x3 0x3 0x0>;
+		output-comp = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x3 0x3 0x3
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+		loss-match = /bits/ 8 <
+				/* Parameters for USB */
+				0x1 0x3 0x3 0x1
+				/* Parameters for DP */
+				0x2 0x2 0x2 0x2>;
+	};
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "unused";
+};
+
+&usb0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb3phy_portselect_gpio>;
+	gpios = <&tlmm 122 0>;
+
+	ssusb_redriver = <&redriver>;
+	qcom,wcd_usbss = <&wcd_usbss>;
+};
