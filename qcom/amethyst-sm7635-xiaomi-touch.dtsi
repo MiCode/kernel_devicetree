@@ -1,0 +1,222 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+/*
+ * Copyright (C) 2020 MediaTek Inc.
+ */
+ 
+/* TOUCH start */
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+
+&tlmm {
+	mi_ts_miso_active: mi_ts_miso_active {
+		mux {
+			pins = "gpio0";
+			function = "qup0_se0_l0";
+		};
+
+		config {
+			pins = "gpio0";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	mi_ts_mosi_active: mi_ts_mosi_active {
+		mux {
+			pins = "gpio1";
+			function = "qup0_se0_l1";
+		};
+
+		config {
+			pins = "gpio1";
+			drive-strength = <4>;
+			bias-disable;
+		};
+	};
+	mi_ts_clk_active: mi_ts_clk_active {
+		mux {
+			pins = "gpio2";
+			function = "qup0_se0_l2";
+		};
+
+		config {
+			pins = "gpio2";
+			drive-strength = <4>;
+			bias-disable;
+		};
+	};
+	mi_ts_cs_active: mi_ts_cs_active {
+		mux {
+			pins = "gpio3";
+			function = "qup0_se0_l3";
+		};
+		config {
+			pins = "gpio3";
+			drive-strength = <6>;
+			bias-disable;
+			output-high;
+		};
+	};
+	mi_ts_spi_suspend: qupv3_se0_spi_sleep {
+		mux {
+			pins = "gpio0", "gpio1", "gpio2", "gpio3";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio0", "gpio1", "gpio2", "gpio3";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+	mi_ts_reset_active: mi_ts_reset_active {
+		mux {
+			pins = "gpio87";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio87";
+			drive-strength = <8>;
+			bias-disable;
+		};
+	};
+	mi_ts_int_active: mi_ts_int_active {
+		mux {
+			pins = "gpio70";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio70";
+			input-enable;
+			bias-disable;
+		};
+	};
+	mi_ts_reset_suspend: mi_ts_reset_suspend {
+		mux {
+			pins = "gpio87";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio87";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+	mi_ts_int_suspend: mi_ts_int_suspend {
+		mux {
+			pins = "gpio70";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio70";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+};
+
+&L13B {
+	regulator-min-microvolt = <3224000>;
+	regulator-max-microvolt = <3224000>;
+	qcom,init-voltage = <3224000>;
+};
+
+&L23B {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+	qcom,init-voltage = <1800000>;
+};
+
+
+&qupv3_se0_i2c {
+    status = "disabled";
+};
+
+&qupv3_se0_spi {
+	status = "ok";
+	qcom,rt;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-0 = <&mi_ts_miso_active &mi_ts_mosi_active &mi_ts_clk_active &mi_ts_cs_active>;
+	pinctrl-1 = <&mi_ts_spi_suspend>;
+	xiaomi_touch@0 {
+		status = "ok";
+		compatible = "xiaomi,touch-spi";
+		reg = <0x0>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <70 0x2008>;
+		spi-max-frequency = <15000000>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&mi_ts_int_active &mi_ts_reset_active>;
+		pinctrl-1 = <&mi_ts_int_suspend &mi_ts_reset_suspend>;
+		avdd-supply = <&L13B>;
+		iovdd-supply = <&L23B>;
+
+		/*1st touch ic info goodix9916r*/
+		goodix,avdd-name = "avdd";
+		goodix,iovdd-name = "iovdd";
+		goodix,reset-gpio = <&tlmm 87 0x00>;
+		goodix,irq-gpio = <&tlmm 70 0x2008>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <122000>;
+		goodix,panel-max-y = <271200>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,support-fod = <1>;
+		goodix,fod-lx = <504>;
+		goodix,fod-ly = <2332>;
+		goodix,fod-x-size = <210>;
+		goodix,fod-y-size = <210>;
+		goodix,support-super-resolution = <100>;
+		goodix,firmware-name = "goodix_firmware_csot";
+		goodix,config-name = "goodix_cfg_group_csot";
+		goodix,touch-expert-array = <2 3 2 2
+					     4 3 3 2
+					     3 3 4 2>;
+		/* 2st touch ic info focal3683g */
+		focaltech,iovdd-name = "iovdd";
+		focaltech,avdd-name = "avdd";
+		focaltech,reset-gpio = <&tlmm 87 0x00>;
+		focaltech,irq-gpio = <&tlmm 70 0x2008>;
+		focaltech,max-touch-number = <10>;
+		focaltech,support-fod = <1>;
+		focaltech,fod-lx = <504>;
+		focaltech,fod-ly = <2332>;
+		focaltech,fod-x-size = <210>;
+		focaltech,fod-y-size = <210>;
+		focaltech,super-resolution-factors = <16>;
+		focaltech,display-coords =  <0 0 122000 271200>;
+		focaltech,touch-range-array = <1 5 10 15 20>;
+		focaltech,touch-def-array = <3 3 3 3>;
+		focaltech,touch-expert-array = <10 10 10 10
+						20 20 15 10
+						20 20 20 10>;
+
+		/* xiaomi-touch key info*/
+		mi_tp,game-mode-array =
+				<1 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,active-mode-array =
+				<1 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,up-threshold-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,tolerance-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,aim-sensitivity-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,tap-stability-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,edge-filter-array =
+				<3 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,panel-orien-array =
+				<3 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,report-rate-array =
+				<3 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,expert-mode-array =
+				<3 1 1 1 1>;  /* MAX MIN DEF SET GET	*/
+	};
+};
+
+/* TOUCH end */
