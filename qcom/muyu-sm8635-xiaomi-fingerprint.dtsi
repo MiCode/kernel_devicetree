@@ -1,0 +1,84 @@
+
+&soc {
+	fingerprint_fpc {
+		status = "ok";
+		compatible = "fpc,fpc1020";
+		interrupt-parent = <&tlmm>;
+		interrupts = <117 0x0>;
+		fpc,gpio_rst    = <&tlmm 55 0x0>;
+		fpc,gpio_irq    = <&tlmm 117 0x0>;
+		fp_vdd_vreg-supply = <&L15B>;
+		pinctrl-names = "fpc1020_reset_reset",
+                                "fpc1020_reset_active",
+                                "fpc1020_irq_active";
+
+		pinctrl-0 = <&msm_gpio_reset>;
+		pinctrl-1 = <&msm_gpio_reset_output_high>;
+		pinctrl-2 = <&msm_gpio_irq>;
+	};
+
+	/*pre power on*/
+	xiaomi_fingerprint {
+		compatible = "xiaomi-fingerprint";
+		status = "ok";
+		fingerprint,name = "xiaomi-fingerprint";
+	};
+
+	/*OCP: Listen screen on/off*/
+	/*
+       fingerprint_screen: fingerprint-screen {
+            panel = <&dsi_r66451_amoled_video
+                 &dsi_n81a_36_02_0a_dualdsi_dsc_lcd_video
+                 &dsi_n81a_36_02_0a_p0_dualdsi_dsc_lcd_video>;
+       };
+       */
+};
+
+&L15B {
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	qcom,init-voltage = <3300000>;
+};
+
+&tlmm {
+	/* FP_RESET_N */
+	msm_gpio_reset: msm_gpio_reset {
+		mux {
+			pins = "gpio55";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio55";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	/* FP_RESET_N, state device active*/
+	msm_gpio_reset_output_high: msm_gpio_reset_output_high {
+		mux {
+			pins = "gpio55";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio55";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+
+	/* FP_INT_N */
+	msm_gpio_irq: msm_gpio_irq {
+		mux {
+			pins = "gpio117";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio117";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};

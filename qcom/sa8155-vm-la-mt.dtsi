@@ -1,0 +1,63 @@
+&reserved_memory {
+	pmem_shared: pmem_shared_region {
+		reg = <0x1 0x2c200000 0x0 0x53e00000>;
+		label = "pmem_shared_mem";
+	};
+
+	secure_display_memory: secure_display_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x0a000000>;
+	};
+};
+
+&usb0 {
+	status = "ok";
+};
+
+&usb2_phy0 {
+	status = "ok";
+};
+
+&sdhc_2 {
+	status = "ok";
+};
+
+/ {
+	rename_devices: rename_devices {
+		compatible = "qcom,rename-devices";
+		rename_blk: rename_blk {
+			device-type = "block";
+			actual-dev = "vda", "vdb", "vdc",
+					"vdd", "vde", "vdf",
+					"vdg", "vdh", "vdi",
+					"vdj", "vdk", "vdl",
+					"vdm", "vdn", "vdo",
+					"vdp", "vdq", "vdr",
+					"vds", "vdt", "vdu";
+			rename-dev = "super", "userdata", "metadata",
+					"persist", "modem_a","bluetooth_a",
+					"misc", "vbmeta_a", "vbmeta_b",
+					"boot_a", "dtbo_a","dsp_a",
+					"modem_b", "bluetooth_b", "boot_b",
+					"dtbo_b", "dsp_b", "vendor_boot_b",
+					"vendor_boot_a", "init_boot_b", "init_boot_a";
+		};
+	};
+
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup.memory=nokmem,nosocket kpti=0 arm64.nopauth kasan=off msm_show_resume_irq.debug_mask=1";
+		bootconfig = "androidboot.usbcontroller=a600000.dwc3 androidboot.fstab_suffix=gen3.qcom androidboot.dtbo_idx=10";
+	};
+};
+
+&qcom_dma_heaps {
+	qcom,display {
+		qcom,dma-heap-name = "system-secure";
+		qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+		qcom,max-align = <9>;
+		memory-region = <&secure_display_memory>;
+	};
+};

@@ -1,0 +1,93 @@
+#include <dt-bindings/gpio/gpio.h>
+#include "volcano-thermal-overlay.dtsi"
+
+&soc {
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-crow";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L2B>;
+	vdda-phy-max-microamp = <140120>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4B>;
+	vdda-pll-max-microamp = <18340>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B>;
+	vdda-qref-max-microamp = <2310>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L12B>;
+	vcc-max-microamp = <800000>;
+
+	vccq-supply = <&L5F>;
+	vccq-max-microamp = <750000>;
+
+	vccq2-supply = <&L4F>;
+	vccq2-max-microamp = <750000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L5B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	status = "ok";
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	vdd-supply = <&L13B>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L23B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 65 GPIO_ACTIVE_LOW>;
+};
+
+&qupv3_se0_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "ok";
+	qcom,i2c-touch-active = "focaltech,fts_ts";
+
+	focaltech@38 {
+		compatible = "focaltech,fts_ts";
+		reg = <0x38>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <19 0x2008>;
+		focaltech,reset-gpio = <&tlmm 20 0x00>;
+		focaltech,irq-gpio = <&tlmm 19 0x2008>;
+		focaltech,display-coords = <0 0 1080 2408>;
+		focaltech,max-touch-number = <10>;
+		focaltech,ic-type = <0x8726081C>;
+		focaltech,touch-type = "primary";
+
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend","pmx_ts_release";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+	};
+};

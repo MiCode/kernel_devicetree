@@ -1,0 +1,46 @@
+&soc {
+	fingerprint_goodix {
+		compatible = "goodix,fingerprint";
+		fp_vdd_vreg-supply = <&L16B>;
+		goodix,gpio-reset = <&tlmm 76 0x0>;
+		goodix,gpio-irq = <&tlmm 75 0x0>;
+		pinctrl-names = "fingerprint_goodix_default", "fingerprint_goodix_rst";
+		pinctrl-0 = <&fingerprint_goodix_int_floating>;
+		pinctrl-1 = <&fingerprint_goodix_int_pull_down>;
+		status = "ok";
+	};
+	fingerprint_fpc {
+		compatible = "fpc,fpc16xx";
+		fpvdd-supply = <&L16B>;
+		status = "ok";
+	};
+};
+&L16B {
+	regulator-min-microvolt = <3200000>;
+	regulator-max-microvolt = <3200000>;
+	qcom,init-voltage = <3200000>;
+};
+&tlmm {
+	fingerprint_goodix_int_floating: fingerprint_goodix_int_floating {
+		mux {
+			pins = "gpio75";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio75";
+			input-enable;
+			bias-disable;
+		};
+	};
+	fingerprint_goodix_int_pull_down: fingerprint_goodix_int_pull_down {
+		mux {
+			pins = "gpio75";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio75";
+			input-enable;
+			bias-pull-down;
+		};
+	};
+};

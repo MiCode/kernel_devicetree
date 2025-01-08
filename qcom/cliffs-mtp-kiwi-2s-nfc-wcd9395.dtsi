@@ -1,0 +1,73 @@
+#include "cliffs-mtp.dtsi"
+
+&S3E {
+	regulator-min-microvolt = <806000>;
+	regulator-max-microvolt = <1003000>;
+	qcom,init-voltage = <806000>;
+};
+
+&pmic_glink_debug {
+	/delete-node/  i2c@101;
+	i2c@101 {
+		reg = <0x101>; /* I2C instance 1 in ADSP for SE0 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1396@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+	};
+
+	/* SPMI bridge bus 1 with SMB1510 device */
+	spmi@200 {
+		reg = <0x200>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,bus-type = "spmi";
+
+		qcom,smb1510@d {
+			compatible = "qcom,spmi-pmic";
+			reg = <13 SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	/delete-node/ smb1393_1_iin;
+	/delete-node/ smb1393_1_ichg;
+	/delete-node/ smb1393_1_die_temp;
+	/delete-node/ smb1393_2_iin;
+	/delete-node/ smb1393_2_ichg;
+	/delete-node/ smb1393_2_die_temp;
+
+	smb1396_1_iin {
+		reg = <0x1013401>;
+		label = "smb1396_1_iin";
+	};
+
+	smb1396_1_ichg {
+		reg = <0x1013402>;
+		label = "smb1396_1_ichg";
+	};
+
+	smb1396_1_die_temp {
+		reg = <0x1013403>;
+		label = "smb1396_1_die_temp";
+	};
+};
+
+&wcd_usbss {
+	interrupt-parent = <&spmi_bus>;
+	interrupts = <0x0 0xb6 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "usb_wcd";
+	nvmem-cells = <&usb_mode>;
+	nvmem-cell-names = "usb_mode";
+};
+
+&wcd_usbss {
+	status = "ok";
+};
