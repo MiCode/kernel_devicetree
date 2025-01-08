@@ -25,7 +25,7 @@
 	memory { device_type = "memory"; reg = <0 0 0 0>; };
 
 	chosen: chosen {
-		bootargs = "loglevel=6 kpti=0 log_buf_len=256K swiotlb=noforce loop.max_part=7 irqaffinity=0-3 cpufreq.default_governor=performance kasan=off cgroup.memory=nokmem,nosocket disable_dma32=on kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 service_locator.enable=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 no-steal-acc printk.console_no_auto_verbose=1 can.stats_timer=0 ftrace_dump_on_oops ufshcd-core.use_mcq_mode=n firmware_class.path=/vendor/firmware_mnt/image,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware";
+		bootargs = "loglevel=6 kpti=0 log_buf_len=256K swiotlb=noforce loop.max_part=7 irqaffinity=0-3 cpufreq.default_governor=performance kasan=off cgroup.memory=nokmem,nosocket disable_dma32=on kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 service_locator.enable=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 no-steal-acc printk.console_no_auto_verbose=0 can.stats_timer=0 ftrace_dump_on_oops ufshcd-core.use_mcq_mode=n firmware_class.path=/vendor/firmware_mnt/image,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware";
 		stdout-path = "/soc/qcom,qupv3_0_geni_se@ac0000/qcom,qup_uart@a94000:115200n8";
 	};
 
@@ -355,7 +355,7 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 
-	disp_rdump_region@d5100000 {
+	disp_rdump_region@e3940000 {
 	};
 
 	dsi_pll_codes {
@@ -1445,6 +1445,11 @@
 			compatible = "qcom,altmode-glink";
 			#altmode-cells = <1>;
 		};
+
+		charger_partition: charger_partition {
+			compatible = "xiaomi,charger_partition";
+			status = "disabled";
+		};
 	};
 
 	qcom,pmic_glink_log {
@@ -2179,14 +2184,6 @@
 		status = "ok";
 	};
 
-	ramoops_mem: ramoops_region {
-		compatible = "ramoops";
-		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
-		size = <0x0 0x200000>;
-		pmsg-size = <0x200000>;
-		mem-type = <2>;
-	};
-
 	adsp_pas: remoteproc-adsp@03000000 {
 		compatible = "qcom,volcano-adsp-pas";
 		reg = <0x03000000 0x10000>;
@@ -2487,6 +2484,7 @@
 
 	adsp_sleepmon: adsp-sleepmon {
 		compatible = "qcom,adsp-sleepmon";
+		qcom,wait_time_lpm = <45>;
 		qcom,rproc-handle = <&adsp_pas>;
 	};
 
@@ -2847,6 +2845,14 @@
 		alignment = <0x0 0x400000>;
 	};
 
+	ramoops_mem: ramoops_region {
+		compatible = "ramoops";
+		reg = <0x0 0xa7000000 0x0 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+		mem-type = <2>;
+	};
+
 	cdsp_secure_heap_cma: secure_cdsp_region { /* Secure DSP */
 		compatible = "shared-dma-pool";
 		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
@@ -2986,6 +2992,7 @@
 	status = "ok";
 };
 
+/*
 &qupv3_se7_i2c {
 	status = "ok";
 	fsa4480: fsa4480@42 {
@@ -2993,6 +3000,7 @@
 		reg = <0x42>;
 	};
 };
+*/
 
 &soc {
 	S1J: pm3001a-s1j {
