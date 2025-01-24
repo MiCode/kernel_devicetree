@@ -12,7 +12,7 @@
 	interrupt-parent = <&vgic>;
 
 	chosen {
-		bootargs = "nokaslr log_buf_len=256K console=hvc0 loglevel=8 swiotlb=noforce";
+		bootargs = "nokaslr log_buf_len=256K console=hvc0 loglevel=8 swiotlb=noforce memhp_default_state=online_movable memory_hotplug.memmap_on_memory=force";
 	};
 
 	cpus {
@@ -47,17 +47,15 @@
 			exit-latency-us = <129>;
 			min-residency-us = <560>;
 			arm,psci-suspend-param = <0x00000004>;
-			status = "disabled";
 		};
 
-		CLUSTER_PWR_DWN: cl5 { /* C4+CL5 */
+		CLUSTER_PWR_DWN: ss3 { /* C4+CL5+SS3 */
 			compatible = "arm,idle-state";
 			idle-state-name = "ret-pll-off";
 			entry-latency-us = <1964>;
 			exit-latency-us = <1901>;
 			min-residency-us = <24511>;
-			arm,psci-suspend-param = <0x01000054>;
-			status = "disabled";
+			arm,psci-suspend-param = <0x0000C354>;
 		};
 	};
 
@@ -71,14 +69,14 @@
 		vendor = "QTI";
 		image-name = "qcom,oemvm";
 		qcom,pasid = <0x0 0x22>;
-		qcom,qtee-config-info = "p=9,7C,8F,97,159,7F1;";
+		qcom,qtee-config-info = "p=3,9,39,7C,8F,97,159,7F1,CDF;";
 		qcom,secdomain-ids = <49>;
 		qcom,primary-vm-index = <0>;
 		vm-uri = "vmuid/oemvm";
 		vm-guid = "847bfe26-0b12-5728-812a-06103f6bdec0";
 		qcom,sensitive;
 
-		vm-attrs = "crash-fatal", "context-dump";
+		vm-attrs = "crash-fatal", "context-dump", "crash-restart";
 
 		memory {
 			#address-cells = <0x2>;
@@ -109,6 +107,12 @@
 		vdevices {
 			generate = "/hypervisor";
 
+			minidump {
+				vdevice-type = "minidump";
+				push-compatible = "qcom,minidump_rm";
+				minidump_allowed;
+			};
+
 			rm-rpc {
 				vdevice-type = "rm-rpc";
 				generate = "/hypervisor/qcom,resource-mgr";
@@ -127,9 +131,24 @@
 				dma-coherent;
 				dma_base = <0x0 0x0>;
 				memory {
-					qcom,label = <0x13>;
+					qcom,label = <0x16>;			//for persist.img
 					#address-cells = <0x2>;
 					base = <0x0 0xFFEFC000>;
+				};
+			};
+
+			virtio-mmio@1 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				dma-coherent;
+				dma_base = <0x0 0x4000>;
+				memory {
+					qcom,label = <0x13>;			//for system.img
+					#address-cells = <0x2>;
+					base = <0x0 0xFFF00000>;
 				};
 			};
 
@@ -138,11 +157,11 @@
 				generate = "/swiotlb";
 				push-compatible = "swiotlb";
 				peer-default;
-				dma_base = <0x0 0x4000>;
+				dma_base = <0x0 0x8000>;
 				memory {
 					qcom,label = <0x14>;
 					#address-cells = <0x2>;
-					base = <0x0 0xFFF00000>;
+					base = <0x0 0xFFF04000>;
 				};
 			};
 
@@ -169,6 +188,15 @@
 				peer-default;
 			};
 
+			test-large-dmabuf-oemvm {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/test-large-dmabuf-oemvm-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0xe>;
+				peer-default;
+			};
+
 			msgqsock-msgq-pair {
 				vdevice-type = "message-queue-pair";
 				generate = "/hypervisor/msgqsock-msgq-pair";
@@ -176,6 +204,15 @@
 				queue-depth = <0x8>;
 				peer = "vm-name:qcom,trustedvm";
 				qcom,label = <0x3>;
+			};
+
+			mem-buf-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/membuf-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label = <0x000000C>;
 			};
 
 			qrtr-shm {
@@ -192,7 +229,7 @@
 	};
 
 	firmware: firmware {
-		scm {
+		qcom_scm: scm {
 			compatible = "qcom,scm";
 		};
 	};
@@ -233,11 +270,23 @@
 
 	qcom,mem-buf {
 		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "consumer";
+		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
+		qcom,dmabuf-ipa-size = <0x1 0x00000000>; /* 4GB IPA space for dmabuf */
 		qcom,vmid = <49>;
 	};
 
 	qcom,mem-buf-msgq {
 		compatible = "qcom,mem-buf-msgq";
+		qcom,msgq-names = "oem_vm";
+	};
+
+	virtio_mem_device {
+		compatible = "qcom,virtio-mem";
+		/* Must be memory_block_size_bytes() aligned */
+		qcom,max-size = <0x0 0x10000000>;
+		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
+		qcom,block-size = <0x400000>;
 	};
 
 	qcom,test-dbl-oemvm {
@@ -251,17 +300,32 @@
 		affinity = <0>;
 	};
 
-	qcom,gh-qtimer@16805000 {
+	qcom,test-large-dmabuf-oemvm {
+		compatible = "qcom,gh-large-dmabuf-test";
+		gunyah-label = <0xe>;
+	};
+
+	qcom,gh-qtimer@1680b000 {
 		compatible = "qcom,gh-qtmr";
-		reg = <0x16805000 0x1000>;
+		reg = <0x1680b000 0x1000>;
 		reg-names = "qtmr-base";
-		interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+		interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "qcom,qtmr-intr";
 		qcom,secondary;
 	};
 
 	qcom_smcinvoke {
 		compatible = "qcom,smcinvoke";
+	};
+
+	qcom_mem_object {
+		compatible = "qcom,mem-object";
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+		qcom,custom-bridge-size = <512>;
+		qcom,support-hypervisor;
 	};
 
 	qcom,qrtr {
@@ -279,3 +343,4 @@
 		msgq-label = <3>;
 	};
 };
+#include "sun-vm-dma-heaps.dtsi"

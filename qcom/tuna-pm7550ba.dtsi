@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "pm7550ba.dtsi"
+#include <dt-bindings/spmi/spmi.h>
+
+/ {
+	qcom,pmic-id-size = <8>;
+	qcom,pmic-id = <0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x4C>;
+};
+
+&spmi0_debug_bus {
+	qcom,pm7550ba-debug@7 {
+		compatible = "qcom,spmi-pmic";
+		reg = <7 SPMI_USID>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,can-sleep;
+	};
+};
+
+&pmic_glink_debug {
+	/* Primary SPMI bus */
+	glink_debug_spmi0: spmi@0 {
+		reg = <0>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		qcom,pm7550ba-debug@7 {
+			compatible = "qcom,spmi-pmic";
+			reg = <7 SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pm7550ba_vib {
+	status = "okay";
+};
+
+&pm7550ba_amoled {
+	status = "okay";
+};
+

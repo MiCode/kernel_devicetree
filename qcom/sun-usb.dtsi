@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <dt-bindings/clock/qcom,gcc-sun.h>
@@ -9,11 +9,13 @@
 &soc {
 	usb0: ssusb@a600000 {
 		compatible = "qcom,dwc-usb3-msm";
-		reg = <0xa600000 0x100000>;
-		reg-names = "core_base";
+		reg = <0xa600000 0x100000>,
+			<0x1fc6000 0x4>;
+		reg-names = "core_base",
+			"tcsr_dyn_en_dis";
 
-		#address-cells = <1>;
-		#size-cells = <1>;
+		#address-cells = <2>;
+		#size-cells = <2>;
 		ranges;
 
 		USB3_GDSC-supply = <&gcc_usb30_prim_gdsc>;
@@ -57,13 +59,19 @@
 			0x144 /* GSI_RING_BASE_ADDR_H */
 			0x1a4>; /* GSI_IF_STS */
 
-		dwc3@a600000 {
+		/*
+		 * Establish dependency on smmu driver so that depopulate path of
+		 * deferred probe doesn't run into existing bug in smmu driver.
+		 */
+		dummy-supply = <&apps_smmu>;
+
+		dwc3_0: dwc3@a600000 {
 			compatible = "snps,dwc3";
-			reg = <0xa600000 0xd93c>;
+			reg = <0x0 0xa600000 0x0 0xd93c>;
 
 			iommus = <&apps_smmu 0x40 0x0>;
 			qcom,iommu-dma = "atomic";
-			qcom,iommu-dma-addr-pool = <0x90000000 0x60000000>;
+			memory-region = <&dwc3_mem_region>;
 			dma-coherent;
 
 			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
@@ -76,11 +84,19 @@
 			snps,dis-u2-entry-quirk;
 			snps,dis_u2_susphy_quirk;
 			snps,ssp-u3-u0-quirk;
+			snps,usb2-lpm-disable;
+			snps,usb2-gadget-lpm-disable;
 			tx-fifo-resize;
+			num-hc-interrupters = /bits/ 16 <3>;
 			dr_mode = "otg";
 			maximum-speed = "super-speed-plus";
 			usb-role-switch;
 		};
+	};
+
+	dwc3_mem_region: dwc3_mem_region {
+		iommu-addresses = <&dwc3_0 0x0 0x0 0x0 0x90000000>,
+					<&dwc3_0 0x0 0xf0000000 0xffffffff 0x10000000>;
 	};
 
 	/* USB port related High Speed PHY */
@@ -104,6 +120,10 @@
 
 		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
 		reset-names = "phy_reset";
+	};
+
+	usb_nop_phy:usb_nop_phy{
+		compatible = "usb-nop-xceiv";
 	};
 
 	/* USB port related QMP USB DP Combo PHY */
@@ -234,11 +254,11 @@
 				USB3_DP_QSERDES_RXA_SIGDET_ENABLES 0x0C
 				USB3_DP_QSERDES_RXA_SIGDET_CNTRL 0x04
 				USB3_DP_QSERDES_RXA_SIGDET_DEGLITCH_CNTRL 0x0E
-				USB3_DP_QSERDES_RXA_RX_MODE_00_LOW 0x22
-				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH 0x12
-				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH2 0xDA
-				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH3 0x3F
-				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH4 0xDB
+				USB3_DP_QSERDES_RXA_RX_MODE_00_LOW 0x3F
+				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH 0xBF
+				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH2 0xFF
+				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH3 0xDF
+				USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH4 0xED
 				USB3_DP_QSERDES_RXA_RX_MODE_01_LOW 0x19
 				USB3_DP_QSERDES_RXA_RX_MODE_01_HIGH 0x09
 				USB3_DP_QSERDES_RXA_RX_MODE_01_HIGH2 0x91
@@ -284,11 +304,11 @@
 				USB3_DP_QSERDES_RXB_SIGDET_ENABLES 0x0C
 				USB3_DP_QSERDES_RXB_SIGDET_CNTRL 0x04
 				USB3_DP_QSERDES_RXB_SIGDET_DEGLITCH_CNTRL 0x0E
-				USB3_DP_QSERDES_RXB_RX_MODE_00_LOW 0x22
-				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH 0x12
-				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH2 0xDA
-				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH3 0x3F
-				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH4 0xDB
+				USB3_DP_QSERDES_RXB_RX_MODE_00_LOW 0x3F
+				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH 0xBF
+				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH2 0xFF
+				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH3 0xDF
+				USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH4 0xED
 				USB3_DP_QSERDES_RXB_RX_MODE_01_LOW 0x19
 				USB3_DP_QSERDES_RXB_RX_MODE_01_HIGH 0x09
 				USB3_DP_QSERDES_RXB_RX_MODE_01_HIGH2 0x91
@@ -305,7 +325,7 @@
 				USB3_DP_PCS_LOCK_DETECT_CONFIG3 0x20
 				USB3_DP_PCS_LOCK_DETECT_CONFIG6 0x13
 				USB3_DP_PCS_REFGEN_REQ_CONFIG1 0x21
-				USB3_DP_PCS_RX_SIGDET_LVL 0x99
+				USB3_DP_PCS_RX_SIGDET_LVL 0x55
 				USB3_DP_PCS_RCVR_DTCT_DLY_P1U2_L 0xE7
 				USB3_DP_PCS_RCVR_DTCT_DLY_P1U2_H 0x03
 				USB3_DP_PCS_CDR_RESET_TIME 0x0A
@@ -314,7 +334,6 @@
 				USB3_DP_PCS_PCS_TX_RX_CONFIG 0x0C
 				USB3_DP_PCS_EQ_CONFIG1 0x4B
 				USB3_DP_PCS_EQ_CONFIG5 0x10
-				USB3_DP_PCS_USB3_POWER_STATE_CONFIG1 0x68
 				USB3_DP_PCS_USB3_LFPS_DET_HIGH_COUNT_VAL 0xF8
 				USB3_DP_PCS_USB3_RXEQTRAINING_DFE_TIME_S2 0x07
 				USB3_DP_PCS_USB3_RCVR_DTCT_DLY_U3_L 0x40

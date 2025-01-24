@@ -8,7 +8,7 @@ title: Qualcomm Technologies, Inc. (QTI) BWMON Driver
 
 maintainers:
   - avajid@quicinc.com <quic_avajid@quicinc.com>
-  - gurbaror@quicinc.com <quic_gurbaror@quicinc.com>
+  - Shivnandan Kumar <quic_kshivnan@quicinc.com>
 
 description: |
   The Qualcomm Technologies, Inc. BWMON Driver monitors bandwidth counters that
@@ -31,8 +31,15 @@ properties:
     maxItems: 2
 
   reg-names:
-    - const: base
-    - const: global_base
+    items:
+      - const: base
+      - const: global_base
+
+  "#address-cells":
+    enum: [1, 2]
+
+  "#size-cells":
+    enum: [1, 2]
 
   interrupts:
     description: Lists the threshold IRQ.
@@ -49,7 +56,6 @@ properties:
       node will be using for voting in the SLOW path.
 
   qcom,hw-timer-hz:
-    $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Hardware sampling rate in Hz. This field must be
       specified for "qcom,bwmon4"
@@ -69,19 +75,34 @@ properties:
     description:
       Number of bytes monitor counts in
 
+  qcom,map-ne:
+    type: boolean
+    description: |
+      Specify if the bwmon memory region should be mapped as nE (non-Early).
+
 required:
   - compatible
   - reg
   - reg-names
   - interrupts
-  - qcom,target-dev
+  - qcom,mport
   - qcom,hw-timer-hz
+  - qcom,count-unit
+  - qcom,target-dev
+  - '#address-cells'
+  - '#size-cells'
+
+additionalProperties: true
 
 examples:
   - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
     bwmon_llcc: qcom,bwmon-llcc@90b6400 {
         compatible = "qcom,bwmon4";
-        reg = <0x90b6400 0x300>, <0x90b6300 0x200>;
+        #address-cells = <1>;
+        #size-cells = <1>;
+        reg = <0x90b6400 0x300>,
+              <0x90b6300 0x200>;
         reg-names = "base", "global_base";
         interrupts = <GIC_SPI 581 IRQ_TYPE_LEVEL_HIGH>;
         qcom,mport = <0>;

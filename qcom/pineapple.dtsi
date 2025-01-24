@@ -32,7 +32,7 @@
 
 
 	chosen: chosen {
-		bootargs = "loglevel=6 kpti=0 log_buf_len=256K swiotlb=noforce kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 irqaffinity=0-1 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc cgroup.memory=nokmem,nosocket printk.console_no_auto_verbose=1 kasan=off loop.max_part=7 no-steal-acc can.stats_timer=0 ufs_qcom.crash_on_ber=y firmware_class.path=/vendor/firmware_mnt/image,/vendor/firmware_mnt/image/kiwi,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware,/vendor/firmware/wlan/qca_cld/kiwi_v2 pcie_ports=compat disable_dma32=on pci-msm-drv.pcie_sm_regs=0x1D07000,0x1040,0x1048,0x3000,0x2";
+		bootargs = "loglevel=6 kpti=0 log_buf_len=256K swiotlb=noforce kernel.panic_on_rcu_stall=1 fw_devlink.strict=1 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 irqaffinity=0-1 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc cgroup.memory=nokmem,nosocket printk.console_no_auto_verbose=1 kasan=off loop.max_part=7 no-steal-acc can.stats_timer=0 ufs_qcom.crash_on_ber=y firmware_class.path=/vendor/firmware_mnt/image,/vendor/firmware_mnt/image/kiwi,/vendor/vm-system/oemvm/boot,/vendor/vm-system/trustedvm/boot,/vendor/firmware,/vendor/firmware/wlan/qca_cld/kiwi_v2 pcie_ports=compat disable_dma32=on pci-msm-drv.pcie_sm_regs=0x1D07000,0x1040,0x1048,0x3000,0x2 ftrace_dump_on_oops";
 		stdout-path = "/soc/qcom,qupv3_2_geni_se@8c0000/qcom,qup_uart@89c000:115200n8";
 	};
 
@@ -879,8 +879,8 @@
 	cam_crm: crm@add7000 {
 		label = "cam_crm";
 		compatible = "qcom,cam-crm";
-		reg = <0xadd7000 0x2000>, <0xadd9800 0x800>, <0xadda000 0x2000>;
-		reg-names = "base", "crm_b", "crm_c";
+		reg = <0xadd7000 0x2000>, <0xadd9800 0x800>, <0xadda000 0x2000>, <0xadd9000 0x800>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v";
 		interrupts = <GIC_SPI 121 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "cam_crm";
 		clocks = <&camcc CAM_CC_DRV_AHB_CLK>;
@@ -891,8 +891,8 @@
 	pcie_crm: crm@1d01000 {
 		label = "pcie_crm";
 		compatible = "qcom,pcie-crm";
-		reg = <0x1d01000 0x3000>, <0x1d04800 0x800>, <0x1d05000 0x2000>;
-		reg-names = "base", "crm_b", "crm_c";
+		reg = <0x1d01000 0x3000>, <0x1d04800 0x800>, <0x1d05000 0x2000>, <0x1d04000 0x800>;
+		reg-names = "base", "crm_b", "crm_c", "crm_v";
 		interrupts = <GIC_SPI 248 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "pcie_crm";
 		clocks = <&pcie_0_pipe_clk>;
@@ -982,7 +982,6 @@
 
 		memory-region = <&spss_region_mem>;
 
-		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		qcom,spss-scsr-bits = <24 25>;
@@ -1480,20 +1479,29 @@
 		 };
 	};
 
+	ufshc_dma_resv: ufshc_dma_resv_region {
+		/*
+		 * Restrict IOVA mappings for UFSHC buffers to the 3 GB region
+		 * from 0x1000 - 0xffffffff.
+		 */
+		iommu-addresses = <&ufshc_mem 0x0 0x1000>;
+	};
+
 	ufshc_mem: ufshc@1d84000 {
 		compatible = "qcom,ufshc";
 		reg = <0x1d84000 0x3000>,
-		      <0x1d88000 0x8000>,
-		      <0x1d90000 0x9000>;
-		reg-names = "ufs_mem", "ufs_ice", "ufs_ice_hwkm";
+		      <0x1d88000 0x18000>,
+		      <0x1da5000 0x2000>, <0x1da4000 0x10>;
+		reg-names = "ufs_mem", "ice", "mcq_sqd", "mcq_vs";
 		interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
 		phys = <&ufsphy_mem>;
 		phy-names = "ufsphy";
 		#reset-cells = <1>;
 
+		qcom,ice-use-hwkm;
 		qcom,prime-mask = <0x80>;
 		qcom,silver-mask = <0x0f>;
-		qcom,esi-affinity-mask = <0xf0>;
+		qcom,esi-affinity-mask = <5 6 7 5 6 7 5 6>;
 
 		lanes-per-direction = <2>;
 		dev-ref-clk-freq = <0>; /* 19.2 MHz */
@@ -1595,10 +1603,16 @@
 
 		iommus = <&apps_smmu 0x60 0x0>;
 		qcom,iommu-dma = "fastmap";
+		qcom,iommu-msi-size = <0x1000>;
+		memory-region = <&ufshc_dma_resv>;
 		shared-ice-cfg = <&ice_cfg>;
 		dma-coherent;
 
 		qcom,bypass-pbl-rst-wa;
+
+		msi-parent = <&gic_its 0x60>;
+		qcom,max-cpus = <8>;
+		qcom,broken-ahit-wa;
 
 		status = "disabled";
 
@@ -2158,7 +2172,6 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo";
 
-		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		interconnects = <&lpass_lpicx_noc MASTER_LPASS_PROC &mc_virt SLAVE_EBI1>,
@@ -2237,7 +2250,6 @@
 		mx-uV-uA = <RPMH_REGULATOR_LEVEL_NOM_L1 100000>;
 		reg-names = "cx", "mx";
 
-		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>,
@@ -2315,7 +2327,6 @@
 		clocks = <&rpmhcc RPMH_CXO_CLK>;
 		clock-names = "xo";
 
-		qcom,signal-aop;
 		qcom,qmp = <&aoss_qmp>;
 
 		interconnects = <&nsp_noc MASTER_CDSP_PROC &mc_virt SLAVE_EBI1>,
@@ -2378,9 +2389,9 @@
 	gic-interrupt-router {
 		compatible = "qcom,gic-intr-routing";
 		/* keep silver core only to avoid wakeup of gold cores */
-		qcom,gic-class0-cpus = <0 1>;
+		qcom,gic-class0-cpus = <&CPU0 &CPU1>;
 		/* keep gold and gold+ cores in class1 */
-		qcom,gic-class1-cpus = <2 3 4 5 6 7>;
+		qcom,gic-class1-cpus = <&CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
 	};
 
 	qcom,secure-buffer {
@@ -2395,7 +2406,8 @@
 	};
 
 	qcom,mem-buf-msgq {
-	       compatible = "qcom,mem-buf-msgq";
+		compatible = "qcom,mem-buf-msgq";
+		qcom,msgq-names = "trusted_vm";
 	};
 
 	qti,smmu-proxy {
@@ -2661,10 +2673,6 @@
 
 	qcom_c1dcvs: qcom,c1dcvs {
 		compatible = "qcom,c1dcvs-v2";
-	};
-
-	qcom_mpam: qcom,mpam {
-		compatible = "qcom,mpam";
 	};
 
 	qcom_cpufreq_stats: qcom,cpufreq_stats {
@@ -3251,6 +3259,11 @@
 	gpu_micro_code_mem: gpu_microcode_region@9b09a000 {
 		no-map;
 		reg = <0x0 0x9b09a000 0x0 0x2000>;
+	};
+
+	lost_reg_mem {
+		no-map;
+		reg = <0x0 0x9b09c000 0x0 0x4000>;
 	};
 
 	spss_region_mem: spss_region_region@9b0a0000 {

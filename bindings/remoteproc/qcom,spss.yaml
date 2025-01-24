@@ -22,7 +22,7 @@ properties:
       - qcom,sun-spss-pas
 
   reg:
-    minItems: 6
+    minItems: 1
     items:
       - description: SP to SoC IRQ status register
       - description: SP to SoC IRQ clear register
@@ -30,7 +30,6 @@ properties:
       - description: RMB error register
       - description: RMB general purpose register
       - description: RMB error spare2 register
-      - description: SP PBL patch version register
 
   reg-names:
     items:
@@ -40,7 +39,6 @@ properties:
       - const: rmb_err
       - const: rmb_general_purpose
       - const: rmb_err_spare2
-      - const: sp_pbl_patch_ver
 
   interrupts:
     items:
@@ -60,6 +58,12 @@ properties:
   px-supply:
     description: Phandle to the PX regulator
 
+  sensors-supply:
+    description: Phandle to the Sensors regulator
+
+  sensors-uV-uA:
+    description: Voltage and Current levels for Sensors regulator
+
   memory-region:
     maxItems: 1
     description: Reference to the reserved-memory for the SPSS
@@ -76,6 +80,8 @@ required:
   - reg-names
   - interrupts
   - cx-supply
+  - sensors-supply
+  - sensors-uV-uA
   - clocks
   - clock-names
   - memory-region
@@ -93,15 +99,16 @@ examples:
               <0x1881028 0x4>,
               <0x188103c 0x4>,
               <0x1881100 0x4>,
-              <0x1882014 0x4>,
-              <0x221C8490 0x4>;
+              <0x1882014 0x4>;
         reg-names = "sp2soc_irq_status", "sp2soc_irq_clr", "sp2soc_irq_mask",
-                    "rmb_err", "rmb_general_purpose", "rmb_err_spare2",
-                    "sp_pbl_patch_ver";
+                    "rmb_err", "rmb_general_purpose", "rmb_err_spare2";
         interrupts = <0 352 1>;
 
         cx-supply = <&VDD_CX_LEVEL>;
         cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+
+        sensors-supply = <&L2J>;
+        sensors-uV-uA = <1200000 100000>;
 
         clocks = <&rpmhcc RPMH_CXO_CLK>;
         clock-names = "xo";

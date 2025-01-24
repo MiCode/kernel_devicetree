@@ -10,15 +10,15 @@ maintainers:
   - David Collins <quic_collinsd@quicinc.com>
 
 description: |
-  rpmh-regulator devices support PMIC regulator management via the Voltage
-  Regulator Manager (VRM), Aggregated Resource Controller (ARC) and
-  Oscillator Buffer (XOB) RPMh accelerators.  The APPS processor communicates
+  rpmh-regulator devices support PMIC regulator management via the Voltage Regulator
+  Manager (VRM), Aggregated Resource Controller (ARC), Oscillator Buffer (XOB)  and
+  Programmable Boot Sequencer (PBS) RPMh accelerators.  The APPS processor communicates
   with these hardware blocks via a Resource State Coordinator (RSC) using command
   packets.  The VRM allows changing four parameters for a given regulator: enable state,
   output voltage, operating mode and minimum headroom voltage.  The ARC allows changing
   only a single parameter for a given regulator: its operating level.  This
   operating level is fed into CPR which then decides upon a final explicit voltage
-  for the regulator.  The XOB allows changing only a single parameter for a given
+  for the regulator.  The XOB and PBS allow changing only a single parameter for a given
   regulator: its enable state.  Despite its name, the XOB is capable of controlling
   the enable state of any PMIC peripheral.  It is used for clock buffers, low-voltage
   switches, and LDO/SMPS regulators which have a fixed voltage and mode.
@@ -36,6 +36,7 @@ properties:
       - qcom,rpmh-vrm-regulator
       - qcom,rpmh-arc-regulator
       - qcom,rpmh-xob-regulator
+      - qcom,rpmh-pbs-regulator
 
   qcom,resource-name:
     description: |
@@ -139,7 +140,7 @@ patternProperties:
 
       regulator-enable-ramp-delay:
         description: |
-          For VRM and XOB resources, the time in microseconds to delay
+          For VRM, XOB and PBS resources, the time in microseconds to delay
           after enabling a regulator.
 
       qcom,set:
@@ -292,6 +293,17 @@ examples:
         qcom,set = <RPMH_REGULATOR_SET_ALL>;
         regulator-min-microvolt = <1800000>;
         regulator-max-microvolt = <1800000>;
+      };
+    };
+
+    rpmh-regulator-vrmsd {
+      compatible = "qcom,rpmh-pbs-regulator";
+      qcom,resource-name = "vrm.sd";
+
+      L24B_PBS:
+      pm6450_l24_pbs: regulator-pm6450-l24-pbs {
+        regulator-name = "pm6450_l24_pbs";
+        qcom,set = <RPMH_REGULATOR_SET_ALL>;
       };
     };
 

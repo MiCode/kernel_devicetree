@@ -4,7 +4,10 @@
 $id: http://devicetree.org/schemas/arm/msm/sys-pm-violators.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: Qualcomm Technologies, Inc. (QTI) System PM Violoators bindings
+title: Qualcomm Technologies, Inc. System PM Violoators
+
+maintainers:
+       - Maulik Shah <quic_mkshah@quicinc.com>
 
 description: |
   System PM Violoators is a virtual device sends a QMP message to AOP to start
@@ -15,6 +18,8 @@ description: |
 properties:
   compatible:
     enum:
+      - qcom,sys-pm-parrot
+      - qcom,sys-pm-ravelin
       - qcom,sys-pm-lahaina
       - qcom,sys-pm-waipio
       - qcom,sys-pm-kalama
@@ -28,13 +33,34 @@ properties:
       The address on the AOP Message RAM from where the stats are read.
 
   qcom,qmp:
-    description:
-      Handle to the QMP mailbox.
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: Handle to the QMP mailbox.
 
 required:
   - compatible
   - reg
   - qcom,qmp
+
+allOf:
+  - if:
+      properties:
+        compatible:
+          contains:
+            enum:
+              - qcom,sys-pm-sun
+              - qcom,sys-pm-pineapple
+              - qcom,sys-pm-parrot
+              - qcom,sys-pm-ravelin
+    then:
+      properties:
+        reg:
+          items:
+            - description: AOP Message RAM base register region
+        qcom,qmp:
+          items:
+            - description: Handle to the QMP mailbox.
+
+additionalProperties: false
 
 examples:
   - |

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 %YAML 1.2
 ---
-$id: "http://devicetree.org/schemas/serial/qcom,msm-geni-uart.yaml#"
+$id: "http://devicetree.org/schemas/serial/qcom,serial-geni-msm.yaml#"
 $schema: "http://devicetree.org/meta-schemas/core.yaml#"
 
 title: Qualcomm Technologies, Inc. Serial UART for GENI based cores
@@ -34,9 +34,8 @@ properties:
       - const: qup-memory
 
   interrupts:
-    minItems: 1
-    items:
-      - description: UART core irq
+    description: first irq for UART core & second irq for host wake up
+    maxItems: 2
 
   operating-points-v2: true
 
@@ -59,9 +58,10 @@ properties:
   reg:
     maxItems: 1
 
-  interrupts:
-    items:
-      - description: byte which is used for waking up.
+  # Optional property
+  qcom,suspend-ignore-children:
+    type: boolean
+    description: When set ignores dependencies on children by PM framework
 
 required:
   - compatible
@@ -101,5 +101,6 @@ examples:
         pinctrl-3 = <&qupv3_se14_default_cts>, <&qupv3_se14_default_rts>,
             <&qupv3_se14_default_tx>, <&qupv3_se14_default_rx>;
         qcom,wakeup-byte = <0xFD>;
+        qcom,suspend-ignore-children;
     };
 ...

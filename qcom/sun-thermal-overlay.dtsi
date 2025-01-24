@@ -5,22 +5,26 @@
 
 #include <dt-bindings/thermal/thermal_qti.h>
 
+&soc {
+	gpu_dump_skip_cdev: qcom,gpu-dump-skip-cdev {
+		compatible = "qcom,gpu-dump-skip-cdev";
+		nvmem-cells = <&wr_thermal_flag>;
+		nvmem-cell-names = "wr_thermal_flag";
+		#cooling-cells = <2>;
+	};
+};
+
 &thermal_zones {
-	socd {
+	pmih010x-bcl-lvl0 {
 		cooling-maps {
-			socd_apc1 {
-				trip = <&socd_trip>;
-				cooling-device = <&APC1_MX_CX_PAUSE 1 1>;
+			lbat_modem0 {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&modem_bcl 1 1>;
 			};
 
-			socd_cdsp1 {
-				trip = <&socd_trip>;
-				cooling-device = <&cdsp_sw 4 4>;
-			};
-
-			socd_gpu0 {
-				trip = <&socd_trip>;
-				cooling-device = <&msm_gpu 4 4>;
+			lbat_gpu0 {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&msm_gpu 1 1>;
 			};
 		};
 	};
@@ -32,28 +36,18 @@
 				cooling-device = <&modem_bcl 2 2>;
 			};
 
-			lbat_cdsp1 {
-				trip = <&b_bcl_lvl1>;
-				cooling-device = <&cdsp_sw 4 4>;
-			};
-
 			lbat_gpu1 {
 				trip = <&b_bcl_lvl1>;
-				cooling-device = <&msm_gpu 4 4>;
+				cooling-device = <&msm_gpu 2 2>;
 			};
 		};
 	};
 
 	pmih010x-bcl-lvl2 {
 		cooling-maps {
-			lbat_cdsp2 {
-				trip = <&b_bcl_lvl2>;
-				cooling-device = <&cdsp_sw 5 THERMAL_NO_LIMIT>;
-			};
-
 			lbat_gpu2 {
 				trip = <&b_bcl_lvl2>;
-				cooling-device = <&msm_gpu 5 THERMAL_NO_LIMIT>;
+				cooling-device = <&msm_gpu 3 3>;
 			};
 		};
 	};
@@ -65,14 +59,9 @@
 				cooling-device = <&modem_bcl 1 1>;
 			};
 
-			vph_cdsp0 {
-				trip = <&bcl_lvl0>;
-				cooling-device = <&cdsp_sw 2 2>;
-			};
-
 			vph_gpu0 {
 				trip = <&bcl_lvl0>;
-				cooling-device = <&msm_gpu 2 2>;
+				cooling-device = <&msm_gpu 1 1>;
 			};
 		};
 	};
@@ -84,28 +73,18 @@
 				cooling-device = <&modem_bcl 2 2>;
 			};
 
-			vph_cdsp1 {
-				trip = <&bcl_lvl1>;
-				cooling-device = <&cdsp_sw 4 4>;
-			};
-
 			vph_gpu1 {
 				trip = <&bcl_lvl1>;
-				cooling-device = <&msm_gpu 4 4>;
+				cooling-device = <&msm_gpu 2 2>;
 			};
 		};
 	};
 
 	pm8550-bcl-lvl2 {
 		cooling-maps {
-			vph_cdsp2 {
-				trip = <&bcl_lvl2>;
-				cooling-device = <&cdsp_sw 5 THERMAL_NO_LIMIT>;
-			};
-
 			vph_gpu2 {
 				trip = <&bcl_lvl2>;
-				cooling-device = <&msm_gpu 5 THERMAL_NO_LIMIT>;
+				cooling-device = <&msm_gpu 3 3>;
 			};
 		};
 	};
@@ -176,7 +155,7 @@
 		};
 	};
 
-	sys-therm-0 {
+	xo-therm {
 		cooling-maps {
 			apc1_cdev {
 				trip = <&trip_config0>;

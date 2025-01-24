@@ -9,14 +9,15 @@ title: Last Level Cache Controller
 maintainers:
   - Rishabh Bhatnagar <rishabhb@codeaurora.org>
   - Sai Prakash Ranjan <saiprakash.ranjan@codeaurora.org>
+  - Avinash Philip <quic_avinashp@quicinc.com>
 
 description: |
-  LLCC (Last Level Cache Controller) provides last level of cache memory in SoC,
-  that can be shared by multiple clients. Clients here are different cores in the
-  SoC, the idea is to minimize the local caches at the clients and migrate to
-  common pool of memory. Cache memory is divided into partitions called slices
-  which are assigned to clients. Clients can query the slice details, activate
-  and deactivate them.
+  LLCC (Last Level Cache Controller) provides last level of cache memory in
+  SoC, that can be shared by multiple clients. Clients here are different cores
+  in the SoC, the idea is to minimize the local caches at the clients and
+  migrate to common pool of memory. Cache memory is divided into partitions
+  called slices which are assigned to clients. Clients can query the slice
+  details, activate and deactivate them.
 
 properties:
   compatible:
@@ -34,6 +35,9 @@ properties:
       - qcom,sm8550-llcc
       - qcom,pineapple-llcc
       - qcom,sun-llcc
+      - qcom,sdxpinn-llcc
+      - qcom,kera-llcc
+      - qcom,x1e80100-llcc
 
   reg:
     minItems: 2
@@ -47,11 +51,43 @@ properties:
     maxItems: 1
 
   child-node:
-    description: Container of llcc_perfmon node
+    description: |
+      - Container of llcc_perfmon node
+      - Container of scid heuristics
     type: object
     properties:
-        compatible:
-            const: qcom,llcc-perfmon
+      compatible:
+        items:
+          - const: qcom,llcc-perfmon
+          - const: qcom,scid-heuristics
+
+      qcom,heuristics-scid:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          SCID number of HEURISTICS SID
+      qcom,freq-threshold-idx:
+        $ref: '/schemas/types.yaml#/definitions/uint32-array'
+        description: |
+          CPU DVFS frequency threshold index
+        minItems: 1
+        maxItems: 2
+      qcom,frequency-threshold-residency:
+        $ref: '/schemas/types.yaml#/definitions/uint32-array'
+        description: |
+          CPU DVFS frequency threshold Residency value in micro seconds
+        minItems: 1
+        maxItems: 2
+      qcom,scid-heuristics-enabled:
+        description: |
+          On enabling this flag, Heuristics driver will communicate to qcom
+          control software to enable the Heuristics based SCID functionality.
+        type: boolean
+
+    required:
+      - compatible
+
+    additionalProperties: false
+
 required:
   - compatible
   - reg
@@ -65,6 +101,7 @@ allOf:
             enum:
               - qcom,pineapple-llcc
               - qcom,sun-llcc
+              - qcom,x1e80100-llcc
     then:
       properties:
         reg:
@@ -75,7 +112,7 @@ allOf:
             - description: LLCC3 base register region
             - description: LLCC broadcast base register region
         reg-names:
-            items:
+          items:
             - const: llcc0_base
             - const: llcc1_base
             - const: llcc2_base
@@ -86,8 +123,6 @@ additionalProperties: false
 
 examples:
   - |
-    #include <dt-bindings/interrupt-controller/arm-gic.h>
-
     soc {
         #address-cells = <2>;
         #size-cells = <2>;
@@ -104,5 +139,13 @@ examples:
             llcc_perfmon {
                 compatible = "qcom,llcc-perfmon";
             }
+
+            scid_heuristics {
+                compatible = "qcom,scid-heuristics";
+                qcom,heuristics-scid = <32>;
+                qcom,freq-threshold-idx = <11>, <10>;
+                qcom,frequency-threshold-residency = <5000>, <5000>;
+                qcom,scid-heuristics-enabled;
+            };
         };
     };

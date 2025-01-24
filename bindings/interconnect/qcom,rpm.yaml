@@ -43,6 +43,12 @@ properties:
       - qcom,sdm660-gnoc
       - qcom,sdm660-mnoc
       - qcom,sdm660-snoc
+      - qcom,monaco-bimc
+      - qcom,monaco-system_noc
+      - qcom,monaco-config_noc
+      - qcom,monaco-clk_virt
+      - qcom,monaco-mmnrt_virt
+      - qcom,monaco-mmrt_virt
 
   '#interconnect-cells':
     description: |
@@ -96,6 +102,12 @@ allOf:
               - qcom,sdm660-cnoc
               - qcom,sdm660-gnoc
               - qcom,sdm660-snoc
+              - qcom,monaco-bimc
+              - qcom,monaco-system_noc
+              - qcom,monaco-config_noc
+              - qcom,monaco-clk_virt
+              - qcom,monaco-mmnrt_virt
+              - qcom,monaco-mmrt_virt
 
     then:
       properties:
@@ -215,6 +227,27 @@ allOf:
             - description: Aggregate2 USB3 AXI Clock.
             - description: Config NoC USB2 AXI Clock.
 
+  - if:
+      properties:
+        compatible:
+          contains:
+            enum:
+              - qcom,monaco-system_noc
+
+    then:
+      properties:
+        clock-names:
+          items:
+            - const: bus
+            - const: bus_a
+
+        clocks:
+          items:
+            - description: Bus Clock.
+            - description: Bus A Clock.
+            - description: IPA Clock.
+            - description: Config NoC USB2 AXI Clock.
+            - description: System NoC USB2 AXI Clock.
 examples:
   - |
       #include <dt-bindings/clock/qcom,rpmcc.h>

@@ -8,34 +8,37 @@ The driver supports also hovering as an absolute single touch event with x, y, z
 coordinates.
 
 Required properties:
-- compatible		: must be "st,stmfts" OR "st,fts"
-- reg			: I2C slave address, (e.g. 0x49)
+- compatible		: must be "st,stmfts" OR "st,fts" OR "st,fts2"
+- reg			: I2C slave address, (e.g. 0x49). Or 0 for SPI interface
 - interrupts		: interrupt specification
 - avdd-supply		: analogic power supply
 - vdd-supply		: power supply
-- touchscreen-size-x	: see touchscreen.txt
-- touchscreen-size-y	: see touchscreen.txt
-
-Optional properties:
-- touch-key-connected	: specifies whether the touchkey feature is connected
-- ledvdd-supply		: power supply to the touch key leds
+- st,irq-gpio		: interrupt gpio.
+- st,irq-flags		: irq trigger type config, , value should be:
+				1 - rising edge,
+				2 - falling edge,
+				4 - high level,
+				8 - low level.
+- st,reset-gpio		: reset gpio
+- st,regulator_dvdd	: dvdd regulator name
+- st,regulator_avdd	: avdd regulator name
 
 Example:
 
-i2c@00000000 {
-
-	/* ... */
-
-	touchscreen@49 {
-		compatible = "st,stmfts";
+&i2c_6 {
+	status = "ok";
+	st_fts@49 {
+		compatible = "st,fts";
 		reg = <0x49>;
-		interrupt-parent = <&gpa1>;
-		interrupts = <1 IRQ_TYPE_NONE>;
-		touchscreen-size-x = <1599>;
-		touchscreen-size-y = <2559>;
-		touch-key-connected;
-		avdd-supply = <&ldo30_reg>;
-		vdd-supply = <&ldo31_reg>;
-		ledvdd-supply = <&ldo33_reg>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <162 0x2008>;
+		vdd-supply = <&L4B>;
+		avdd-supply = <&L14B>;
+		st,irq-gpio = <&tlmm 162 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 161 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
 	};
 };

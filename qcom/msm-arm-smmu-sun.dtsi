@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <dt-bindings/interrupt-controller/arm-gic.h>
@@ -17,8 +17,13 @@
 		ranges;
 		dma-coherent;
 
-		qcom,regulator-names = "vdd";
-		vdd-supply = <&gpu_cc_cx_gdsc>;
+		/*
+		 * When gdsc is enabled, and cpu enters cpuidle, DDR
+		 * bandwidth vote must be present to prevent DDR
+		 * shutdown.
+		 */
+		power-domains = <&gpucc GPU_CC_CX_SMMU_GDSC>;
+		interconnects = <&gem_noc MASTER_GPU_TCU &mc_virt SLAVE_EBI1>;
 
 		clocks = <&gpucc GPU_CC_HLOS1_VOTE_GPU_SMMU_CLK>;
 		clock-names =

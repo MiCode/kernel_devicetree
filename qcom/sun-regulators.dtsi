@@ -483,7 +483,7 @@
 			regulator-name = "pm_humu_l9";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
 			regulator-min-microvolt = <2960000>;
-			regulator-max-microvolt = <3008000>;
+			regulator-max-microvolt = <3300000>;
 			qcom,init-voltage = <2960000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
 		};
@@ -546,7 +546,6 @@
 			regulator-max-microvolt = <1800000>;
 			qcom,init-voltage = <1800000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
-			qcom,proxy-consumer-enable;
 		};
 	};
 
@@ -650,6 +649,12 @@
 	rpmh-regulator-bobb1 {
 		compatible = "qcom,rpmh-vrm-regulator";
 		qcom,resource-name = "bobb1";
+		qcom,regulator-type = "pmic5-bob";
+		qcom,supported-modes =
+			<RPMH_REGULATOR_MODE_PASS
+			RPMH_REGULATOR_MODE_AUTO
+			RPMH_REGULATOR_MODE_HPM>;
+		qcom,mode-threshold-currents = <0 1000000 2000000>;
 
 		BOB1: pm_humu_bob1: regulator-pm-humu-bob1 {
 			regulator-name = "pm_humu_bob1";
@@ -657,12 +662,19 @@
 			regulator-min-microvolt = <3008000>;
 			regulator-max-microvolt = <4000000>;
 			qcom,init-voltage = <3296000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_PASS>;
 		};
 	};
 
 	rpmh-regulator-bobb2 {
 		compatible = "qcom,rpmh-vrm-regulator";
 		qcom,resource-name = "bobb2";
+		qcom,regulator-type = "pmic5-bob";
+		qcom,supported-modes =
+			<RPMH_REGULATOR_MODE_PASS
+			RPMH_REGULATOR_MODE_AUTO
+			RPMH_REGULATOR_MODE_HPM>;
+		qcom,mode-threshold-currents = <0 1000000 2000000>;
 
 		BOB2: pm_humu_bob2: regulator-pm-humu-bob2 {
 			regulator-name = "pm_humu_bob2";
@@ -670,6 +682,7 @@
 			regulator-min-microvolt = <2704000>;
 			regulator-max-microvolt = <3008000>;
 			qcom,init-voltage = <2720000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_PASS>;
 		};
 	};
 
@@ -792,6 +805,7 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
+		qcom,send-defaults;
 
 		L1F: pm_v6f_l1: pm_v8f_l1: regulator-pm-vxf-l1 {
 			regulator-name = "pm_v6f_l1";
@@ -800,6 +814,26 @@
 			regulator-max-microvolt = <920000>;
 			qcom,init-voltage = <880000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+		};
+
+		L1F_AO: pm_v6f_l1_ao: pm_v8f_l1_ao: regulator-pm-vxf-l1-ao {
+			regulator-name = "pm_v6f_l1_ao";
+			qcom,set = <RPMH_REGULATOR_SET_ACTIVE>;
+			regulator-min-microvolt = <880000>;
+			regulator-max-microvolt = <920000>;
+			qcom,init-voltage = <880000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			regulator-always-on;
+		};
+
+		L1F_SO: pm_v6f_l1_so: pm_v8f_l1_so: regulator-pm-vxf-l1-so {
+			regulator-name = "pm_v6f_l1_so";
+			qcom,set = <RPMH_REGULATOR_SET_SLEEP>;
+			regulator-min-microvolt = <880000>;
+			regulator-max-microvolt = <920000>;
+			qcom,init-voltage = <880000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_LPM>;
+			qcom,init-enable = <0>;
 		};
 	};
 
@@ -909,7 +943,6 @@
 			<RPMH_REGULATOR_MODE_LPM
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
-
 		L2G: pm_v8g_l2: regulator-pm-v8g-l2 {
 			regulator-name = "pm_v8g_l2";
 			qcom,set = <RPMH_REGULATOR_SET_ALL>;
@@ -929,6 +962,7 @@
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
 		proxy-supply = <&L3G>;
+		qcom,send-defaults;
 
 		L3G: pm_v8g_l3: regulator-pm-v8g-l3 {
 			regulator-name = "pm_v8g_l3";
@@ -938,6 +972,26 @@
 			qcom,init-voltage = <1200000>;
 			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
 			qcom,proxy-consumer-enable;
+		};
+
+		L3G_AO: pm_v8g_l3_ao: regulator-pm-v8g-l3-ao {
+			regulator-name = "pm_v8g_l3_ao";
+			qcom,set = <RPMH_REGULATOR_SET_ACTIVE>;
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <1256000>;
+			qcom,init-voltage = <1200000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_HPM>;
+			regulator-always-on;
+		};
+
+		regulator-pm-v8g-l3-so {
+			regulator-name = "pm_v8g_l3_so";
+			qcom,set = <RPMH_REGULATOR_SET_SLEEP>;
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <1256000>;
+			qcom,init-voltage = <1200000>;
+			qcom,init-mode = <RPMH_REGULATOR_MODE_LPM>;
+			qcom,init-enable = <0>;
 		};
 	};
 
@@ -1095,7 +1149,7 @@
 		qcom,resource-name = "ldoj2";
 		qcom,regulator-type = "pmic5-ldo";
 		qcom,supported-modes =
-			<RPMH_REGULATOR_MODE_LPM
+			<RPMH_REGULATOR_MODE_RET
 			 RPMH_REGULATOR_MODE_HPM>;
 		qcom,mode-threshold-currents = <0 30000>;
 
