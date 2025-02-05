@@ -1,0 +1,49 @@
+/* And public attribution of longcheer platforms */
+#include "longcheer-sm4635-common.dtsi"
+#include "warm-pinctrl.dtsi"
+
+&sdhc_2 {
+	cd-gpios = <&tlmm 92 GPIO_ACTIVE_HIGH>;
+};
+
+&usb0 {
+	dwc3@4e00000 {
+		usb-phy = <&usb2_phy0>, <&usb_nop_phy>;
+		maximum-speed = "high-speed";
+	};
+};
+
+&usb_qmp_dp_phy {
+	status = "disabled";
+};
+
+&usb_nop_phy {
+	status = "okay";
+};
+
+&soc {
+	/*add simtray status*/
+	simtray {
+		compatible = "xiaomi,simtray-status";
+		status-gpio = <&tlmm 92 0x00>;
+	};
+
+	qcom,rmtfs_sharedmem@0 {
+		compatible = "qcom,sharedmem-uio";
+		reg = <0x0 0x800000>;
+		reg-names = "rmtfs";
+		qcom,client-id = <0x00000001>;
+		qcom,vm-nav-path;
+	};
+
+	thermal_message: thermal-message {
+		board-sensor = "VIRTUAL-SENSOR";
+	};
+
+	reboot_reason {
+		compatible = "qcom,reboot-reason";
+		nvmem-cells = <&restart_reason>;
+		nvmem-cell-names = "restart_reason";
+	};
+
+};

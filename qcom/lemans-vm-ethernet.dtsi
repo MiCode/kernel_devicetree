@@ -1,0 +1,114 @@
+#include "pm8775-vm.dtsi"
+&soc {
+
+	emac1_mtl_rx_setup: rx-queues-config {
+		snps,rx-queues-to-use = <4>;
+		snps,rx-sched-sp;
+
+		queue0 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x0>;
+			snps,route-up;
+			snps,priority = <0x1>;
+		};
+
+		queue1 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x1>;
+			snps,route-ptp;
+		};
+
+		queue2 {
+			snps,avb-algorithm;
+			snps,map-to-dma-channel = <0x2>;
+			snps,route-avcp;
+		};
+
+		queue3 {
+			snps,avb-algorithm;
+			snps,map-to-dma-channel = <0x3>;
+			snps,priority = <0xC>;
+		};
+	};
+
+	emac1_mtl_tx_setup: tx-queues-config {
+		snps,tx-queues-to-use = <4>;
+		snps,tx-sched-sp;
+		queue0 {
+			snps,dcb-algorithm;
+		};
+
+		queue1 {
+			snps,dcb-algorithm;
+		};
+
+		queue2 {
+			snps,avb-algorithm;
+			snps,send_slope = <0x1000>;
+			snps,idle_slope = <0x1000>;
+			snps,high_credit = <0x3E800>;
+			snps,low_credit = <0xFFC18000>;
+		};
+
+		queue3 {
+			snps,avb-algorithm;
+			snps,send_slope = <0x1000>;
+			snps,idle_slope = <0x1000>;
+			snps,high_credit = <0x3E800>;
+			snps,low_credit = <0xFFC18000>;
+		};
+
+	};
+
+	ethqos_hw: qcom,ethernet@23000000 {
+		compatible = "qcom,stmmac-ethqos","snps,dwmac-4.20a";
+		qcom,arm-smmu;
+		reg = <0x23000000 0x10000>,
+				<0x23016000 0x100>,
+				<0x08902000 0xE10>;
+		reg-names = "stmmaceth","rgmii","serdes";
+		clocks = <&gcc GCC_EMAC1_AXI_CLK>,
+				<&gcc GCC_EMAC1_SLV_AHB_CLK>,
+				<&gcc GCC_EMAC1_PTP_CLK>,
+				<&gcc GCC_EMAC1_PHY_AUX_CLK>,
+				<&gcc GCC_SGMI_CLKREF_EN>,
+				<&gcc GCC_EMAC1_RGMII_CLK>;
+		clock-names = "stmmaceth", "pclk", "ptp_ref", "phyaux","sgmi_ref","rgmii";
+
+		emac-phy-addr = <10>;
+		snps,ptp-ref-clk-rate = <230400000>;
+		snps,ptp-req-clk-rate = <125000000>;
+		interrupts-extended = <&intc 0 929 4>;
+		interrupt-names = "macirq";
+
+		snps,tso;
+		snps,pbl = <32>;
+		rx-fifo-depth = <16384>;
+		tx-fifo-depth = <20480>;
+		snps,mtl-rx-config = <&emac1_mtl_rx_setup>;
+		snps,mtl-tx-config = <&emac1_mtl_tx_setup>;
+		snps,reset-gpios = <&pm8775_3_gpios 9 GPIO_ACTIVE_HIGH>;
+		gdsc_emac-supply = <&gcc_emac1_gdsc>;
+		vreg_emac_phy-supply = <&pm8775_a_l5>;
+		pinctrl-names = "dev-emac-mdc",
+			"dev-emac-mdio";
+
+		pinctrl-0 = <&emac1_mdc>;
+		pinctrl-1 = <&emac1_mdio>;
+		snps,reset-delays-us = <0 11000 70000>;
+		phy-mode = "sgmii";
+		snps,ps-speed = <1000>;
+		pcs-v3;
+		eth-c22-mdio-probe;
+		virtio-mdio;
+		gdsc-off-on-suspend;
+
+		ethqos_emb_smmu: ethqos_emb_smmu {
+			compatible = "qcom,emac-smmu-embedded";
+			iommus = <&apps_smmu 0x140 0xf>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
+		};
+	};
+};
+

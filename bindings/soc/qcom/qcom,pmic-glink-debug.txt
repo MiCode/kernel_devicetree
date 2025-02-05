@@ -1,0 +1,87 @@
+Qualcomm Technologies, Inc. Glink PMIC Debug Controller
+
+The Qualcomm Technologies, Inc. Glink PMIC debug controller device provides an
+interface to read and write PMIC registers over PMIC Glink using a remote
+subsytem (e.g. DSP).  This allows for debugging PMIC peripherals on either
+SPMI bus or I2C bus that would typically only be accessible to the charger
+and fuel gauging firmware running on the remote subsystem.
+
+Refer to Documentation/devicetree/bindings/soc/qcom/qcom,pmic-glink.txt for
+information on "qcom,pmic_glink_log" device which is used in the example below.
+
+See spmi.yaml for the generic SPMI controller binding requirements for SPMI
+bus grandchild nodes. And the I2C bus grandchild nodes have very similar
+structure and properties with SPMI bus nodes but just has property
+"qcom,bus-type" with "i2c" string value.
+
+Required device node structure:
+
+The Glink PMIC debug controller node must contain at least one child node.  Each
+child node corresponds to either an SPMI bus or I2C bus accessible from the remote
+subsystem.
+
+Top Level Node Supported Properties:
+
+- compatible:
+	Usage:      required
+	Value type: <stringlist>
+	Definition: Must be one of: "qcom,pmic-glink-debug",
+				    "qcom,spmi-glink-debug",
+				    "qcom,i2c-glink-debug".
+
+Child Node Supported Properties:
+
+- qcom,bus-type
+	Usage:      optional
+	Value type: <string>
+	Definition: Specify the bus type on the remote subsystem to access
+		    the PMIC devices defined in the subnodes.
+		    It has to be either "spmi" or "i2c". If this property is
+		    not defined, it will be treated as SPMI bus by default.
+
+- reg
+	Usage:      required
+	Value type: <u32>
+	Definition: Bus ID. In SPMI bus subnode, it is the physical SPMI bus
+		    ID in the system, and the allowed range is [0, 7].
+
+		    In I2C bus subnode, it is the I2C bus instance ID (indexed
+		    from 1) in the remote subsystem along with adding an offset
+		    0x100, and the allowed range is [0x101, 0x1ff].
+
+		    For SPMI-bridge bus which relies on the brain PMIC for
+		    the real SPMI bus transaction, the bus ID is specified
+		    with an offset of 0x200.
+
+Example:
+
+&soc {
+	qcom,pmic_glink_log {
+		qcom,spmi_glink_debug {
+			compatible = "qcom,spmi-glink-debug";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			spmi@0 {
+				reg = <0>;
+			};
+
+			spmi@1 {
+				reg = <1>;
+				qcom,bus-type = "spmi";
+			};
+
+			/* I2C bus with instance ID 7 in ADSP for SE6 */
+			i2c@107 {
+				reg = <0x107>;
+				qcom,bus-type = "i2c";
+			};
+
+			/* SPMI-bridge bus 0 */
+			spmi@200 {
+				reg = <0x200>;
+				qcom,bus-type = "spmi";
+			};
+		};
+	};
+};

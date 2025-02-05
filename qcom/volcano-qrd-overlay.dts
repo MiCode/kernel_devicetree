@@ -1,0 +1,27 @@
+/dts-v1/;
+/plugin/;
+
+#include "volcano-qrd.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Volcano QRD";
+	compatible = "qcom,volcano-qrd", "qcom,volcano", "qcom,volcanop-qrd", "qcom,volcanop", "qcom,qrd";
+	qcom,msm-id = <636 0x10000>, <640 0x10000>, <641 0x10000>;
+	qcom,board-id = <11 0>;
+};
+
+
+&pmiv0104_eusb2_repeater {
+	status = "ok";
+	vdd18-supply = <&L7B>;
+	vdd3-supply = <&L17B>;
+
+	qcom,param-override-seq =
+		<0xb 0x51
+		 0x6 0x57>;
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pmiv0104_eusb2_repeater>;
+	usb-repeater = <&pmiv0104_eusb2_repeater>;
+};

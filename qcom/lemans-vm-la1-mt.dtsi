@@ -1,0 +1,69 @@
+&soc {
+	ptp_virtual {
+		compatible = "qcom,ptp_virtual";
+		reg = <0x908c6000 0x1000>,
+			<0x23047000 0x1000>,
+			<0x17c23000 0x1000>;
+		reg-names = "ptp_carveout_mem",
+				"ptp_reg",
+				"qtimer_reg";
+	};
+};
+
+&hab {
+	vmid = <5>;
+};
+
+/ {
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup.memory=nokmem,nosocket kpti=0 ufshcd-core.use_mcq_mode=n arm64.nopauth kasan=off msm_show_resume_irq.debug_mask=1";
+		bootconfig = "androidboot.usbcontroller=a800000.dwc3 androidboot.fstab_suffix=gen4.qcom androidboot.dtbo_idx=4";
+	};
+
+	rename_devices: rename_devices {
+		compatible = "qcom,rename-devices";
+		rename_blk: rename_blk {
+			device-type = "block";
+			actual-dev = "vda", "vdb", "vdc",
+					"vdd", "vde", "vdf",
+					"vdg", "vdh", "vdi",
+					"vdj", "vdk", "vdl",
+					"vdm", "vdn", "vdo",
+					"vdp", "vdq", "vdr",
+					"vds", "vdt", "vdu";
+			rename-dev = "super", "userdata", "metadata",
+					"persist", "modem_a","bluetooth_a",
+					"misc", "vbmeta_a", "vbmeta_b",
+					"boot_a", "dtbo_a", "dsp_a",
+					"modem_b", "bluetooth_b", "boot_b",
+					"dtbo_b", "dsp_b", "vendor_boot_b",
+					"vendor_boot_a", "init_boot_b", "init_boot_a";
+		};
+	};
+};
+
+&usb1 {
+	/delete-property/ qcom,host-poweroff-in-pm-suspend;
+	/delete-property/ qcom,default-mode-host;
+	status = "ok";
+};
+
+&usb2_phy1 {
+	status = "ok";
+};
+
+&usb_qmp_phy1 {
+	status = "ok";
+};
+
+&qupv3_1 {
+	status = "disabled";
+};
+
+&qupv3_2 {
+	status = "disabled";
+};
+
+&pcie_smmu {
+	status = "disabled";
+};

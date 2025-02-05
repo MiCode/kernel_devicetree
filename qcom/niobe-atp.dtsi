@@ -1,0 +1,214 @@
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+#include "niobe-pmic-overlay.dtsi"
+#include "niobe-thermal-overlay.dtsi"
+
+&msm_sdexpress {
+	vdd1-supply = <&L12B>;
+	qcom,vdd1-voltage-level = <2960000 2960000>;
+	qcom,vdd1-current-level = <0 600000>;
+
+	vdd2-supply = <&L5B>;
+	qcom,vdd2-voltage-level = <1800000 1800000>;
+	qcom,vdd2-current-level = <0 600000>;
+
+	sdexpress-gpios = <&tlmm 71 0>;
+	clkreq-gpios = <&tlmm 149 GPIO_ACTIVE_LOW>;
+
+	status = "ok";
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	vdd-supply = <&L12B>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L19B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 148 GPIO_ACTIVE_LOW>;
+};
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default
+			     &key_confirm_default
+			     &key_back_default>;
+
+		back_key {
+			label = "back_key";
+			gpios = <&pm8550vs_c_gpios 2 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_BACK>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		confirm_key {
+			label = "confirm_key";
+			gpios = <&pm8550vs_c_gpios 5 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_OK>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8550vs_c_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pm8550b_eusb2_repeater>;
+	usb-repeater = <&pm8550b_eusb2_repeater>;
+};
+
+&usb0 {
+	usb-role-switch;
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		port {
+			usb_port0_connector: endpoint {
+				remote-endpoint = <&usb_port0>;
+			};
+		};
+	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-pineapple";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L3C>;
+	vdda-phy-max-microamp = <213030>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L1D>;
+	vdda-pll-max-microamp = <18310>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L1F>;
+	vdda-qref-max-microamp = <4250>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L13B>;
+	vcc-max-microamp = <750000>;
+
+	vccq-supply = <&L1C>;
+	vccq-max-microamp = <560000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L3B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	qcom,vccq-shutdown-supply = <&L1C>;
+	qcom,vccq-shutdown-max-microamp = <560000>;
+
+	status = "ok";
+};
+
+&regulator_ocp_notifier {
+	status = "ok";
+	periph-19b-supply = <&S1B>;
+	periph-19e-supply = <&S2B>;
+	periph-1a1-supply = <&S3B_LEVEL>;
+	periph-1aa-supply = <&S6B_LEVEL>;
+	periph-1c1-supply = <&L1B>;
+	periph-1c3-supply = <&L3B>;
+	periph-1c4-supply = <&L4B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c6-supply = <&L6B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1cd-supply = <&L13B>;
+	periph-1ce-supply = <&L14B>;
+	periph-1cf-supply = <&L15B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d3-supply = <&L19B>;
+	periph-1d6-supply = <&L22B>;
+	periph-1d7-supply = <&L23B>;
+	periph-1e4-supply = <&BOB1>;
+	periph-29b-supply = <&S1C_LEVEL>;
+	periph-29e-supply = <&S2C_LEVEL>;
+	periph-2a4-supply = <&S4C_LEVEL>;
+	periph-2a1-supply = <&S3C>;
+	periph-2c1-supply = <&L1C>;
+	periph-2c3-supply = <&L3C>;
+	periph-39b-supply = <&S1D_LEVEL>;
+	periph-3a1-supply = <&S3D_LEVEL>;
+	periph-3a4-supply = <&S4D_LEVEL>;
+	periph-3a7-supply = <&S5D>;
+	periph-3aa-supply = <&S6D>;
+	periph-3c1-supply = <&L1D>;
+	periph-3c2-supply = <&L2D>;
+	periph-3c3-supply = <&L3D>;
+	periph-5a1-supply = <&S3F_LEVEL>;
+	periph-5a4-supply = <&S4F>;
+	periph-5a7-supply = <&S5F>;
+	periph-5aa-supply = <&S6F_LEVEL>;
+	periph-5c1-supply = <&L1F>;
+	periph-5c2-supply = <&L2F_LEVEL>;
+	periph-5c3-supply = <&L3F_LEVEL>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c44-supply = <&L5M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
+	periph-d40-supply = <&L1N>;
+	periph-d41-supply = <&L2N>;
+	periph-d42-supply = <&L3N>;
+	periph-d43-supply = <&L4N>;
+	periph-d44-supply = <&L5N>;
+	periph-d45-supply = <&L6N>;
+	periph-d46-supply = <&L7N>;
+};
