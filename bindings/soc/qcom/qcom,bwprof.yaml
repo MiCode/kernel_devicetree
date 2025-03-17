@@ -1,0 +1,108 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,bwprof.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Bwprof profiling driver
+
+maintainers:
+  - Shivnandan Kumar <quic_kshivnan@quicinc.com>
+  - Amir Vajid <quic_avajid@quicinc.com>
+
+description:
+  The QTI BWPROF Driver is responsible for monitoring bandwidth counters on
+  Qualcomm Technologies, Inc. (QTI) chipset that represent the read/write traffic
+  through different interconnects in the system. The driver provides this data to
+  userspace clients at modest time intervals for the purpose of bandwidth
+  profiling
+
+properties:
+  compatible:
+    enum:
+      - qcom,bwprof
+
+  reg:
+    items:
+      - description: mem freq base address
+
+  reg-names:
+    items:
+      - const: mem-freq
+
+  "#address-cells":
+    enum: [1, 2]
+
+  "#size-cells":
+    enum: [1, 2]
+
+  qcom,bus-width:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: The width of the bus in bits.
+
+patternProperties:
+  "^qcom,bwprof[0-9-a-z]*@[0-9]*$":
+    type: object
+    description:
+      bwprof use subnodes for bwmon monitor instance.
+
+    properties:
+      compatible:
+        enum:
+          - qcom,bwprof-mon
+
+      reg:
+        description: bwprof mon base address.
+
+      reg-names:
+        items:
+          - const: base
+
+      client:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: The client of bandwidth monitor, which can be either "total", "cpu", or "gpu".
+
+    additionalProperties: false
+
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - '#address-cells'
+  - '#size-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+    bwprof: qcom,bwprof-ddr@19090000 {
+            compatible = "qcom,bwprof";
+            #address-cells = <1>;
+            #size-cells = <1>;
+            qcom,bus-width = <16>;
+            reg = <0x190BA050 0x10>;
+            reg-names = "mem-freq";
+
+            bwprof_0: qcom,bwprof0@19092000 {
+                    compatible = "qcom,bwprof-mon";
+                    reg = <0x19092000 0x1000>;
+                    reg-names = "base";
+                    client = "total";
+            };
+
+            bwprof_1: qcom,bwprof1@19093000 {
+                    compatible = "qcom,bwprof-mon";
+                    reg = <0x19093000 0x1000>;
+                    reg-names = "base";
+                    client = "cpu";
+            };
+
+            bwprof_2: qcom,bwprof2@19094000 {
+                    compatible = "qcom,bwprof-mon";
+                    reg = <0x19094000 0x1000>;
+                    reg-names = "base";
+                    client = "gpu";
+            };
+
+    };

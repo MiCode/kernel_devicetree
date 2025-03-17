@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+&soc {
+	/* QUPv3_1 Wrapper Instance */
+	qupv3_1: qcom,qupv3_1_geni_se@ac0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0xac0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
+		ranges;
+		status = "ok";
+
+		/* Debug UART Instance */
+		qupv3_se7_2uart: qcom,qup_uart@a9c000 {
+			compatible = "qcom,geni-debug-uart";
+			reg = <0xA9C000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 579 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S7_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se7_2uart_tx_active>, <&qupv3_se7_2uart_rx_active>;
+			pinctrl-1 = <&qupv3_se7_2uart_sleep>;
+			status = "disabled";
+		};
+	};
+};

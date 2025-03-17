@@ -1,0 +1,562 @@
+#include "mca.dtsi"
+
+&tlmm {
+	charger_cp_nlpm_default: charger_cp_nlpm_default {
+		mux {
+			pins = "gpio110";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio110";
+			drive-strength = <2>;   /* 2 mA */
+			bias-disable;
+		};
+	};
+
+	charger_cp_int_default: charger_cp_int_default {
+		mux {
+			pins = "gpio68";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio68";
+			drive-strength = <2>;   /* 2 mA */
+			bias-disable;
+		};
+	};
+
+	wireless_rx_int_default: wireless_rx_int_default {
+		mux {
+			pins = "gpio69";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio69";
+			drive-strength = <2>;
+			bias-pull-up;
+			input-enable;
+			qcom,apps;
+		};
+	};
+};
+
+&pmih010x_gpios {
+	slave_batt_det {
+		slave_batt_det_default: slave_batt_det_default {
+			pins = "gpio2";
+			function = "gpio";
+			input-enable;
+			bias-pull-up;
+		};
+	};
+};
+
+
+&qupv3_se5_i2c {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	bq27z561_standlone@55 {
+		compatible = "ti,bq27z561_master";
+		ic_role = <0>;
+		reg = <0x55>;
+		unseal_key = <0x02 0x0b 0x55 0x02>;
+		bq,charge-full-design = <5500>;
+		soh_th = <92>;
+		cycle_th = <400>;
+		cycle_step = <50>;
+		resistance-id = <100000>;
+		status = "ok";
+	};
+
+	sc8585_master@6e {
+		compatible = "sc8585_master";
+		status = "ok";
+		ic_role = <0>;
+		reg = <0x6e>;
+		cp-int= <&tlmm 68 0>;
+		cp-nlpm-gpio = <&tlmm 110 0x00>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&charger_cp_nlpm_default>, <&charger_cp_int_default>;
+		bat-ovp-threshold = <4650>;
+		bat-ovp-alarm-threshold = <4600>;
+		bus-ovp-threshold = <21000 11000 6000>;
+		usb-ovp-threshold = <21000 14000 7500>;
+		bus-ocp-threshold = <4500 5500 4500>;
+		wpc-ovp-threshold = <21000>;
+		out-ovp-threshold = <5000>;
+		pmid2-uvp-threshold = <100>;
+		pmid2-ovp-threshold = <600>;
+
+	};
+
+	hl7603@77 {
+		compatible = "hl7603";
+		reg = <0x77>;
+		vout_threshold = <3400>;
+	};
+};
+
+&qupv3_se11_i2c {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	nu1652@41 {
+		compatible = "fuda,nu1652";
+		reg = <0x41>;
+		project_vendor = <3>;
+		support-hall = <0>;
+		rx_role = <0>;
+		fw_version_index = <0>;
+		pinctrl-names = "rx_int_pull_up";
+		pinctrl-0 = <&wireless_rx_int_default>;
+		rx-int = <&tlmm 69 0x00>;
+		pwr-det-int = <&tlmm 96 0x00>;
+		sleep-rx-gpio = <&tlmm 94 0x00>;
+	};
+};
+
+&mca_adsp_glink {
+	status = "ok";
+};
+
+&mca_bc12_class {
+	status = "ok";
+};
+
+&mca_qcom_subpmic_proxy {
+	status = "ok";
+	otg_boost_src = <2>;
+	gpio_chip_type = <1>;
+	vdd_boost_en = <0x0709>;
+	otg_ovp_en = <0x070A>;
+	mi,support-cid = <1>;
+	cid_gpio_int = <0x0708>;
+};
+
+&mca_protocol_core {
+	status = "ok";
+};
+
+&mca_protocol_pd_class {
+	status = "ok";
+	max_power = <90>;
+};
+
+&mca_qcom_pd_protocol {
+	status = "ok";
+};
+
+&mca_protocol_qc_class {
+	status = "ok";
+};
+
+&mca_strategy_buckchg_class {
+	status = "ok";
+};
+
+&mca_strategy_quick_charge {
+	status = "ok";
+	cp_type = <0>;
+	min_vbat = <3100>;
+	max_vbat = <4490>;
+	div_single_curr = <5000 12000 15600>;
+	div_max_curr = <5000 12000 15600>;
+	max_power = <90000>;
+	qc_normal_charge_fv = <4510>;
+	pps_taper_vol_hys = <7>;
+	hardware_cv = <1>;
+
+	/* temp_low, temp_high, low_temp_hys, high_temp_hys, max_current, volt_para_name stage_para_name*/
+	/* temp_low, temp_high, low_temp_hys, high_temp_hys, max_current, normal_fv, ffc_fv,volt_para_name stage_para_name*/
+	temp_para1 =
+		"-65535", "10", "0", "0", "0", "4100", "4100", "null", "null", "null", "null",
+		"10", "15", "0", "0", "6480",  "4530", "4530", "normal_volt_para1_1", "null", "null", "null",
+		"15", "20", "0", "0", "13500", "4530", "4530", "normal_volt_para1_2", "null", "null", "null",
+		"20", "35", "2", "2", "15600", "4510", "4580", "normal_volt_para1_3", "ffc_volt_para1_3", "null", "ffc_stage_para1_3",
+		"35", "40", "2", "2", "15600", "4510", "4580", "normal_volt_para1_4", "ffc_volt_para1_4", "null", "ffc_stage_para1_4",
+		"40", "48", "2", "2", "15600", "4510", "4580", "normal_volt_para1_5", "ffc_volt_para1_5", "null", "ffc_stage_para1_5",
+		"48", "65535", "0", "0", "0", "4100", "4100", "null", "null", "null", "null";
+
+	normal_volt_para1_1 =
+		"4200", "6480", "400",
+		"4523", "5400", "800";
+
+	normal_volt_para1_2 =
+		"4200", "13500", "7350",
+		"4523", "8100", "800";
+
+	normal_volt_para1_3 =
+		"4300", "15600", "6480",
+		"4503", "6480", "800";
+	ffc_volt_para1_3 =
+		"4300", "15600", "12400",
+		"4350", "12400", "9720",
+		"4400", "9720", "8100",
+		"4500", "8100", "6480",
+		"4573", "6480", "1036";
+	ffc_stage_para1_3 = <0 1 0 0 0 0 0 0 0 0>;
+
+	normal_volt_para1_4 =
+		"4300", "15600", "6480",
+		"4503", "6480", "800";
+	ffc_volt_para1_4 =
+		"4300", "15600", "12400",
+		"4350", "12400", "9720",
+		"4400", "9720", "8100",
+		"4500", "8100", "6480",
+		"4573", "6480", "1254";
+	ffc_stage_para1_4 = <0 1 0 0 0 0 0 0 0 0>;
+
+	normal_volt_para1_5 =
+		"4300", "15600", "6480",
+		"4503", "6480", "800";
+	ffc_volt_para1_5 =
+		"4300", "15600", "12400",
+		"4350", "12400", "9720",
+		"4400", "9720", "8100",
+		"4500", "8100", "6480",
+		"4573", "6480", "1581";
+	ffc_stage_para1_5 = <0 1 0 0 0 0 0 0 0 0>;
+};
+
+&mca_strategy_pd_auth {
+	status = "ok";
+};
+
+
+&strategy_fg {
+	status = "ok";
+	fg_type = <0>;
+	report-full-rsoc = <9700>;
+	soc-proportion = <97>;
+	soc-proportion-c = <96>;
+	vcutoff_shutdown_delay = <3050>;
+	vcutoff_sw = <2900>;
+	support-cc-vterm;
+	support-vpack-low-shutdown;
+	cc_vterm_cfg =
+		"800", "3000", "3050", "2900",
+		"1200", "3250", "3300", "2900",
+		"65535", "3300", "3350", "2900";
+	adapt_power = <90>;
+	model-name = "O1_5500mah_90w";
+	model-name-global = "O1_5500mah_90w";
+	support_full_design_gl;
+	charge-full-design = <6000>;
+	charge-full-design-gl = <5500>;
+	support_dtpt = <1>;
+	support-lossless-rechg = <1>;
+	lossless_rechg_cfg = <15 47 300>;
+	suppot_RSOC_0_smooth = <1>;
+	smooth_temp_unit = <0 150>; //15℃
+	smooth_curr_unit = <0 300000 600000 1000000 >;
+	smooth_vol_offset = <0x80000000 0 100 200 300 >;
+	dischg_smooth_low_temp_unit = <
+		10 10 10 10
+		20 10 10 10
+		40 20 10 10
+		80 40 30 20
+		150 80 70 50 >;
+	dischg_smooth_high_temp_unit = <
+		10 10 10 10
+		30 20 10 10
+		60 40 20 10
+		150 70 50 40
+		200 150 100 70 >;
+};
+
+&pm8550_gpios {
+        anti_burn_mos_ctrl {
+                anti_burn_mos_ctrl_default: anti_burn_mos_ctrl_default {
+                        pins = "gpio9";
+                        function = "normal";
+                        output-enable;
+                        //drive-strength = <2>;
+                        power-source = <0>;
+                };
+        };
+};
+
+&connector_antiburn {
+	status = "ok";
+	pinctrl-names = "default";
+	pinctrl-0 = <&anti_burn_mos_ctrl_default>;
+	mos-ctrl-gpio = <&pm8550_gpios 9 0>;
+	antiburn_otg_detect = <1>;
+	support_soft_antiburn = <1>;
+	support_hw_antiburn = <1>;
+	use_double_ntc = <1>;
+	monitor_interval = <1000>;
+	thermal-zone-name = "conn_therm";
+	thermal-zone-name2 = "conn_therm2";
+	max_temp_increase_rate = <4>; /*ntc temperature increase speed per second.*/
+	otg_boost_src = <2>;   //BOOST_SRC_EXTERNAL
+	en_src = <0>;      //OTG_EN_BOOST
+	//thermal-board-temp-name = "board_sensor_therm";
+};
+
+&mca_bmd {
+	status = "ok";
+	btb_bmd_scheme = <3 1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&slave_batt_det_default>;
+	btb_gpio = <&pmih010x_gpios 2 GPIO_ACTIVE_LOW>;
+};
+
+&smart_charge {
+	status = "ok";
+	cell_type = <1>;
+	support_cc_ichg;
+	cc_ichg_cfg = </* cyclecount delta_ichg*/
+	800 100
+	65536 200>;
+};
+
+&soc_limit {
+	status = "ok";
+};
+
+&mca_path_control {
+	status = "ok";
+};
+
+&mca_lpd_detect {
+	status = "ok";
+};
+
+&mca_strategy_basic_wireless_class {
+	status = "ok";
+	support_q_value = <1>;
+	max_power = <80>;
+	//low_inductance_tx_50W, low_inductance_tx_80W
+	tx_q1 = /bits/ 8 <0x13 0x1A>;
+	tx_q2 = <30 31>;
+	rx_max_iout = <4650 3950>;
+	/* standard_tx, musical_box, plate_tx, car_mounted, train_tx, redmi_30w_tx,sailboat_tx ,
+		low_inductance_50w_tx, low_inductance_80w_tx, support_fan*/
+	adapter_para_91A1 = "0", "0", "0", "0", "0", "0", "0", "1", "0", "1";
+	adapter_para_9135 = "1", "0", "0", "0", "0", "0", "0", "0", "1", "1";
+};
+
+&mca_strategy_quick_wireless_class {
+	status = "ok";
+	min_vbat = <3100>;
+	max_vbat = <4380>;
+	div_single_curr = <0 0 13000>;
+	div_max_curr = <0 0 13000>;
+	support_mode = <6>;
+
+	batt_para =
+		"0", "atl", "temp_para1",
+		"0", "lwn", "temp_para2";
+	/* temp_low, temp_high, low_temp_hys, high_temp_hys, max_current, normal_fv, ffc_fv, volt_para_name stage_para_name*/
+	temp_para1 =
+		"-65535", "10", "0", "0", "0", "4100", "4100", "null", "null", "null", "null",
+		"10", "15", "0", "0", "5880", "4530", "4530", "normal_volt_para1_1", "null", "null", "null",
+		"15", "20", "0", "0", "12250", "4530", "4530", "normal_volt_para1_2", "null", "null", "null",
+		"20", "35", "2", "2", "15600", "4510", "4580", "normal_volt_para1_3", "ffc_volt_para1_3", "null", "ffc_stage_para1_3",
+		"35", "40", "2", "2", "15600", "4510", "4580", "normal_volt_para1_4", "ffc_volt_para1_4", "null", "ffc_stage_para1_4",
+		"40", "48", "2", "2", "15600", "4510", "4580", "normal_volt_para1_5", "ffc_volt_para1_5", "null", "ffc_stage_para1_5",
+		"48", "65535", "0", "0", "0", "4100", "4100", "null", "null", "null", "null";
+
+	normal_volt_para1_1 =
+		"4200", "5880", "400",
+		"4530", "4900", "800";
+
+	normal_volt_para1_2 =
+		"4200", "12250", "7350",
+		"4530", "7350", "800";
+
+	normal_volt_para1_3 =
+		"4320", "15600", "5880",
+		"4510", "5880", "800";
+	ffc_volt_para1_3 =
+		"4320", "15600", "12400",
+		"4350", "12400", "8820",
+		"4400", "8820", "7350",
+		"4500", "7350", "5880",
+		"4570", "5880", "2300";
+	ffc_stage_para1_3 = <0 0 0 0 0 0 0 0 0 0>;
+
+	normal_volt_para1_4 =
+		"4300", "15600", "5880",
+		"4510", "5880", "800";
+	ffc_volt_para1_4 =
+		"4300", "15600", "12400",
+		"4350", "12400", "8820",
+		"4400", "8820", "7350",
+		"4500", "7350", "5880",
+		"4570", "5880", "3400";
+	ffc_stage_para1_4 = <0 0 0 0 0 0 0 0 0 0>;
+
+	normal_volt_para1_5 =
+		"4300", "15600", "5880",
+		"4510", "5880", "800";
+	ffc_volt_para1_5 =
+		"4300", "15600", "12400",
+		"4350", "12400", "8820",
+		"4400", "8820", "7350",
+		"4500", "7350", "5880",
+		"4570", "5880", "3400";
+	ffc_stage_para1_5 = <0 0 0 0 0 0 0 0 0 0>;
+
+	temp_para2 =
+		"-65535", "10", "0", "0", "0", "4100", "4100", "null", "null", "null", "null",
+		"10", "15", "0", "0", "5880", "4530", "4530", "normal_volt_para2_1", "null", "null", "null",
+		"15", "20", "0", "0", "12250", "4530", "4530", "normal_volt_para2_2", "null", "null", "null",
+		"20", "35", "2", "2", "15600", "4510", "4580", "normal_volt_para2_3", "ffc_volt_para2_3", "null", "ffc_stage_para2_3",
+		"35", "40", "2", "2", "15600", "4510", "4580", "normal_volt_para2_4", "ffc_volt_para2_4", "null", "ffc_stage_para2_4",
+		"40", "48", "2", "2", "15600", "4510", "4580", "normal_volt_para2_5", "ffc_volt_para2_5", "null", "ffc_stage_para2_5",
+		"48", "65535", "0", "0", "0", "4100", "4100", "null", "null", "null", "null";
+
+	normal_volt_para2_1 =
+		"4200", "5880", "400",
+		"4530", "4900", "800";
+
+	normal_volt_para2_2 =
+		"4200", "12250", "7350",
+		"4530", "7350", "800";
+
+	normal_volt_para2_3 =
+		"4300", "15600", "5880",
+		"4510", "5880", "800";
+	ffc_volt_para2_3 =
+		"4300", "15600", "12400",
+		"4350", "12400", "8820",
+		"4400", "8820", "7350",
+		"4500", "7350", "5880",
+		"4570", "5880", "2300";
+	ffc_stage_para2_3 = <0 0 0 0 0 0 0 0 0 0>;
+
+	normal_volt_para2_4 =
+		"4300", "15600", "5880",
+		"4510", "5880", "800";
+	ffc_volt_para2_4 =
+		"4300", "15600", "12400",
+		"4350", "12400", "8820",
+		"4400", "8820", "7350",
+		"4500", "7350", "5880",
+		"4570", "5880", "3400";
+	ffc_stage_para2_4 = <0 0 0 0 0 0 0 0 0 0>;
+
+	normal_volt_para2_5 =
+		"4300", "15600", "5880",
+		"4510", "5880", "800";
+	ffc_volt_para2_5 =
+		"4300", "15600", "12400",
+		"4350", "12400", "8820",
+		"4400", "8820", "7350",
+		"4500", "7350", "5880",
+		"4570", "5880", "3400";
+	ffc_stage_para2_5 = <0 0 0 0 0 0 0 0 0 0>;
+
+	vstep_para =
+		"1", "2000", "2",
+		"2", "2000", "4",
+		"4", "4000", "25",
+		"4", "3000", "25",
+		"4", "2000", "6",
+		"4", "1000", "3",
+		"4", "500", "2",
+		"4", "200", "1";
+};
+
+&mca_strategy_wireless_revchg_class{
+	status = "ok";
+	rev_boost_voltage = <6300>;
+};
+
+&mca_qcom_sysfs {
+	status = "ok";
+};
+
+&mca_business_battery {
+	status = "ok";
+};
+
+&mca_business_charger {
+	status = "ok";
+};
+
+&mca_platform_cp {
+	status = "ok";
+	cp-num = <1>;
+	cp-dir-list = "cp_master";
+};
+
+&mca_platform_wireless {
+	status = "ok";
+	wireless-num = <1>;
+	wireless-dir-list = "wireless_master";
+};
+
+&mca_charge_interface
+{
+	status = "ok";
+};
+
+&mca_charger_thermal
+{
+	status = "ok";
+	support_wireless = <1>;
+	/* bpp_in default_epp_in bpp_ichg default_epp_ichg div1_single div1_multi div2_single div2_multi div4_single
+		div4_multi*/
+	wireless_thermal = <
+	1100 1800 2200 3600 9000 9000 9000 9000 9000 9000 /* level 1 */
+	1100 1500 2200 3000 8000 8000 8000 8000 8000 8000 /* level 2 */
+	1100 1300 2200 2600 7000 7000 7000 7000 7000 7000 /* level 3 */
+	1100 1300 2200 2600 6000 6000 6000 6000 6000 6000 /* level 4 */
+	700  1300 1400 2600 5000 5000 5000 5000 5000 5000 /* level 5 */
+	700  1300 1400 2600 4000 4000 4000 4000 4000 4000 /* level 6 */
+	600  800  1200 1600 3500 3500 3500 3500 3500 3500 /* level 7 */
+	600  800  1200 1600 3000 3000 3000 3000 3000 3000 /* level 8 */
+	500  600  1000 1200 2500 2500 2500 2500 2500 2500 /* level 9 */
+	500  600  1000 1200 2000 2000 2000 2000 2000 2000 /* level 10 */
+	500  500  1000 1000 1500 1500 1500 1500 1500 1500 /* level 11 */
+	500  500  1000 1000 1000 1000 1000 1000 1000 1000 /* level 12 */
+	500  500  1000 1000 800  800  800  800  800  800  /* level 13 */
+	400  400  800  800  500  500  500  500  500  500  /* level 14 */
+	300  300  600  600  300  300  300  300  300  300  /* level 15 */
+	>;
+};
+
+&mca_buckchg_jeita
+{
+	status = "ok";
+	volt_para1 =
+		"4200", "810",
+		"4530", "540";
+	volt_para2 =
+		"4200", "1080",
+		"4530", "810";
+	volt_para3 =
+		"4200", "1620",
+		"4500", "1080";
+	/* temp_low, temp_high, low_temp_hys, high_temp_hys, max_current, vterm, iterm volt_para_name */
+	jeita_para =
+		"-65535", "-9", "0", "2", "0", "4530", "270", "null",
+		"-9", "0", "1", "2", "810", "4530", "270", "volt_para1",
+		"0", "5", "1", "2", "1080", "4530", "270", "volt_para2",
+		"5", "10", "1", "2", "1620", "4530", "270", "volt_para3",
+		"10", "20", "2", "2", "4000", "4530", "270", "null",
+		"20", "48", "2", "2", "4000", "4520", "270", "null",
+		"48", "60", "2", "2", "2700", "4060", "270", "null" ,
+		"60", "65535", "2", "2", "0", "4060", "270", "null";
+	jeita_para_ffc =
+		"20", "35", "2", "2", "4000", "4595", "1036", "null",
+		"35", "40", "2", "2", "4000", "4595", "1254", "null",
+		"40", "48", "2", "2", "4000", "4595", "1581", "null";
+};
+
+&charger_partition
+{
+	status = "ok";
+};
+
+&mca_vbat_ovp_mon {
+	vbat_ovp_threshold_ffc = <4580>;
+	vbat_ovp_threshold_normal = <4530>;
+	status = "ok";
+};

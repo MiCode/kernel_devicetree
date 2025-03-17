@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/serial/qcom,serial-geni-msm.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. Serial UART for GENI based cores
+
+maintainers:
+  - Mukesh Kumar Savaliya <quic_msavaliy@quicinc.com>
+
+allOf:
+  - $ref: /schemas/serial/serial.yaml#
+
+properties:
+  compatible:
+    enum:
+      - qcom,msm-geni-serial-hs
+      - qcom,msm-geni-console
+
+  clocks:
+    maxItems: 1
+
+  clock-names:
+    const: se-clk
+
+  interconnects:
+    maxItems: 3
+
+  interconnect-names:
+    items:
+      - const: qup-core
+      - const: qup-config
+      - const: qup-memory
+
+  interrupts:
+    description: first irq for UART core & second irq for host wake up
+    maxItems: 2
+
+  operating-points-v2: true
+
+  pinctrl-0: true
+  pinctrl-1: true
+  pinctrl-2: true
+  pinctrl-3: true
+
+  pinctrl-names:
+    minItems: 1
+    items:
+      - const: default
+      - const: active
+      - const: sleep
+      - const: shutdown
+
+  power-domains:
+    maxItems: 1
+
+  reg:
+    maxItems: 1
+
+  # Optional property
+  qcom,suspend-ignore-children:
+    type: boolean
+    description: When set ignores dependencies on children by PM framework
+
+required:
+  - compatible
+  - clocks
+  - clock-names
+  - interrupts
+  - reg
+  - qcom,wakeup-byte
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    #include <dt-bindings/clock/qcom,gcc-sun.h>
+    #include <dt-bindings/interconnect/qcom,sun.h>
+
+    qupv3_se14_4uart: qcom,qup_uart@898000 {
+        compatible = "qcom,msm-geni-serial-hs";
+        reg = <0x898000 0x4000>;
+        reg-names = "se_phys";
+        interrupts = <&intc GIC_SPI 461 IRQ_TYPE_LEVEL_HIGH>,
+            <&tlmm 27 IRQ_TYPE_LEVEL_HIGH>;
+        clock-names = "se-clk";
+        clocks = <&gcc GCC_QUPV3_WRAP2_S6_CLK>;
+        interconnect-names = "qup-core", "qup-config", "qup-memory";
+        interconnects = <&clk_virt MASTER_QUP_CORE_2 &clk_virt SLAVE_QUP_CORE_2>,
+                        <&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_2>,
+                        <&aggre2_noc MASTER_QUP_2 &mc_virt  SLAVE_EBI1>;
+        pinctrl-names = "default", "active", "sleep", "shutdown";
+        pinctrl-0 = <&qupv3_se14_default_cts>, <&qupv3_se14_default_rts>,
+            <&qupv3_se14_default_tx>, <&qupv3_se14_default_rx>;
+        pinctrl-1 = <&qupv3_se14_cts>, <&qupv3_se14_rts>,
+            <&qupv3_se14_tx>, <&qupv3_se14_rx>;
+        pinctrl-2 = <&qupv3_se14_cts>, <&qupv3_se14_rts>,
+            <&qupv3_se14_tx>, <&qupv3_se14_default_rx>;
+        pinctrl-3 = <&qupv3_se14_default_cts>, <&qupv3_se14_default_rts>,
+            <&qupv3_se14_default_tx>, <&qupv3_se14_default_rx>;
+        qcom,wakeup-byte = <0xFD>;
+        qcom,suspend-ignore-children;
+    };
+...

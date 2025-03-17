@@ -1,0 +1,129 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/gunyah/vm.yaml#
+$schema: http://devicetree.org/meta-schemas/base.yaml#
+
+title: Virtual Machine (VM) Configuration
+
+maintainers:
+  - Venkata Narendra Kumar Gutta <quic_vgutta@quicinc.com>
+  - Murali Nalajala <quic_mnalajal@quicinc.com>
+
+description: |+
+  Configuration properties for Virtual Machines. This configuration
+  is used by virtual machine manager and know about various
+  properties of VM before it launch the virtual machine
+
+properties:
+  compatible:
+    const: qcom,vm-1.0
+
+  vm-type:
+    description: type of virtual machine e.g aarch64, x86 etc
+    const: aarch64-guest
+
+  boot-config:
+    const: fdt,unified
+
+  os-type:
+    const: linux
+
+  kernel-entry-segment:
+    $ref: /schemas/types.yaml#/definitions/string-array
+
+  kernel-entry-offset:
+    $ref: /schemas/types.yaml#/definitions/uint64
+
+  vendor:
+    $ref: /schemas/types.yaml#/definitions/string-array
+
+  image-name:
+    $ref: /schemas/types.yaml#/definitions/string-array
+
+  qcom,pasid:
+    $ref: /schemas/types.yaml#/definitions/uint64
+    description: PIL SW-ID, only for PIL VMs
+
+  memory:
+    type: object
+    properties:
+      "#address-cells":
+        const: 2
+      "#size-cells":
+        const: 2
+      base-address:
+        description: Base address of the memory for virtual machine
+        maxItems: 2
+      size-min:
+        description: Size of the memory that is being used by the virtual machine
+        maxItems: 2
+
+  segments:
+    type: object
+    properties:
+      kernel:
+        maxItems: 4
+        description: Load location offset of the kernel
+      dt:
+        maxItems: 4
+        description: Load location offset of devicetree
+
+  vcpus:
+    type: object
+    properties:
+      config:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: path to DT node where CPU configuration will be overlaid by RM
+      affinity:
+        enum:
+          - static
+          - sticky
+          - proxy
+      affinity-map:
+        $ref: /schemas/types.yaml#/definitions/uint32-array
+        description: |
+          Array where index is the vCPU id.
+          The value at the index is the physical cpu to affine that vcpu to.
+
+  interrupts:
+    type: object
+    properties:
+      config:
+        $ref: /schemas/types.yaml#/definitions/phandle
+        description: Phandle to the interrupt controller
+
+  vdevices:
+    type: object
+    properties:
+      generate:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: path to DT node where vdevices configuration will be overlaid by RM
+    patternProperties:
+      ".*":
+        type: object
+        properties:
+          vdevice-type:
+            enum:
+              - rm-rpc
+              - doorbell-source
+              - doorbell
+              - message-queue
+              - shm
+              - shm-doorbell
+              - iomem
+          generate:
+            $ref: /schemas/types.yaml#/definitions/string
+            description: path to DT node where vdevices configuration will be overlaid by RM
+          push-compatible:
+            $ref: /schemas/types.yaml#/definitions/string-array
+            description: Additional compatible strings to apply to the vdevice DT node
+          qcom,label:
+            $ref: /schemas/types.yaml#/definitions/uint32
+            description: label provided by RM when providing the capability to VM
+
+required:
+  - compatible
+  - image_to_be_loaded
+
+additionalProperties: true

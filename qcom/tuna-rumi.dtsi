@@ -1,0 +1,132 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/clock/qcom,gcc-tuna.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+
+&arch_timer {
+	clock-frequency = <500000>;
+};
+
+&memtimer {
+	clock-frequency = <500000>;
+};
+
+&soc {
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+
+	usb_emuphy: phy@a784000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x0a784000 0x9500>;
+
+		qcom,emu-init-seq = <0xfffff 0x4
+			0xffff0 0x4
+			0x100000 0x20
+			0x0 0x20
+			0x000101F0 0x20
+			0x00100000 0x3c
+			0x0 0x3c
+			0x0 0x4>;
+	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L1F>;
+	vdda-phy-max-microamp = <214160>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4B>;
+	vdda-pll-max-microamp = <18340>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B>;
+	vdda-qref-max-microamp = <64500>;
+
+	/* Detect whether RH132 card based sequences to be used */
+	qcom,soc_emulation_type_addr = <0x1fc8004>;
+	qcom,soc_emulation_type_bits = <32>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+	limit-rate = <2>; /* HS Rate-B */
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L12B>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L3F>;
+	vccq-max-microamp = <1200000>;
+
+	qcom,vddp-ref-clk-supply = <&L5B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	clock-names =
+		"core_clk",
+		"bus_aggr_clk",
+		"iface_clk",
+		"core_clk_unipro",
+		"core_clk_ice",
+		"ref_clk",
+		"tx_lane0_sync_clk",
+		"rx_lane0_sync_clk",
+		"rx_lane1_sync_clk";
+	clocks =
+		<&gcc GCC_UFS_PHY_AXI_CLK>,
+		<&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
+		<&gcc GCC_UFS_PHY_AHB_CLK>,
+		<&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
+		<&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
+		<&rpmhcc RPMH_CXO_PAD_CLK>,
+		<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
+
+	qcom,disable-lpm;
+
+	status = "ok";
+};
+
+&usb0 {
+	dwc3@a600000 {
+		usb-phy = <&usb_emuphy>, <&usb_nop_phy>;
+		dr_mode = "peripheral";
+		maximum-speed = "high-speed";
+	};
+};
+
+&cam_rsc {
+	status = "disabled";
+};
+
+&disp_rsc {
+	status = "disabled";
+};
+
+&qupv3_se7_2uart {
+	qcom,rumi_platform;
+};
