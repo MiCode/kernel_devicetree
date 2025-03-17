@@ -49,3 +49,5 @@
 | uke-v-oss | Xiaomi Pad 7 | Android V | LA.VENDOR.14.3.0.r1-14500-r1.0.r1_00042.0 |[uke-v-oss](https://github.com/MiCode/kernel_devicetree/tree/uke-v-oss) |
 | bsp-miro-v-oss | REDMI K80 PRO | Android V | qcom-LA.VENDOR.14.3.0.r1-14500-r1.0.r1_00042.0 |[bsp-miro-v-oss](https://github.com/MiCode/kernel_devicetree/tree/bsp-miro-v-oss) |
 | warm-u-oss | Redmi A4 5G / POCO C75 5G | Android U | snapdragon-mid-2024-spf-1-0_r1.0.r1_00006.0 |[warm-u-oss](https://github.com/MiCode/kernel_devicetree/tree/warm-u-oss) |
+| dada-v-oss | Xiaomi 15 / Xiaomi 15 Pro | Android V | qcom-LA.VENDOR.15.4.0.r1-08900-r1.0.r1_00022.1 |[dada-v-oss](https://github.com/MiCode/kernel_devicetree/tree/dada-v-oss) |
+
