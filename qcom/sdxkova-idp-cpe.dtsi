@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "sdxkova-pmic-overlay.dtsi"
+
+&sdhc_1 {
+	status = "ok";
+
+	reg = <0x0 0x08804000 0x0 0x1000>, <0x0 0x08805000 0x0 0x1000>;
+	reg-names = "hc", "cqhci";
+
+	mmc-ddr-1_8v;
+	mmc-hs200-1_8v;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+
+	bus-width = <8>;
+	no-sd;
+	non-removable;
+	supports-cqe;
+	cap-mmc-hw-reset;
+
+	/* DLL HSR settings. Refer go/hsr - <Target> DLL settings */
+	qcom,dll-hsr-list = <0x000F442C 0x0 0x01
+				0x090106C0 0x80040868>;
+
+	/* Add dt entry for gcc hw reset */
+	resets = <&gcc GCC_EMMC_BCR>;
+	reset-names = "core_reset";
+
+	vdd-supply = <&vreg_sdc1_emmc_sd_vdd>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L6B>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 200000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_emmc_on>;
+	pinctrl-1 = <&sdc1_emmc_off>;
+
+	operating-points-v2 = <&sdhc1_opp_table>;
+};
+
+&pmx75_vbus_detect {
+	status = "ok";
+};
+

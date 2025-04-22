@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "monaco-thermal-overlay.dtsi"
+#include "monaco-haptics-fifo-data.dtsi"
+
+&sdhc_1 {
+	status = "ok";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	vdd-supply = <&L25A>;
+	qcom,vdd-voltage-level = <3080000 3080000>;
+	qcom,vdd-current-level = <0 250000>;
+
+	vdd-io-supply = <&L15A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 250000>;
+};
+
+&sdhc_3 {
+	/* device core power supply for sd card*/
+	vdd-supply = <&L26A>;
+	qcom,vdd-voltage-level = <3304000 3304000>;
+	qcom,vdd-current-level = <200 570000>;
+
+	/* device communication power supply for msm_io*/
+	vdd-io-supply = <&L16A>;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-current-level = <200 22000>;
+
+	keep-power-in-suspend;
+	non-removable;
+	qcom,core_3_0v_support;
+	qcom,restore-after-cx-collapse;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc3_clk_on &sdc3_cmd_on &sdc3_data_on>;
+	pinctrl-1 = <&sdc3_clk_off &sdc3_cmd_off &sdc3_data_off>;
+
+	/* forbid SDR104/SDR50/DDR50 for hi3881 */
+	sdhci-caps-mask = <0x7 0x0>;
+	qcom,devfreq,freq-table = <400000 20000000 25000000 50000000>;
+	max-frequency = <50000000>;
+
+	status = "disabled";
+};
+
+&pm5100_sdam_2 {
+	hap_cl_brake: cl_brake@7c {
+		reg = <0x7c 0x1>;
+		bits = <0 8>;
+	};
+};
+
+&pm5100_haptics {
+	nvmem-cell-names = "hap_cl_brake";
+	nvmem-cells = <&hap_cl_brake>;
+	nvmem-names = "hap_cfg_sdam";
+	nvmem = <&pm5100_sdam_23>;
+	status = "okay";
+};

@@ -1,0 +1,40 @@
+#include "sun-mtp-v8.dtsi"
+
+&soc {
+	dump_display_mem: dump_display_region@81cf4000 {
+		compatible = "xiaomi,dump_display";
+		reg = <0x81cf4000 0x800>;
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8550_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <32>;
+			linux,can-disable;
+		};
+	};
+
+	mtdoops_pmsg@0xa3500000 {
+		compatible = "xiaomi,mtdoops_pmsg";
+		reg = <0xa3500000 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	bootmonitor_pmsg@0xa3500000 {
+		compatible = "xiaomi,bootmonitor_pmsg";
+		reg = <0xa3500000 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+};

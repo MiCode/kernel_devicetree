@@ -1,0 +1,124 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/spmi/spmi.h>
+
+&spmi_bus {
+	#address-cells = <2>;
+	#size-cells = <0>;
+	interrupt-controller;
+	#interrupt-cells = <4>;
+
+	qcom,pmd802x@4 {
+		compatible = "qcom,spmi-pmic";
+		reg = <0x4 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		pmd802x_tz: pmd802x-temp-alarm@a00 {
+			compatible = "qcom,spmi-temp-alarm";
+			reg = <0xa00>;
+			interrupts = <0x4 0xa 0x0 IRQ_TYPE_EDGE_BOTH>;
+			#thermal-sensor-cells = <0>;
+		};
+
+		pmd802x_gpios: pinctrl@8800 {
+			compatible = "qcom,pmd802x-gpio";
+			reg = <0x8800>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		amoled-ecm@f900 {
+			compatible = "qcom,amoled-ecm";
+			reg = <0xf900>;
+			nvmem-names = "amoled-ecm-sdam0", "amoled-ecm-sdam1",
+				      "amoled-ecm-sdam2";
+			nvmem = <&pmk8550_sdam_13>, <&pmk8550_sdam_14>,
+				<&pmk8550_sdam_41>;
+			interrupt-names = "ecm-sdam0", "ecm-sdam1",
+					  "ecm-sdam2";
+			interrupts = <0x0 0x7c 0x1 IRQ_TYPE_EDGE_RISING>,
+				     <0x0 0x7d 0x1 IRQ_TYPE_EDGE_RISING>,
+				     <0x0 0x98 0x1 IRQ_TYPE_EDGE_RISING>;
+		};
+
+		qcom-amoled {
+			compatible = "qcom,amoled-regulator";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			/*
+			 * Following ibb_spur_sqm_timer nvmem cell is specified
+			 * only to show its use. But it won't be used by
+			 * amoled-regulator until qcom,ibb-spur-mitigation-level
+			 * and other related properties are specified under
+			 * ibb subnode.
+			 */
+			nvmem-cells = <&ibb_spur_sqm_timer>;
+			nvmem-cell-names = "ibb_spur_sqm_timer";
+			status = "disabled";
+
+			ibb_vreg: ibb@f800 {
+				reg = <0xf800>;
+				reg-names = "ibb_base";
+				regulator-name = "ibb";
+				regulator-min-microvolt = <800000>;
+				regulator-max-microvolt = <9000000>;
+				regulator-allow-set-load;
+				qcom,swire-control;
+			};
+
+			ab_vreg: elvdd@f900 {
+				reg = <0xf900>;
+				reg-names = "ab_base";
+				regulator-name = "ab";
+				regulator-min-microvolt = <2500000>;
+				regulator-max-microvolt = <5500000>;
+				qcom,swire-control;
+			};
+
+			oledb_vreg: oledb@fa00 {
+				reg = <0xfa00>;
+				reg-names = "oledb_base";
+				regulator-name = "oledb";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <8000000>;
+				qcom,swire-control;
+			};
+		};
+	};
+};
+
+&thermal_zones {
+	pmd802x_temp_alarm: pmd802x_tz {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pmd802x_tz>;
+
+		trips {
+			pmd802x_trip0: trip0 {
+				temperature = <95000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			pmd802x_trip1: trip1 {
+				temperature = <115000>;
+				hysteresis = <0>;
+				type = "hot";
+			};
+
+			pmd802x_trip2: trip2 {
+				temperature = <145000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+		};
+	};
+};
