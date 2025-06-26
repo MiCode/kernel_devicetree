@@ -1,0 +1,130 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/mtd/qcom,msm-nand.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. QPIC nand controller
+
+maintainers:
+  - Pradeep P V K <quic_pragalla@quicinc.com>
+  - Sarthak Garg <quic_sartgarg@quicinc.com>
+
+properties:
+  compatible:
+    const: qcom,msm-nand
+
+  reg:
+    maxItems: 2
+
+  reg-names:
+    maxItems: 2
+
+  clocks:
+    items:
+      - description: Core Clock.
+
+  clock-names:
+    items:
+      - const: core_clk
+
+  interrupts:
+    maxItems: 1
+
+  interrupt-names:
+    const: bam_irq
+
+  iommus:
+    items:
+      - description: phandle to apps_smmu node with sid mask.
+
+  qcom,iommu-dma:
+    description: |
+      default
+        Standard iommu translation behaviour. Calling iommu and DMA apis in
+        atomic context is not allowed.
+      bypass
+        DMA APIs will use 1-to-1 translation between dma_addr and phys_addr.
+      fastmap
+        DMA APIs will run faster, but use several orders of magnitude more
+        memory. Also allows using iommu and DMA apis in atomic context.
+      atomic
+        Allows using iommu and DMA apis in atomic context.
+      disabled
+        The iommu client is responsible for allocating an iommu domain.
+    enum:
+      - default
+      - bypass
+      - fastmap
+      - atomic
+      - disabled
+
+  dma-coherent: true
+
+  interconnects:
+    items:
+      - description: data path, nand to ddr.
+
+  interconnect-names:
+    items:
+      - const: nand-ddr
+
+  qcom,reg-adjustment-offset:
+    description: base adjustment offset value for the version registers.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  nvmem-cells:
+    items:
+      - description: Phandle to nvmem cell that contains 'boot_config'.
+
+  nvmem-cell-names:
+    items:
+      - const: boot_conf
+
+  qcom,boot_dev_bits:
+    description: Number of FAST_BOOT bits in boot_config register.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,nand_boot:
+    description: boot device detection values for NAND.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    #include <dt-bindings/interconnect/qcom,sdx75.h>
+    qcom,nand@f9af0000 {
+      compatible = "qcom,msm-nand";
+      reg = <0xf9af0000 0x1000>,
+            <0xf9ac4000 0x8000>;
+      reg-names = "nand_phys",
+                  "bam_phys";
+      qcom,reg-adjustment-offset = <0x4000>;
+
+      interrupts = <0 279 0>;
+      interrupt-names = "bam_irq";
+
+      interconnects = <&system_noc MASTER_QPIC &mc_virt SLAVE_EBI1>;
+      interconnect-names = "nand-ddr";
+
+      clock-names = "core_clk";
+      clocks = <&rpmhcc RPMH_QPIC_CLK>;
+
+      nvmem-cells = <&boot_config>;
+      nvmem-cell-names = "boot_conf";
+      qcom,boot_dev_bits = <0x4>;
+      qcom,nand_boot = <0x0>;
+
+      iommus = <&apps_smmu 0x100 0x3>;
+      qcom,iommu-dma = "atomic";
+      dma-coherent;
+
+    };

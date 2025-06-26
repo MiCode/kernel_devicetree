@@ -1,0 +1,77 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "tuna-pm7550ba.dtsi"
+
+&pmic_glink_debug {
+	/delete-node/ i2c@104;
+	/delete-node/ spmi@200;
+
+		i2c@105 {
+		reg = <0x105>;  /* I2C instance 5 in ADSP for SE4 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1500@69 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x69>;
+			qcom,can-sleep;
+		};
+
+		qcom,smb1500@68 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x68>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	/delete-node/ smb1398_1_iin;
+	/delete-node/ smb1398_1_ichg;
+	/delete-node/ smb1398_1_die_temp;
+
+	smb1500_1_iin {
+		reg = <0x1056901>;
+		label = "smb1500_1_iin";
+	};
+
+	smb1500_1_ichg {
+		reg = <0x1056902>;
+		label = "smb1500_1_ichg";
+	};
+
+	smb1500_1_die_temp {
+		reg = <0x1056903>;
+		label = "smb1500_1_die_temp";
+	};
+
+	smb1500_2_iin {
+		reg = <0x1056801>;
+		label = "smb1500_2_iin";
+	};
+
+	smb1500_2_ichg {
+		reg = <0x1056802>;
+		label = "smb1500_2_ichg";
+	};
+
+	smb1500_2_die_temp {
+		reg = <0x1056803>;
+		label = "smb1500_2_die_temp";
+	};
+};
+
+&pm7550ba_eusb2_repeater {
+	vdd18-supply = <&L7B>;
+	vdd3-supply = <&L17B>;
+	status = "ok";
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pm7550ba_eusb2_repeater>;
+	usb-repeater = <&pm7550ba_eusb2_repeater>;
+};

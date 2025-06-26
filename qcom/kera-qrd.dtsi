@@ -1,0 +1,160 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+#include <dt-bindings/gpio/gpio.h>
+
+&sdhc_2 {
+	vdd-supply = <&L13B>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 976270>;
+
+	vdd-io-supply = <&L23B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 5830>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 58 GPIO_ACTIVE_LOW>;
+
+	qcom,uses_level_shifter;
+
+	status = "ok";
+};
+
+&qupv3_se4_i2c {
+	status = "ok";
+	fsa4480: fsa4480@42 {
+		compatible = "qcom,fsa4480-i2c";
+		reg = <0x42>;
+	};
+};
+
+&qupv3_se8_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "ok";
+	qcom,touch-active = "goodix,gt9916S";
+	qcom,la-vm;
+
+	goodix-berlin@0 {
+		compatible = "goodix,gt9916S";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <13 0x2008>;
+		goodix,reset-gpio = <&tlmm 16 0x00>;
+		goodix,irq-gpio = <&tlmm 13 0x2008>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <1080>;
+		goodix,panel-max-y = <2400>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,firmware-name = "goodix_firmware_spi.bin";
+		goodix,config-name = "goodix_cfg_group_spi.bin";
+		goodix,avdd-name = "avdd";
+		goodix,iovdd-name = "iovdd";
+		avdd-supply = <&L22B>;
+		iovdd-supply = <&L8B>;
+		goodix,touch-type = "primary";
+		goodix,qts_en;
+
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <653>;
+		qts,trusted-touch-io-bases = <0x880000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 0 0 &tlmm 1 0 &tlmm 2 0
+						&tlmm 3 0 &tlmm 16 0 &tlmm 13 0x2008>;
+	};
+};
+
+&pmic_glink_debug {
+	i2c@105 {
+		reg = <0x105>;  /* I2C instance 5 in ADSP for SE4 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1393@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1393_1_iin {
+		reg = <0x1053401>;
+		label = "smb1393_1_iin";
+	};
+
+	smb1393_1_ichg {
+		reg = <0x1053402>;
+		label = "smb1393_1_ichg";
+	};
+
+	smb1393_1_die_temp {
+		reg = <0x1053403>;
+		label = "smb1393_1_die_temp";
+	};
+};
+
+
+&qupv3_se4_i2c {
+	status = "ok";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	redriver: redriver@1c {
+		compatible = "onnn,redriver";
+		reg = <0x1c>;
+
+		vdd-supply = <&L7B>;
+
+		lane-channel-swap;
+
+		eq = /bits/ 8 <
+				/* Parameters for USB */
+				0x4 0x4 0x4 0x4
+				/* Parameters for DP */
+				0x5 0x7 0x7 0x5>;
+		flat-gain = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x1 0x1 0x3
+				/* Parameters for DP */
+				0x0 0x3 0x3 0x0>;
+		output-comp = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x3 0x3 0x3
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+		loss-match = /bits/ 8 <
+				/* Parameters for USB */
+				0x1 0x3 0x3 0x1
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+	};
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "unused";
+};
+
+&usb0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb3phy_portselect_gpio>;
+	gpios = <&tlmm 122 0>;
+
+	ssusb_redriver = <&redriver>;
+
+	qcom,wcd_usbss = <&wcd_usbss>;
+
+};

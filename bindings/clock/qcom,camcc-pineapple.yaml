@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/qcom,camcc-pineapple.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Camera Clock & Reset Controller Binding for PINEAPPLE
+
+maintainers:
+  - Xubin Bai <quic_xubibai@quicinc.com>
+
+description: |
+  Camera clock control module which supports the clocks, resets and
+  power domains on PINEAPPLE.
+
+  See also:
+  - dt-bindings/clock/qcom,camcc-pineapple.h
+
+properties:
+  compatible:
+    enum:
+      - qcom,pineapple-camcc
+      - qcom,pineapple-camcc-v2
+
+  clocks:
+    items:
+      - description: Board XO source
+      - description: Sleep clock source
+
+  clock-names:
+    items:
+      - const: bi_tcxo
+      - const: sleep_clk
+
+  qcom,cam_crm-crmc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: Phandle pointer to the CESTA crmc node
+
+  vdd_mm-supply:
+    description: Phandle pointer to the vdd_mm logic rail supply
+
+  vdd_mx-supply:
+    description: Phandle pointer to the vdd_mx logic rail supply
+
+  vdd_mxc-supply:
+    description: Phandle pointer to the vdd_mxc logic rail supply
+
+required:
+  - compatible
+  - clocks
+  - clock-names
+
+allOf:
+  - $ref: "qcom,gcc.yaml#"
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    camcc: clock-controller@ade0000 {
+      compatible = "qcom,pineapple-camcc", "syscon";
+      reg = <0xade0000 0x20000>;
+      reg-name = "cc_base";
+      vdd_mm-supply = <&VDD_MM_LEVEL>;
+      vdd_mx-supply = <&VDD_MX_LEVEL>;
+      vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+      clocks = <&rpmhcc RPMH_CXO_CLK>,
+               <&sleep_clk>;
+      clock-names = "bi_tcxo",
+                    "sleep_clk";
+      qcom,cam_crm-crmc = <&camcc_crmc>;
+      #clock-cells = <1>;
+      #reset-cells = <1>;
+    };
+...

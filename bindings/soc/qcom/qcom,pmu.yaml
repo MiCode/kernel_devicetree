@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,pmu.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) PMU Monitor Driver
+
+maintainers:
+  - avajid@quicinc.com <quic_avajid@quicinc.com>
+  - gurbaror@quicinc.com <quic_gurbaror@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. PMU Driver provides an interface to request
+  for per-CPU performance counters that are available on some QTI chipsets.
+
+properties:
+  compatible:
+    const: qcom,pmu
+
+  qcom,long-counter:
+    description:
+      Specify if the pmu counters are long (64 bit) counters.
+    type: boolean
+
+  qcom,pmu-events-tbl:
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    description:
+      A list of the pmu events to be configured on the cpus. The first column in
+      the table contains the event id and the second column contains a bit mask
+      (cpumask) of cpus for which the event should be configured on. The third
+      column contains the AMU id for events that are present as part of AMU
+      counters. The list of ids can be found in enum amu_counters
+      (include/soc/qcom/pmu_lib.h). 0xFF represents an invalid id. The fourth
+      column represents the index in enum cpucp_ev_idx
+      (include/linux/scmi_pmu.h), which is a shared enum between hlos and cpucp.
+      This helps maintain the sequence of events when pmu hardware ids or cached
+      counts are shared between hlos and cpucp. 0xFF represents an invalid
+      index, which means this event is not supposed to be shared between hlos
+      and cpucp.
+
+required:
+  - compatible
+  - qcom,pmu-events-tbl
+
+examples:
+  - |
+    qcom,pmu {
+      compatible = "qcom,pmu";
+      qcom,long-counter;
+      qcom,pmu-events-tbl =
+        < 0x0008 0xFF 0x02 0x02 >,
+        < 0x0011 0xFF 0x01 0x01 >,
+        < 0x0017 0xFF 0xFF 0x04 >,
+        < 0x002A 0xFF 0xFF 0xFF >,
+        < 0x1000 0xFF 0xFF 0xFF >;
+    };
