@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/input/touchscreen/parade_pt.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Parade pt touch controller
+
+description: The Parade Touch controller is connected to the
+  host processor via I2C. The controller generates interrupts
+  when the user touches the panel. The host controller is
+  expected to read the touch coordinates over I2C and pass
+  the coordinates to the rest of the system.
+
+maintainers:
+  - Akshay Gola <quic_agola@quicinc.com>
+
+allOf:
+  - $ref: touchscreen.yaml#
+
+properties:
+  compatible:
+    enum:
+      - parade,pt_i2c_adapter
+
+  reg:
+    description: i2c slave address of the device.
+
+  vdd-supply:
+    description: digital voltage power supply needed to power device.
+
+  vcc_i2c-supply:
+    description: i2c voltage power supply needed to power device.
+
+  parade,reset-gpio:
+    description: reset gpio
+
+  parade,irq-gpio:
+    description: irq gpio
+
+unevaluatedProperties: false
+
+required:
+  - compatible
+  - reg
+  - vdd-supply
+  - vcc_i2c-supply
+  - parade,reset-gpio
+  - parade,irq-gpio
+
+examples:
+  - |
+    &i2c_1 {
+                status = "ok";
+
+                tsc@24 {
+                        compatible = "parade,pt_i2c_adapter";
+                        reg = <0x24>;
+                        status = "ok";
+
+                        vdd-supply = <&L29A>;
+                        vcc_i2c-supply = <&L21A>;
+
+                        parade,core {
+                                parade,rst_gpio = <&tlmm 71 0x00>;
+                                parade,irq_gpio = <&tlmm 80 0x2008>;
+                        };
+                };
+        };

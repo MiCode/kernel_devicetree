@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include "tuna-pmic-overlay.dtsi"
+
+/*
+&qupv3_se4_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+	qcom,touch-active = "st,fts";
+	qcom,la-vm;
+
+	st_fts@0 {
+		compatible = "st,fts";
+		reg = <0x0>;
+		spi-max-frequency = <1000000>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <176 0x2008>;
+		vdd-supply = <&L1D>;
+		avdd-supply = <&L22B>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		st,irq-gpio = <&tlmm 176 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 189 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
+
+		st,touch-type = "primary";
+		st,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <658>;
+		qts,trusted-touch-io-bases = <0xa90000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 16 0 &tlmm 17 0 &tlmm 18 0
+						&tlmm 19 0 &tlmm 189 0 &tlmm 176 0x2008>;
+
+	};
+};
+*/
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-niobe";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L1F>;
+	vdda-phy-max-microamp = <213100>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L4B>;
+	vdda-pll-max-microamp = <18340>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B>;
+	vdda-qref-max-microamp = <64500>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&L12B>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L3F>;
+	vccq-max-microamp = <1200000>;
+
+	qcom,vccq-proxy-vote-supply = <&L3F>;
+	qcom,vccq-proxy-vote-max-microamp = <1200000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L5B>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S2B>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	status = "ok";
+};
+
+&wcd_usbss {
+	interrupt-parent = <&spmi_bus>;
+	interrupts = <0x0 0xb6 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "usb_wcd";
+	nvmem-cells = <&usb_mode>;
+	nvmem-cell-names = "usb_mode";
+};
+
+&sdhc_2 {
+	vdd-supply = <&L13B>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 976310>;
+
+	vdd-io-supply = <&L23B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 5830>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
+
+	qcom,uses_level_shifter;
+
+	status = "ok";
+};
+
+&thermal_zones {
+	/delete-node/ sys-therm-11;
+};
+
+&qupv3_se5_i2c {
+	status = "ok";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	redriver: redriver@1c {
+		compatible = "onnn,redriver";
+		reg = <0x1c>;
+
+		vdd-supply = <&L7B>;
+
+		lane-channel-swap;
+
+		eq = /bits/ 8 <
+				/* Parameters for USB */
+				0x4 0x4 0x4 0x4
+				/* Parameters for DP */
+				0x5 0x7 0x7 0x5>;
+		flat-gain = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x1 0x1 0x3
+				/* Parameters for DP */
+				0x0 0x3 0x3 0x0>;
+		output-comp = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x3 0x3 0x3
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+		loss-match = /bits/ 8 <
+				/* Parameters for USB */
+				0x1 0x3 0x3 0x1
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+	};
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "unused";
+};
+
+&usb0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb3phy_portselect_gpio>;
+	gpios = <&tlmm 122 0>;
+
+	ssusb_redriver = <&redriver>;
+
+	qcom,wcd_usbss = <&wcd_usbss>;
+
+};
