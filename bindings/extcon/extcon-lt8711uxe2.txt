@@ -1,0 +1,37 @@
+LT8711UXE2 Extcon device
+
+Required properties:
+- compatible: Should be "lt,lt8711uxe2"
+- reg: Main I2C slave ID (for I2C host driver)
+- interrupt-parent: the phandle for the gpio controller
+- interrupts: description of interrupt line
+- lt,irq-gpio: Main IRQ gpio mapping
+- lt,dp-lane-sel: Main DP lane mapping
+- lt,dp-alt-en: Main DP alt mapping
+- lt,reset-gpio: Main reset gpio mapping
+- lt,cc-gpio: use the GPIO signal from KTM5030 to determine CC communication
+- pinctrl-names: the pin control state names; should contain "default"
+- pinctrl-0: List of phandles to configure the GPIO pin used as interrupt line
+
+Example:
+
+&qupv3_hub_i2c3 {
+	status = "ok";
+	extcon_lt8711uxe2: lt8711uxe2@3f {
+		compatible = "lt,lt8711uxe2";
+		reg = <0x3f>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <31 IRQ_TYPE_LEVEL_HIGH>;
+		lt,irq-gpio = <&tlmm 31 0>;
+		lt,dp-lane-sel = <&tlmm 50 0>;
+		lt,dp-alt-en = <&tlmm 51 0>;
+		lt,reset-gpio = <&tlmm 46 0>;
+		lt.cc-gpio = <&tlmm 18 0>;
+		usb-ss-support;
+		pinctrl-names = "default";
+		pinctrl-0 = <&lt8711uxe2_int &lt8711uxe2_dp_alt_en
+			&lt8711uxe2_dp_lane_sel &lt8711uxe2_rst>;
+		img-fw-rev = <0x000004>;
+		status = "okay";
+	};
+};

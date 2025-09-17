@@ -1,0 +1,257 @@
+#include "sdxpinn-pmic-overlay.dtsi"
+
+&arch_timer {
+	clock-frequency = <500000>;
+};
+
+&memtimer {
+	clock-frequency = <500000>;
+};
+
+&soc   {
+	pcie0: qcom,pcie@1bf0000 {
+		status = "ok";
+		reg = <0x01bf0000 0x4000>,
+			<0x01bf7000 0x2000>,
+			<0x48000000 0xf20>,
+			<0x48000f20 0xa8>,
+			<0x48001000 0x2000>,
+			<0x48100000 0x100000>,
+			<0x01bf4000 0x1000>,
+			<0x01bf7500 0x1000>;
+		reg-names = "parf", "phy", "dm_core", "elbi", "iatu",
+				"conf", "mhi", "rumi";
+		qcom,target-link-speed = <0x1>;
+		qcom,link-check-max-count = <200>; /* 1 sec */
+		qcom,no-l1-supported;
+		qcom,no-l1ss-supported;
+		qcom,no-aux-clk-sync;
+	};
+
+	pcie1: qcom,pcie@1c08000 {
+		status = "ok";
+		reg = <0x01c08000 0x4000>,
+			<0x01c0e000 0x2000>,
+			<0x68000000 0xf1d>,
+			<0x68000f20 0xa8>,
+			<0x68001000 0x1000>,
+			<0x68100000 0x100000>,
+			<0x01c0c000 0x1000>,
+			<0x01c0d000 0x1000>;
+		reg-names = "parf", "phy", "dm_core", "elbi", "iatu",
+				"conf", "mhi", "rumi";
+		qcom,target-link-speed = <0x1>;
+		qcom,link-check-max-count = <200>; /* 1 sec */
+		qcom,no-l1-supported;
+		qcom,no-l1ss-supported;
+		qcom,no-aux-clk-sync;
+	};
+
+	pcie2: qcom,pcie@1c10000 {
+		status = "disabled";
+		reg = <0x01c10000 0x4000>,
+			<0x1c16000 0x2000>,
+			<0x6c000000 0xf1d>,
+			<0x6c000f20 0xa8>,
+			<0x6c001000 0x1000>,
+			<0x6c100000 0x100000>,
+			<0x01c14000 0x1000>;
+		reg-names = "parf", "phy", "dm_core", "elbi", "iatu",
+				"conf", "mhi";
+		qcom,target-link-speed = <0x1>;
+		qcom,link-check-max-count = <200>;
+		qcom,no-l1-supported;
+		qcom,no-l1ss-supported;
+		qcom,no-aux-clk-sync;
+	};
+
+	bi_tcxo: bi_tcxo {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <4>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo";
+	};
+
+	bi_tcxo_ao: bi_tcxo_ao {
+		compatible = "fixed-factor-clock";
+		clocks = <&xo_board>;
+		clock-mult = <1>;
+		clock-div = <4>;
+		#clock-cells = <0>;
+		clock-output-names = "bi_tcxo_ao";
+	};
+};
+
+&qupv3_se1_2uart {
+	qcom,rumi_platform;
+};
+
+&SILVER_OFF {
+	status = "nok";
+};
+
+&SILVER_RAIL_OFF {
+	status = "nok";
+};
+
+&CLUSTER_PWR_DN {
+	status = "nok";
+};
+
+&CX_RET {
+	status = "nok";
+};
+
+&APSS_OFF {
+	status = "nok";
+};
+
+&vreg_sdc2_sd_ls_vccb {
+	compatible = "qcom,stub-regulator";
+	/delete-property/ enable-gpio;
+	status = "ok";
+};
+
+&vreg_sdc2_sd_vdd {
+	status = "ok";
+};
+
+&soc {
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+
+	usb_emu_phy_0: usb_emu_phy@a784000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x0a784000 0x9500>;
+
+		qcom,emu-init-seq = <0x100000 0x20
+				     0x0 0x20
+				     0x000101F0 0x20
+				     0x100000 0x3c
+				     0x0 0x3c
+				     0x0010060 0x3c>;
+	};
+};
+
+&usb {
+	dwc3@a600000 {
+		usb-phy = <&usb_emu_phy_0>, <&usb_nop_phy>;
+		maximum-speed = "high-speed";
+		dr_mode = "peripheral";
+	};
+};
+
+&pcie_ep {
+	reg = <0x48003800 0x10000>,
+		<0x48000000 0xf20>,
+		<0x48000f20 0xa8>,
+		<0x48001000 0x2000>,
+		<0x01bf0000 0x4000>,
+		<0x01bf7000 0x2000>,
+		<0x01bf4000 0x1000>,
+		<0x01bf7500 0x4>;
+	reg-names = "msi", "dm_core", "elbi", "iatu",
+		    "parf", "phy", "mmio", "rumi";
+
+	qcom,pcie-link-speed = <1>;
+	qcom,tcsr-not-supported;
+
+	status = "ok";
+};
+
+&mhi_device {
+	status = "ok";
+};
+
+&sdhc_1 {
+	status = "ok";
+	vdd-supply = <&vreg_sdc1_emmc_sd_vdd>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L6B>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 200000>;
+
+	/delete-property/ mmc-ddr-1_8v;
+	/delete-property/ mmc-hs200-1_8v;
+	/delete-property/ mmc-hs400-1_8v;
+	/delete-property/ mmc-hs400-enhanced-strobe;
+
+	max-frequency = <100000000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	vdd-supply = <&vreg_sdc2_sd_vdd>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&vreg_sdc2_sd_ls_vccb>;
+	qcom,vdd-io-voltage-level = <2850000 2850000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	is_rumi;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 103 GPIO_ACTIVE_LOW>;
+};
+
+&rpmhcc {
+	compatible = "qcom,dummycc";
+	clock-output-names = "rpmh_clocks";
+};
+
+&debugcc {
+	clocks = <&bi_tcxo>, <&gcc 0>;
+	clock-names = "xo_clk_src", "gcc";
+};
+
+&gcc {
+	clocks = <&bi_tcxo>, <&emac0_sgmiiphy_mac_rclk>, <&emac0_sgmiiphy_mac_tclk>,
+		 <&emac0_sgmiiphy_rclk>, <&emac0_sgmiiphy_tclk>, <&emac1_sgmiiphy_mac_rclk>,
+		 <&emac1_sgmiiphy_mac_tclk>, <&emac1_sgmiiphy_rclk>, <&emac1_sgmiiphy_tclk>,
+		 <&pcie20_phy_aux_clk>, <&pcie_1_pipe_clk>, <&pcie_2_pipe_clk>, <&pcie_pipe_clk>,
+		 <&sleep_clk>, <&usb3_phy_wrapper_gcc_usb30_pipe_clk>;
+};
+
+&gcc_emac0_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_emac1_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_pcie_1_phy_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_pcie_2_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_pcie_phy_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&gcc_usb3_phy_gdsc {
+	compatible = "regulator-fixed";
+};
+
+&cpufreq_hw {
+	clocks = <&bi_tcxo>, <&gcc GPLL0>;
+};

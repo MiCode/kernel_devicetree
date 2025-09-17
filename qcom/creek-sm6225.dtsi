@@ -1,0 +1,67 @@
+/*
+  this file is for attribution only of zeus
+  And public attribution of longcheer platforms(like M7 and so and)
+*/
+#include "lc_chg/lc_chg.dtsi"
+
+#include "creek-pinctrl.dtsi"
+#include <dt-bindings/clock/qcom,gcc-khaje.h>
+
+&sdhc_2 {
+	cd-gpios = <&tlmm 88 GPIO_ACTIVE_HIGH>;
+};
+
+/* IR PWM Bringup */
+&soc {
+	irled_pwm_38k: irled_pwm_38k {
+		status = "disbaled";
+		compatible = "qcom-ir-pwm";
+
+		lct,use_cal_mode;
+		lct,cal_enable_time_with_us = <105>;
+		lct,cal_disable_time_with_us = <30>;
+
+		clock-names = "gp2_clk";
+		clocks = <&gcc GCC_GP2_CLK>;
+		pinctrl-names = "active", "sleep";
+		pinctrl-0 = <&irled_pwm_active>;
+		pinctrl-1 = <&irled_pwm_sleep>;
+	};
+
+	mtdoops_pmsg@0x48000000 {
+		compatible = "mtdoops_pmsg";
+		reg = <0x48000000 0x00200000>;
+		console-size = <0x80000>;
+		pmsg-size = <0x100000>;
+	};
+};
+
+/* IR SPI Bringup */
+&qupv3_se4_2uart {
+	status = "disabled";
+};
+
+&qupv3_se4_spi {
+	status = "ok";
+	/* Add slave device config here */
+	ir_spi@1 {
+		compatible = "lc,ir-spi";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <1>; /* Chip select 0 */
+		spi-max-frequency = <1000000>;
+		spi-cpol;
+		status = "ok";
+	};
+};
+
+&usb2_phy0 {
+	qcom,param-override-seq_normal = <
+			0xa6 0x6c	/* override_x0 */
+			0x1f 0x70	/* override_x1 */
+			0x1e 0x74>;	/* override x2 */
+	qcom,param-override-seq-factory = <
+			0xa6 0x6c	/* override_x0 */
+			0x1f 0x70	/* override_x1 */
+			0x1e 0x74>;	/* override x2 */
+};

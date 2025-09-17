@@ -1,0 +1,262 @@
+#include <dt-bindings/subpmic/subpmic_chip.h>
+
+/* GPIO_108 : MAIN_CHG_INT_N */
+
+&tlmm {
+	subpmic_intc_pin: subpmic_intc_pin {
+		mux {
+			pins = "gpio108";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio108";
+			drive-strength = <2>; /* 2 mA */
+			bias-pull-up;         /* PULL DOWN */
+			input-enable;
+		};
+	};
+};
+
+&qupv3_se1_i2c {
+	status = "okay";
+	qcom,bus-recovery;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+
+	xm_subpmic_base: xm_subpmic_base {
+		#io-channel-cells = <1>;
+		compatible = "xiaomi,subpmic-sc6601";
+		reg = <0x61>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <108 0>;
+		interrupt-controller;
+		#interrupt-cells = <1>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&subpmic_intc_pin>;
+		subpmic_sc6601_chg: subpmic_sc6601_chg {
+			#io-channel-cells = <1>;
+			compatible = "southchip,sc6601-power";
+			interrupts = <SC6601_IRQ_HK>, <SC6601_IRQ_CHARGER>,
+					<SC6601_IRQ_DPDM>, <SC6601_IRQ_LED>;
+			interrupt-names = "Hourse Keeping", "Buck Charger",
+					"DPDM", "LED";
+			sc,vsys-limit = <3500>;
+			sc,batsnc-enable = <1>;
+			sc,vbat = <4528>;
+			sc,charge-curr = <4000>;
+			sc,iindpm-disable = <0>;
+			sc,input-curr-limit = <3000>;
+			sc,ico-enable = <0>;
+			sc,iindpm-ico = <100>;
+			sc,precharge-volt = <1>;      /* 0:2900mv, 1:3000, 2:3100, 3:3200 */
+			sc,precharge-curr = <250>;
+			sc,term-en = <1>;
+			sc,term-curr = <1100>;     /* ma */
+			sc,rechg-dis = <1>;
+			sc,rechg-dg = <0>;    /* 0:64ms , 1:256ms , 2:1024ms , 3:2048ms */
+			sc,rechg-volt = <0>;  /* 0:100mv , 1:200mv , 2:300mv , 3:400mv */
+			sc,boost-voltage = <5000>;
+			sc,boost-max-current = <1500>;
+			sc,conv-ocp-dis = <0>;
+			sc,tsbat-jeita-dis = <1>;
+			sc,ibat-ocp-dis = <0>;
+			sc,vpmid-ovp-otg-dis = <0>;
+			sc,vbat-ovp-buck-dis = <0>;
+			sc,ibat-ocp = <1>;    /* 0:10A , 1:12A , 2:14A , 3:16A */
+			/* usb */
+			dpdm-supply = <&usb2_phy0>;
+		};
+
+		subpmic_cid {
+			#io-channel-cells = <1>;
+			compatible = "southchip,subpmic_cid";
+			interrupts = <SC6601_IRQ_CID>;
+			interrupt-names = "CID";
+		};
+
+		subpmic_sy6976_chg: subpmic_sy6976_chg{
+			#io-channel-cells = <1>;
+			compatible = "sy,sy6976-power";
+			interrupts = <SC6601_IRQ_HK>, <SC6601_IRQ_CHARGER>,
+					<SC6601_IRQ_DPDM>, <SC6601_IRQ_LED>;
+			interrupt-names = "Hourse Keeping", "Buck Charger",
+						"DPDM", "LED";
+			sy,vsys-limit = <3500>;
+			sy,batsnc-enable = <1>;
+			sy,vbat = <4528>;
+			sy,charge-curr = <4000>;
+			sy,iindpm-disable = <0>;
+			sy,input-curr-limit = <3000>;
+			sy,ico-enable = <0>;
+			sy,iindpm-ico = <100>;
+			sy,precharge-volt = <1>;        /* 0:2900mv, 1:3000, 2:3100, 3:3200 */
+			sy,precharge-curr = <250>;
+			sy,term-en = <1>;
+			sy,term-curr = <200>;           /* ma */
+			sy,rechg-dis = <0>;
+			sy,rechg-dg = <0>;              /* 0:64ms , 1:256ms , 2:1024ms , 3:2048ms */
+			sy,rechg-volt = <0>;            /* 0:100mv , 1:200mv , 2:300mv , 3:400mv */
+			sy,boost-voltage = <5000>;
+			sy,boost-max-current = <2100>;
+			sy,conv-ocp-dis = <0>;
+			sy,tsbat-jeita-dis = <1>;
+			sy,ibat-ocp-dis = <0>;
+			sy,vpmid-ovp-otg-dis = <0>;
+			sy,vbat-ovp-buck-dis = <0>;
+			sy,ibat-ocp = <1>;              /* 0:12A , 1:16A */
+			sy,cid-en = <1>;                /* 0 disable, 1 enable */
+			sy,fast-chg-safety-timer = <3>; /* 0:5h , 1:8h , 2:12h , 3:24h */
+			status = "okay";
+			def-supply = <&qupv3_se1_i2c>;
+			/* usb */
+			dpdm-supply = <&usb2_phy0>;
+		};
+
+		subpmic_nu6601_chg: subpmic_nu6601_chg{
+			#io-channel-cells = <1>;
+			status = "okay";
+			compatible = "nuvolta,nu6601_charger";
+			interrupts = <USB_DET_DONE>, <VBUS_0V>, <VBUS_GD>, <CHG_FSM>,
+							<CHG_OK>, <BC12_DET_DONE>, <DM_COT_PLUSE_DONE>, <DP_COT_PLUSE_DONE>,
+							<DPDM_2PLUSE_DONE>, <DPDM_3PLUSE_DONE>, <DM_16PLUSE_DONE>, <DP_16PLUSE_DONE>,
+							<HVDCP_DET_FAIL>, <HVDCP_DET_OK>, <BOOST_FAIL>, <BOOST_GOOD>, <LED1_TIMEOUT>,
+							<LED2_TIMEOUT>, <VBAT_OV>, <DCD_TIMEOUT>, <RID_CID_DET>;
+			interrupt-names = "usb_det_done", "vbus_0v", "vbus_gd", "chg_fsm",
+							"chg_ok", "bc1p2_det_done", "dm_cot_pluse_done", "dp_cot_pluse_done",
+							"dpdm_2pluse_done", "dpdm_3pluse_done", "dm_16pluse_done", "dp_16pluse_done",
+							"hvdcp_det_fail", "hvdcp_det_ok", "boost_fail", "boost_gd", "led1_timeout", "led2_timeout",
+							"vbat_ov" ,"dcd_timeout", "rid_cid_det";
+
+			/* charger default */
+		 	charger,enable-termination = <1>;
+		 	charger,enable-ico = <0>;
+		 	charger,batsns-en = <1>;
+			charger,otg-vol = <5200>; /* mV */
+		 	charger,otg-current = <1500>; /* mA */
+		 	charger,charge-voltage = <4400>; /* mV */
+			charger,charge-current = <3000>; /* mA */
+			charger,precharge-current = <250>; /* mA */
+			charger,term-current = <200>; /* mA */
+		 	charger,input-curr-limit = <3000>; /* mA */
+		 	charger,iindpm-disable = <0>; /* 0 enable 1 disable*/
+		 	charger,rechg-dis = <0>; /* 0 enable 1 disable*/
+		 	charger,rechg-volt = <0>;  /* 0:100mv , 1:200mv*/
+		 	charger,cid-en = <1>; /* 0 disable, 1 enable */
+
+			/* fled default */
+			torch_max_level = <36>;  /* 500 mA */
+			strobe_max_level = <116>;  /* 50 ~ 500 mA */
+			strobe_timeout = <11>; /* 300ms */
+			strobe_max_timeout = <23>; /* 10 ~ 800 ms */
+			dpdm-supply = <&usb2_phy0>;
+		};
+
+		subpmic_flash: flash_led {
+			compatible = "qcom,subpmic-flash-led";
+			qcom,thermal-derate-current = <200 500>;
+			status = "ok";
+
+			subpmic_flash0: qcom,flash_0 {
+				qcom,type = "flash";
+				qcom,led-name = "led:flash_0";
+				qcom,max-current-ma = <1500>;
+				qcom,default-led-trigger = "flash0_trigger";
+				qcom,leds = "led1";
+				qcom,duration-ms = <200>;
+			};
+
+			subpmic_flash1: qcom,flash_1 {
+				qcom,type = "flash";
+				qcom,led-name = "led:flash_1";
+				qcom,max-current-ma = <1500>;
+				qcom,default-led-trigger = "flash1_trigger";
+				qcom,leds = "led2";
+				qcom,duration-ms = <200>;
+			};
+
+			subpmic_torch0: qcom,torch_0 {
+				qcom,type = "torch";
+				qcom,led-name = "led:torch_0";
+				qcom,max-current-ma = <500>;
+				qcom,default-led-trigger = "torch0_trigger";
+				qcom,leds = "led1";
+			};
+
+			subpmic_torch1: qcom,torch_1 {
+				qcom,type = "torch";
+				qcom,led-name = "led:torch_1";
+				qcom,max-current-ma = <500>;
+				qcom,default-led-trigger = "torch1_trigger";
+				qcom,leds = "led2";
+			};
+
+			subpmic_switch0: qcom,led_switch_0 {
+				qcom,type = "switch";
+				qcom,led-name = "led:switch_0";
+				qcom,default-led-trigger = "switch0_trigger";
+				qcom,leds = "led1";
+			};
+
+			subpmic_switch1: qcom,led_switch_1 {
+				qcom,type = "switch";
+				qcom,led-name = "led:switch_1";
+				qcom,default-led-trigger = "switch1_trigger";
+				qcom,leds = "led2";
+			};
+		};
+		subpmic_nu6601_flash_led {
+			compatible = "qcom,subpmic-flash-led";
+			qcom,thermal-derate-current = <200 500>;
+			status = "disabled";
+			nu6601_subpmic_flash0 {
+				qcom,type = "flash";
+				qcom,led-name = "led:flash_0";
+				qcom,max-current-ma = <1500>;
+				qcom,default-led-trigger = "flash0_trigger";
+				qcom,leds = "led1";
+				qcom,duration-ms = <200>;
+			};
+			nu6601_subpmic_flash1 {
+				qcom,type = "flash";
+				qcom,led-name = "led:flash_1";
+				qcom,max-current-ma = <1500>;
+				qcom,default-led-trigger = "flash1_trigger";
+				qcom,leds = "led2";
+				qcom,duration-ms = <200>;
+			};
+			nu6601_subpmic_torch0 {
+				qcom,type = "torch";
+				qcom,led-name = "led:torch_0";
+				qcom,max-current-ma = <500>;
+				qcom,default-led-trigger = "torch0_trigger";
+				qcom,leds = "led1";
+			};
+			nu6601_subpmic_torch1 {
+				qcom,type = "torch";
+				qcom,led-name = "led:torch_1";
+				qcom,max-current-ma = <500>;
+				qcom,default-led-trigger = "torch1_trigger";
+				qcom,leds = "led2";
+			};
+			nu6601_subpmic_switch0 {
+				qcom,type = "switch";
+				qcom,led-name = "led:switch_0";
+				qcom,default-led-trigger = "switch0_trigger";
+				qcom,leds = "led1";
+			};
+			nu6601_subpmic_switch1 {
+				qcom,type = "switch";
+				qcom,led-name = "led:switch_1";
+				qcom,default-led-trigger = "switch1_trigger";
+				qcom,leds = "led2";
+			};
+			nu6601_subpmic_switch2 {
+				qcom,type = "switch";
+				qcom,led-name = "led:switch_2";
+				qcom,default-led-trigger = "switch2_trigger";
+				qcom,leds = "led1_2";
+			};
+		};
+	};
+};

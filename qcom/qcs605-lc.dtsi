@@ -1,0 +1,375 @@
+#include "qcs605.dtsi"
+#include "pm8005.dtsi"
+#include "qcs605-pm660-pm8005-regulator.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. QCS605 SoC";
+	compatible = "qcom,qcs605";
+
+	chosen {
+		bootargs = "core_ctl_disable_cpumask=0-3";
+	};
+};
+
+&soc {
+	cpus {
+		/delete-node/ cpu@200;
+		/delete-node/ cpu@300;
+		/delete-node/ cpu@400;
+		/delete-node/ cpu@500;
+
+		cpu-map {
+			cluster0 {
+				/delete-node/ core2;
+				/delete-node/ core3;
+				/delete-node/ core4;
+				/delete-node/ core5;
+			};
+		};
+	};
+
+	/delete-node/ jtagmm@7240000;
+	/delete-node/ jtagmm@7340000;
+	/delete-node/ jtagmm@7440000;
+	/delete-node/ jtagmm@7540000;
+	/delete-node/ cti@7220000;
+	/delete-node/ cti@7320000;
+	/delete-node/ cti@7420000;
+	/delete-node/ cti@7520000;
+	/delete-node/ etm2;
+	/delete-node/ etm3;
+	/delete-node/ etm4;
+	/delete-node/ etm5;
+
+	cpuss_dump {
+		/delete-node/ qcom,l1_i_cache200;
+		/delete-node/ qcom,l1_i_cache300;
+		/delete-node/ qcom,l1_i_cache400;
+		/delete-node/ qcom,l1_i_cache500;
+		/delete-node/ qcom,l1_d_cache200;
+		/delete-node/ qcom,l1_d_cache300;
+		/delete-node/ qcom,l1_d_cache400;
+		/delete-node/ qcom,l1_d_cache500;
+		/delete-node/ qcom,l1_tlb_dump200;
+		/delete-node/ qcom,l1_tlb_dump300;
+		/delete-node/ qcom,l1_tlb_dump400;
+		/delete-node/ qcom,l1_tlb_dump500;
+	};
+
+	funnel_apss: funnel@7800000 {
+		ports {
+			/delete-node/ port@3;
+			/delete-node/ port@4;
+			/delete-node/ port@5;
+			/delete-node/ port@6;
+		};
+	};
+
+	qcom,lpm-levels {
+		qcom,pm-cluster@0 {
+			qcom,pm-cpu@0 {
+				qcom,cpu = <&CPU0 &CPU1>;
+			};
+		};
+	};
+
+	qcom,chd_silver {
+		compatible = "qcom,core-hang-detect";
+		label = "silver";
+		qcom,threshold-arr = <0x17e00058 0x17e10058>;
+		qcom,config-arr = <0x17e00060 0x17e10060>;
+	};
+};
+
+&pm660_temp_alarm {
+	cooling-maps {
+		/delete-node/ trip0_cpu2;
+		/delete-node/ trip0_cpu3;
+		/delete-node/ trip0_cpu4;
+		/delete-node/ trip0_cpu5;
+		/delete-node/ trip1_cpu2;
+		/delete-node/ trip1_cpu3;
+		/delete-node/ trip1_cpu4;
+		/delete-node/ trip1_cpu5;
+	};
+};
+
+&thermal_zones {
+
+	xo-therm-step {
+		cooling-maps {
+			/delete-node/ skin_cpu2;
+			/delete-node/ skin_cpu3;
+			/delete-node/ skin_cpu4;
+			/delete-node/ skin_cpu5;
+		};
+	};
+
+	xo-therm-605-step {
+		status = "disabled";
+	};
+};
+
+&spmi_bus {
+	/delete-node/ qcom,pm660l@2;
+	/delete-node/ qcom,pm660l@3;
+};
+
+&thermal_zones {
+	pm660l_tz {
+		/delete-property/ thermal-sensors;
+	};
+};
+
+&soc {
+	remoteproc-cdsp@8300000 {
+		/delete-property/ cx-supply;
+		cx-supply = <&pm8005_s1_level>;
+	};
+
+	remoteproc-adsp@62400000 {
+		/delete-property/ cx-supply;
+		cx-supply = <&pm8005_s1_level>;
+	};
+};
+
+&gcc {
+	/delete-property/ vdd_cx-supply;
+	/delete-property/ vdd_cx_ao-supply;
+	vdd_cx-supply = <&pm8005_s1_level>;
+	vdd_cx_ao-supply = <&pm8005_s1_level_ao>;
+};
+
+&videocc {
+	/delete-property/ vdd_cx-supply;
+	vdd_cx-supply = <&pm8005_s1_level>;
+};
+
+&camcc {
+	/delete-property/ vdd_mx-supply;
+	/delete-property/ vdd_cx-supply;
+	vdd_cx-supply = <&pm8005_s1_level>;
+	vdd_mx-supply = <&pm660_s2_level>;
+};
+
+&dispcc {
+	/delete-property/ vdd_cx-supply;
+	vdd_cx-supply = <&pm8005_s1_level>;
+};
+
+&gpucc {
+	/delete-property/ vdd_mx-supply;
+	/delete-property/ vdd_cx-supply;
+	vdd_cx-supply = <&pm8005_s1_level>;
+	vdd_mx-supply = <&pm660_s2_level>;
+};
+
+&modem_pas {
+	/delete-property/ mx-supply;
+	/delete-property/ cx-supply;
+	/delete-property/ mss-supply;
+	cx-supply = <&pm8005_s1_level>;
+	mx-supply = <&pm660_s2_level>;
+	mss-supply = <&pm8005_s1_level>;
+};
+
+&gpucc {
+	/delete-property/ vdd_gfx-supply;
+	vdd_gfx-supply = <&pm8005_s3_level>;
+};
+
+&gpu_cx_gdsc {
+	/delete-property/ parent-supply;
+	/delete-property/ vdd_parent-supply;
+	parent-supply = <&pm8005_s1_level>;
+	vdd_parent-supply = <&pm8005_s1_level>;
+};
+
+&gpu_gx_gdsc {
+	/delete-property/ parent-supply;
+	parent-supply = <&pm8005_s3_level>;
+};
+
+&tlmm {
+	lt9611_vcc_eldo_default: lt9611_vcc_eldo_default {
+		mux {
+			pins = "gpio53";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio53";
+			drive-strength = <8>;
+			bias-disable = <0>;
+			output-low;
+		};
+	};
+};
+
+&soc {
+	lt9611_vcc_eldo: lt9611-gpio-regulator@0 {
+		compatible = "regulator-fixed";
+		regulator-name = "lt9611_vcc_eldo";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-enable-ramp-delay = <233>;
+		gpio = <&tlmm 53 0>;
+		enable-active-high;
+		pinctrl-names = "default";
+		pintctrl-0 = <&lt9611_vcc_eldo_default>;
+	};
+};
+
+&qupv3_se9_i2c {
+	status = "okay";
+
+	lt9611: lt,lt9611@3b {
+		compatible = "lt,lt9611";
+		reg = <0x3b>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <96 0>;
+		interrupt-names = "lt_irq";
+		lt,irq-gpio = <&tlmm 96 0x0>;
+		lt,reset-gpio = <&tlmm 95 0x0>;
+		lt,non-pluggable;
+		lt,preferred-mode = "1920x1080";
+
+		vdd-supply = <&pm660_l12>;
+		vcc-supply = <&lt9611_vcc_eldo>;
+		lt,supply-entries {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			lt,supply-entry@0 {
+				reg = <0>;
+				lt,supply-name = "vdd";
+				lt,supply-min-voltage = <1800000>;
+				lt,supply-max-voltage = <1800000>;
+				lt,supply-enable-load = <200000>;
+				lt,supply-post-on-sleep = <50>;
+			};
+
+			lt,supply-entry@1 {
+				reg = <1>;
+				lt,supply-name = "vcc";
+				lt,supply-min-voltage = <3300000>;
+				lt,supply-max-voltage = <3300000>;
+				lt,supply-post-on-sleep = <50>;
+			};
+		};
+
+		lt,customize-modes {
+			lt,customize-mode-id@0 {
+				lt,mode-h-active = <1920>;
+				lt,mode-h-front-porch = <88>;
+				lt,mode-h-pulse-width = <44>;
+				lt,mode-h-back-porch = <148>;
+				lt,mode-h-active-high;
+				lt,mode-v-active = <1080>;
+				lt,mode-v-front-porch = <4>;
+				lt,mode-v-pulse-width = <5>;
+				lt,mode-v-back-porch = <36>;
+				lt,mode-v-active-high;
+				lt,mode-refresh-rate = <60>;
+				lt,mode-clock-in-khz = <148500>;
+			};
+
+			lt,customize-mode-id@1 {
+				lt,mode-h-active = <3840>;
+				lt,mode-h-front-porch = <176>;
+				lt,mode-h-pulse-width = <88>;
+				lt,mode-h-back-porch = <296>;
+				lt,mode-h-active-high;
+				lt,mode-v-active = <2160>;
+				lt,mode-v-front-porch = <8>;
+				lt,mode-v-pulse-width = <10>;
+				lt,mode-v-back-porch = <72>;
+				lt,mode-v-active-high;
+				lt,mode-refresh-rate = <30>;
+				lt,mode-clock-in-khz = <297000>;
+			};
+		};
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+		};
+	};
+};
+
+&pm660_pdphy {
+	/delete-property/ vdd-pdphy-supply;
+};
+
+&qusb_phy0 {
+	vdd-supply = <&pm660_l6>;
+	vdda33-supply = <&pm660_l17>;
+};
+
+&usb_qmp_dp_phy {
+	vdd-supply = <&pm660_l6>;  /* 0.88v */
+	core-supply = <&pm660_l2>; /* 1.2v */
+};
+
+&bluetooth {
+	qca,bt-vdd-core-supply = <&pm660_l9>;
+	qca,bt-vdd-pa-supply = <&pm660_l3>;
+	/delete-property/ qca,bt-vdd-ldo-supply;
+};
+
+&qupv3_se6_4uart {
+	status = "ok";
+};
+
+&apps_smmu {
+	/delete-property/ qcom,actlr;
+};
+
+&msm_fastrpc_compute_cb1 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb2 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb3 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb4 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb5 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb6 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb7 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb8 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb9 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb10 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb11 {
+	/delete-property/ dma-coherent;
+};
+
+&msm_fastrpc_compute_cb12 {
+	/delete-property/ dma-coherent;
+};

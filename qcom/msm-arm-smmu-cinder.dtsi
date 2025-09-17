@@ -1,0 +1,138 @@
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+&soc {
+	apps_smmu: apps-smmu@15000000 {
+		compatible = "qcom,qsmmu-v500";
+		reg = <0x15000000 0x100000>;
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		#global-interrupts = <1>;
+		#size-cells = <1>;
+		#address-cells = <1>;
+		ranges;
+		dma-coherent;
+
+		interrupts =	<GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 426 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 671 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 672 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 181 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 182 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 183 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 184 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 185 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 187 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 188 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 189 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 191 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 192 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 315 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 316 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 317 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 318 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 319 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 320 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 321 IRQ_TYPE_LEVEL_HIGH>;
+
+		anoc_1_tbu: anoc_1_tbu@150ed000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x150ed000 0x1000>;
+			qcom,stream-id-range = <0x0 0x400>;
+			qcom,iova-width = <36>;
+		};
+
+		anoc_pcie_tbu: anoc_pcie_tbu@150f1000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x150f1000 0x1000>;
+			qcom,stream-id-range = <0x400 0x400>;
+			qcom,iova-width = <36>;
+		};
+
+		anoc_ecpri_dma_0_tbu: anoc_ecpri_dma_0_tbu@150f5000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x150f5000 0x1000>;
+			qcom,stream-id-range = <0x800 0x400>;
+			qcom,iova-width = <36>;
+		};
+
+		anoc_ecpri_dma_1_tbu: anoc_ecpri_dma_1_tbu@150f9000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x150f9000 0x1000>;
+			qcom,stream-id-range = <0xc00 0x400>;
+			qcom,iova-width = <36>;
+		};
+
+		anoc_ecpri_gsi_tbu: anoc_ecpri_gsi_tbu@150fd000 {
+			compatible = "qcom,qsmmuv500-tbu";
+			reg = <0x150fd000 0x1000>;
+			qcom,stream-id-range = <0x1000 0x400>;
+			qcom,iova-width = <36>;
+		};
+	};
+
+	dma_dev {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
+	};
+
+	iommu_test_device {
+		compatible = "qcom,iommu-debug-test";
+
+		usecase0_apps {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x3e0 0x0>;
+		};
+
+		usecase1_apps_fastmap {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x3e0 0x0>;
+			qcom,iommu-dma = "fastmap";
+		};
+
+		usecase2_apps_atomic {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x3e0 0x0>;
+			qcom,iommu-dma = "atomic";
+		};
+
+		usecase3_apps_dma {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x3e0 0x0>;
+			dma-coherent;
+		};
+
+		usecase4_apps_secure {
+			compatible = "qcom,iommu-debug-usecase";
+			iommus = <&apps_smmu 0x3e0 0x0>;
+			qcom,iommu-vmid = <0xa>; /* VMID_CP_PIXEL */
+		};
+	};
+};

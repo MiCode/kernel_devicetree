@@ -1,0 +1,401 @@
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/qcom,gcc-khaje.h>
+#include "bengal-thermal-overlay.dtsi"
+
+&pm6125_gpios {
+	key_vol_up {
+		key_vol_up_default: key_vol_up_default {
+			pins = "gpio5";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			power-source = <0>;
+		};
+	};
+
+	eldo9_pin {
+		usb_eldo9:gpio@c000 {
+			pins = "gpio1";
+			function = "normal";
+			qcom,drive-strength = <2>;
+			power-source = <0>;
+			bias-disable;
+			output-high;
+		};
+	};
+};
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm6125_gpios 5 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			linux,can-disable;
+			debounce-interval = <15>;
+			gpio-key,wakeup;
+		};
+	};
+
+	vdda_usb_ss_dp_core: vdda_usb_ss_dp_core {
+		compatible = "regulator-fixed";
+		regulator-name = "vdd_supply";
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <880000>;
+		enable-active-high;
+		gpio = <&pm6125_gpios 1 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb_eldo9>;
+	};
+};
+
+&usb_qmp_dp_phy {
+	vdd-supply = <&vdda_usb_ss_dp_core>;
+};
+
+&qupv3_se1_i2c {
+	awinic@64 {
+		compatible = "awinic,aw2016_led";
+		reg = <0x64>;
+
+		awinic,red {
+			awinic,name = "red";
+			awinic,id = <0>;
+			awinic,imax = <2>;
+			awinic,led-current = <3>;
+			awinic,max-brightness = <255>;
+			awinic,rise-time-ms = <6>;
+			awinic,hold-time-ms = <0>;
+			awinic,fall-time-ms = <6>;
+			awinic,off-time-ms = <4>;
+		};
+
+		awinic,green {
+			awinic,name = "green";
+			awinic,id = <1>;
+			awinic,imax = <2>;
+			awinic,led-current = <3>;
+			awinic,max-brightness = <255>;
+			awinic,rise-time-ms = <6>;
+			awinic,hold-time-ms = <0>;
+			awinic,fall-time-ms = <6>;
+			awinic,off-time-ms = <4>;
+		};
+
+		awinic,blue {
+			awinic,name = "blue";
+			awinic,id = <2>;
+			awinic,imax = <2>;
+			awinic,led-current = <3>;
+			awinic,max-brightness = <255>;
+			awinic,rise-time-ms = <6>;
+			awinic,hold-time-ms = <0>;
+			awinic,fall-time-ms = <6>;
+			awinic,off-time-ms = <4>;
+		};
+
+	};
+};
+
+&sdhc_1 {
+	vdd-supply = <&L24A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&L11A>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	status = "ok";
+};
+
+&sdhc_2 {
+	vdd-supply = <&L22A>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&L5A>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	vdd-io-bias-supply = <&L7A>;
+	qcom,vdd-io-bias-voltage-level = <1256000 1256000>;
+	qcom,vdd-io-bias-current-level = <0 6000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 88 GPIO_ACTIVE_LOW>;
+
+	status = "ok";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-khaje";
+
+	vdda-phy-supply = <&L4A>; /* 0.9v */
+	vdda-pll-supply = <&L18A>; /* 1.8v */
+	vdda-phy-max-microamp = <85700>;
+	vdda-pll-max-microamp = <18300>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+	vdd-hba-fixed-regulator;
+
+	vcc-supply = <&L24A>;
+	vcc-max-microamp = <800000>;
+
+	vccq2-supply = <&L11A>;
+	vccq2-max-microamp = <800000>;
+
+	qcom,vddp-ref-clk-supply = <&L18A>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	reset-gpios = <&tlmm 113 GPIO_ACTIVE_LOW>;
+	resets = <&gcc GCC_UFS_PHY_BCR>;
+	reset-names = "rst";
+
+	status = "ok";
+};
+
+&pm6125_pwm {
+	status = "ok";
+};
+
+&qupv3_se2_i2c {
+	status = "okay";
+	qcom,i2c-touch-active="synaptics,tcm-i2c";
+
+	synaptics_tcm@20 {
+		compatible = "synaptics,tcm-i2c";
+		reg = <0x20>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <80 0x2008>;
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend",
+			"pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+		synaptics,irq-gpio = <&tlmm 80 0x2008>;
+		synaptics,irq-on-state = <0>;
+		synaptics,reset-gpio = <&tlmm 86 0x00>;
+		synaptics,reset-on-state = <0>;
+		synaptics,reset-active-ms = <20>;
+		synaptics,reset-delay-ms = <200>;
+		synaptics,power-delay-ms = <200>;
+		synaptics,ubl-i2c-addr = <0x20>;
+		synaptics,extend_report;
+		synaptics,firmware-name = "synaptics_firmware_k.img";
+	};
+};
+
+&thermal_zones {
+	quiet-therm {
+		polling-delay-passive = <2000>;
+		trips {
+			quiet_batt_trip0: batt-trip0 {
+				temperature = <41000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			quiet_modem_trip0: modem-trip0 {
+				temperature = <42000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			quiet_batt_trip1: batt-trip1 {
+				temperature = <43000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			quiet_batt_trip2: batt-trip2 {
+				temperature = <45000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			quiet_gold_trip: gold-trip {
+				temperature = <47000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			quiet_batt_trip3: batt-trip3 {
+				temperature = <47000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			quiet_batt_trip4: batt-trip4 {
+				temperature = <48000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			quiet_gpu_trip: gpu-trip {
+				temperature = <48000>;
+				hysteresis = <4000>;
+				type = "passive";
+			};
+
+			quiet_silver_trip: silver-trip {
+				temperature = <50000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			quiet_hvx_trip: hvx-trip {
+				temperature = <52000>;
+				hysteresis = <4000>;
+				type = "passive";
+			};
+
+			quiet_modem_trip1: modem-trip1 {
+				temperature = <60000>;
+				hysteresis = <4000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			gold_cdev {
+				trip = <&quiet_gold_trip>;
+				/* limit to 1766400khz */
+				cooling-device = <&CPU4 0 4>;
+			};
+
+			silver_cdev {
+				trip = <&quiet_silver_trip>;
+				/* limit to 1516800khz */
+				cooling-device = <&CPU0 0 2>;
+			};
+
+			gpu_cdev {
+				trip = <&quiet_gpu_trip>;
+				cooling-device = <&msm_gpu 0 3>;
+			};
+
+			hvx_cdev {
+				trip = <&quiet_hvx_trip>;
+				cooling-device = <&cdsp_sw 4 4>;
+			};
+
+			mdm_cdev0 {
+				trip = <&quiet_modem_trip0>;
+				cooling-device = <&modem_proc 1 1>;
+			};
+
+			mdm_cdev1 {
+				trip = <&quiet_modem_trip1>;
+				cooling-device = <&modem_proc 3 3>;
+			};
+		};
+	};
+
+	pa-therm0 {
+		trips {
+			pa_therm0_trip0: pa-therm0-trip0 {
+				temperature = <52000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			pa_therm0_trip1: pa-therm0-trip1 {
+				temperature = <54000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			pa_therm0_trip2: pa-therm0-trip2 {
+				temperature = <60000>;
+				hysteresis = <4000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			modem_cdev0 {
+				trip = <&pa_therm0_trip0>;
+				cooling-device = <&modem_pa 1 1>;
+			};
+
+			modem_cdev1 {
+				trip = <&pa_therm0_trip1>;
+				cooling-device = <&modem_pa 2 2>;
+			};
+
+			modem_cdev2 {
+				trip = <&pa_therm0_trip2>;
+				cooling-device = <&modem_pa 3 3>;
+			};
+		};
+	};
+};
+
+&tlmm {
+	fpc_reset_int: fpc_reset_int {
+		fpc_reset_low: reset_low {
+			mux {
+				pins = "gpio104";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio104";
+				drive-strength = <2>;
+				bias-disable;
+				output-low;
+			};
+		};
+
+		fpc_reset_high: reset_high {
+			mux {
+				pins = "gpio104";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio104";
+				drive-strength = <2>;
+				bias-disable;
+				output-high;
+			};
+		};
+
+		fpc_int_low: int_low {
+			mux {
+				pins = "gpio97";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio97";
+				drive-strength = <2>;
+				bias-pull-down;
+				input-enable;
+			};
+		};
+	};
+};

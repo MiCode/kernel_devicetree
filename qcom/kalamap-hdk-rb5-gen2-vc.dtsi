@@ -1,0 +1,108 @@
+#include "kalamap-rb5-gen2.dtsi"
+
+&tlmm {
+	qps615_intn_wol {
+		aqr_intn_wol_sig: aqr_intn_wol_sig {
+			mux {
+				pins = "gpio197";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio197";
+				input-enable;
+				bias-disable;
+			};
+		};
+
+		napa_intn_wol_sig: napa_intn_wol_sig {
+			mux {
+				pins = "gpio60";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio60";
+				input-enable;
+				bias-disable;
+			};
+		};
+	};
+};
+
+&soc {
+	aqr_vreg: aqr_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "aqr_vreg";
+		gpio = <&tlmm 160 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		enable-active-high;
+	};
+
+	qep_vreg: qep_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "qep_vreg";
+		gpio = <&tlmm 163 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		enable-active-high;
+	};
+};
+
+/* BDF 2.3.0 */
+&pcie0_bus2_dev3_fn0 {
+	reg = <0x1800 0x0 0x0 0x0 0x0>;
+	qps615_eth0,qps615_eth0@pcie0_rp {
+		reg = <0x0 0x0 0x0 0x0 0x0>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&aqr_intn_wol_sig>;
+
+		qcom,phy-rst-gpio = <0>;
+
+		interrupts-extended = <&tlmm 197 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-names = "wol_irq";
+
+		phy-supply = <&aqr_vreg>;
+		qcom,phy-rst-delay-us = <221000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+
+	/* BDF 5.0.0 */
+	pcie0_bus5_dev0_fn0: pcie0_ntn3_eth0 {
+		reg = <0x0 0x0 0x0 0x0 0x0>;
+		qcom,iommu-group = <&eth0_pci_iommu_group>;
+		eth0_pci_iommu_group: eth0_pci_iommu_group {
+			qcom,iommu-dma = "atomic";
+		};
+	};
+
+	qps615_eth1,qps615_eth1@pcie0_rp {
+		reg = <0x100 0x0 0x0 0x0 0x0>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&napa_intn_wol_sig>;
+
+		qcom,phy-rst-gpio = <1>;
+
+		interrupts-extended = <&tlmm 60 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-names = "wol_irq";
+
+		phy-supply = <&qep_vreg>;
+		qcom,phy-rst-delay-us = <20000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+
+	/* BDF 5.0.1 */
+	pcie0_bus5_dev0_fn1: pcie0_ntn3_eth1 {
+		reg = <0x100 0x0 0x0 0x0 0x0>;
+		qcom,iommu-group = <&eth1_pci_iommu_group>;
+		eth1_pci_iommu_group: eth1_pci_iommu_group {
+			qcom,iommu-dma = "atomic";
+		};
+	};
+};
+

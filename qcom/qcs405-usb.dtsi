@@ -1,0 +1,207 @@
+#include <dt-bindings/clock/qcom,gcc-qcs404.h>
+#include <dt-bindings/interconnect/qcom,qcs405.h>
+
+&soc {
+	/* Secondary USB port related controller */
+	usb3: ssusb@7580000 {
+		compatible = "qcom,dwc-usb3-msm";
+		reg = <0x7580000 0x100000>;
+		reg-names = "core_base";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		interrupts = <GIC_SPI 25 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 319 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "pwr_event_irq", "hs_phy_irq";
+
+		dpdm-supply = <&usb2_phy0>;
+		clocks = <&gcc GCC_USB30_MASTER_CLK>,
+			 <&gcc GCC_SYS_NOC_USB3_CLK>,
+			 <&gcc GCC_USB30_SLEEP_CLK>,
+			 <&gcc GCC_USB30_MOCK_UTMI_CLK>,
+			 <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&gcc GCC_PCNOC_USB3_CLK>;
+		clock-names = "core_clk", "iface_clk", "sleep_clk",
+				"utmi_clk", "xo", "noc_aggr_clk";
+
+		qcom,core-clk-rate = <200000000>;
+		qcom,core-clk-rate-hs = <100000000>;
+
+		qcom,pm-qos-latency = <181>;
+		qcom,default-bus-vote = <2>; /* use svs bus voting */
+		interconnect-names = "usb-ddr", "ddr-usb";
+		interconnects = <&system_noc MASTER_USB3 &bimc SLAVE_EBI_CH0>,
+				<&bimc MASTER_AMPSS_M0 &pc_noc SLAVE_USB3>;
+
+		resets = <&gcc GCC_USB_30_BCR>;
+		reset-names = "core_reset";
+
+		status = "disabled";
+		dwc3@7580000 {
+			compatible = "snps,dwc3";
+			reg = <0x7580000 0xcd00>;
+			interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&usb2_phy1>, <&usb_ss_phy>;
+			linux,sysdev_is_parent;
+			snps,disable-clk-gating;
+			snps,has-lpm-erratum;
+			snps,hird-threshold = /bits/ 8 <0x10>;
+			snps,dis-u1-entry-quirk;
+			snps,dis-u2-entry-quirk;
+			snps,dis_u2_susphy_quirk;
+			snps,dis_enblslpm_quirk;
+			maximum-speed = "super-speed";
+			dr_mode = "host";
+		};
+	};
+
+	/* Secondary USB port related High Speed PHY */
+	usb2_phy1: hsphy@7a000 {
+		compatible = "qcom,usb-snps-hsphy";
+		reg = <0x7a000 0x200>;
+		reg-names = "phy_csr";
+
+		vdd-supply = <&pms405_l4>;
+		vdda18-supply = <&pms405_l5>;
+		vdda33-supply = <&pms405_l12>;
+		qcom,vdd-voltage-level = <0 1144000 1200000>;
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&gcc GCC_USB_HS_PHY_CFG_AHB_CLK>,
+			 <&gcc GCC_USB2A_PHY_SLEEP_CLK>;
+		clock-names = "ref_clk", "phy_csr_clk", "sleep_clk";
+
+		resets = <&gcc GCC_USB_HS_PHY_CFG_AHB_BCR>,
+			 <&gcc GCC_USB2A_PHY_BCR>;
+		reset-names = "phy_reset", "phy_por_reset";
+
+		qcom,snps-hs-phy-init-seq =
+			<0xc0 0x01 0>,
+			<0xe8 0x0d 0>,
+			<0x74 0x12 0>,
+			<0x98 0x63 0>,
+			<0x9c 0x03 0>,
+			<0xa0 0x1d 0>,
+			<0xa4 0x03 0>,
+			<0x8c 0x23 0>,
+			<0x78 0x08 0>,
+			<0x7c 0xdc 0>,
+			<0x90 0xe0 20>,
+			<0x74 0x10 0>,
+			<0x90 0x60 0>,
+			<0xffffffff 0xffffffff 0>;
+		status = "disabled";
+	};
+
+	/* Secondary USB port related Super Speed PHY */
+	usb_ss_phy: ssphy@78000 {
+		compatible = "qcom,usb-ssphy";
+		reg = <0x78000 0x400>;
+		vdd-supply = <&pms405_l3>;
+		vdda18-supply = <&pms405_l5>;
+		qcom,vdd-voltage-level = <0 1050000 1050000>;
+
+		clocks = //<&cmn_blk_pll CMN_BLK_PLL>,
+			 <&gcc GCC_USB_HS_PHY_CFG_AHB_CLK>,
+			 <&gcc GCC_USB3_PHY_PIPE_CLK>;
+		clock-names = "ref_clk", "cfg_ahb_clk", "pipe_clk";
+
+		resets = <&gcc GCC_USB3_PHY_BCR>,
+			 <&gcc GCC_USB3PHY_PHY_BCR>;
+		reset-names = "phy_reset", "phy_com_reset";
+		status = "disabled";
+	};
+
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+
+	/* Primary USB port related controller */
+	usb2s: hsusb@78c0000 {
+		compatible = "qcom,dwc-usb3-msm";
+		reg = <0x78c0000 0x100000>;
+		reg-names = "core_base";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 318 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "pwr_event_irq", "hs_phy_irq";
+
+		clocks = <&gcc GCC_USB_HS_SYSTEM_CLK>,
+			 <&gcc GCC_PCNOC_USB2_CLK>,
+			 <&gcc GCC_USB_HS_INACTIVITY_TIMERS_CLK>,
+			 <&gcc GCC_USB20_MOCK_UTMI_CLK>,
+			 <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "core_clk", "iface_clk", "sleep_clk",
+				"utmi_clk", "xo";
+
+		qcom,core-clk-rate = <133333333>;
+		qcom,default-bus-vote = <2>; /* use svs bus voting */
+		interconnect-names = "usb-ddr", "ddr-usb";
+		interconnects = <&pc_noc MASTER_XM_USB_HS1 &bimc SLAVE_EBI_CH0>,
+				<&bimc MASTER_AMPSS_M0 &pc_noc SLAVE_USB_HS>;
+
+
+		resets = <&gcc GCC_USB_HS_BCR>;
+		reset-names = "core_reset";
+
+		dwc3@78c0000 {
+			compatible = "snps,dwc3";
+			reg = <0x78c0000 0xcd00>;
+			interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&usb2_phy0>, <&usb_nop_phy>;
+			linux,sysdev_is_parent;
+			snps,disable-clk-gating;
+			snps,has-lpm-erratum;
+			snps,hird-threshold = /bits/ 8 <0x10>;
+			snps,dis-u1-entry-quirk;
+			snps,dis-u2-entry-quirk;
+			snps,dis_u2_susphy_quirk;
+			snps,dis_enblslpm_quirk;
+			maximum-speed = "high-speed";
+			dr_mode = "otg";
+			usb-role-switch;
+		};
+	};
+
+	/* Primary USB port related High Speed PHY */
+	usb2_phy0: hsphy@7c000 {
+		compatible = "qcom,usb-snps-hsphy";
+		reg = <0x7c000 0x200>;
+		reg-names = "phy_csr";
+
+		vdd-supply = <&pms405_l4>;
+		vdda18-supply = <&pms405_l5>;
+		vdda33-supply = <&pms405_l12>;
+		qcom,vdd-voltage-level = <0 1144000 1200000>;
+
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			 <&gcc GCC_USB_HS_PHY_CFG_AHB_CLK>,
+			 <&gcc GCC_USB2A_PHY_SLEEP_CLK>;
+		clock-names = "ref_clk", "phy_csr_clk", "sleep_clk";
+
+		resets = <&gcc GCC_QUSB2_PHY_BCR>,
+			 <&gcc GCC_USB2_HS_PHY_ONLY_BCR>;
+		reset-names = "phy_reset", "phy_por_reset";
+
+		qcom,snps-hs-phy-init-seq =
+			<0xc0 0x01 0>,
+			<0xe8 0x0d 0>,
+			<0x74 0x12 0>,
+			<0x98 0x63 0>,
+			<0x9c 0x03 0>,
+			<0xa0 0x1d 0>,
+			<0xa4 0x03 0>,
+			<0x8c 0x23 0>,
+			<0x78 0x08 0>,
+			<0x7c 0xdc 0>,
+			<0x90 0xe0 20>,
+			<0x74 0x10 0>,
+			<0x90 0x60 0>,
+			<0xffffffff 0xffffffff 0>;
+	};
+
+};

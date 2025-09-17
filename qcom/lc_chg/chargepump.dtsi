@@ -1,0 +1,167 @@
+&tlmm {
+	/* GPIO_84 : CHG_PUMP_INT_N */
+	chargepump_int_default: chargepump_int_default {
+		mux {
+			pins = "gpio84";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio84";
+			drive-strength = <2>;   /* 2 mA */
+			bias-pull-up;           /* PULL DOWN */
+			input-enable;
+		};
+	};
+};
+
+&qupv3_se0_i2c {
+    status = "ok";
+    qcom,bus-recovery;
+    clock-frequency = <400000>;
+
+    #address-cells = <1>;
+    #size-cells = <0>;
+    sc8551: sc8551-charger@65{
+		compatible = "sc,sc8551-standalone";
+		reg = <0x66>;
+		irq-gpios = <&tlmm 84 0>;
+		/*
+		sc,sc8551,bat-ovp-disable = <0>;
+		sc,sc8551,bat-ocp_disable = <0>;
+		sc,sc8551,bat-ovp-alarm-disable = <0>;
+		sc,sc8551,bus-ocp-disable = <0>;
+		sc,sc8551,bus-ovp-alarm-disable = <0>;
+		sc,sc8551,bus-ocp-alarm-disable = <0>;
+		sc,sc8551,bat-ucp-alarm-disable = <0>;
+		*/
+		sc,sc8551,bat-therm-disable = <0>;
+		sc,sc8551,bus-therm-disable = <0>;
+	 	sc,sc8551,bat-ovp-threshold = <4525>;
+		sc,sc8551,bat-ovp-alarm-threshold = <4400>;
+		sc,sc8551,bat-ocp-threshold = <8000>;
+		sc,sc8551,bat-ocp-alarm-threshold = <7500>;
+	    sc,sc8551,bus-ovp-threshold = <12000>;
+		sc,sc8551,bus-ovp-alarm-threshold = <11000>;
+		sc,sc8551,bus-ocp-threshold = <3750>;
+		sc,sc8551,bus-ocp-alarm-threshold = <3500>;
+	    sc,sc8551,bat-ucp-alarm-threshold = <2000>;
+	    sc,sc8551,bat-therm-threshold = <0x15>;
+		sc,sc8551,bus-therm-threshold = <0x15>;
+		sc,sc8551,die-therm-threshold = <125>;
+		sc,sc8551,ac-ovp-threshold = <12>;
+		sc,sc8551,sense-resistor-mohm = <5>;
+        status = "disabled";
+	};
+
+    sc853x-charger@61{
+        compatible = "southchip,sc853x-standalone";
+        #io-channel-cells = <1>;
+        reg = <0x61>;
+        status = "okay";
+        sc853x,intr_gpio = <&tlmm 84 0>;
+        charger_name = "primary_dvchg";
+        charger_name_v4_19 = "primary_dvchg";
+
+        sc,sc853x,vbat-ovp-dis = <0>;
+        sc,sc853x,vbat-ovp = <90>; /*3840 + val * 10*/
+        sc,sc853x,ibat-ocp-dis = <1>;
+        sc,sc853x,ibat-ocp = <81>; /*val * 100*/
+        sc,sc853x,vbus-ovp-dis = <0>;
+        sc,sc853x,vbus-ovp = <3>; /*9250 + val * 250*/
+        sc,sc853x,vac-ovp-dis = <0>;
+        sc,sc853x,vac-ovp = <4>; /*0:6.5V 1:11V 2:12V 3:13V 4:14V 5~7:15V*/
+        sc,sc853x,ibus-ocp-dis = <0>;
+        sc,sc853x,ibus-ocp = <70>; /*val * 50*/
+        sc,sc853x,pmid2out-ovp-dis = <0>;
+        sc,sc853x,pmid2out-ovp = <0>; /*400 + val * 100*/
+        sc,sc853x,pmid2out-uvp-dis = <0>;
+        sc,sc853x,pmid2out-uvp = <1>; /*100 + val * 50*/
+        sc,sc853x,ibatreg = <0>; /*200 + val * 100*/
+        sc,sc853x,ibusreg = <0>; /*100 + val * 50*/
+        sc,sc853x,vbatreg = <0>; /*50 + val * 50*/
+        sc,sc853x,tdiereg = <1>; /*0:90°C 1:100°C 2:110°C 3:120°C*/
+        sc,sc853x,them-flt = <24>; /*val * 25*/
+        sc,sc853x,ibat-sns-res = <1>; /*0:2hmo 1:5hmo*/
+        sc,sc853x,pmid-pd-en = <0>;
+        sc,sc853x,vbus-pd-en = <0>;
+        sc,sc853x,work-mode = <0>; /*0: 2:1charge   1: 1:1charge
+                                     2: 1:2converte 3: 1:1converte*/
+        sc,sc853x,ss-timeout = <7>; /*0:disable 1:10ms 2:20ms 3:400ms
+                                    4:80ms 5:320ms 6:1.28s 7:10.24s*/
+        sc,sc853x,wd-timeout-dis = <1>;
+        sc,sc853x,wd-timeout = <0>; /*0:0.5s 1:1s 2:5s 3:30s*/
+        sc,sc853x,vout-ovp-dis = <0>;
+        sc,sc853x,vout-ovp = <3>; /*4700 + val * 100*/
+        sc,sc853x,fsw-freq = <7>; /*500 + val * 100*/
+        sc,sc853x,pin-diag-fall-dis = <0>;
+        sc,sc853x,them-flt-dis = <1>;
+        sc,sc853x,tshut-dis = <1>;
+        sc,sc853x,vbus-in-range-dis = <0>;
+        sc,sc853x,ibus-ucp-dis = <0>;
+        sc,sc853x,ibat-reg-dis = <0>;
+        sc,sc853x,ibus-reg-dis = <0>;
+        sc,sc853x,vbat-reg-dis = <0>;
+        sc,sc853x,tdie-reg-dis = <1>;
+        sc,sc853x,ibat-ocp-dg = <0>; /*0:160us 1:80us 2:320us 3:5ms*/
+        sc,sc853x,ibus-ucp-fall-dg = <1>; /*0:8us 1:5ms 2:40ms 3:160ms*/
+        sc,sc853x,ibus-ocp-dg = <0>; /*0:160us 1:80us 2:320us 3:5ms*/
+        sc,sc853x,vbat-ovp-dg = <0>; /*0:8us 1:160us 2:320us 3:5ms*/
+    };
+
+    bq25960h_standalone: bq25960h@3f {
+        compatible = "bq,bq25960h-standalone";
+        #io-channel-cells = <1>;
+        status = "okay";
+        reg = <0x3f>;
+        bq25960h,intr_gpio = <&tlmm 84 0>;
+        charger_name = "primary_dvchg1";
+    };
+
+
+    bq25960_standalone: bq25960@65 {
+        compatible = "bq,bq25960-standalone";
+        #io-channel-cells = <1>;
+        reg = <0x65>;
+        status = "okay";
+        bq25960,intr_gpio = <&tlmm 84 0>;
+        charger_name = "primary_dvchg";
+        def-supply = <&bq25960h_standalone>;
+
+        bq,bq25960,vbat-ovp-dis = <0>;
+        bq,bq25960,vbat-ovp = <127>; /*3500 + val * 10*/
+        bq,bq25960,vbat-ovp-alm-dis = <1>;
+        bq,bq25960,vbat-ovp-alm = <122>; /*3500 + val * 10*/
+        bq,bq25960,ibat-ocp-dis = <0>;
+        bq,bq25960,ibat-ocp  = <61>; /*2000 + val * 100*/
+        bq,bq25960,ibat-ocp-alm-dis = <1>;
+        bq,bq25960,ibat-ocp-alm = <61>; /*2000 + val * 100*/
+        bq,bq25960,ibus-ucp-dis = <0>;
+        bq,bq25960,ibus-ucp = <0>;
+        bq,bq25960,chg-config-2 = <0>;
+        bq,bq25960,vbus-pd-en = <0>;
+        bq,bq25960,vbus-ovp = <100>; /*7000 + val * 50*/
+        bq,bq25960,vbus-ovp-alm-dis = <0>;
+        bq,bq25960,vbus-ovp-alm = <100>; /*7000 + val * 50*/
+        bq,bq25960,ibus-ocp = <13>; /*1000 + val * 250*/
+        bq,bq25960,tsbus-flt-dis = <1>;
+        bq,bq25960,tsbat-flt-dis = <1>;
+        bq,bq25960,tdie-alm = <200>; /*25 + val * 0.5*/
+        bq,bq25960,tsbus-flt = <21>;
+        bq,bq25960,tsbat-flt = <21>;
+        bq,bq25960,vac1-ovp = <3>; /*0:6.5V 1:10.5V 2:12V 3:14V 4:16V 5~7:18V*/
+        bq,bq25960,vac2-ovp = <3>; /*0:6.5V 1:10.5V 2:12V 3:14V 4:16V 5~7:18V*/
+        bq,bq25960,vac1-pd-en = <0>;
+        bq,bq25960,vac2-pd-en = <0>;
+        bq,bq25960,fsw-set = <4>; /*0:187.5KHz 1:250KHz 2:300KHz
+                                    3:375KHz 4:500KHz 5:750KHz */
+        bq,bq25960,wd-timeout = <0>; /*0:0.5s 1:1s 2:5s 3:30s*/
+        bq,bq25960,wd-timeout-dis = <1>;
+        bq,bq25960,ibat-sns-r = <0>; /*0:2mho 1:5mho*/
+        bq,bq25960,ss-timeout = <5>; /*0:6.25ms 1:12.5ms 2:25ms 3:50ms
+                                        4:100ms 5:400ms 6:1.5s 7:10s*/
+        bq,bq25960,ibus-ucp-fall-dg = <1>; /*0:0.01ms, 1:5ms, 2:50ms, 3:150ms*/
+        bq,bq25960,vout-ovp-dis = <0>;
+        bq,bq25960,ms = <0>;
+        bq,bq25960,vout-ovp = <3>; /*4700 + val * 100*/
+    };
+};

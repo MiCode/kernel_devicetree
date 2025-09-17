@@ -1,0 +1,44 @@
+/dts-v1/;
+/plugin/;
+
+#include "trinketp-iot-idp.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. USBC Display Port Enable IDP";
+	compatible = "qcom,trinketp-iot-idp", "qcom,trinketp-iot", "qcom,idp";
+	qcom,msm-id = <468 0x10000>;
+	qcom,board-id = <34 5>;
+};
+
+&soc {
+	usb2_extcon: usb2_extcon {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&tlmm 25 GPIO_ACTIVE_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb2_det_default>;
+	};
+};
+
+&qupv3_se3_i2c {
+	qcom,clk-freq-out = <400000>;
+	status = "okay";
+
+	usb0_typec: usb0_typec@20 {
+		compatible = "ti,tps6598x";
+		reg = <0x20>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&tps_i2c_intr>;
+	};
+};
+
+
+&usb0 {
+	extcon = <&pmi632_charger>, <&eud>, <&usb2_extcon>;
+	dwc3@4e00000 {
+		usb-phy = <&qusb_phy0>, <&usb_nop_phy>;
+		maximum-speed = "high-speed";
+	};
+};

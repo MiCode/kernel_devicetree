@@ -1,0 +1,70 @@
+/dts-v1/;
+
+#include "kalamale_roboticsvm.dtsi"
+#include "kalamale_roboticsvm2-dvt.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Kalama LE DVT ROBOTICS GVM2";
+	compatible = "qcom,kalamap-iot", "qcom,kalamap", "qcom,iot";
+	qcom,board-id = <0x1021f 0x2>, <0x1041f 0x2>;
+
+	qcom,mem-buf {
+		qcom,vmid = <53>;
+	};
+
+	cpus {
+		/delete-node/ cpu@100;
+	};
+
+	qcom,vm-config {
+		image-name = "qcom,roboticsvm2";
+		qcom,pasid = <0x0 0x22>;
+		qcom,qtee-config-info = "p=7C,8F,97,159,7F1;";
+		qcom,secdomain-ids = <53>;
+		vm-uri = "vmuid/roboticsvm2";
+		vm-guid = "847bfe26-0b12-5728-812a-06103f6bdec0";
+		memory {
+			size-min = <0x0 0x4800000>;    /* 72 MB */
+		};
+
+		vcpus {
+			affinity = "static";
+			affinity-map = <0x6>;
+		};
+
+		vdevices {
+			virtio-mmio@0 {
+				dma_base = <0x0 0x0>;
+				memory {
+					qcom,label = <0x13>;
+					#address-cells = <0x2>;
+					base = <0x0 0xFFEFC000>;
+				};
+			};
+
+			swiotlb-shm {
+				dma_base = <0x0 0x4000>;
+				memory {
+					qcom,label = <0x14>;
+					#address-cells = <0x2>;
+					base = <0x0 0xFFF00000>;
+				};
+			};
+
+
+			/delete-node/ vsock-msgq;
+
+			vcpu-sched-test-msgq {
+				qcom,label = <0x9>;
+			};
+		};
+	};
+};
+
+&soc {
+	qtee_shmbridge {
+		qcom,custom-bridge-size = <512>;
+	};
+
+	/delete-node/ vsock-gunyah;
+};

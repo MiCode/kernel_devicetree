@@ -1,0 +1,145 @@
+#include "kalamap-v2.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. KalamaP QCS";
+	compatible = "qcom,kalamap";
+	qcom,msm-id = <603 0x20000>;
+};
+
+&video_mem {
+	reg = <0x0 0x9bb00000 0x0 0x1000000>;
+};
+
+&cvp_mem {
+	reg = <0x0 0x9cb00000 0x0 0x700000>;
+};
+
+&cdsp_mem {
+	reg = <0x0 0x9d200000 0x0 0x2000000>;
+};
+
+&q6_cdsp_dtb_mem {
+	reg = <0x0 0x9f200000 0x0 0x80000>;
+};
+
+&q6_adsp_dtb_mem {
+	reg = <0x0 0x9f280000 0x0 0x80000>;
+};
+
+&adspslpi_mem {
+	reg = <0x0 0x9f300000 0x0 0x4080000>;
+};
+
+&reserved_memory {
+	hyp_mem: hyp_mem_region@80e00000 {
+		no-map;
+		reg = <0x0 0x80e00000 0x0 0x400000>;
+	};
+};
+
+&pcie1_rp {
+	/delete-node/ qcom,mhi@0;
+};
+
+&mem_client_3 {
+	qcom,peripheral-size = <0x0>;
+};
+
+&mem_client_4 {
+	qcom,peripheral-size = <0x0>;
+};
+
+&mem_client_5 {
+	qcom,peripheral-size = <0x0>;
+};
+
+&soc {
+	qcom,msm_gsi {
+		compatible = "qcom,msm_gsi";
+	};
+
+	ipa_hw: qcom,ipa@3e00000 {
+		compatible = "qcom,ipa";
+		reg =
+		<0x3e00000 0x84000>,
+		<0x3e04000 0xfc000>;
+		reg-names = "ipa-base", "gsi-base";
+		pas-ids = <0xf>;
+		firmware-names = "ipa_fws";
+		memory-regions = <&ipa_gsi_mem>;
+		qcom,ipa-cfg-offset = <0x0140000>;
+		interrupts =
+		<0 654 IRQ_TYPE_LEVEL_HIGH>,
+		<0 432 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "ipa-irq", "gsi-irq";
+		qcom,ipa-hw-ver = <24>; /* IPA core version = IPAv5.5 */
+		qcom,ipa-hw-mode = <0>;
+		qcom,platform-type = <2>; /* APQ platform */
+		qcom,ee = <0>;
+		qcom,ipa-config-is-auto;
+		qcom,ipa-config-is-apq-dma; /* APQ DMA Use Case*/
+		qcom,ipa-config-is-apq-no-uc-load; /* APQ No uC loading*/
+		qcom,entire-ipa-block-size = <0x200000>;
+		qcom,use-ipa-tethering-bridge;
+		qcom,mhi-event-ring-id-limits = <9 11>; /* start and end */
+		qcom,arm-smmu;
+		qcom,smmu-fast-map;
+		qcom,use-64-bit-dma-mask;
+		qcom,ipa-endp-delay-wa-v2;
+		qcom,tx-poll;
+		qcom,register-collection-on-crash;
+		qcom,testbus-collection-on-crash;
+		qcom,non-tn-collection-on-crash;
+		qcom,ipa-gpi-event-rp-ddr;
+		qcom,ulso-supported;
+		qcom,ulso-ip-id-min-linux-val = <0>;
+		qcom,ulso-ip-id-max-linux-val = <0xffff>;
+		qcom,ulso-ip-id-min-windows-val = <0>;
+		qcom,ulso-ip-id-max-windows-val = <0x7fff>;
+		qcom,max_num_smmu_cb = <1>;
+		clock-names = "core_clk";
+		clocks = <&rpmhcc RPMH_IPA_CLK>;
+		qcom,interconnect,num-cases = <5>;
+		qcom,interconnect,num-paths = <3>;
+		interconnects = <&aggre2_noc MASTER_IPA &gem_noc SLAVE_LLCC>,
+				<&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_IPA_CFG>;
+		interconnect-names = "ipa_to_llcc", "llcc_to_ebi1", "appss_to_ipa";
+		/* No vote */
+		qcom,no-vote =
+		<0 0 0 0 0 0>;
+
+		/* SVS2 */
+		qcom,svs2 =
+		<0 0 0 1300000 0 76800>;
+
+		/* SVS */
+		qcom,svs =
+		<1200000 0 1200000 2800000 0 150000>;
+
+		/* NOMINAL */
+		qcom,nominal =
+		<2400000 0 2400000 5500000 0 400000>;
+
+		/* TURBO */
+		qcom,turbo =
+		<3600000 0 3600000 5500000 0 400000>;
+
+		qcom,bus-vector-names = "MIN", "SVS2", "SVS", "NOMINAL",
+		"TURBO";
+		qcom,throughput-threshold = <2000 4000 8000>;
+		qcom,scaling-exceptions = <>;
+
+		ipa_smmu_ap: ipa_smmu_ap {
+			compatible = "qcom,ipa-smmu-ap-cb";
+			iommus = <&apps_smmu 0x4A0 0x0>;
+			qcom,iommu-dma-addr-pool = <0x20000000 0x20000000>;
+			qcom,additional-mapping =
+			/* modem tables in IMEM */
+			<0x146A8000 0x146A8000 0x2000>;
+			qcom,iommu-dma = "bypass";
+			qcom,ipa-q6-smem-size = <45056>;
+		};
+
+	};
+};

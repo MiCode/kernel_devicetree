@@ -1,0 +1,42 @@
+Power management Silent mode is a boot up mode with display and
+audio disabled. This mode allows the platform to boot up the kernel
+without enabling the UI, thereby masking the overall system boot latency.
+Predominant usage could be seen in automotive applications where
+boot latency is critical.
+Top 2 use cases could be:
+- One possible occasion for booting silently is when the driver approaches the
+  vehicle and based on the trigger by proximity sensor the vehicle does a remote
+  start before driver comes in the car.
+
+- Another might be if the system needs to run in the middle of
+  the night to perform updates.
+
+Add " pm_silentmode_kernel_state"  viewable/editable via sysfs.
+
+Kernel driver to monitor external GPIO input to indicate boot into
+kernel silent mode or not. This driver sets up the GPIO and links it
+up with an IRQ that is rising/falling edge triggered.
+On the GPIO rising edge, the IRQ thread is used to clear the sysfs
+in the PM framework that holds the state of the pm_silentmode_kernel_state.
+On the GPIO falling edge, the IRQ thread is used to set the sysfs
+in the PM framework that holds the state of the pm_silentmode_kernel_state.
+
+The Device tree entry for silent mode can be used to register a GPIO
+to the driver framework and use it to communicate to the Vehicle
+interface processor.
+
+Required properties:
+
+- compatible: "qcom,silent-mode"
+- qcom,silent-boot-gpio: GPIO needed HW interface from VIP to SoC
+- interrupts: Assign interrupt that is dual edge triggered
+- interrupt-names: Name of the interrupt under /proc/interrupt
+
+Example:
+
+	qcom,silent-mode {
+		compatible = "qcom,silent-mode";
+		qcom,silent-boot-gpio = <&pm8150_1_gpios 6 GPIO_ACTIVE_LOW>;
+		interrupts = < 0xc5 0 IRQ_TYPE_EDGE_BOTH>;
+		interrupt-names = "silent_pm8150_1_gpio6";
+	};

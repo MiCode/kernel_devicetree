@@ -1,0 +1,146 @@
+#include "subpmic.dtsi"
+#include "tcpc.dtsi"
+#include "chargepump.dtsi"
+#include "bq28z610_fg.dtsi"
+
+&soc {
+	lc_chg_manager:lc_chg_manager {
+		compatible = "lc,lc_chg_manager";
+		#io-channel-cells = <1>;
+		status = "ok";
+		lc_chg_manager,QC3_mode = <0>; /*0-not support; 1-QC3; 2-QC3P5*/
+		lc_chg_manager,usb_charger_current = <500>;
+		lc_chg_manager,float_charger_current = <1000>;
+		lc_chg_manager,cdp_charger_current = <900>;
+		lc_chg_manager,ac_charger_current = <1800>;
+		lc_chg_manager,hvdcp_charger_current = <3600>;
+		lc_chg_manager,hvdcp_input_current = <1600>;
+		lc_chg_manager,hvdcp3_charger_current = <4000>;
+		lc_chg_manager,hvdcp3_input_current = <3000>;
+		lc_chg_manager,pd2_charger_current = <3600>;
+		lc_chg_manager,pd2_input_current = <2000>;
+		lc_chg_manager,lpd_enable = <1>;
+		chargerpump,master;
+		lc_chg_manager,battery_temp_level = <(-100) 150 480 520 600>;
+		lc,thermal-enable;
+		lc,pd-thermal-mitigation = <5950 5400 5000 4500 4000
+									3700 3300 3000 2800 2600
+									2300 1500 1000 800 500
+									400>;
+		lc,pd-thermal-mitigation-fast = <5950 5400 5000 4500 4000
+									3700 3300 3000 2800 2600
+									2300 1500 1000 800 500
+									400>;
+		lc,qc2-thermal-mitigation = <5950 5400 5000 4500 4000
+									 3700 3300 3000 2800 2600
+									 2300 1500 1000 800 500
+									 400>;
+		lc_chg_manager,cyclecount = <100 300 800 65535>;
+		lc_chg_manager,dropfv = <0 20 20 40>;
+		step_jeita {
+			max_charger_voltage = <11000000>;
+			fv_offset_15_to_35 = <50>;
+			fv_offset_35_to_48 = <60>;
+			iterm = <500>;
+			ffc_low_tbat = <150>;
+			ffc_high_tbat = <480>;
+			ffc_medium_tbat = <350>;
+			ffc_high_soc = <95>;
+			under_4200_curr_offset = <0>;
+			step_fallback_hyst = <25>;
+			step_forward_hyst = <5>;
+			jeita_fallback_hyst = <5>;
+			jeita_forward_hyst = <5>;
+			jeita_fcc_cfg = <(-100)	0	687
+					1	50	1374
+					51	100	2748
+					101	150	4809
+					151	200	5496
+					201	350	6000
+					351	400	6000
+					401	450	6000
+					451	600	3435>;
+			jeita_fv_cfg = <(-100)	0	4530
+					1	50	4530
+					51	100	4530
+					101	150	4530
+					151	200	4530
+					201	350	4560
+					351	400	4560
+					401	450	4560
+					451	600	4100>;
+			step_chg_cfg_cycle = <3600	4250	6000
+					4251	4300	6000
+					4301	4480	5000
+					4481	4530	4000>;
+		};
+	};
+
+	lc_cp_policy:lc_cp_policy {
+		compatible = "lc,lc_cp_policy";
+		#io-channel-cells = <1>;
+		status = "ok";
+	};
+
+	lc_qc_policy:lc_qc_policy {
+		compatible = "lc,lc_qc_policy";
+		#io-channel-cells = <1>;
+		status = "ok";
+		max_vbus = <12000>;
+		max_ibus_qc3_18w = <1900>;
+		max_ibat_qc3_18w = <3500>;
+		max_ibus_qc3_27w = <3000>;
+		max_ibat_qc3_27w = <5400>;
+		max_ibus_qc35 = <2250>;
+		max_ibat_qc35 = <4400>;
+		tune_step_ibat_qc3_27 = <2000>;
+		tune_step_ibat_qc3_18 = <1900>;
+		tune_step_ibat_qc35 = <200>;
+		tune_step_ibus_qc3_27 = <1000>;
+		tune_step_ibus_qc3_18 = <950>;
+		tune_step_ibus_qc35 = <50>;
+		high_soc = <95>;
+		cv_vbat = <4440>;
+		cv_vbat_ffc = <4450>;
+		cv_ibat = <2000>;
+	};
+
+	rpm: rt_pd_manager {
+		compatible = "richtek,rt-pd-manager";
+		#io-channel-cells = <1>;
+		status = "ok";
+	};
+
+	lc_pd_adapter: lc_pd_adapter {
+		compatible = "lc,pd_adapter";
+		status = "ok";
+		pd_adapter,name = "pd_adapter1";
+		#io-channel-cells = <1>;
+	};
+
+	xm_pd_adapter:xm_pd_adapter {
+		compatible = "xiaomi,pd_adapter";
+		status = "ok";
+		adapter_name = "pd_adapter";
+		#io-channel-cells = <1>;
+	};
+};
+
+&usb0 {
+	extcon = <&rpm>, <&eud>;
+};
+
+&subpmic_flash {
+	status = "ok";
+};
+
+&qupv3_se1_i2c {
+	bob_supply: bob@75 {
+		compatible = "richtek,rt6160";
+		reg = <0x75>;
+		regulator-name = "rt6160-buckboost";
+		regulator-min-microvolt = <2025000>;
+		regulator-max-microvolt = <5200000>;
+	};
+};
+

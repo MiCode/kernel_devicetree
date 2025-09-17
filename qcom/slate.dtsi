@@ -1,0 +1,251 @@
+&qupv3_se4_spi {  /* BLSP4 QUP3*/
+		status = "ok";
+		qcom,shared_ee;
+		qcom,slate-spi {
+			compatible = "qcom,slate-spi";
+			reg = <0>;
+			spi-max-frequency = <40000000>;
+			interrupt-parent = <&tlmm>;
+			qcom,irq-gpio = <&tlmm 95 1>;
+		};
+};
+
+&soc {
+	aon_pas:qcom,rproc-slate {
+		compatible = "qcom,rproc-slate";
+		qcom,firmware-name = "slatefw.mdt";
+		/* GPIO inputs from blackghost */
+		qcom,slate2ap-status-gpio = <&tlmm 98 0>;
+		/* GPIO output to blackghost */
+		qcom,ap2slate-status-gpio = <&tlmm 97 0>;
+	};
+
+	qcom,slate-daemon {
+		compatible = "qcom,slate-daemon";
+		qcom,firmware-name = "slatefw.mdt";
+		qcom,rproc-handle = <&aon_pas>;
+		/* GPIO for external flash */
+		qcom,platform-reset-gpio = <&pm5100_gpios 15 0>;
+		clocks = <&rpmcc RPM_SMD_RF_CLK2>;
+		clock-names = "rf_clk2";
+		status = "ok";
+	};
+
+	glink_slatecom:qcom,glink-slatecom-xprt-slate {
+		compatible = "qcom,glink-slatecom-xprt";
+		label = "slate";
+
+		qcom,glink-slate-events-bridge {
+			qcom,glink-channels = "slate-event";
+			qcom,intents = <0x0181 1>;
+		};
+
+		qcom,glink-slatecom-ctrl {
+			qcom,glink-channels = "slate-ctrl";
+			qcom,intents = <0x0C 1>;
+		};
+
+		qcom,glink-slate-ux-ctl {
+			qcom,glink-channels = "slate-ux-ctl";
+			qcom,intents = <0x0C 1>;
+		};
+
+		qcom,glink-slatecom-qcli {
+			qcom,glink-channels = "slate-qcli";
+			qcom,intents = <0x0C 1>;
+			status = "ok";
+		};
+
+		qcom,glink-slate-rsb {
+			qcom,glink-channels = "slate-rsb-ctl";
+			qcom,intents = <0x0C 1>;
+		};
+
+		qcom,glink-slate-touch {
+			qcom,glink-channels = "touch-ctrl";
+			qcom,intents = <0x0C 1>;
+		};
+
+		qcom,glink-slate-dfu {
+			qcom,glink-channels = "slate-dfu";
+			qcom,intents = <0x24 1>;
+		};
+
+		qcom,glink-slate-custom-data {
+			qcom,glink-channels = "slate_custom_data";
+			qcom,intents = <0x24 1>;
+		};
+
+		qcom,glinkpkt-slate-ssc-hal {
+			qcom,glink-channels = "ssc_hal";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-sso-hal {
+			qcom,glink-channels = "sso_hal";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-cam-hal {
+			qcom,glink-channels = "cam_hal";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-usta {
+			qcom,glink-channels = "ssc_usta";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-location-ctrl {
+			qcom,glink-channels = "location_ctrl";
+			qcom,intents = <0x1000 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-0 {
+			qcom,glink-channels = "ssc_test_0";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-1 {
+			qcom,glink-channels = "ssc_test_1";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-2 {
+			qcom,glink-channels = "ssc_test_2";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-3 {
+			qcom,glink-channels = "ssc_test_3";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-4 {
+			qcom,glink-channels = "ssc_test_4";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-5 {
+			qcom,glink-channels = "ssc_test_5";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-6 {
+			qcom,glink-channels = "ssc_test_6";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-7 {
+			qcom,glink-channels = "ssc_test_7";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-8 {
+			qcom,glink-channels = "ssc_test_8";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-9 {
+			qcom,glink-channels = "ssc_test_9";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-10 {
+			qcom,glink-channels = "ssc_test_10";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-11 {
+			qcom,glink-channels = "ssc_test_11";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-12 {
+			qcom,glink-channels = "ssc_test_12";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-13 {
+			qcom,glink-channels = "ssc_test_13";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glinkpkt-slate-ssc-test-14 {
+			qcom,glink-channels = "ssc_test_14";
+			qcom,intents = <0x2710 2
+					0x3E8  2>;
+		};
+
+		qcom,glink-ss-bt-ctrl {
+			qcom,glink-channels = "ss_bt_ctrl";
+			qcom,intents = <0x1000 10>;
+		};
+
+		qcom,glink-ss-bt-data {
+			qcom,glink-channels = "ss_bt_data";
+			qcom,intents = <0x1000 10>;
+		};
+
+		qcom,glink-ss-bt-le-data {
+			qcom,glink-channels = "ss_bt_le_data";
+			qcom,intents = <0x1000 10>;
+		};
+
+		qcom,glink-ss-bt-ssr-data {
+			qcom,glink-channels = "ss_bt_ssr_data";
+			qcom,intents = <0xf2f8 10>;
+		};
+		qcom,glink-ss-bt-obex-data {
+			qcom,glink-channels = "ss_bt_obex_data";
+			qcom,intents = <0x1000 10>;
+		};
+	};
+
+	qcom,slatecom-rpmsg {
+		compatible = "qcom,slatecom-rpmsg";
+		qcom,glink-channels = "slate-ctrl";
+		qcom,glinkpkt-edge = "slate";
+		intents = <0x200 20>;
+	};
+
+	qcom,slate-events-bridge {
+		compatible = "qcom,slate-events-bridge";
+	};
+
+	qcom,slate-events-bridge-rpmsg {
+		compatible = "qcom,slate-events-bridge-rpmsg";
+		qcom,glink-channels = "slate-event";
+		qcom,glinkpkt-edge = "slate";
+	};
+
+	qcom,slate-rsb {
+		compatible = "qcom,slate-rsb";
+	};
+
+	qcom,slatetouch-rpmsg {
+		compatible = "qcom,slatetouch-rpmsg";
+		qcom,glink-channels = "touch-ctrl";
+		qcom,glinkpkt-edge = "slate";
+		intents = <0x200 1>;
+	};
+};

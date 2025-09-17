@@ -1,0 +1,103 @@
+&soc {
+	goodix_fp {
+		compatible = "xiaomi,goodixfingerprint";
+		interrupt-parent = <&tlmm>;
+		interrupt = <83 0x1>;
+		fp-gpio-irq = <&tlmm 83 0x0>;
+		fp-gpio-reset = <&tlmm 104 0x0>;
+		//fp_vdd_vreg-supply = <&L21A>;
+		pinctrl-names = "xiaomifp_reset_outputlow",
+				"xiaomifp_reset_outputhigh",
+				"xiaomifp_irq_active",
+				"xiaomifp_ldo_outputlow",
+				"xiaomifp_ldo_outputhigh";
+		pinctrl-0 = <&msm_gpio_104>;
+		pinctrl-1 = <&msm_gpio_104_output_high>;
+		pinctrl-2 = <&msm_gpio_83>;
+		pinctrl-3 = <&msm_gpio_65_output_low>;
+		pinctrl-4 = <&msm_gpio_65_output_high>;
+		status = "okay";
+	};
+	silead_fp {
+		compatible = "sil,silead_fp";
+		interrupt-parent = <&tlmm>;
+		interrupts = <83 0x1>;
+		irq-gpios  = <&tlmm 83 0x00>;
+		rst-gpios  = <&tlmm 104 0x00>;
+		//avdd-gpios  = <&tlmm 65 0x00>;
+		pinctrl-names = "xiaomifp_ldo_outputhigh";
+		pinctrl-0 = <&msm_gpio_65_output_high>;
+		status = "okay";
+	};
+	xiaomi_fingerprint {
+		compatible = "xiaomi-fingerprint";
+		status = "ok";
+		fingerprint,name = "xiaomi-fingerprint";
+	};
+};
+&tlmm {
+	/* GPIO_104 : FP_RESET_N, add for fingerprint */
+	msm_gpio_104: msm_gpio_104 {
+		mux {
+			 pins = "gpio104";
+			 function = "gpio";
+		};
+		config {
+			pins = "gpio104";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+	/* GPIO_104 : FP_RESET_N, state device active*/
+	msm_gpio_104_output_high: msm_gpio_104_output_high {
+		mux {
+			pins = "gpio104";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio104";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+	/* GPIO_83 : FP_INT_N */
+	msm_gpio_83: msm_gpio_83 {
+		mux {
+			pins = "gpio83";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio83";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+	/* GPIO_65 : FP_LDO_EN, add for fingerprint */
+	msm_gpio_65_output_low: msm_gpio_65_output_low {
+		mux {
+			 pins = "gpio65";
+			 function = "gpio";
+		};
+		config {
+			pins = "gpio65";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+	/* GPIO_65 : FP_LDO_EN, state device active*/
+	msm_gpio_65_output_high: msm_gpio_65_output_high {
+		mux {
+			pins = "gpio65";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio65";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+};

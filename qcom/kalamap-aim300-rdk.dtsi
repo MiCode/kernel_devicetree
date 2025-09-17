@@ -1,0 +1,424 @@
+#include "kalamap-aim300.dtsi"
+
+&tlmm {
+	pice1_usb_hub_3p3_default: pice1_usb_hub_3p3_default {
+		mux {
+			pins = "gpio178";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio178";
+			drive-strength = <2>;
+			output-high;
+			bias-pull-up;
+		};
+	};
+
+	pice1_hub_ponrst_default: pice1_hub_ponrst_default {
+		mux {
+			pins = "gpio72";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio72";
+			drive-strength = <2>;
+			output-high;
+			bias-pull-up;
+		};
+	};
+
+	fan_pwr_en_gpio_default: fan_pwr_en_gpio_default {
+		mux {
+			pins = "gpio154";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio154";
+			drive-strength = <2>;
+			output-low;
+			bias-disable;
+		};
+	};
+};
+
+&soc {
+	/* remove the node, use upd verg instead */
+	/delete-node/ qps615_bridge_0p9_vreg;
+
+	rlt8211_3p3: rlt8211_3v3_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "rtl8211_3p3";
+		gpio = <&tlmm 106 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <74000>;
+	};
+
+	verg_hub_3p3: verg_3p3 {
+		compatible = "regulator-fixed";
+		regulator-name = "verg_3p3";
+		gpio = <&tlmm 186 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	usb_hub_3p3_switch: usb_hub_3p3_switch {
+		compatible = "regulator-fixed";
+		regulator-name = "usb_hub_3p3_switch";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pice1_usb_hub_3p3_default>;
+		gpio = <&tlmm 178 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&verg_hub_3p3>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <10000>;
+	};
+
+	usb_hub_rest_vreg: usb_hub_rest_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "usb_hub_rest_vreg";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pice1_hub_ponrst_default>;
+		gpio = <&tlmm 72 GPIO_ACTIVE_HIGH>;
+		vin-supply = <&usb_hub_3p3_switch>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <10000>;
+	};
+};
+
+&pcie1 {
+	vreg-3p3-supply = <&usb_hub_rest_vreg>;
+};
+
+&reserved_memory {
+	pci_usb_mem: pci_usb_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x2000000>;
+	};
+};
+
+&pcie1_i2c_ctrl {
+	ep-reset-gpio-mask = <0x1c>;
+};
+
+&pcie1_bus2_dev2_fn0 {
+	reg = <0x1000 0x0 0x0 0x0 0x0>;
+	/* BDF 4.0.0 */
+	pcie1_bus4_dev0_fn0: pcie1_bus4_dev0_fn0 {
+		reg = <0x0 0x0 0x0 0x0 0x0>;
+		qcom,iommu-group = <&xhci_pci_iommu_group0>;
+		memory-region = <&pci_usb_mem>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		xhci_pci_iommu_group0: xhci_pci_iommu_group0 {
+			qcom,iommu-msi-size = <0x1000>;
+			qcom,iommu-dma-addr-pool = <0xc0000000 0x10000000>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-pagetable = "coherent";
+			qcom,iommu-faults = "stall-disable", "HUPCF", "no-CFRE", "non-fatal";
+		};
+	};
+};
+
+&pcie1_bus2_dev3_fn0 {
+	reg = <0x1800 0x0 0x0 0x0 0x0>;
+	rlt8211_eth1: rlt8221_eth1 {
+		reg = <0x100 0x0 0x0 0x0 0x0>;
+		qcom,phy-rst-gpio = <1>;
+		qcom,phy-rst-delay-us = <82000>;
+		qcom,phy-port-interface = <2>;
+		qcom,phy-built-in-wol;
+		qcom,phy-reverse-rst;
+		phy-supply = <&rlt8211_3p3>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			phy0: ethernet-phy@0 {
+				reg = <0>;
+				realtek,aldps-enable;
+			};
+		};
+	};
+
+	/delete-node/ qps615_eth1;
+};
+
+&qupv3_se12_i2c {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	fancontroller: max31760@50 {
+		compatible = "maxim,max31760";
+		reg = <0x50>;
+		#cooling-cells = <2>;
+		maxim,fan-num = <1>;
+		maxim,vdd-supply = <&bob_3p3>;
+		maxim,vcca-supply = <&L15B>;
+		regulator-name = "maxim,vdd", "maxim,vcca";
+		pinctrl-names = "default";
+		pinctrl-0 = <&fan_pwr_en_gpio_default>;
+		maxim,pwr-en-gpio = <&tlmm 154 GPIO_ACTIVE_HIGH>;
+		status = "ok";
+	};
+};
+
+&qupv3_se4_spi {
+	status = "disabled";
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "default";
+};
+
+&redriver {
+	status = "disabled";
+};
+
+&thermal_zones {
+	cpu-1-9 {
+		trips {
+			thermal-engine-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			thermal-hal-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			fan_cpu19_config0: fan-cpu19-config0 {
+				temperature = <1000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_cpu19_config1: fan-cpu19-config1 {
+				temperature = <80000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_cpu19_config2: fan-cpu19-config2 {
+				temperature = <90000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			fan_cdev_0 {
+				trip = <&fan_cpu19_config0>;
+				cooling-device = <&fancontroller 50 50>;
+			};
+
+			fan_cdev_1 {
+				trip = <&fan_cpu19_config1>;
+				cooling-device = <&fancontroller 80 80>;
+			};
+
+			fan_cdev_2 {
+				trip = <&fan_cpu19_config2>;
+				cooling-device = <&fancontroller 100 100>;
+			};
+		};
+	};
+
+	cpu-1-10 {
+		trips {
+			thermal-engine-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			thermal-hal-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			fan_cpu1a_config0: fan-cpu1a-config0 {
+				temperature = <1000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_cpu1a_config1: fan-cpu1a-config1 {
+				temperature = <80000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_cpu1a_config2: fan-cpu1a-config2 {
+				temperature = <90000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			fan_cdev_0 {
+				trip = <&fan_cpu1a_config0>;
+				cooling-device = <&fancontroller 50 50>;
+			};
+
+			fan_cdev_1 {
+				trip = <&fan_cpu1a_config1>;
+				cooling-device = <&fancontroller 80 80>;
+			};
+
+			fan_cdev_2 {
+				trip = <&fan_cpu1a_config2>;
+				cooling-device = <&fancontroller 100 100>;
+			};
+		};
+	};
+
+	gpuss-0 {
+		trips {
+			thermal-engine-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			thermal-hal-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			fan_gpuss0_config0: fan-gpuss0-config0 {
+				temperature = <1000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_gpuss0_config1: fan-gpuss0-config1 {
+				temperature = <80000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_gpuss0_config2: fan-gpuss0-config2 {
+				temperature = <90000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			fan_cdev_0 {
+				trip = <&fan_gpuss0_config0>;
+				cooling-device = <&fancontroller 50 50>;
+			};
+
+			fan_cdev_1 {
+				trip = <&fan_gpuss0_config1>;
+				cooling-device = <&fancontroller 80 80>;
+			};
+
+			fan_cdev_2 {
+				trip = <&fan_gpuss0_config2>;
+				cooling-device = <&fancontroller 100 100>;
+			};
+		};
+	};
+
+	gpuss-1 {
+		trips {
+			thermal-engine-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			thermal-hal-config {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			fan_gpuss1_config0: fan-gpuss1-config0 {
+				temperature = <1000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_gpuss1_config1: fan-gpuss1-config1 {
+				temperature = <80000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+
+			fan_gpuss1_config2: fan-gpuss1-config2 {
+				temperature = <90000>;
+				hysteresis = <5000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			fan_cdev_0 {
+				trip = <&fan_gpuss1_config0>;
+				cooling-device = <&fancontroller 50 50>;
+			};
+
+			fan_cdev_1 {
+				trip = <&fan_gpuss1_config1>;
+				cooling-device = <&fancontroller 80 80>;
+			};
+
+			fan_cdev_2 {
+				trip = <&fan_gpuss1_config2>;
+				cooling-device = <&fancontroller 100 100>;
+			};
+		};
+	};
+
+	usb-therm {
+		trips {
+			fan_thmbat0_config0: fan-thmbat0-config0 {
+				temperature = <43000>;
+				hysteresis = <2000>;
+				type = "passive";
+			};
+
+			fan_thmbat1_config1: fan-thmbat1-config1 {
+				temperature = <45000>;
+				hysteresis = <3000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			fan_cdev_0 {
+				trip = <&fan_thmbat0_config0>;
+				cooling-device = <&fancontroller 80 80>;
+			};
+
+			fan_cdev_1 {
+				trip = <&fan_thmbat1_config1>;
+				cooling-device = <&fancontroller 100 100>;
+			};
+		};
+	};
+};

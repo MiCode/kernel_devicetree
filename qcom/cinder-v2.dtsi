@@ -1,0 +1,75 @@
+#include "cinder.dtsi"
+
+&pcie_ep {
+	reg = <0x48020000 0x100>,
+		<0x48000000 0xf20>,
+		<0x48001000 0x2200>,
+		<0x48000f40 0xa8>,
+		<0x48010000 0x10000>,
+		<0x48004000 0x4400>,
+		<0x48009000 0x1000>,
+		<0x01c00000 0x4000>,
+		<0x01c20000 0x10000>,
+		<0x01c04000 0x1000>,
+		<0x01fc6000 0x1000>,
+		<0xc2fa000 0x4>,
+		<0x48030000 0x100>;
+	reg-names = "msi", "dm_core", "dm_core_vf", "elbi", "iatu",
+			"msix_table", "msix_pba", "parf",
+			"phy", "mmio", "tcsr_pcie_perst_en",
+			"aoss_cc_reset", "msi_vf";
+	/delete-property/ qcom,sriov-mask;
+	qcom,pcie-parf-msi-vf-indexed;
+	qcom,db-fwd-off-varied;
+};
+
+&mhi_device {
+	qcom,mhi-ifc-id = <0x060117cb>;
+	interrupts = <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 611 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 612 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 613 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 614 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 586 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 587 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 589 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 590 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 591 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 592 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 593 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 594 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 595 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 596 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 597 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 598 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "mhi-device-inta", "mhi-virt-device-int-0",
+			"mhi-virt-device-int-1", "mhi-virt-device-int-2",
+			"mhi-virt-device-int-3", "mhi-virt-device-int-4",
+			"mhi-virt-device-int-5", "mhi-virt-device-int-6",
+			"mhi-virt-device-int-7", "mhi-virt-device-int-8",
+			"mhi-virt-device-int-9", "mhi-virt-device-int-10",
+			"mhi-virt-device-int-11", "mhi-virt-device-int-12",
+			"mhi-virt-device-int-13", "mhi-virt-device-int-14",
+			"mhi-virt-device-int-15";
+};
+
+&mhi_net_device {
+	qcom,mhi-num-nw-client-limit = <16>;
+	qcom,mhi-ethernet-interface-ch-list = <50 52 54 56 58 60 62 64 66 68 70 72 74 76>;
+};
+
+&gcc {
+	compatible = "qcom,cinder-gcc-v2", "syscon";
+};
+
+&debugcc {
+	compatible = "qcom,cinder-debugcc-v2", "syscon";
+};
+
+&ecpricc {
+	compatible = "qcom,cinder-ecpricc-v2", "syscon";
+};
+
+&tsc {
+	qcom,tsc-hw-preload;
+};

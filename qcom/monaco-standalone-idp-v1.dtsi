@@ -1,0 +1,72 @@
+#include "monaco-idp-v1-common.dtsi"
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm5100.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+
+&pm5100_qbg {
+	status = "ok";
+	qcom,battery-data = <&monaco_batterydata>;
+	nvmem-cell-names = "qbg_debug_mask_low", "qbg_debug_mask_high", "skip_esr_state";
+	nvmem-cells = <&qbg_debug_mask_low>, <&qbg_debug_mask_high>, <&skip_esr_state>;
+	#io-channel-cells = <1>;
+	io-channels = <&pm5100_adc PM5100_ADC5_GEN3_BATT_THM_100K_PU>,
+			<&pm5100_adc PM5100_ADC5_GEN3_BAT_ID_100K_PU>,
+			<&pm5100_charger PSY_IIO_CHARGE_DONE>,
+			<&pm5100_charger PSY_IIO_RECHARGE_SOC>,
+			<&pm5100_charger PSY_IIO_FORCE_RECHARGE>,
+			<&pm5100_charger PSY_IIO_SYS_SOC>;
+	io-channel-names = "batt-temp",
+			"batt-id",
+			"charge_done",
+			"recharge_soc",
+			"force_recharge",
+			"sys_soc";
+	qcom,vbat-cutoff-mv = <3100>;
+	qcom,ibat-cutoff-ma = <10>;
+	qcom,vph-min-mv = <2500>;
+	qcom,iterm-ma = <20>;
+	qcom,vbatt-empty-threshold-mv = <3000>;
+};
+
+&pm5100_charger {
+	#io-channel-cells = <1>;
+	io-channels = <&pm5100_adc PM5100_ADC5_GEN3_USB_SNS_V_16>,
+			<&pm5100_adc PM5100_ADC5_GEN3_USB_IN_I>,
+			<&pm5100_adc PM5100_ADC5_GEN3_CHG_TEMP>,
+			<&pm5100_adc PM5100_ADC5_GEN3_DIE_TEMP>,
+			<&pm5100_adc PM5100_ADC5_GEN3_VPH_PWR>,
+			<&pm5100_qbg PSY_IIO_RESISTANCE_ID>,
+			<&pm5100_qbg PSY_IIO_VOLTAGE_NOW>,
+			<&pm5100_qbg PSY_IIO_TEMP>,
+			<&pm5100_qbg PSY_IIO_CAPACITY>,
+			<&pm5100_qbg PSY_IIO_VOLTAGE_OCV>,
+			<&pm5100_qbg PSY_IIO_VOLTAGE_AVG>,
+			<&pm5100_qbg PSY_IIO_DEBUG_BATTERY>,
+			<&pm5100_qbg PSY_IIO_CURRENT_NOW>,
+			<&pm5100_qbg PSY_IIO_VOLTAGE_MAX>,
+			<&pm5100_qbg PSY_IIO_CHARGE_FULL>,
+			<&pm5100_qbg PSY_IIO_CHARGE_COUNTER>,
+			<&pm5100_qbg PSY_IIO_CYCLE_COUNT>,
+			<&pm5100_qbg PSY_IIO_CHARGE_FULL_DESIGN>,
+			<&pm5100_qbg PSY_IIO_TIME_TO_FULL_NOW>;
+
+	io-channel-names = "usb_in_voltage",
+				"usb_in_current",
+				"chg_temp",
+				"die_temp",
+				"vph_voltage",
+				"resistance_id",
+				"voltage_now",
+				"temp",
+				"capacity",
+				"voltage_ocv",
+				"voltage_avg",
+				"debug_battery",
+				"current_now",
+				"voltage_max",
+				"charge_full",
+				"charge_counter",
+				"cycle_count",
+				"charge_full_design",
+				"time_to_full_now";
+};
+
