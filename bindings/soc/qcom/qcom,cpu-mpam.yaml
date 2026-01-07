@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,cpu-mpam.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) CPU MPAM Driver
+
+maintainers:
+  - Huang Yiwei <quic_hyiwei@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. (QTI) CPU MPAM Driver provides configfs nodes
+  for userspace clients to set MPAM configuration with CPUCP firmware via
+  consolidated SCMI protocol.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,cpu-mpam
+
+  reg:
+    items:
+      - description: address and size of CPUCP DTIM area for CPUCP MPAM monitor data
+
+  reg-names:
+    items:
+      - const: mon-base
+
+  child-node:
+    description: |
+      Available components of the CPU MPAM.
+    type: object
+    properties:
+      qcom,msc-id:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          MSC id of the child node.
+
+      qcom,msc-name:
+        $ref: '/schemas/types.yaml#/definitions/string'
+        description: |
+          MSC name of the child node.
+
+    required:
+      - qcom,msc-id
+      - qcom,msc-name
+
+    additionalProperties: false
+
+required:
+  - compatible
+  - reg
+  - reg-names
+
+additionalProperties: false
+
+examples:
+  - |
+    cpu_mpam: qcom,cpu_mpam {
+      compatible = "qcom,cpu-mpam";
+      reg = <0x17b6f000 0x400>;
+      reg-names = "mon-base";
+
+      L2_0 {
+        qcom,msc-id = <0>;
+        qcom,msc-name = "L2_0";
+      };
+
+      L2_1 {
+        qcom,msc-id = <1>;
+        qcom,msc-name = "L2_1";
+      };
+    };
+...

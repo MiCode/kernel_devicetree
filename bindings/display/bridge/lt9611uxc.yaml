@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/display/bridge/lt9611uxc.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: LT9611uxc DSI to HDMI bridge
+
+maintainers:
+  - Lei Chen <quic_chenlei@quicinc.com>
+
+description: |
+  LT9611UXC are bridge devices which convert DSI to HDMI
+
+properties:
+  compatible:
+    const: lt,lt9611uxc
+
+  reg:
+    maxItems: 1
+
+  interrupts:
+    maxItems: 1
+
+  lt,irq-gpio:
+    description: Main IRQ gpio mapping
+
+  lt,reset-gpio:
+    description: Main reset gpio mapping
+
+  lt,hdmi-ps-gpio:
+    description: GPIO mapping for HDMI PS
+
+  lt,hdmi-en-gpio:
+    description: GPIO mapping for HDMI EN
+
+  vdd-supply:
+    description: Regulator for 1.8V MIPI phy power.
+
+  vcc-supply:
+    description: Regulator for 3.3V IO power.
+
+  ports:
+    $ref: /schemas/graph.yaml#/properties/ports
+
+    properties:
+      port@0:
+        $ref: /schemas/graph.yaml#/properties/port
+        description: MIPI port-1 for MIPI input
+    required:
+      - port@0
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - vdd-supply
+  - vcc-supply
+  - ports
+
+allOf:
+  - $ref: ../dsi-controller.yaml#
+
+additionalProperties: false
+
+examples:
+  - |
+    &qupv3_se9_i2c {
+      lt9611@3b {
+        compatible = "lt,lt9611uxc";
+        reg = <0x3b>;
+        interrupt-parent = <&tlmm>;
+        interrupts = <125 0>;
+        interrupt-names = "lt_irq";
+        lt,irq-gpio = <&tlmm 125 0x0>;
+        lt,reset-gpio = <&tlmm 134 0x0>;
+        lt,hdmi-ps-gpio = <&tlmm 136 0x0>;
+        lt,hdmi-en-gpio = <&tlmm 137 0x0>;
+
+        vcc-supply = <&pm660l_l6>;
+        vdd-supply = <&pm660_l11>;
+
+        ports {
+          #address-cells = <1>;
+          #size-cells = <0>;
+
+          port@0 {
+            reg = <0>;
+            lt9611_in: endpoint {
+              remote-endpoint = <&ext_dsi_out>;
+            };
+          };
+        };
+      };
+    };
+
+...

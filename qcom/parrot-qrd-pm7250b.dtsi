@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "parrot-pm7250b.dtsi"
+
+/ {
+	qcom,pmic-id-size = <9>;
+	qcom,pmic-id = <0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x2E>;
+};
+
+&battery_charger {
+	qcom,thermal-mitigation = <7000000 6000000 5400000 5000000
+				4500000 4000000 3500000 3000000 2600000 2250000
+				1500000 1100000 800000 500000 350000>;
+	qcom,wireless-charging-not-supported;
+};
+
+&usb0 {
+	usb-role-switch;
+	extcon = <&eud>;
+
+	dwc3@a600000 {
+		usb-role-switch;
+		dr_mode = "otg";
+	};
+
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		port {
+			usb_port0_connector: endpoint {
+				remote-endpoint = <&usb_port0>;
+			};
+		};
+	};
+};

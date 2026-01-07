@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/interrupt-controller/qcom,show-resume-irqs.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Show Resume IRQs from interrupt controller
+
+maintainers:
+  - Maulik Shah <quic_mkshah@quicinc.com>
+
+description: |
+  Qualcomm Technologies Inc. SoCs can be interrupted in order to come out
+  of low power modes, knowing the wake up source allows debugging of
+  unnecessary wake up interrupts that may bring the SoC out of its low power
+  mode. Driver reads GIC registers to determine the interrupt which triggered
+  just before the resume loop unrolls.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,show-resume-irqs
+
+  reg:
+    items:
+      - description: GICD base register region
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    show_resume_irqs@17100000 {
+        compatible = "qcom,show-resume-irqs";
+        reg = <0x17100000 0x10000>;
+    };

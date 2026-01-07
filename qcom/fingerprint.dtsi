@@ -1,0 +1,107 @@
+&soc {
+	fingerprint_xiaomi {
+	    compatible = "xiaomi,xiaomi-fp";
+	    xiaomi,gpio_irq = <&tlmm 111 0x0>;
+	    vfp-supply = <&pm6150l_l11>;
+	    netlink-event = <29>;
+	    pinctrl-names = "reset_high", "reset_low", "eint_default", "eint_pulldown";
+            pinctrl-0 = <&fingerprints_reset_high>;
+	    pinctrl-1 = <&fingerprints_reset_low>;
+	    pinctrl-2 = <&fingerprints_eint_default>;
+	    pinctrl-3 = <&fingerprints_eint_pulldown>;
+	    //pinctrl-4 = <&fingerprints_pwr_high>;
+	    //pinctrl-5 = <&fingerprints_pwr_low>;
+	    status = "okay";
+	};
+};
+
+&tlmm {
+/* GPIO_101 : FP_RESET_N, add for fingerprint */
+	fingerprints_reset_high: fingerprints_reset_high {
+		mux {
+			 pins = "gpio101";
+			 function = "gpio";
+		};
+
+		config {
+			pins = "gpio101";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+
+	/* GPIO_101 : FP_RESET_N, state device active*/
+	fingerprints_reset_low: fingerprints_reset_low {
+		mux {
+			pins = "gpio101";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio101";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	/* GPIO_111 : FP_INT_N */
+	fingerprints_eint_default: fingerprints_eint_default {
+		mux {
+			pins = "gpio111";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio111";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+
+	/* GPIO_111 : FP_INT_N */
+	fingerprints_eint_pulldown: fingerprints_eint_pulldown {
+		mux {
+			pins = "gpio111";
+    		function = "gpio";
+    	};
+    
+    	config {
+    		pins = "gpio111";
+    		drive-strength = <2>;
+    		bias-pull-down;
+    	};
+    };
+
+/*
+	fingerprints_pwr_high: fingerprints_pwr_high {
+		mux {
+			pins = "gpio132";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio132";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+
+
+	fingerprints_pwr_low: fingerprints_pwr_low {
+		mux {
+			pins = "gpio132";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio132";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+*/
+};
