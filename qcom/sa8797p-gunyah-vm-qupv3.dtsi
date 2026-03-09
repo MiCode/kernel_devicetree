@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+&soc {
+	/* QUPv3_2  wrapper  instance */
+	qupv3_2: qcom,qupv3_2_geni_se@8c0000 {
+		compatible = "qcom,sa8797p-geni-se-qup", "qcom,sa8255p-geni-se-qup";
+		reg = <0x8c0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		iommus = <&apps_smmu_0 0x15b8 0x0>;
+		qcom,iommu-dma = "default";
+		status = "disabled";
+
+		/* BT UART Instances */
+		qupv3_se14_4uart: qcom,qup_uart14@880000 {
+			compatible = "qcom,sa8797p-geni-uart", "qcom,sa8255p-geni-uart";
+			reg = <0x880000 0x3000>;
+			interrupts = <GIC_SPI 373 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&scmi_power 12>, <&scmi_perf 3>;
+			power-domain-names = "power", "perf";
+			status = "disabled";
+		};
+
+		qupv3_se17_4uart: qcom,qup_uart@88c000 {
+			compatible = "qcom,sa8797p-geni-uart", "qcom,sa8255p-geni-uart";
+			reg = <0x88c000 0x3000>;
+			interrupts = <GIC_SPI 585 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&scmi_power 4>, <&scmi_perf 0>;
+			power-domain-names = "power", "perf";
+			status = "disabled";
+		};
+	};
+};

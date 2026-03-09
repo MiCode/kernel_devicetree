@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/regulator/qcom,ocp-notifier.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. Regulator Over-Current Notifier
+
+maintainers:
+  - David Collins <quic_collinsd@quicinc.com>
+
+description: |
+  This device provides support for logging and notifying consumers about
+  regulator over-current (OCP) and alarm (voltage droop) events on certain
+  Qualcomm Technologies, Inc. PMIC devices.  This is useful for debugging as
+  well as for providing a more graceful recovery mechanism than resetting the
+  entire system.
+
+properties:
+  compatible:
+    const: qcom,regulator-ocp-notifier
+
+  interrupts:
+    minItems: 1
+    items:
+      - description: PMIC regulator OCP notification summary interrupt
+      - description: PMIC regulator alarm notification summary interrupt
+
+  nvmem-cells:
+    minItems: 1
+    items:
+      - description: PMIC regulator OCP log nvmem cell phandle
+      - description: PMIC regulator alarm log nvmem cell phandle
+
+  nvmem-cell-names:
+    items:
+      - const: ocp_log
+      - const: alarm_log
+
+patternProperties:
+  "^periph-[0-9a-f]{3}-supply$":
+    description: |
+      phandle of the regulator device corresponding to the PMIC peripheral with
+      PPID equal to the hex value listed in the supply property name.
+
+required:
+  - compatible
+  - interrupts
+  - nvmem-cells
+  - nvmem-cell-names
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    regulator-ocp-notifier {
+        compatible = "qcom,regulator-ocp-notifier";
+        interrupt-parent = <&spmi_bus>;
+        interrupts = <0x0 0x71 0x1 IRQ_TYPE_EDGE_RISING>,
+                     <0x0 0x85 0x1 IRQ_TYPE_EDGE_RISING>;
+        nvmem-cells = <&ocp_log>, <&alarm_log>;
+        nvmem-cell-names = "ocp_log", "alarm_log";
+
+        periph-1c1-supply = <&L1B>;
+        periph-1c2-supply = <&L2B>;
+        periph-1c5-supply = <&L5B>;
+    };

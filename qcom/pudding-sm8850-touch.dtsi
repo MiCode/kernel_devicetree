@@ -1,0 +1,289 @@
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+
+	touch_avdd_vreg: touch_avdd_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "touch_avdd_vreg";
+		enable-active-high;
+		gpio = <&tlmm 117 0>;
+	};
+};
+
+&L4I {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+	qcom,init-voltage = <1800000>;
+};
+
+&tlmm {
+	syna_tcm_eint_init: syna_tcm_eint_init {
+		mux {
+			/* GPIO 158 Interrupt */
+			pins = "gpio158";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio158";
+			bias-disable;
+			input-enable;
+		};
+	};
+
+	syna_tcm_rst_init: syna_tcm_rst_init {
+		mux {
+			/* GPIO 66 Interrupt */
+			pins = "gpio66";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio66";
+			bias-disable;
+			output-low;
+		};
+	};
+
+	syna_tcm_eint_suspend: syna_tcm_eint_suspend {
+		mux {
+			/* GPIO 158 Interrupt */
+			pins = "gpio158";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio158";
+			bias-pull-down;
+		};
+	};
+
+	syna_tcm_rst_suspend: syna_tcm_rst_suspend {
+		mux {
+			/* GPIO 66 Interrupt */
+			pins = "gpio66";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio66";
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	mi_ts_spi_miso_active: mi_ts_spi_miso_active {
+		mux {
+			pins = "gpio48";
+			function = "qup4_se0_l0";
+		};
+		config {
+			pins = "gpio48";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+
+	mi_ts_spi_mosi_active: mi_ts_spi_mosi_active {
+		mux {
+			pins = "gpio49";
+			function = "qup4_se0_l1";
+		};
+		config {
+			pins = "gpio49";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+
+	mi_ts_spi_clk_active: mi_ts_spi_clk_active {
+		mux {
+			pins = "gpio50";
+			function = "qup4_se0_l2";
+		};
+		config {
+			pins = "gpio50";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+
+	mi_ts_spi_cs_active: mi_ts_spi_cs_active {
+		mux {
+			pins = "gpio51";
+			function = "qup4_se0_l3";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+
+
+	mi_ts_spi_cs_sleep: mi_ts_spi_cs_sleep {
+		mux {
+			pins = "gpio51";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+	};
+
+	mi_ts_spi_sleep: mi_ts_spi_sleep {
+		mux {
+			pins = "gpio48", "gpio49",
+				"gpio50";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio48", "gpio49",
+				"gpio50";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};
+
+&qupv3_se19_spi {
+	status = "ok";
+	pinctrl-0 = <&mi_ts_spi_mosi_active>, <&mi_ts_spi_miso_active>,
+				<&mi_ts_spi_clk_active>, <&mi_ts_spi_cs_active>;
+	pinctrl-1 = <&mi_ts_spi_sleep>, <&mi_ts_spi_cs_sleep>;
+	qcom,la-vm;
+	qcom,rt;
+	synaptics_tcm@0 {
+		compatible = "synaptics,tcm-spi";
+		reg = <0x0>;
+		spi-max-frequency = <15000000>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <158 0x2008>;
+		avdd-supply = <&touch_avdd_vreg>;
+		iovdd-supply = <&L4I>;
+
+		synaptics,avdd-name = "avdd";
+		synaptics,iovdd-name = "iovdd";
+		/*synaptics,bus-reg-name = "vdd";*/
+		/*synaptics,pwr-reg-name = "avdd";*/
+		synaptics,irq-gpio = <&tlmm 158 0x2008>;
+		synaptics,reset-gpio = <&tlmm 66 0x00>;
+		synaptics,irq-on-state = <0>;
+		synaptics,spi-mode = <0>;
+		synaptics,byte-delay-us = <0>;
+		synaptics,block-delay-us = <0>;
+		synaptics,power-delay-ms = <50>;
+		synaptics,reset-active-ms = <10>;
+		synaptics,reset-delay-ms = <200>;
+		synaptics,ubl-max-freq = <15000000>;
+		synaptics,ubl-byte-delay-us = <20>;
+		synaptics,fod-lx=<597>;
+		synaptics,fod-ly=<2406>;
+		synaptics,fod-x-size=<246>;
+		synaptics,fod-y-size=<246>;
+		synaptics,max-x = <1220>;
+		synaptics,max-y = <2656>;
+		synaptics,rx-num = <16>;
+		synaptics,tx-num = <35>;
+		synaptics,special-rx-num = <16>;
+		synaptics,special-tx-num = <35>;
+		synaptics,frame-data-page-size = <1>;
+		synaptics,frame-data-buf-size = <10>;
+		synaptics,raw-data-page-size = <5>;
+		synaptics,raw-data-buf-size = <5>;
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend";
+		pinctrl-0 = <&syna_tcm_eint_init &syna_tcm_rst_init>;
+		pinctrl-1 = <&syna_tcm_eint_suspend &syna_tcm_rst_suspend>;
+		synaptics,super-resolution-factor = <100>;
+
+		mi_tp,game-mode-array =
+				<1 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,active-mode-array =
+				<1 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,tolerance-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,up-threshold-array =
+				<4 0 3 3 3>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,aim-sensitivity-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,tap-stability-array =
+				<4 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,edge-filter-array =
+				<3 0 2 2 2>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,panel-orien-array =
+				<3 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,report-rate-array =
+				<3 0 0 0 0>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,expert-mode-array =
+				<3 1 1 1 1>;  /* MAX MIN DEF SET GET	*/
+		mi_tp,cornerfilter-area-step-array = <0 100 170 250>; /* step 0 to step 3 */
+		mi_tp,cornerzone-filter-hor1-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<0 0 0 0 170 170 0 0>,
+				<0 1 0 0 0 0 0 0>,
+				<0 2 0 2229 170 2399 0 0>,
+				<0 3 0 0 0 0 0 0>;
+		mi_tp,cornerzone-filter-hor2-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<0 0 0 0 0 0 0 0>,
+				<0 1 909 0 1079 170 0 0>,
+				<0 2 0 0 0 0 0 0>,
+				<0 3 909 2229 1079 2399 0 0>;
+		mi_tp,cornerzone-filter-ver-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<0 0 0 0 0 0 0 0>,
+				<0 1 0 0 0 0 0 0>,
+				<0 2 0 2099 150 2399 0 0>,
+				<0 3 929 2099 1079 2399 0 0>;
+		mi_tp,deadzone-filter-hor-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<2 0 0 0 1079 5 0 0>,
+				<2 1 0 2394 1079 2399 0 0>,
+				<2 2 0 0 0 0 0 0>,
+				<2 3 0 0 0 0 0 0>;
+		mi_tp,deadzone-filter-ver-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<2 0 0 0 0 0 0 0>,
+				<2 1 0 0 0 0 0 0>,
+				<2 2 0 0 5 2399 0 0>,
+				<2 3 1074 0 1079 2399 0 0>;
+		mi_tp,edgezone-filter-hor-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<1 0 0 0 1079 40 0 0>,
+				<1 1 0 2359 1079 2399 0 0>,
+				<1 2 0 0 40 2399 0 0>,
+				<1 3 1039 0 1079 2399 0 0>;
+		mi_tp,edgezone-filter-ver-array =
+			/* B0:Type, B1:pos, B2:x0, B3:y0, B4:x1, B5:y1, B6:reserved, B7: reserved */
+				<1 0 0 0 0 0 0 0>,
+				<1 1 0 0 0 0 0 0>,
+				<1 2 0 0 40 2399 0 0>,
+				<1 3 1039 0 1079 2399 0 0>;
+		synaptics,panel-display-resolution = <1440 3200>;  /* X  Y*/
+		syna,qts_en;
+		syna,touch-type = "primary";
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "tvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <647>;
+		qts,trusted-touch-io-bases = <0x1a80000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+                                          &tlmm 51 0 &tlmm 66 0 &tlmm 158 0x2008>;
+		synaptics,config-array-size = <1>;
+		synaptics,default-thp-config-name = "pudding_syna_thp_config.ini";
+		synaptics,default-fw-image-name = "synaptics_spi_pudding.img";
+		synaptics,default-test-limit-name = "pudding_test_limits_S3910P.csv";
+		synpatics,cfg_0 {
+			synaptics,tp-vendor = <0x00>;
+			synaptics,thp-config-name = "pudding_syna_thp_config.ini";
+			synaptics,fw-image-name = "synaptics_spi_pudding.img";
+			synaptics,test-limit-name = "pudding_test_limits_S3910P.csv";
+		};
+	};
+};

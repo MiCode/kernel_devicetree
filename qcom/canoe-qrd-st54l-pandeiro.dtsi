@@ -1,0 +1,105 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "canoe-qrd.dtsi"
+
+&wcd_usbss {
+	interrupt-parent = <&spmi0_bus>;
+	interrupts = <0x0 0xb6 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "usb_wcd";
+	nvmem-cells = <&usb_mode>;
+	nvmem-cell-names = "usb_mode";
+
+	mode-switch;
+
+	port {
+		wcd_usbss_mux: endpoint {
+			remote-endpoint = <&ucsi_audio_mux>;
+		};
+	};
+};
+
+&ucsi_audio_mux {
+	remote-endpoint = <&wcd_usbss_mux>;
+};
+
+&usb0 {
+	qcom,wcd_usbss = <&wcd_usbss>;
+};
+
+&xoagg_therm {
+	status = "ok";
+};
+
+&pmk8850_vadc {
+	pinctrl-0 = <&pa_therm2_default>, <&xoagg_therm_default>;
+	pinctrl-names = "default";
+};
+
+&pmic_glink_debug {
+	i2c@104 {
+		reg = <0x104>; /* I2C instance 4 in ADSP for SE3 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		smb1501@68 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x68>;
+			qcom,can-sleep;
+		};
+
+		smb1501@69 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x69>;
+			qcom,can-sleep;
+		};
+
+		cps4061@30 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x30>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1501_1_iin {
+		reg = <0x1046801>;
+		label = "smb1501_1_iin";
+	};
+
+	smb1501_1_ichg {
+		reg = <0x1046802>;
+		label = "smb1501_1_ichg";
+	};
+
+	smb1501_1_die_temp {
+		reg = <0x1046803>;
+		label = "smb1501_1_die_temp";
+	};
+
+	smb1501_2_iin {
+		reg = <0x1046901>;
+		label = "smb1501_2_iin";
+	};
+
+	smb1501_2_ichg {
+		reg = <0x1046902>;
+		label = "smb1501_2_ichg";
+	};
+
+	smb1501_2_die_temp {
+		reg = <0x1046903>;
+		label = "smb1501_2_die_temp";
+	};
+};
+
+&pmih010x_eusb2_repeater {
+	qcom,param-override-seq =
+		 <0x2 0x54>;
+};

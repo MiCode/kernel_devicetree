@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,mpam.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) MPAM Driver
+
+maintainers:
+  - avajid@quicinc.com <quic_avajid@quicinc.com>
+  - gurbaror@quicinc.com <quic_gurbaror@quicinc.com>
+  - Huang Yiwei <quic_hyiwei@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. (QTI) MPAM Driver provides sysfs nodes for
+  userspace clients to communicate MPAM configuration settings with CPUCP
+  firmware via consolidated SCMI protocol.
+
+properties:
+  compatible:
+    enum:
+      - qcom,cpu-mpam
+      - qcom,platform-mpam
+      - qcom,mpam
+
+  reg:
+    items:
+      - description: address and size of CPUCP DTIM area for MPAM monitor data
+
+  reg-names:
+    items:
+      - const: mon-base
+
+required:
+  - compatible
+  - reg
+  - reg-names
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom_mpam: qcom,mpam {
+      compatible = "qcom,mpam";
+      reg = <0x17b6f000 0x400>;
+      reg-names = "mon-base";
+    };
+
+    cpu_mpam: qcom,cpu_mpam {
+      compatible = "qcom,cpu-mpam";
+      reg = <0x17b6f400 0x400>;
+      reg-names = "mon-base";
+    };
+
+    noc_bw_mpam: qcom,noc_bw_mpam {
+      compatible = "qcom,platform-mpam";
+      reg = <0x17b6f800 0x400>;
+      reg-names = "mon-base";
+    };
+...

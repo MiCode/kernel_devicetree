@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/hab.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Hypervisor ABstraction
+
+maintainers:
+  - Leon Xia <quic_lxia@quicinc.com>
+
+description:
+  HAB(Hypervisor ABstraction) is meant to be a cross-platform abstraction layer
+  for utilizing the underlying hypervisor system. This API can be accessed from
+  both user and kernel sides.
+  The intended users of this are primarily the multimedia drivers who want to
+  communicate with the host OS to use the multimedia hardware.
+
+properties:
+  compatible:
+    const: qcom,hab
+
+  vmid:
+    description:
+      the local VM's ID
+      It should be unique in a system, and host's ID should be 0. Here is an
+      example for a system as qvm host + agl gvm + android gvm, and such below
+      setting is proper,
+      qvm host's vmid 0
+      agl gvm's vmid 1
+      android gvm's vmid 2
+
+  grp-start-id:
+    description: mmid group starting ID, eg, 100 is for MM_AUD_1~4
+
+  role:
+    description:
+      the local role of this group, and must be "fe" or "be"
+
+  remote-vmids:
+    description:
+      When the local role is "fe", this is to tell which VM is the
+      relevant BE. When it is "be", this is to tell which VMs it will support as
+      BE.
+
+  kernel_only:
+    description:
+      If the current mmid group can only be accessed by kernel hab
+      clients, please add this property.
+
+  dma-coherent:
+    description:
+      Add this property when IO-coherency is supported in the
+      current MMID group. The HAB driver will attach a char device to the exported
+      dma-buf for the HAB client and extract memory metadata by calling dma-buf
+      ops map_attachment() and unmap_attachment() during memory unexport, where
+      cache operations will be triggered. Enabling this property will skip the
+      cache operations.
+
+additionalProperties: false
+
+required:
+  - compatible
+  - vmid
+  - grp-start-id
+  - role
+  - remote-vmids
+  - kernel_only
+
+examples:
+  - |
+    qcom,hab {
+      compatible = "qcom,hab";
+      vmid = <2>;
+
+      mmid100: mmid-grp@100 {
+        grp-start-id = <100>;
+        role = "fe";
+        remote-vmids = <0>;
+      };
+
+      mmid200: mmid-grp@200 {
+        grp-start-id = <200>;
+        role = "fe";
+        remote-vmids = <0>;
+        kernel_only;
+      };
+
+      mmid300: mmid-grp@300 {
+        grp-start-id = <300>;
+        role = "fe";
+        remote-vmids = <0>;
+        dma-coherent;;
+      };
+
+    };
+

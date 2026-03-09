@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,spmi-pmic-err-debug.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. SPMI error debug
+
+maintainers:
+  - Jishnu Prakash <quic_jprakash@quicinc.com>
+
+description: |
+  This binding describes the Qualcomm Technologies, Inc. SPMI error debug device.
+  In case of any hardware errors in the SPMI PMIC Arbiter, this device processes
+  the protocol IRQ triggered to read and dump the relevant data needed for further
+  debugging.
+
+properties:
+  compatible:
+    const: qcom,spmi-pmic-err-debug
+
+  reg:
+    items:
+      - description: configuration registers
+      - description: geni registers
+
+  reg-names:
+    items:
+      - const: cnfg
+      - const: geni
+
+  interrupts:
+    maxItems: 1
+
+  interrupt-names:
+    const: protocol_irq
+
+  nvmem-cells:
+    maxItems: 1
+
+  nvmem-cell-names:
+    const: tz_dbg
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - interrupt-names
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+    spmi-err@c42d000 {
+        compatible = "qcom,spmi-pmic-err-debug";
+        reg = <0xc42d000 0x4000>,
+              <0xc42c000 0x4c>;
+        reg-names = "cnfg", "geni";
+
+        interrupts-extended = <&pdc 23 IRQ_TYPE_LEVEL_HIGH>;
+        interrupt-names = "protocol_irq";
+        nvmem-cells = <&tz_dbg_en>;
+        nvmem-cell-names = "tz_dbg";
+    };

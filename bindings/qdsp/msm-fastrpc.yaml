@@ -1,0 +1,98 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/qdsp/msm-fastrpc.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. FastRPC Driver
+
+description:
+  The MSM FastRPC driver implements an IPC (Inter-Processor Communication)
+  mechanism that allows for clients to transparently make remote method
+  invocations across DSP and APPS boundaries. This enables developers
+  to offload tasks to the DSP and free up the application processor for
+  other tasks.qcom,adsprpc-mem node defines the ADSP remote heap region.
+  Device is used for CMA allocations and mappings for both secure and
+  non-secure usecases.
+
+maintainers:
+  - Anirudh Raghavendra <quic_araghave@quicinc.com>
+
+properties:
+  compatible :
+  oneOf:
+    - items:
+        - "qcom,msm-fastrpc-adsp"
+        - "qcom,msm-fastrpc-compute"
+
+  optional:
+    - qcom,rpc-latency-us		:	FastRPC QoS latency vote
+    - qcom,adsp-remoteheap-vmid		:	FastRPC remote heap VMID list
+    - qcom,secure-context-bank		:	Bool indicating secure FastRPC context bank.
+    - qcom,fastrpc-legacy-remote-heap	:	Bool indicating hypervisor is not supported.
+    - qcom,fastrpc-adsp-audio-pdr	:	Flag to enable ADSP Audio PDR
+    - qcom,secure-domains		:	FastRPC secure domain configuration
+    - qcom,fastrpc-adsp-sensors-pdr	:	Flag to enable Sensors PDR
+
+    child-node:
+      description:
+        Child nodes representing the compute context banks
+      properties:
+      required:
+        - compatible	:	Must be "qcom,msm-fastrpc-compute-cb"
+        - label		:	Label describing the channel this context bank belongs to
+        - iommus	:	A list of phandle and IOMMU specifier pairs that describe the
+					IOMMU master interfaces of the device
+        - dma-coherent	:	A flag marking a context bank as I/O coherent
+        - shared-cb	:	A value indicating how many fastrpc sessions can share a
+					context bank
+
+    child-node:
+      description:
+        Child node for rpmsg instead of glink for IPC
+      properties:
+      required:
+        - compatible		:	Must be "qcom,msm-fastrpc-rpmsg"
+
+    child-node:
+      description:
+        Child node representing the Remote Heap region
+      properties:
+      required:
+        - compatible		:	Must be "qcom,msm-adsprpc-mem-region"
+        - memory-region		:	CMA region which is owned by this device
+        - restrict-access	:	Blocking vote for hyp_assign_phys function call
+
+Example:
+	qcom,msm_fastrpc {
+		compatible = "qcom,msm-fastrpc-compute";
+		qcom,fastrpc-rpmsg;
+		qcom,rpc-latency-us = <235>;
+		qcom,adsp-remoteheap-vmid = <22 37>;
+		qcom,fastrpc-adsp-sensors-pdr;
+
+		qcom,msm_fastrpc_rpmsg {
+			compatible = "qcom,msm-fastrpc-rpmsg";
+			qcom,glink-channels = "fastrpcglink-apps-dsp";
+			intents = <0x64 64>;
+		};
+
+		qcom,msm_fastrpc_compute_cb_1 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "cdsprpc-smd";
+			qcom,secure-context-bank;
+			iommus = <&apps_smmu 0x1401 0x0>;
+			dma-coherent;
+		};
+		qcom,msm_fastrpc_compute_cb_2 {
+			compatible = "qcom,msm-fastrpc-compute-cb";
+			label = "sdsprpc-smd";
+			iommus = <&apps_smmu 0x1402 0x0>;
+			shared-cb = <5>;
+		};
+		qcom,adsprpc-mem {
+			compatible = "qcom,msm-adsprpc-mem-region";
+			memory-region = <&adsp_mem>;
+			restrict-access;
+		};
+	};

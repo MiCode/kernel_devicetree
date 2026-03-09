@@ -1,0 +1,102 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/spi/qcom,sa8255p-geni-spi.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: GENI based Qualcomm Universal Peripheral (QUP) Serial Peripheral Interface (SPI)
+
+maintainers:
+  - Praveen Talari <quic_ptalari@quicinc.com>
+
+description:
+  The QUP v3 core is a GENI based AHB slave that provides a common data path
+  (an output FIFO and an input FIFO) for serial peripheral interface (SPI)
+  mini-core.
+
+  SPI in master mode supports up to 50MHz, up to four chip selects,
+  programmable data path from 4 bits to 32 bits and numerous protocol variants.
+
+allOf:
+  - $ref: /schemas/spi/spi-controller.yaml#
+
+properties:
+  compatible:
+    const: qcom,sa8255p-geni-spi
+
+  dmas:
+    maxItems: 2
+
+  dma-names:
+    items:
+      - const: tx
+      - const: rx
+
+  interrupts:
+    maxItems: 1
+
+  power-domains:
+    minItems: 2
+    maxItems: 2
+    description: power-domains must be <2>, that are power and perf domains
+      1st param - scmi protocol domain handler
+      2nd param - serial engine index
+
+      Power Domain - The power protocol manages the power states of devices,
+      turning them on or off such as clocks, ICC paths and TLMM(GPIO) using the
+      PM runtime framework.
+
+      Performance Domain - The performance protocol sets UART communication
+      speeds by selecting different performance levels through the OPP framework.
+
+      Supported perf levels for frequency in firmware are below
+      +---------------------+--------------------+
+      |  Perf level value   |  Frenquency(KHZ)   |
+      +---------------------+--------------------+
+      |      1              |      1             |
+      |      5              |      5             |
+      |      10             |      10            |
+      |      50             |      50            |
+      |      100            |      100           |
+      |      500            |      500           |
+      |      1000           |      1000          |
+      |      5000           |      5000          |
+      |      10000          |      10000         |
+      |      15000          |      15000         |
+      |      20000          |      20000         |
+      |      25000          |      25000         |
+      |      30000          |      30000         |
+      |      35000          |      35000         |
+      |      40000          |      40000         |
+      |      45000          |      45000         |
+      |      50000          |      50000         |
+      +---------------------+--------------------+
+
+  power-domain-names:
+    items:
+      - const: power
+      - const: perf
+
+  reg:
+    maxItems: 1
+
+required:
+  - compatible
+  - interrupts
+  - reg
+  - power-domains
+  - power-domain-names
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+    spi@888000 {
+        compatible = "qcom,sa8255p-geni-spi";
+        reg = <0x888000 0x4000>;
+        interrupts = <GIC_SPI 584 IRQ_TYPE_LEVEL_HIGH>;
+        power-domains = <&scmi10_pd 16>, <&scmi10_dvfs 16>;
+        power-domain-names = "power", "perf";
+    };

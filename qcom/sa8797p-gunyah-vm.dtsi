@@ -1,0 +1,1650 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h>
+#include <dt-bindings/mailbox/qcom-ipcc.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
+#include <dt-bindings/mailbox/qcom-ipcc-sa8797p.h>
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+	qcom,msm-id = <690 0x10000>, <690 0x20000>, <690 0x10001>;
+	qcom,msm-name = "SA_GUNYAH_VM";
+	interrupt-parent = <&intc>;
+
+	chosen {
+		bootargs = "console=hvc0 root=/dev/ram rw rootwait nokaslr log_buf_len=1M androidboot.force_normal_boot=1 ufshcd-core.use_mcq_mode=n kpti=0 loglevel=8 printk.devkmsg=on maxcpus=6 driver_async_probe=arm-scmi";
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		system_cma: linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x0 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x2000000>;
+			linux,cma-default;
+		};
+
+		qseecom_mem: qseecom_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1400000>;
+		};
+
+		qseecom_ta_mem: qseecom_ta_region {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			reusable;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x1000000>;
+		};
+
+		glink_cma_mem1: glink-cma-region@1 {
+			no-map;
+			qcom,label = <0x60>;
+		};
+
+		glink_cma_mem2: glink-cma-region@2 {
+			no-map;
+			qcom,label = <0x61>;
+		};
+
+		glink_cma_mem3: glink-cma-region@3 {
+			no-map;
+			qcom,label = <0x62>;
+		};
+
+		glink_cma_mem4: glink-cma-region@4 {
+			no-map;
+			qcom,label = <0x63>;
+		};
+
+		glink_cma_mem5: glink-cma-region@5 {
+			no-map;
+			qcom,label = <0x64>;
+		};
+
+		glink_cma_mem6: glink-cma-region@6 {
+			no-map;
+			qcom,label = <0x65>;
+		};
+
+		glink_cma_mem7: glink-cma-region@7 {
+			no-map;
+			qcom,label = <0x66>;
+		};
+	};
+
+	cpus {
+		#address-cells = <0x2>;
+		#size-cells = <0x0>;
+
+		CPU0: cpu@0 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x0>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU1: cpu@100 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x100>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU2: cpu@200 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x200>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU3: cpu@300 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x300>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU4: cpu@10000 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x400>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		CPU5: cpu@10100 {
+			compatible = "arm,armv8";
+			reg = <0x0 0x500>;
+			device_type = "cpu";
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_PWR_DWN>;
+		};
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&CPU0>;
+				};
+
+				core1 {
+					cpu = <&CPU1>;
+				};
+
+				core2 {
+					cpu = <&CPU2>;
+				};
+
+				core3 {
+					cpu = <&CPU3>;
+				};
+
+				core4 {
+					cpu = <&CPU4>;
+				};
+
+				core5 {
+					cpu = <&CPU5>;
+				};
+			};
+		};
+	};
+
+	idle-states {
+		CPU_PWR_DWN: c4 { /* C4 */
+			compatible = "arm,idle-state";
+			idle-state-name = "rail-pc";
+			entry-latency-us = <702>;
+			exit-latency-us = <1061>;
+			min-residency-us = <4488>;
+			arm,psci-suspend-param = <0x40000004>;
+			local-timer-stop;
+		};
+	};
+
+	virtio_input_keyboard@1c150000 {
+		wakeup-source;
+	};
+
+	virtio_blk_super {
+		qcom,dev-name = "super";
+	};
+
+	virtio_blk_userdata {
+		qcom,dev-name = "userdata";
+	};
+
+	virtio_blk_metadata {
+		qcom,dev-name = "metadata";
+	};
+
+	virtio_blk_persist {
+		qcom,dev-name = "persist";
+	};
+
+	virtio_blk_misc {
+		qcom,dev-name = "misc";
+	};
+
+	virtio_blk_vbmeta_b {
+		qcom,dev-name = "vbmeta_b";
+	};
+
+	virtio_blk_vbmeta_a {
+		qcom,dev-name = "vbmeta_a";
+	};
+
+	virtio_blk_modem_b {
+		qcom,dev-name = "modem_b";
+	};
+
+	virtio_blk_modem_a {
+		qcom,dev-name = "modem_a";
+	};
+
+	virtio_blk_bluetooth_b {
+		qcom,dev-name = "bluetooth_b";
+	};
+
+	virtio_blk_bluetooth_a {
+		qcom,dev-name = "bluetooth_a";
+	};
+
+	virtio_blk_la_boot_b {
+		qcom,dev-name = "boot_b";
+	};
+
+	virtio_blk_la_boot_a {
+		qcom,dev-name = "boot_a";
+	};
+
+	virtio_blk_la_dtbo_b {
+		qcom,dev-name = "dtbo_b";
+	};
+
+	virtio_blk_la_dtbo_a {
+		qcom,dev-name = "dtbo_a";
+	};
+
+	virtio_blk_dsp_b {
+		qcom,dev-name = "dsp_b";
+	};
+
+	virtio_blk_dsp_a {
+		qcom,dev-name = "dsp_a";
+	};
+
+	virtio_blk_la_vendor_boot_b {
+		qcom,dev-name = "vendor_boot_b";
+	};
+
+	virtio_blk_la_vendor_boot_a {
+		qcom,dev-name = "vendor_boot_a";
+	};
+
+	virtio_blk_la_init_boot_b {
+		qcom,dev-name = "init_boot_b";
+	};
+
+	virtio_blk_la_init_boot_a {
+		qcom,dev-name = "init_boot_a";
+	};
+
+	virtio_blk_la_devinfo {
+		qcom,dev-name = "devinfo";
+	};
+
+	vm_config: qcom,vm-config {
+		compatible = "qcom,vm-1.0";
+		vm-type = "aarch64-guest";
+		boot-config = "fdt,unified";
+		os-type = "linux";
+		kernel-entry-segment = "kernel";
+		kernel-entry-offset = <0x0 0x0>;
+		vendor = "QTI";
+		image-name = "qcom,autogvm";
+		qcom,pasid = <0x0 0x2c>;
+		qcom,qtee-config-info = "p=3,16,57,77,78,7A,7C,8F,97,159,199,47E,7F1,10C;ta=keymaster64,widevine,pr_3_0,she_gvm,auto_test_a,auto_test_b,auto_test_c,auto_test_d,auto_test_e,auto_test_f,auto_test_g,auto_test_h,auto_test_i,auto_test_j,auto_test_k,auto_test_l,auto_test_m,auto_test_n,auto_test_o,auto_test_p,auto_test_320,auto_test_321,auto_test_322,auto_test_323,auto_test_324,apttestapp,apttestapp64,aptcryptotestapp,aptcryptotestapp64,smplserv,tzecotestapp,tzecotestappcbo1,smci_auto_test_1,smci_auto_test_2,smci_auto_test_3,smci_auto_test_4,smci_auto_test_5,smci_auto_test_6,smci_auto_test_7,smci_auto_test_8,smci_auto_test_9,smci_auto_test_10,smci_auto_test_11,smci_auto_test_12,smci_auto_test_13,smci_auto_test_14,smci_auto_test_15,smci_auto_test_16,smci_auto_test_init_crash,smci_auto_test_restartable,smci_auto_test_shutdown_crash,fsp_test_1,fsp_test_2,fsp_test_3,bintestapp64,tzecotestapp1,crypto_testapp,sst_testapp,autosst_testapp,auto_test_unpermitted,FD02C9DA-306C-48C7-A49C-BBD827AE86EE,5AF8C3E6-D9DF-446E-4FF2-D4D58E8CA49B,19CE19B9-FD73-4262-8553-E5CAC40C895A,C02CAC07-2639-4EF0-BC12-C4AF1FB3E276,15C6B6E4-D083-48E4-8744-4D90A8FF1EF2,CAD10542-34E4-452D-6156-E979AA6E61BC,23914957-C174-4EA6-54D1-DA820F77B4B0,5AF8C3E6-D9DF-446E-4FF2-C3C47D7B938A,CAD10542-34E4-452D-6156-E979AA6E6132,5AF8C3E6-D9DF-446E-4FF2-B2B36C6A8279,smplap64;";
+		qcom,secdomain-ids = <52>;
+		qcom,primary-vm-index = <0>;
+		vm-attrs = "guest-ram-dump";
+
+		memory {
+			#address-cells = <0x2>;
+			#size-cells = <0x0>;
+
+			/* The IPA of the Guest regions is placed as IPA=PA */
+			is-direct;
+		};
+
+		segments {
+			ramdisk = <2>;
+		};
+
+		vcpus {
+			config = "/cpus";
+			affinity = "static";
+			affinity-map = <0x5 0x4 0x3 0x2 0x1 0x0>;
+			sched-priority = <0>;       /* relative to PVM */
+			sched-timeslice = <5000>;   /* in ms */
+		};
+
+		interrupts {
+			config = &intc;
+		};
+
+		vdevices {
+			generate = "/hypervisor";
+
+			rm-rpc {
+				vdevice-type = "rm-rpc";
+				generate = "/hypervisor/qcom,resource-mgr";
+				console-dev;
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				qcom,label = <0x1>;
+			};
+
+			virtio-mmio@0 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x0>;
+				memory {
+					qcom,label = <0x20>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@1 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_devinfo";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x4000>;
+				memory {
+					qcom,label = <0x21>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@2 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_init_boot_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x8000>;
+				memory {
+					qcom,label = <0x22>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@3 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_init_boot_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0xC000>;
+				memory {
+					qcom,label = <0x23>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@4 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_vendor_boot_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x10000>;
+				memory {
+					qcom,label = <0x24>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@5 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_vendor_boot_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x14000>;
+				memory {
+					qcom,label = <0x25>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@6 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_dsp_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x18000>;
+				memory {
+					qcom,label = <0x26>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@7 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_dsp_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1C000>;
+				memory {
+					qcom,label = <0x27>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@8 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_dtbo_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x20000>;
+				memory {
+					qcom,label = <0x28>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@9 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_dtbo_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x24000>;
+				memory {
+					qcom,label = <0x29>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@10 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_boot_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x28000>;
+				memory {
+					qcom,label = <0x2A>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@11 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_la_boot_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x2C000>;
+				memory {
+					qcom,label = <0x2B>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@12 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_bluetooth_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x30000>;
+				memory {
+					qcom,label = <0x2C>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@13 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_bluetooth_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x34000>;
+				memory {
+					qcom,label = <0x2D>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@14 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_modem_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x38000>;
+				memory {
+					qcom,label = <0x2E>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@15 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_modem_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x3C000>;
+				memory {
+					qcom,label = <0x2F>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@16 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_vbmeta_a";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x40000>;
+				memory {
+					qcom,label = <0x30>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@17 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_vbmeta_b";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x44000>;
+				memory {
+					qcom,label = <0x31>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@18 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_misc";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x48000>;
+				memory {
+					qcom,label = <0x32>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@19 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_persist";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x4C000>;
+				memory {
+					qcom,label = <0x33>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@20 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_metadata";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x50000>;
+				memory {
+					qcom,label = <0x34>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@21 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_userdata";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x54000>;
+				memory {
+					qcom,label = <0x35>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			virtio-mmio@22 {
+				vdevice-type = "virtio-mmio";
+				patch = "/virtio_blk_super";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x58000>;
+				memory {
+					qcom,label = <0x36>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio net 0 device */
+			virtio-mmio@23 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x5C000>;
+				memory {
+					qcom,label = <0x37>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio net 1 device */
+			virtio-mmio@24 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x64000>;
+				memory {
+					qcom,label = <0x38>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* HAB 0 device */
+			virtio-mmio@25 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x6C000>;
+				memory {
+					qcom,label = <0x39>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* HAB 1 device */
+			virtio-mmio@26 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x7C000>;
+				memory {
+					qcom,label = <0x3A>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* HAB 2 device */
+			virtio-mmio@27 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x8>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x8C000>;
+				memory {
+					qcom,label = <0x3B>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* HAB 3 device */
+			virtio-mmio@28 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0xA>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0xCC000>;
+				memory {
+					qcom,label = <0x3C>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* HAB 4 device */
+			virtio-mmio@29 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x6>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x11C000>;
+				memory {
+					qcom,label = <0x3D>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* HAB 5 device */
+			virtio-mmio@30 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x6>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x14C000>;
+				memory {
+					qcom,label = <0x3E>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio input 0 device */
+			virtio-mmio@31 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				virtio,device-type = <18>;
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x17C000>;
+				memory {
+					qcom,label = <0x3F>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio input 1 device */
+			virtio-mmio@32 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				virtio,device-type = <18>;
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x180000>;
+				memory {
+					qcom,label = <0x40>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio console device */
+			virtio-mmio@33 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x184000>;
+				memory {
+					qcom,label = <0x41>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio SCMI device */
+			virtio-mmio@34 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x18C000>;
+				memory {
+					qcom,label = <0x42>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio vsock device */
+			virtio-mmio@35 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x3>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x194000>;
+				memory {
+					qcom,label = <0x43>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio glink device */
+			virtio-mmio@36 {
+				vdevice-type = "virtio-mmio";
+				patch = "/soc/virtio-glink-cma@2e000000";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1A0000>;
+				memory {
+					qcom,label = <0x44>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio FastRPC device */
+			virtio-mmio@37 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1A2000>;
+				memory {
+					qcom,label = <0x45>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio I2C device */
+			virtio-mmio@38 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1A6000>;
+				memory {
+					qcom,label = <0x46>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* Virtio SSR device */
+			virtio-mmio@39 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x1>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1A8000>;
+				memory {
+					qcom,label = <0x47>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* VHAB 6 device */
+			virtio-mmio@40 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1AA000>;
+				memory {
+					qcom,label = <0x48>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* VHAB 7 device */
+			virtio-mmio@41 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1BA000>;
+				memory {
+					qcom,label = <0x49>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			/* VHAB 8 device */
+			virtio-mmio@42 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x6>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1CA000>;
+				memory {
+					qcom,label = <0x4A>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+			/* Reserved device */
+			virtio-mmio@43 {
+				vdevice-type = "virtio-mmio";
+				generate = "/virtio-mmio";
+				peer-default;
+				vqs-num = <0x2>;
+				push-compatible = "virtio,mmio";
+				sync-reset;
+				dma-coherent;
+				dma_base = <0x0 0x1A0000>;
+				memory {
+					qcom,label = <0x4B>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			swiotlb-shm {
+				vdevice-type = "shm";
+				generate = "/swiotlb";
+				push-compatible = "swiotlb";
+				peer-default;
+				dma_base = <0x0 0x200000>;
+				memory {
+					qcom,label = <0x50>;
+					#address-cells = <0x2>;
+					allocate-base;
+				};
+			};
+
+			vsmmu@15a00000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15a00000>;
+				num-cbs = <0x8>;
+				num-smrs = <0x8>;
+				patch = "/soc/apps-smmu@15a00000";
+			};
+
+			vsmmu@15c00000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15c00000>;
+				num-cbs = <0x8>;
+				num-smrs = <0x8>;
+				patch = "/soc/apps-smmu@15c00000";
+			};
+
+			vsmmu@15e00000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15e00000>;
+				num-cbs = <0x1>;
+				num-smrs = <0xc>;
+				patch = "/soc/apps-smmu@15e00000";
+			};
+
+			hab-virq5-dbl {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/hab-virq5-dbl";
+				qcom,label = <0x5>;
+				peer-default;
+			};
+
+			hab-virq5-dbl-source {
+				vdevice-type = "doorbell-source";
+				generate = "/hypervisor/hab-virq5-dbl-source";
+				qcom,label = <0x5>;
+				peer-default;
+			};
+
+			hab-virq6-dbl {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/hab-virq6-dbl";
+				qcom,label = <0x6>;
+				peer-default;
+			};
+
+			hab-virq6-dbl-source {
+				vdevice-type = "doorbell-source";
+				generate = "/hypervisor/hab-virq6-dbl-source";
+				qcom,label = <0x6>;
+				peer-default;
+			};
+		};
+	};
+
+	firmware: firmware {
+		scm {
+			compatible = "qcom,scm";
+		};
+
+		qcom_smcinvoke {
+			compatible = "qcom,smcinvoke";
+		};
+
+		qcom_mem_object {
+			compatible = "qcom,mem-object";
+		};
+
+		android {
+			compatible = "android,firmware";
+			boot_devices = "70002000.virtio_blk_la_devinfo,70003000.virtio_blk_la_init_boot_a,70004000.virtio_blk_la_init_boot_b,70005000.virtio_blk_la_vendor_boot_a,70006000.virtio_blk_la_vendor_boot_b,70007000.virtio_blk_dsp_a,70008000.virtio_blk_dsp_b,70009000.virtio_blk_la_dtbo_a,7000a000.virtio_blk_la_dtbo_b,7000b000.virtio_blk_la_boot_a,7000c000.virtio_blk_la_boot_b,7000d000.virtio_blk_bluetooth_a,7000e000.virtio_blk_bluetooth_b,7000f000.virtio_blk_modem_a,70010000.virtio_blk_modem_b,70011000.virtio_blk_vbmeta_a,70012000.virtio_blk_vbmeta_b,70013000.virtio_blk_misc,70014000.virtio_blk_persist,70015000.virtio_blk_metadata,70016000.virtio_blk_userdata,70017000.virtio_blk_super";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,system,vendor";
+			};
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev="/dev/block/platform/vdevs/1c0f0000.virtio_blk/vdc";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait";
+					status = "disabled";
+				};
+			};
+		};
+	};
+
+	soc: soc { };
+};
+
+&soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	ranges = <0 0 0 0xffffffff>;
+	compatible = "simple-bus";
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	intc: interrupt-controller@17a00000 {
+		compatible = "arm,gic-v3";
+		interrupt-controller;
+		#interrupt-cells = <0x3>;
+		#redistributor-regions = <1>;
+		redistributor-stride = <0x0 0x20000>;
+		reg = <0x17a00000 0x10000>,     /* GICD */
+		      <0x17a60000 0x100000>;    /* GICR * 8 */
+	};
+
+	arch_timer: timer {
+		compatible = "arm,armv8-timer";
+		always-on;
+		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 12 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
+		clock-frequency = <19200000>;
+	};
+
+	apps_smmu_0: apps-smmu@15a00000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+	};
+
+	apps_smmu_1: apps-smmu@15c00000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+	};
+
+	apps_smmu_2: apps-smmu@15e00000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+	};
+
+	qcom_dma_heaps: qcom,dma-heaps {
+		compatible = "qcom,dma-heaps";
+
+		qcom,qseecom {
+			qcom,dma-heap-name = "qcom,qseecom";
+			qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+			memory-region = <&qseecom_mem>;
+		};
+
+		qcom,qseecom_ta {
+			qcom,dma-heap-name = "qcom,qseecom-ta";
+			qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+			memory-region = <&qseecom_ta_mem>;
+		};
+	};
+
+
+	qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "consumer";
+		qcom,vmid = <52>;
+	};
+
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+		qcom,custom-bridge-size = <512>;
+		qcom,support-hypervisor;
+	};
+
+	dma_dev@0x0 {
+		compatible = "qcom,iommu-dma";
+		memory-region = <&system_cma>;
+	};
+
+	hab: qcom,hab {
+		compatible = "qcom,hab";
+		vmid = <2>;
+		virt-irq = <0x5 0x6>;
+
+		mmidgrp100: mmidgrp100 {
+			grp-start-id = <100>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp200: mmidgrp200 {
+			grp-start-id = <200>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp300: mmidgrp300 {
+			grp-start-id = <300>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp400: mmidgrp400 {
+			grp-start-id = <400>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp500: mmidgrp500 {
+			grp-start-id = <500>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp600: mmidgrp600 {
+			grp-start-id = <600>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1400: mmidgrp1400 {
+			grp-start-id = <1400>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1500: mmidgrp1500 {
+			grp-start-id = <1500>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+
+		mmidgrp1600: mmidgrp1600 {
+			grp-start-id = <1600>;
+			role = "fe";
+			remote-vmids = <0>;
+		};
+	};
+
+	scmi {
+		compatible = "arm,scmi-virtio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "ok";
+
+		scmi_power: protocol@11 {
+			reg = <0x11>;
+			#power-domain-cells = <1>;
+		};
+
+		scmi_perf: protocol@13 {
+			reg = <0x13>;
+			#power-domain-cells = <1>;
+		};
+
+		scmi_reset: protocol@16 {
+			reg = <0x16>;
+			#reset-cells = <1>;
+		};
+	};
+
+	ipcc_mproc_apps_ns1: qcom,ipcc@9008000 {
+		compatible = "qcom,ipcc";
+		reg = <0x9008000 0x1000>;
+		interrupts = <GIC_SPI 439 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+		status = "ok";
+	};
+
+	virtio_glink_cma: virtio-glink-cma@2e000000 {
+		glink_bridge: virtio-glink-bridge {
+			compatible = "virtio,device49162";
+			remoteproc_cdsp_glink: glink-edge {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_NSP0 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_NSP0 0>;
+				label = "cdsp";
+				qcom,glink-label = "cdsp";
+			};
+
+			remoteproc_cdsp1_glink: glink-edge1 {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_NSP1 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_NSP1 0>;
+				label = "cdsp1";
+				qcom,glink-label = "cdsp1";
+			};
+
+			remoteproc_cdsp2_glink: glink-edge2 {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_NSP2 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_NSP2 0>;
+				label = "cdsp2";
+				qcom,glink-label = "cdsp2";
+			};
+
+			remoteproc_cdsp3_glink: glink-edge3 {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_NSP3 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_NSP3 0>;
+				label = "cdsp3";
+				qcom,glink-label = "cdsp3";
+			};
+
+			remoteproc_hpass0_glink: glink-edge4 {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_ADSP0 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_ADSP0 0>;
+				label = "adsp";
+				qcom,glink-label = "adsp";
+			};
+
+			remoteproc_hpass1_glink: glink-edge5 {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_ADSP1 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_ADSP1 0>;
+				label = "adsp1";
+				qcom,glink-label = "adsp1";
+			};
+
+			remoteproc_hpass2_glink: glink-edge6 {
+				interrupt-parent = <&ipcc_mproc_apps_ns1>;
+				interrupts = <IPCC_MPROC_ADSP2  0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns1 IPCC_MPROC_ADSP2 0>;
+				label = "adsp2";
+				qcom,glink-label = "adsp2";
+			};
+		};
+	};
+
+	tlmm: pinctrl@f000000 {
+		compatible = "qcom,sa8797p-tlmm";
+		reg = <0xf000000 0x1000000>;
+		interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	qcom_rng_ee13: qrng@10cd000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x10cd000 0x1000>;
+		qcom,no-qrng-config;
+		qcom,no-clock-support;
+		status = "ok";
+	};
+
+	xpcs1: xpcs@1a94000 {
+		status = "disabled";
+		compatible = "qcom,xpcs";
+		reg = <0x1a94000 0x5100>;
+		reg-names = "qxpcs";
+	};
+
+	ethernet1: ethernet@1a80000 {
+		status = "disabled";
+		compatible = "qcom,sa8797p-ethqos", "snps,dwxgmac";
+		reg = <0x1a80000 0x14000>,
+			<0x1aff000 0x1000>;
+
+		reg-names = "stmmaceth", "rgmii";
+
+		interrupts = <GIC_SPI 820 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "macirq";
+
+		iommus = <&apps_smmu_2 0x11c1 0x8>,
+			 <&apps_smmu_2 0x11c2 0x1>,
+			 <&apps_smmu_2 0x11c3 0x1>,
+			 <&apps_smmu_2 0x11c4 0x3>,
+			 <&apps_smmu_2 0x11c5 0x3>,
+			 <&apps_smmu_2 0x11c6 0x3>,
+			 <&apps_smmu_2 0x11c7 0x3>;
+
+		power-domains = <&scmi_power 8>, <&scmi_power 9>, <&scmi_perf 1>, <&scmi_perf 2>;
+		power-domain-names = "power_core", "power_mdio", "perf_serdes", "perf_5g_serdes";
+
+		phy-mode = "10gbase-r";
+
+		snps,tso;
+
+		snps,pbl = <0x10>;
+		dma-coherent;
+
+		rx-fifo-depth = <98304>;
+		tx-fifo-depth = <98304>;
+
+		snps,axi-config = <&stmmac_axi_setup1>;
+		snps,mtl-rx-config = <&mtl_rx_setup1>;
+		snps,mtl-tx-config = <&mtl_tx_setup1>;
+
+		qcom-xpcs-handle = <&xpcs1>;
+
+		mtl_rx_setup1: rx-queues-config {
+			snps,rx-queues-to-use = <7>;
+			snps,rx-sched-sp;
+
+			queue0 {
+				snps,dcb-algorithm;
+				snps,map-to-dma-channel = <0x0>;
+				snps,route-up;
+			};
+
+			queue1 {
+				snps,dcb-algorithm;
+				snps,map-to-dma-channel = <0x1>;
+				snps,route-ptp;
+			};
+
+			queue2 {
+				snps,avb-algorithm;
+				snps,map-to-dma-channel = <0x2>;
+				snps,route-avcp;
+			};
+
+			queue3 {
+				snps,avb-algorithm;
+				snps,map-to-dma-channel = <0x3>;
+				snps,priority = <0xc>;
+			};
+
+			queue4 {
+				snps,dcb-algorithm;
+				snps,map-to-dma-channel = <0x4>;
+			};
+
+			queue5 {
+				snps,dcb-algorithm;
+				snps,map-to-dma-channel = <0x5>;
+			};
+
+			queue6 {
+				snps,dcb-algorithm;
+				snps,map-to-dma-channel = <0x6>;
+			};
+		};
+
+		mtl_tx_setup1: tx-queues-config {
+			snps,tx-queues-to-use = <7>;
+			snps,tx-sched-sp;
+
+			queue0 {
+				snps,dcb-algorithm;
+			};
+
+			queue1 {
+				snps,dcb-algorithm;
+			};
+
+			queue2 {
+				snps,dcb-algorithm;
+			};
+
+			queue3 {
+				snps,dcb-algorithm;
+			};
+
+			queue4 {
+				snps,dcb-algorithm;
+			};
+
+			queue5 {
+				snps,dcb-algorithm;
+			};
+
+			queue6 {
+				snps,dcb-algorithm;
+			};
+		};
+
+		stmmac_axi_setup1: stmmac-axi-config {
+			snps,rd_osr_lmt = <0x10>;
+			snps,wr_osr_lmt = <0x10>;
+			snps,kbbe;
+			snps,blen = <0 0 0 0 16 0 0>;
+		};
+
+		fixed-link {
+			status = "okay";
+			speed = <10000>;
+			full-duplex;
+		};
+	};
+
+	pdc: interrupt-controller@b220000 {
+		compatible = "qcom,pdc";
+		reg = <0xb220000 0x10000>;
+		qcom,pdc-ranges = <7 752 2>, <12 757 2>, <41 786 1>;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&intc>;
+		interrupt-controller;
+	};
+};
+
+&remoteproc_cdsp_glink {
+	qcom,fastrpc {
+		label = "nsp";
+		instance-id = <0>;
+		dsp-type = <1>;
+	};
+};
+
+&remoteproc_cdsp1_glink {
+	qcom,fastrpc {
+		label = "nsp";
+		instance-id = <1>;
+		dsp-type = <1>;
+	};
+};
+
+&remoteproc_cdsp2_glink {
+	qcom,fastrpc {
+		label = "nsp";
+		instance-id = <2>;
+		dsp-type = <1>;
+	};
+};
+
+&remoteproc_cdsp3_glink {
+	qcom,fastrpc {
+		label = "nsp";
+		instance-id = <3>;
+		dsp-type = <1>;
+	};
+};
+
+&remoteproc_hpass0_glink {
+	qcom,fastrpc {
+		label = "hpass";
+		instance-id = <0>;
+		dsp-type = <5>;
+	};
+};
+
+&remoteproc_hpass1_glink {
+	qcom,fastrpc {
+		label = "hpass";
+		instance-id = <1>;
+		dsp-type = <5>;
+	};
+};
+
+&remoteproc_hpass2_glink {
+	qcom,fastrpc {
+		label = "hpass";
+		instance-id = <2>;
+		dsp-type = <5>;
+	};
+};
+
+/ {
+	rename_devices: rename_devices {
+		compatible = "qcom,rename-devices";
+		rename_blk: rename_blk {
+			device-type = "block";
+			actual-dev =    "vda", "vdb", "vdc",
+					"vdd", "vde", "vdf",
+					"vdg", "vdh", "vdi",
+					"vdj", "vdk", "vdl",
+					"vdm", "vdn", "vdo",
+					"vdp", "vdq", "vdr",
+					"vds", "vdt", "vdu", "vdv";
+			rename-dev = "super", "userdata", "metadata",
+					"persist", "misc", "vbmeta_b",
+					"vbmeta_a", "modem_b", "modem_a",
+					"bluetooth_b", "bluetooth_a",
+					"boot_b", "boot_a", "dtbo_b",
+					"dtbo_a", "dsp_b", "dsp_a",
+					"vendor_boot_b", "vendor_boot_a",
+					"init_boot_b", "init_boot_a", "devinfo";
+		};
+	};
+};

@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+#include "pudding-nfc-pinctrl.dtsi"
+
+&soc {
+	st54spi_gpio {
+		status = "ok";
+		compatible = "st,st54spi_gpio";
+		/* gpio used as SE_nRESET */
+		gpio-power_nreset = <&tlmm 46 0x00>;
+	};
+};
+
+&qupv3_se21_i2c {
+        status = "ok";
+        qcom,clk-freq-out = <1000000>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        st21nfc: st21nfc@08 {
+                compatible = "st,st21nfc";
+                reg = <0x08>;
+                irq-gpios = <&tlmm 75 0x00>;
+                reset-gpios = <&tlmm 34 0x00>;
+                clkreq-gpios = <&tlmm 35 0x00>;
+                interrupt-parent = <&tlmm>;
+                interrupts = <75 0>;
+                interrupt-names = "nfc_irq";
+                pinctrl-names = "nfc_active", "nfc_suspend";
+                pinctrl-0 = <&nfc_int_active &nfc_enable_active>;
+                pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend>;
+        };
+};

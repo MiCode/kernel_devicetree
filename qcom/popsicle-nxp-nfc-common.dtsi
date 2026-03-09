@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+#include "sm8850-nxp-nfc-pinctrl.dtsi"
+
+&qupv3_se21_i2c {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	nq@28 {
+		compatible = "qcom,sn-nci";
+		reg = <0x28>;
+		qcom,sn-irq = <&tlmm 75 0x00>;
+		qcom,sn-ven = <&tlmm 34 0x00>;
+		qcom,sn-clkreq = <&tlmm 35 0x00>;
+		qcom,sn-vdd-1p8-supply = <&L1G>;
+		qcom,sn-vdd-1p8-voltage = <1200000 1200000>;
+		qcom,sn-vdd-1p8-current = <157000>;
+		qcom,sn-szone = "enable";
+		interrupt-parent = <&tlmm>;
+		nvmem-cells = <&bob1_off_mode_enable>;
+		nvmem-cell-names = "nfc_bob1_cell";
+		interrupts = <75 0>;
+		interrupt-names = "nfc_irq";
+		pinctrl-names = "nfc_active", "nfc_suspend";
+		pinctrl-0 = <&nfc_int_active &nfc_enable_active>;
+		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend>;
+	};
+};

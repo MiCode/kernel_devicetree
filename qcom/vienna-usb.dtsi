@@ -1,0 +1,105 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025, Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+&soc {
+	usb0: hsusb@a600000 {
+		compatible = "qcom,dwc-usb3-msm";
+		reg = <0xa600000 0x100000>;
+		reg-names = "core_base";
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		USB3_GDSC-supply = <&gcc_usb30_prim_gdsc>;
+
+		clocks = <&gcc GCC_USB30_PRIM_MASTER_CLK>,
+			<&gcc GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
+			<&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
+			<&gcc GCC_USB30_PRIM_MOCK_UTMI_CLK>,
+			<&gcc GCC_USB30_PRIM_SLEEP_CLK>;
+
+		clock-names = "core_clk", "iface_clk", "bus_aggr_clk",
+				"utmi_clk", "sleep_clk";
+
+		resets = <&gcc GCC_USB30_PRIM_BCR>;
+		reset-names = "core_reset";
+
+		interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "pwr_event_irq", "hs_phy_irq";
+
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnects = <&aggre_noc MASTER_USB2_0 &mc_virt SLAVE_EBI1>,
+				<&aggre_noc MASTER_USB2_0 &config_noc SLAVE_IPA_CFG>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB2_0>;
+
+		qcom,num-gsi-evt-buffs = <0x3>;
+		qcom,gsi-reg-offset =
+			<0x0fc /* GSI_GENERAL_CFG */
+			0x110 /* GSI_DBL_ADDR_L */
+			0x120 /* GSI_DBL_ADDR_H */
+			0x130 /* GSI_RING_BASE_ADDR_L */
+			0x144 /* GSI_RING_BASE_ADDR_H */
+			0x1a4>; /* GSI_IF_STS */
+
+		qcom,core-clk-rate = <66666667>;
+
+		qcom,use-eusb2-phy;
+
+		extcon = <&eud>;
+
+		qcom,default-bus-vote = <2>; /* use svs bus voting */
+
+		dwc3@a600000 {
+			compatible = "snps,dwc3";
+			reg = <0xa600000 0xE000>;
+			iommus = <&apps_smmu 0x40 0x0>;
+			qcom,iommu-dma = "bypass";
+			dma-coherent;
+
+			interrupts = <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&eusb2_phy0>, <&usb_nop_phy>;
+			snps,disable-clk-gating;
+			snps,has-lpm-erratum;
+			snps,hird-threshold = /bits/ 8 <0x0>;
+			snps,is-utmi-l1-suspend;
+			snps,dis-u1-entry-quirk;
+			snps,dis-u2-entry-quirk;
+			snps,usb2-gadget-lpm-disable;
+			maximum-speed = "high-speed";
+			dr_mode = "otg";
+			usb-role-switch;
+		};
+	};
+
+	eusb2_phy0: hsphy@88e3000 {
+		compatible = "qcom,usb-m31-eusb2-phy";
+		reg = <0x88e3000 0x29C>,
+			<0x088e2000 0x4>,
+			<0x0c278000 0x4>;
+		reg-names = "eusb2_phy_base",
+				"eud_enable_reg",
+				"eud_detect_reg";
+
+		vdd-supply = <&pmw6100_l25>;
+		qcom,vdd-voltage-level = <0 880000 880000>;
+		vdda12-supply = <&pmw6100_l26>;
+		vdd_refgen-supply = <&pmw6100_l25>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "ref_clk_src";
+
+		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+		reset-names = "phy_reset";
+
+		dummy-supply = <&pmw6100_eusb2_repeater>;
+		usb-repeater = <&pmw6100_eusb2_repeater>;
+	};
+
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+};

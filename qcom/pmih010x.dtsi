@@ -1,0 +1,270 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2023-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/input/qcom,hv-haptics.h>
+
+qcom,pmih010x@7 {
+	compatible = "qcom,spmi-pmic";
+	reg = <7 SPMI_USID>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	pmic-ecid@100 {
+		compatible = "qcom,pmic-ecid";
+		reg = <0x100>;
+		qcom,pmic-name = "pmih010x";
+	};
+
+	pmih010x_tz: pmih010x-temp-alarm@a00 {
+		compatible = "qcom,spmi-temp-alarm";
+		reg = <0xa00>;
+		interrupts = <0x7 0xa 0x0 IRQ_TYPE_EDGE_BOTH>;
+		#thermal-sensor-cells = <0>;
+	};
+
+	pmih010x_lite_tz: pmih010x-temp-alarm-lite@c00 {
+		compatible = "qcom,spmi-temp-alarm";
+		reg = <0xc00>;
+		interrupts = <0x7 0xc 0x0 IRQ_TYPE_EDGE_BOTH>;
+		#thermal-sensor-cells = <0>;
+	};
+
+	pmih010x_gpios: pinctrl@8800 {
+		compatible = "qcom,pmih010x-gpio";
+		reg = <0x8800>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	pmih010x_eusb2_repeater: eusb2-repeater@fd00 {
+		compatible = "qcom,pmic-eusb2-repeater";
+		reg = <0xfd00>;
+	};
+
+	pmih010x_haptics: qcom,hv-haptics@f000 {
+		compatible = "qcom,hv-haptics";
+		reg = <0xf000>, <0xf100>, <0xf200>;
+		interrupts = <0x7 0xf0 0x1 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "fifo-empty";
+		qcom,vmax-mv = <3600>;
+		qcom,lra-period-us = <6667>;
+		qcom,brake-mode = <BRAKE_CLOSE_LOOP>;
+		qcom,brake-pattern = /bits/ 8 <0xff 0x3f 0x1f>;
+		qcom,drv-sig-shape = <WF_SINE>;
+		qcom,brake-sig-shape = <WF_SINE>;
+		qcom,rt-imp-detect;
+
+		hap_swr_slave_reg: qcom,hap-swr-slave-reg {
+			regulator-name = "hap-swr-slave-reg";
+		};
+
+		/*
+		 * Following sub-nodes are just examples of effects
+		 * that play with FIFO mode. qcom,wf-fifo-data and
+		 * qcom,wf-fifo-period and some other waveform related
+		 * properties need to be updated for specific waveforms.
+		 */
+		effect_0 {
+			/* CLICK */
+			qcom,effect-id = <0>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f 7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		effect_1 {
+			/* DOUBLE_CLICK */
+			qcom,effect-id = <1>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f 7f 7f 7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		effect_2 {
+			/* TICK */
+			qcom,effect-id = <2>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		effect_3 {
+			/* THUD */
+			qcom,effect-id = <3>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		effect_4 {
+			/* POP */
+			qcom,effect-id = <4>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		effect_5 {
+			/* HEAVY_CLICK */
+			qcom,effect-id = <5>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f 7f 7f 7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_0 {
+			/* NOOP */
+			qcom,primitive-id = <0>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [00 00 00 00];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_1 {
+			/* CLICK */
+			qcom,primitive-id = <1>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_2 {
+			/* THUD */
+			qcom,primitive-id = <2>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_3 {
+			/* SPIN */
+			qcom,primitive-id = <3>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_4 {
+			/* QUICK_RISE */
+			qcom,primitive-id = <4>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_5 {
+			/* SLOW_RISE */
+			qcom,primitive-id = <5>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_6 {
+			/* QUICK_FALL */
+			qcom,primitive-id = <6>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_7 {
+			/* LIGHT_TICK */
+			qcom,primitive-id = <7>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+
+		primitive_8 {
+			/* LOW_TICK */
+			qcom,primitive-id = <8>;
+			qcom,wf-vmax-mv = <3600>;
+			qcom,wf-fifo-preload;
+			qcom,wf-fifo-data = [7f 7f];
+			qcom,wf-fifo-period = <S_PERIOD_T_LRA>;
+			qcom,wf-auto-res-disable;
+			qcom,wf-brake-disable;
+		};
+	};
+
+	pmih010x_bcl: bcl@4700 {
+		compatible = "qcom,bcl-v5";
+		reg = <0x4700 0x100>;
+		interrupts = <0x7 0x47 0x0 IRQ_TYPE_NONE>,
+			     <0x7 0x47 0x1 IRQ_TYPE_NONE>,
+			     <0x7 0x47 0x2 IRQ_TYPE_NONE>;
+		interrupt-names = "bcl-lvl0",
+				  "bcl-lvl1",
+				  "bcl-lvl2";
+		qcom,pmic7-threshold;
+		#thermal-sensor-cells = <1>;
+	};
+
+	pmih010x_bcl2: bcl@4900 {
+		compatible = "qcom,bcl-v5";
+		reg = <0x4900 0x100>;
+		interrupts = <0x7 0x49 0x0 IRQ_TYPE_NONE>,
+			     <0x7 0x49 0x1 IRQ_TYPE_NONE>,
+			     <0x7 0x49 0x2 IRQ_TYPE_NONE>;
+		interrupt-names = "bcl-lvl0",
+				  "bcl-lvl1",
+				  "bcl-lvl2";
+		qcom,pmic7-threshold;
+		#thermal-sensor-cells = <1>;
+		status = "disabled";
+	};
+
+	bcl_soc: bcl-soc {
+		compatible = "qcom,msm-bcl-soc";
+		#thermal-sensor-cells = <0>;
+	};
+};

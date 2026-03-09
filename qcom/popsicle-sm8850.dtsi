@@ -1,0 +1,755 @@
+/*
+  this file is for attribution only of dada
+  And public attribution of xiaomi platforms(like O2 O3)
+*/
+
+#include "sm8850-xiaomi-common.dtsi"
+
+&soc {
+	xiaomi_fingerprint {
+		compatible = "xiaomi,xiaomi-fp";
+		xiaomi,gpio_irq = <&tlmm 99 0x0>;
+		xiaomi,gpio_ipc = <&tlmm 99 0x0>;
+		xiaomi,vendor_names = "P2_n2_132_431";
+		intr2-pin-enable;
+		intr2-side-config = "TIC";
+		intr2-default-electrical = <1 1>;
+		fp_3v3_vreg-supply = <&L9B>;
+		fp_1v8_vreg-supply = <&fingerprint_1v8_vdd>;
+		netlink-event = <25>;
+		sensor-loc = <480 1906 719 2165>;
+		pinctrl-names = "irq_default";
+		pinctrl-0 = <&fingerprint_irq_default>;
+		status = "ok";
+	};
+
+	fingerprint_1v8_vdd: fingerprint_1v8_vdd {
+		compatible = "regulator-fixed";
+		regulator-name = "fingerprint_1v8_vdd";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&tlmm 56 0x0>;
+		enable-active-high;
+	};
+	
+};
+
+&L9B {
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	qcom,init-voltage = <3300000>;
+};
+
+/* mitee vm */
+&reserved_memory {
+//	oem_vm_mem: oem_vm_region@f8800000 {
+//		reg = <0x0 0xf8800000 0x0 0x3800000>;
+//	};
+/* between is swiotlb */
+	oem_vm_shm: shm@fc200000 {
+		no-map;
+		reg = <0x0 0xfc200000 0x0 0x400000>;
+		gunyah-label = <0x3>;
+	};
+};
+
+&soc {
+
+	mitee: mitee {
+		compatible = "xiaomi,mitee";
+		binding-core = <4 5 6>;
+		tui-supported;
+	};
+
+	mitee-oemvm {
+		compatible = "xiaomi,mitee-hlos-ipc";
+		xiaomi,master;
+		gunyah-shm-label = <0x3>;
+		peer-name = <0x4>;
+		shared-buffer = <&oem_vm_shm>;
+	};
+};
+/* mitee vm */
+
+&qupv3_se0_spi {
+	status = "ok";
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&qupv3_se0_spi_mosi_active>, <&ls_gpio_active>;
+	pinctrl-1 = <&qupv3_se0_spi_sleep>;
+	ir-spi@0 {
+		compatible = "ir-spi";
+		reg = <0>;
+		spi-max-frequency = <19200000>;
+		status = "ok";
+	};
+};
+
+&remoteproc_adsp_glink {
+	qcom,adsp_qrtr {
+		qcom,ch-sched-rt;
+	};
+};
+
+&tlmm {
+	/* FP_INT_N */
+	fingerprint_irq_default: fingerprint_irq_default {
+		mux {
+			pins = "gpio99";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio99";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	
+	qupv3_se0_spi_mosi_active: qupv3_se0_spi_mosi_active {
+		mux {
+			pins = "gpio83";
+			function = "qup1_se0_l1";
+		};
+
+		config {
+			pins = "gpio83";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+
+	qupv3_se0_spi_sleep: qupv3_se0_spi_sleep {
+		mux {
+			pins = "gpio83";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio83";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+
+	ls_gpio_active: ls_gpio_active {
+		mux {
+			pins = "gpio173";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio173";
+			drive-strength = <2>;
+			bias-disable;
+                        output-high;
+		};
+	};
+};
+
+&usb0 {
+	qcom,wcd_usbss = <&wcd_usbss>;
+	wcd_equ = <0xF8>;
+	wcd_equ_host = <0xB0>;
+	maximum_speed = "super-speed";
+	host-force-gen1;
+};
+
+&pmih010x_eusb2_repeater {
+	qcom,host-param-override-seq =
+		<0x00 0x50
+		0x0F 0x51
+		0x04 0x52
+		0x07 0x53
+		0x02 0x54
+		0x03 0x55
+		0x00 0x56
+		0x07 0x57
+		0x02 0x58
+		0x03 0x59
+		0x01 0x5a
+		0x02 0x5b>;
+	qcom,param-override-seq =
+		<0x00 0x50
+		0x0F 0x51
+		0x03 0x52
+		0x07 0x53
+		0x03 0x54
+		0x01 0x55
+		0x03 0x56
+		0x06 0x57
+		0x02 0x58
+		0x01 0x59
+		0x03 0x5a
+		0x02 0x5b>;
+	qcom,param-override-seq-factory =
+		<0x00 0x50
+		0x0E 0x51
+		0x01 0x52
+		0x07 0x53
+		0x03 0x54
+		0x03 0x55
+		0x00 0x56
+		0x06 0x57
+		0x02 0x58
+		0x03 0x59
+		0x01 0x5a
+		0x02 0x5b>;
+};
+
+&usb_qmp_dp_phy {
+	usb3,eyegram-tuning;
+	qcom,usb3-phy-eye-seq =
+	/* <reg_offset, value>*/
+		<USB3_DP_PCS_G12S1_TXMGN_V0 0x1F
+			USB3_DP_PCS_G12S1_TXDEEMPH_M3P5DB 0x17>;
+	qcom,host-usb3-phy-eye-seq =
+		<USB3_DP_PCS_G12S1_TXMGN_V0 0x1F
+			USB3_DP_PCS_G12S1_TXDEEMPH_M3P5DB 0x16>;
+};
+
+&xoagg_therm {
+	status = "ok";
+};
+
+&qtm_therm {
+	status = "ok";
+};
+
+&display_therm {
+	status = "ok";
+};
+
+&charger_therm {
+	status = "ok";
+};
+
+&pmh0101_gpios {
+	pinctrl-0 = <&wireless_therm_default>, <&cpu_therm_default>;
+	pinctrl-names = "default";
+
+	wireless_therm_default: wireless_therm-default-state {
+		pins = "gpio9";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	cpu_therm_default: cpu_therm-default-state {
+		pins = "gpio12";
+		function = "normal";
+		bias-high-impedance;
+	};
+};
+
+/*&pmih010x_gpios {
+	pinctrl-0 = <&display_therm_default>, <&charger_therm_default>;
+	pinctrl-names = "default";
+
+	display_therm_default: display_therm-default-state {
+		pins = "gpio18";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	charger_therm_default: charger_therm-default-state {
+		pins = "gpio12";
+		function = "normal";
+		bias-high-impedance;
+	};
+};*/
+
+&pmk8850_vadc {
+	pinctrl-0 = <&xoagg_therm_default>, <&pa_therm2_default>, <&qtm_therm_default>;
+	pinctrl-names = "default";
+
+	/* PMH0101 ADC Channels */
+	wireless_therm: pmh0101_wireless_therm {
+		reg = <PMH0101_ADC5_GEN4_AMUX3_GPIO9_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_wireless_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmh0101_cpu_therm {
+		reg = <PMH0101_ADC5_GEN4_AMUX4_GPIO12_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_cpu_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	/* PMIH010X ADC Channels */
+	/*pmih010x_display_therm {
+		reg = <PMIH010X_ADC5_GEN4_AMUX5_GPIO18_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_display_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+		qcom,adc5-gen4;
+	};*/
+
+	pmk8850_xo_therm {
+		reg = <PMK8850_ADC5_GEN4_AMUX_THM1_XO_THERM_100K_PU(0, PMK8850_SID)>;
+		label = "pmk8850_xo_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmh0101_wifi_therm {
+		reg = <PMH0101_ADC5_GEN4_AMUX_THM3_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_wifi_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmh0101_pa_therm1 {
+		reg = <PMH0101_ADC5_GEN4_AMUX_THM4_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_pa_therm_1";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmh0101_quiet_therm {
+		reg = <PMH0101_ADC5_GEN4_AMUX_THM1_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_quiet_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmh0101_flash_therm {
+		reg = <PMH0101_ADC5_GEN4_AMUX_THM2_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_flash_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmih010x_batt_therm {
+		reg = <PMIH010X_ADC5_GEN4_AMUX_THM1_BAT_THERM_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_batt_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pmih010x_conn_therm {
+		reg = <PMIH010X_ADC5_GEN4_AMUX_THM4_USB_THERM_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_conn_therm_1";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	/*pmih010x_charger_therm {
+		reg = <PMIH010X_ADC5_GEN4_AMUX4_GPIO12_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_charger_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+		qcom,adc5-gen4;
+	};*/
+};
+
+&thermal_zones {
+	/* WIRELESS_THERM */
+	wireless_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX3_GPIO9_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* CPU_THERM */
+	cpu_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX4_GPIO12_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* DISPLAY_THERM */
+	display_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMIH010X_ADC5_GEN4_AMUX5_GPIO18_100K_PU(1, PMIH010X_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* XO_THERM */
+	xo-therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMK8850_ADC5_GEN4_AMUX_THM1_XO_THERM_100K_PU(0, PMK8850_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			trip_config0: trip-config0 {
+				temperature = <78000>;
+				hysteresis = <8000>;
+				type = "passive";
+			};
+
+			trip_config1: trip-config1 {
+				temperature = <80000>;
+				hysteresis = <10000>;
+				type = "passive";
+			};
+
+			shutdown-trip {
+				temperature = <90000>;
+				hysteresis = <0>;
+				type = "hot";
+			};
+
+			display_test_config1: display-test-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config2: display-test-config2 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config3: display-test-config3 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			therm_cdev0 {
+				trip = <&trip_config0>;
+				cooling-device = <&APC1_MX_CX_PAUSE 1 1
+					&APC0_MX_CX_PAUSE 1 1
+					&cdsp_sw 5 THERMAL_NO_LIMIT
+					&msm_gpu 5 THERMAL_NO_LIMIT>;
+			};
+
+			therm_cdev1 {
+				trip = <&trip_config1>;
+				cooling-device = <&cpu3_hotplug 1 1
+					&cpu4_hotplug 1 1
+					&cpu5_hotplug 1 1
+					&cpu6_hotplug 1 1
+					&cpu7_hotplug 1 1
+					&modem_lte_dsc 255 255
+					&modem_nr_scg_dsc 255 255>;
+			};
+
+			display_cdev1 {
+				trip = <&display_test_config1>;
+				cooling-device = <&display_fps 1 1>;
+			};
+
+			display_cdev2 {
+				trip = <&display_test_config2>;
+				cooling-device = <&display_fps 2 2>;
+			};
+
+			display_cdev3 {
+				trip = <&display_test_config3>;
+				cooling-device = <&display_fps 3 3>;
+			};
+		};
+	};
+
+	/* XOAGG_THERM */
+	xoagg_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMK8850_ADC5_GEN4_AMUX2_GPIO7_100K_PU(0, PMK8850_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* SKIN_THERM */
+	quiet_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX_THM1_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* CAM_FLASH_THERM */
+	flash_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX_THM2_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* WLAN_THERM */
+	wifi_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX_THM3_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* PA_THERM1 */
+	pa_therm1 {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX_THM4_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* QTM_THERM */
+	conn_therm2 {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX2_GPIO2_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* PA_THERM2 */
+	pa_therm2 {
+		thermal-sensors = <&pmk8850_vadc
+				   PMH0101_ADC5_GEN4_AMUX_THM6_GPIO3_100K_PU(0, PMH0101_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* WLS_THERM */
+	charger_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMIH010X_ADC5_GEN4_AMUX4_GPIO12_100K_PU(1, PMIH010X_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* BATT_THERM */
+	batt_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMIH010X_ADC5_GEN4_AMUX_THM1_BAT_THERM_100K_PU(1, PMIH010X_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* USB_THERM */
+	conn_therm {
+		thermal-sensors = <&pmk8850_vadc
+				   PMIH010X_ADC5_GEN4_AMUX_THM4_USB_THERM_100K_PU(1, PMIH010X_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+
+	/* BATT2_THERM */
+	/*sys-therm-12 {
+		thermal-sensors = <&pmk8850_vadc
+				   PMIH010X_ADC5_GEN4_AMUX3_BAT2_THERM_100K_PU(1, PMIH010X_SID)>;
+
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};*/
+};
+
+/*Remove PM8010 N for hardware design*/
+&regulator_ocp_notifier {
+	/delete-property/ periph-d40-supply;
+	/delete-property/ periph-d41-supply;
+	/delete-property/ periph-d42-supply;
+	/delete-property/ periph-d43-supply;
+	/delete-property/ periph-d44-supply;
+	/delete-property/ periph-d45-supply;
+	/delete-property/ periph-d46-supply;
+};
+
+&soc {
+ 	thermal-message {
+  		board-sensor = "VIRTUAL-SENSOR0";
+ 	};
+ };
+
+&soc {
+	xiaomi_mi_trace {
+		compatible = "xiaomi,mi_trace";
+		mt-size = <0x100000>;
+	};
+};

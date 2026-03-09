@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include "alor-mtp.dtsi"
+#include "alor-pmih010x-pmd802x.dtsi"
+
+&S3D_E0 {
+	regulator-min-microvolt = <400000>;
+	regulator-max-microvolt = <1004000>;
+	qcom,init-voltage = <400000>;
+};
+
+&pmic_glink_debug {
+	/* SPMI bridge bus 1 with SMB1510 device */
+	spmi_pmic:spmi@200 {
+		reg = <0x200>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,bus-type = "spmi";
+
+		spmi_pmic_smb1510: qcom,smb1510@d {
+			compatible = "qcom,spmi-pmic";
+			reg = <13 SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+
+	i2c_pmic:i2c@105 {
+		reg = <0x105>;  /* I2C instance 5 in ADSP for SE4 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		i2c_pmic_smb1398_1: qcom,smb1398@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1398_1_iin {
+		reg = <0x1053401>;
+		label = "smb1398_1_iin";
+	};
+
+	smb1398_1_ichg {
+		reg = <0x1053402>;
+		label = "smb1398_1_ichg";
+	};
+
+	smb1398_1_die_temp {
+		reg = <0x1053403>;
+		label = "smb1398_1_die_temp";
+	};
+};

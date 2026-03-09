@@ -1,0 +1,69 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/ {
+	host {
+		buffer@800006000 {
+			reg = <0x08 0x00006000 0x00 0x9000>;
+			android,pvmfw,target = <&qrtr_buff>;
+		};
+	};
+};
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm-v1.1", "qcom,scm";
+		interrupts = <0x00 0x3ad 0x01>;
+		qcom,max-queues = <0x23>;
+	};
+
+};
+
+&reserved_memory {
+	qrtr_buff: buffer@800006000 {
+		compatible = "qcom,qrtr-gunyah-gen";
+		no-map;
+		peers = <0x03 0x31>;
+		qcom,label = <0x108>;
+		qcom,rm-mem-handle = <0x0b>;
+		qcom,shared-memory;
+		reg = <0x08 0x00006000 0x00 0x9000>;
+	};
+};
+
+&non_devices_common {
+		required-subnodes-rm = <&qrtr_shm
+				&minidump
+				&qcom_gunyah_vm>;
+};
+
+&{/}  {
+	qrtr_shm: qrtr-shm {
+		buffer = <&qrtr_buff>;
+		compatible = "qcom,qrtr-gunyah-gen", "qcom,gunyah-shm-doorbell";
+		label = <0x108>;
+		memory-region = <&qrtr_buff>;
+		peer = <0x03>;
+		qcom,label = <0x108>;
+		rx-doorbell = <0x05>;
+		tx-doorbell = <0x04>;
+	};
+
+	minidump: minidump {
+		compatible = "qcom,minidump_rm", "qcom,minidump-rm";
+	};
+
+	qcom_gunyah_vm: qcom,gunyah-vm {
+		compatible = "qcom,gunyah-vm-id-1.0", "qcom,gunyah-vm-id";
+		qcom,image-name = "qcom,oemvm";
+		qcom,owner-vmid = <0x03>;
+		qcom,peers = "vm-name:qcom,trustedvm";
+		qcom,vendor = "Qualcomm";
+		qcom,vm-guid = "847bfe26-0b12-5728-812a-06103f6bdec0";
+		qcom,vm-signing-authority = "qcom,oem";
+		qcom,vm-uri = "vmuid/oemvm";
+		qcom,vmid = <0x31>;
+	};
+};

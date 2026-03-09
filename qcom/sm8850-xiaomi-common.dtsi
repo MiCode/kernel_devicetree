@@ -1,0 +1,38 @@
+#include "canoe-mtp.dtsi"
+
+&soc {
+	dump_display_mem: dump_display_region@ff3ff800 {
+		compatible = "xiaomi,dump_display";
+		reg = <0xff3ff800 0x800>;
+	};
+
+	mtdoops_pmsg_mem: mtdoops_pmsg_region {
+		compatible = "mtdoops";
+		reg = <0x0 0xff400000 0x0 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	bootmonitor_pmsg_mem: bootmonitor_pmsg_region {
+		compatible = "bootmonitor";
+		reg = <0x0 0xff400000 0x0 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+		vol_up {
+			label = "volume_up";
+			gpios = <&tlmm 101 GPIO_ACTIVE_LOW>;
+			linux,input-type = <EV_KEY>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <32>;
+			linux,can-disable;
+		};
+	};
+};

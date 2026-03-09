@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	vm-config {
+		vdevices {
+			vsmmu@15000000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15000000>;
+				num-cbs = <0x7>;
+				num-smrs = <0xe>;
+				patch = "/soc/apps-smmu@15000000";
+			};
+		};
+	};
+};
+
+&soc {
+	apps_smmu: apps-smmu@15000000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+
+		qcom,actlr =
+			/* CAM_HF: Camera */
+			<0x1c08 0x0000 0x00000103>,
+
+			/* SF: Camera */
+			<0x1808 0x0020 0x00000103>,
+			<0x1841 0x0000 0x00000001>,
+			<0x1861 0x0000 0x00000103>,
+			<0x1881 0x0000 0x00000001>,
+			<0x18c2 0x0000 0x00000001>,
+			<0x18e8 0x0000 0x00000103>,
+			<0x1982 0x0000 0x00000001>,
+
+			/* NSP: Compute */
+			<0x0c0b 0x0000 0x00000303>,
+			<0x0c0e 0x0000 0x00000303>,
+
+			/* MDP_HF: Display */
+			<0x0804 0x0002 0x00000001>,
+
+			/* SF: EVA */
+			<0x1901 0x0020 0x00000103>,
+			<0x1925 0x0000 0x00000103>;
+	};
+};

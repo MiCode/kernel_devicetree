@@ -1,0 +1,110 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/leds/common.h>
+#include <dt-bindings/spmi/spmi.h>
+
+pmh0101@1 {
+	compatible = "qcom,spmi-pmic";
+	reg = <1 SPMI_USID>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	pmic-ecid@100 {
+		compatible = "qcom,pmic-ecid";
+		reg = <0x100>;
+		qcom,pmic-name = "pmh0101";
+	};
+
+	pmh0101_tz: pmh0101-temp-alarm@a00 {
+		compatible = "qcom,spmi-temp-alarm";
+		reg = <0xa00>;
+		interrupts = <0x1 0xa 0x0 IRQ_TYPE_EDGE_BOTH>;
+		#thermal-sensor-cells = <0>;
+	};
+
+	pmh0101_gpios: pinctrl@8800 {
+		compatible = "qcom,pmh0101-gpio";
+		reg = <0x8800>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	led_controller: led-controller {
+		compatible = "qcom,pmh0101-pwm", "qcom,pm8350c-pwm";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#pwm-cells = <2>;
+
+		led@1 {
+			reg = <1>;
+			color = <LED_COLOR_ID_RED>;
+			label = "red";
+		};
+
+		led@2 {
+			reg = <2>;
+			color = <LED_COLOR_ID_GREEN>;
+			label = "green";
+		};
+
+		led@3 {
+			reg = <3>;
+			color = <LED_COLOR_ID_BLUE>;
+			label = "blue";
+		};
+	};
+
+	pmh0101_bcl: bcl@4700 {
+		compatible = "qcom,pmh0101-bcl-v5";
+		reg = <0x4700 0x100>;
+		interrupts = <0x1 0x47 0x0 IRQ_TYPE_NONE>,
+			     <0x1 0x47 0x1 IRQ_TYPE_NONE>,
+			     <0x1 0x47 0x2 IRQ_TYPE_NONE>;
+		interrupt-names = "bcl-lvl0",
+				  "bcl-lvl1",
+				  "bcl-lvl2";
+		qcom,pmic7-threshold;
+		#thermal-sensor-cells = <1>;
+	};
+
+	pmh0101_flash: led-controller@ee00 {
+		compatible = "qcom,pmh0101-flash-led", "qcom,spmi-flash-led";
+		reg = <0xee00>;
+
+		pmh0101_flash_led0: led-0 {
+			function = LED_FUNCTION_FLASH;
+			function-enumerator = <0>;
+			color = <LED_COLOR_ID_YELLOW>;
+			led-sources = <1>, <4>;
+			led-max-microamp = <500000>;
+			flash-max-microamp = <2000000>;
+			flash-max-timeout-us = <1280000>;
+		};
+
+		pmh0101_flash_led1: led-1 {
+			function = LED_FUNCTION_FLASH;
+			function-enumerator = <1>;
+			color = <LED_COLOR_ID_WHITE>;
+			led-sources = <2>, <3>;
+			led-max-microamp = <500000>;
+			flash-max-microamp = <2000000>;
+			flash-max-timeout-us = <1280000>;
+		};
+
+		pmh0101_flash_led2: led-2 {
+			function = LED_FUNCTION_FLASH;
+			function-enumerator = <2>;
+			color = <LED_COLOR_ID_AMBER>;
+			led-sources = <1>, <2>, <3>, <4>;
+			led-max-microamp = <500000>;
+			flash-max-microamp = <2000000>;
+			flash-max-timeout-us = <1280000>;
+		};
+	};
+};

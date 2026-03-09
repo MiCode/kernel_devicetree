@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,bwmon.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) BWMON Driver
+
+maintainers:
+  - avajid@quicinc.com <quic_avajid@quicinc.com>
+  - gurbaror@quicinc.com <quic_gurbaror@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. BWMON Driver monitors bandwidth counters that
+  represent the read/write traffic through various interconnects in the system
+  and uses this data to vote for DCVS HW (memory) frequencies. Each device
+  represents a separate bandwidth monitor present on the Qualcomm Technologies,
+  Inc. (QTI) chipset. This driver is a refactor of the bimc-bwmon driver that
+  was previously developed.
+
+properties:
+  compatible:
+    enum:
+      - qcom,bwmon
+      - qcom,bwmon2
+      - qcom,bwmon3
+      - qcom,bwmon4
+      - qcom,bwmon5
+
+  reg:
+    maxItems: 2
+
+  reg-names:
+    - const: base
+    - const: global_base
+
+  interrupts:
+    description: Lists the threshold IRQ.
+
+  qcom,mport:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      The hardware master port that this device can monitor
+
+  qcom,target-dev:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      A phandle to the QTI DCVS HW device node that this
+      node will be using for voting in the SLOW path.
+
+  qcom,hw-timer-hz:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      Hardware sampling rate in Hz. This field must be
+      specified for "qcom,bwmon4"
+
+  qcom,byte-mid-match:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      Byte count MID match value
+
+  qcom,byte-mid-mask:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      Byte count MID mask value
+
+  qcom,count-unit:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      Number of bytes monitor counts in
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - qcom,target-dev
+  - qcom,hw-timer-hz
+
+examples:
+  - |
+    bwmon_llcc: qcom,bwmon-llcc@90b6400 {
+        compatible = "qcom,bwmon4";
+        reg = <0x90b6400 0x300>, <0x90b6300 0x200>;
+        reg-names = "base", "global_base";
+        interrupts = <GIC_SPI 581 IRQ_TYPE_LEVEL_HIGH>;
+        qcom,mport = <0>;
+        qcom,hw-timer-hz = <19200000>;
+        qcom,count-unit = <0x10000>;
+        qcom,target-dev = <&qcom_llcc_dcvs_hw>;
+    };

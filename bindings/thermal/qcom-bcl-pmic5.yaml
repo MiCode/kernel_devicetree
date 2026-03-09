@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qcom-bcl-pmic5.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. BCL Peripheral Device For PMIC version 5
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  Qualcomm Technologies, Inc's PMIC has battery current limiting peripheral,
+  which can monitor for high battery current and low battery voltage in the
+  hardware. The BCL peripheral driver interacts with the PMIC peripheral using
+  the SPMI driver interface. The hardware can take threshold for notifying for
+  high battery current or low battery voltage events. This driver works only
+  with PMIC version 5, where the same BCL peripheral can be found in multiple
+  PMIC's that are used in a device, with limited functionalities. For example,
+  one PMIC can have only vbat monitoring, while the other PMIC can have both
+  vbat and ibat monitoring. This is a common driver, that can interact
+  with the multiple BCL peripherals.
+
+properties:
+  compatible:
+    description: msm battery state of charge device
+    items:
+      - const: qcom,bcl-v5
+      - const: qcom,pm8550-bcl-v5
+      - const: qcom,pmh0101-bcl-v5
+
+  reg:
+    maxItems: 1
+    description: |
+      <a b> where 'a' is the starting register address of the PMIC
+      peripheral and 'b' is the size of the peripheral address space.
+
+  interrupts:
+    minItems: 1
+    maxItems: 3
+    description: |
+      <a b c d> Where,
+      'a' is the SLAVE ID of the PMIC,
+      'b' is the peripheral ID,
+      'c' is the interrupt number in PMIC and
+      'd' is the interrupt type.
+
+  interrupt-names:
+    minItems: 1
+    description: |
+      User defined names for the interrupts. These interrupt
+      names will be used by the drivers to identify the
+      interrupts, instead of specifying the ID's. bcl driver will
+      accept these standard interrupts.
+    items:
+      - const: bcl-lvl0
+      - const: bcl-lvl1
+      - const: bcl-lvl2
+
+  qcom,bcl-mon-vbat-only:
+    type: boolean
+    description: |
+      When this flag is defined, the BCL driver will only monitor
+      Vbat or both Ibat and Vbat based on runtime battery type and
+      Rsense input.
+
+  qcom,bcl-mon-ibat-only:
+    type: boolean
+    description: |
+      When this flag is defined, the BCL driver will only monitor
+      Ibat or don't monitor anything based on runtime battery type
+      and Rsense input.
+
+  qcom,pmic7-threshold:
+    type: boolean
+    description: |
+      When this flag is defined, the BCL driver will account for
+      no bit shift in the threshold registers.
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - interrupt-names
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+    bcl@4200 {
+        compatible = "qcom,bcl-v5";
+        reg = <0x4200 0x100>;
+        interrupts = <0x2 0x42 0x0 IRQ_TYPE_NONE>,
+                     <0x2 0x42 0x1 IRQ_TYPE_NONE>;
+        interrupt-names = "bcl-lvl0",
+                          "bcl-lvl1";
+        qcom,bcl-mon-vbat-only;
+        qcom,pmic7-threshold;
+    };

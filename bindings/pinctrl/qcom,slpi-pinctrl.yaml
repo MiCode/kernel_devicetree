@@ -1,0 +1,151 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/pinctrl/qcom,slpi-pinctrl.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. SLPI Pin controller
+
+maintainers:
+  - Bjorn Andersson <bjorande@quicinc.com>
+
+description: |
+  This DT bindings describes the Pin controller driver
+  being added for supporting SLPI (Sensor Low Power Island) TLMM
+  from QTI chipsets.
+
+properties:
+  compatible:
+    enum:
+      - qcom,slpi-pinctrl
+
+  reg:
+    maxItems: 1
+    description: |
+      Base address and size of the SLPI TLMM register space.
+
+  qcom,num-pins:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Number of PINs supported by the SLPI TLMM.
+
+  clock-names:
+    items:
+      - const: ssc-clk
+
+  clocks:
+    items:
+      - description: Handles to clocks specified in "clock-names" property.
+
+  slpi_mclk0_active:
+    type: object
+    properties:
+      mux:
+        type: object
+        properties:
+          pins:
+            type: boolean
+            items:
+              type: string
+              pattern: "^gpio[0-9]+$"
+          function:
+            pattern: "^func[0-9]+$"
+        required:
+          - pins
+          - function
+
+      config:
+        type: object
+        properties:
+          pins:
+            type: boolean
+            items:
+              type: string
+              pattern: "^gpio[0-9]+$"
+          drive-strength:
+            $ref: /schemas/types.yaml#/definitions/uint32
+          bias-disable:
+            type: boolean
+        required:
+          - pins
+          - drive-strength
+          - bias-disable
+
+  slpi_mclk0_sleep:
+    type: object
+    properties:
+      mux:
+        type: object
+        properties:
+          pins:
+            type: boolean
+            items:
+              type: string
+              pattern: "^gpio[0-9]+$"
+          function:
+            pattern: "^func[0-9]+$"
+        required:
+          - pins
+          - function
+
+      config:
+        type: object
+        properties:
+          pins:
+            type: boolean
+            items:
+              type: string
+              pattern: "^gpio[0-9]+$"
+          drive-strength:
+            $ref: /schemas/types.yaml#/definitions/uint32
+          bias-pull-down:
+            type: boolean
+        required:
+          - pins
+          - drive-strength
+          - bias-pull-down
+
+required:
+  - compatible
+  - reg
+  - qcom,num-pins
+  - clock-names
+  - clocks
+
+additionalProperties: false
+
+examples:
+  - |
+    slpi_tlmm: slpi_pinctrl@2b40000 {
+            compatible = "qcom,slpi-pinctrl";
+            qcom,num-pins = <14>;
+            clock-names = "ssc-clk";
+            clocks =  <&clock_scc>;
+            reg = <0x02b40000 0x20000>;
+
+            slpi_mclk0_active: slpi_mclk0_active {
+                    mux {
+                            pins = "gpio0", "gpio1", "gpio2", "gpio3";
+                            function = "func2";
+                    };
+
+                    config {
+                            pins = "gpio0", "gpio1", "gpio2", "gpio3";
+                            drive-strength = <8>;
+                            bias-disable;
+                    };
+            };
+
+            slpi_mclk0_sleep: slpi_mclk0_sleep {
+                    mux {
+                            pins = "gpio0", "gpio1", "gpio2", "gpio3";
+                            function = "func2";
+                    };
+
+                    config {
+                            pins = "gpio0", "gpio1", "gpio2", "gpio3";
+                            drive-strength = <2>;
+                            bias-pull-down;
+                    };
+            };
+    };

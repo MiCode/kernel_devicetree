@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/serial/qcom,sa8255p-geni-uart.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Geni based QUP UART interface
+
+maintainers:
+  - Praveen Talari <quic_ptalari@quicinc.com>
+
+description: |
+  SA8255p Ride platform is an automotive virtual platform. This platform
+  abstracts resources such as clocks, regulators etc. in the firmware VM.
+  The device drivers request resources operations over SCMI using power,
+  performance, reset and sensor protocols.
+
+allOf:
+  - $ref: /schemas/serial/serial.yaml#
+
+properties:
+  compatible:
+    enum:
+      - qcom,sa7255p-geni-uart
+      - qcom,sa7255p-geni-debug-uart
+      - qcom,sa8255p-geni-uart
+      - qcom,sa8255p-geni-debug-uart
+      - qcom,sa8797p-geni-uart
+      - qcom,sa8797p-geni-debug-uart
+
+  interrupts:
+    minItems: 1
+    items:
+      - description: UART core irq
+      - description: Wakeup irq (RX GPIO)
+
+  power-domains:
+    minItems: 2
+    maxItems: 2
+    description: power-domains must be <2>, that are power and perf domains
+      1st param - scmi protocol domain handler
+      2nd param - serial engine index
+
+      Power Domain - The power protocol manages the power states of devices,
+      turning them on or off such as clocks, ICC paths and TLMM(GPIO) using the
+      PM runtime framework.
+
+      Performance Domain - The performance protocol sets UART communication
+      speeds by selecting different performance levels through the OPP framework.
+
+      Supported perf levels for baudrates in firmware are below
+      +---------------------+--------------------+
+      |  Perf level value   |  Baudrate values   |
+      +---------------------+--------------------+
+      |      300            |      300           |
+      |      1200           |      1200          |
+      |      2400           |      2400          |
+      |      4800           |      4800          |
+      |      9600           |      9600          |
+      |      19200          |      19200         |
+      |      38400          |      38400         |
+      |      57600          |      57600         |
+      |      115200         |      115200        |
+      |      230400         |      230400        |
+      |      460800         |      460800        |
+      |      921600         |      921600        |
+      |      2000000        |      2000000       |
+      |      3000000        |      3000000       |
+      |      3200000        |      3200000       |
+      |      4000000        |      4000000       |
+      +---------------------+--------------------+
+
+  power-domain-names:
+    items:
+      - const: power
+      - const: perf
+
+  reg:
+    maxItems: 1
+
+required:
+  - compatible
+  - interrupts
+  - reg
+  - power-domains
+  - power-domain-names
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+    serial@990000 {
+        compatible = "qcom,sa8255p-geni-uart";
+        reg = <0x990000 0x4000>;
+        interrupts = <GIC_SPI 531 IRQ_TYPE_LEVEL_HIGH>;
+        power-domains = <&scmi11_pd 4>, <&scmi11_dvfs 4>;
+        power-domain-names = "power", "perf";
+    };
+...

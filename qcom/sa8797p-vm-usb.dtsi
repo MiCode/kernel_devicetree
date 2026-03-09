@@ -1,0 +1,71 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+&soc {
+	/* Tertiary USB port related controller */
+	usb2: hsusb@a200000 {
+		compatible = "qcom,dwc3-msm-fw-managed";
+		reg = <0x0a200000 0x200000>;
+		reg-names = "core_base";
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		power-domains = <&scmi_power 0>, <&scmi_power 1>;
+		power-domain-names = "usb_transfer", "usb_core";
+
+		interrupts-extended = <&pdc 8 IRQ_TYPE_EDGE_RISING>,
+				<&intc GIC_SPI 907 IRQ_TYPE_LEVEL_HIGH>,
+				<&pdc 7 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "dp_hs_phy_irq", "pwr_event_irq",
+				"dm_hs_phy_irq";
+		qcom,use-pdc-interrupts;
+
+		qcom,disable-wakeup;
+
+		/*
+		 * Establish dependency on smmu driver so that depopulate path of
+		 * deferred probe doesn't run into existing bug in smmu driver.
+		 */
+		dummy-supply = <&apps_smmu_0>;
+
+		status = "disabled";
+
+		dwc3@a200000 {
+			compatible = "snps,dwc3";
+			reg = <0x0a200000 0xd800>;
+			iommus = <&apps_smmu_0 0x14e0 0x0>;
+			qcom,iommu-dma = "bypass";
+			interrupts = <GIC_SPI 910 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&eusb2_phy2>, <&usb_nop_phy>;
+			snps,disable-clk-gating;
+			snps,has-lpm-erratum;
+			snps,hird-threshold = /bits/ 8 <0x0>;
+			snps,is-utmi-l1-suspend;
+			snps,usb2-gadget-lpm-disable;
+			maximum-speed = "high-speed";
+			dr_mode = "otg";
+			usb-role-switch;
+		};
+	};
+
+	/* Tertiary USB port related High Speed PHY */
+	eusb2_phy2: hsphy@88e0000 {
+		compatible = "qcom,usb-snps-eusb2-fw-managed";
+		reg = <0x88e0000 0x154>;
+		reg-names = "eusb2_phy_base";
+
+		power-domains = <&scmi_power 2>, <&scmi_power 3>;
+		power-domain-names = "usb_transfer", "usb_core";
+
+		status = "disabled";
+	};
+
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+};
+

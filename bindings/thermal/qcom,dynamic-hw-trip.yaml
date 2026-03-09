@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qcom,dynamic-hw-trip.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) dynamic hardware trip setting driver
+
+maintainers:
+  - Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. (QTI) Dynamic hardware trip driver provides
+  thermal zone sysfs nodes for userspace clients to update thermal hardware
+  mitigation thresholds dynamically via consolidated SCMI protocol.
+
+properties:
+  compatible:
+    enum:
+      - qcom,thermal-hw-trip
+
+  qcom,pdp-type:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      CPU cluster type for which dynamic hardware thermal trip needs to be set.
+
+  qcom,trip-temperature:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      CPU trip temperature for which dynamic hardware thermal trip needs to be set.
+
+required:
+  - compatible
+  - qcom,cpu-cluster-type
+  - qcom,trip-temperature
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,dynamic-thermal-trip@0 {
+      compatible = "qcom,thermal-hw-trip";
+      qcom,cpu-cluster-type = <0>;
+      qcom,trip-temperature = <95000>;
+    };
+
+    qcom,dynamic-thermal-trip@1 {
+      compatible = "qcom,thermal-hw-trip";
+      qcom,cpu-cluster-type = <1>;
+      qcom,trip-temperature = <95000>;
+    };
+...

@@ -1,0 +1,144 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/remoteproc/qcom,spss.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: SPSS Peripheral Image Loader
+
+maintainers:
+  - Nurit Lichtenstein <quic_nuritl@quicinc.com>
+
+description:
+  This document defines the binding for a component that loads
+  and boots firmware on the QTI Secure Processor.
+
+properties:
+  compatible:
+    enum:
+      - qcom,waipio-spss-pas
+      - qcom,kalama-spss-pas
+      - qcom,pineapple-spss-pas
+      - qcom,sun-spss-pas
+      - qcom,canoe-spss-pas
+
+  reg:
+    minItems: 1
+    items:
+      - description: SP to SoC IRQ status register
+      - description: SP to SoC IRQ clear register
+      - description: SP to SoC IRQ mask register
+      - description: RMB error register
+      - description: RMB general purpose register
+      - description: RMB error spare2 register
+
+  reg-names:
+    items:
+      - const: sp2soc_irq_status
+      - const: sp2soc_irq_clr
+      - const: sp2soc_irq_mask
+      - const: rmb_err
+      - const: rmb_general_purpose
+      - const: rmb_err_spare2
+
+  interrupts:
+    items:
+      - description: Generic interrupt
+
+  clocks:
+    items:
+      - description: reference to the xo clock and optionally aggre2 clock
+
+  clock-names:
+    items:
+      - const: xo
+
+  cx-supply:
+    description: Phandle to the CX regulator
+
+  px-supply:
+    description: Phandle to the PX regulator
+
+  sensors-supply:
+    description: Phandle to the Sensors regulator
+
+  sensors-uV-uA:
+    description: Voltage and Current levels for Sensors regulator
+
+  memory-region:
+    maxItems: 1
+    description: Reference to the reserved-memory for the SPSS
+
+  glink-edge:
+    $ref: /schemas/remoteproc/qcom,glink-edge.yaml#
+    description:
+      QTI G-Link subnode which represents communication edge, channels
+      and devices related to the SPSS.
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - cx-supply
+  - sensors-supply
+  - sensors-uV-uA
+  - clocks
+  - clock-names
+  - memory-region
+
+additionalProperties: false
+
+examples:
+  # The following example represents the qcom,spss node on a sun device.
+  - |
+    spss_pas: remoteproc-spss@1880000 {
+        compatible = "qcom,sun-spss-pas";
+        ranges;
+        reg = <0x188101c 0x4>,
+              <0x1881024 0x4>,
+              <0x1881028 0x4>,
+              <0x188103c 0x4>,
+              <0x1881100 0x4>,
+              <0x1882014 0x4>;
+        reg-names = "sp2soc_irq_status", "sp2soc_irq_clr", "sp2soc_irq_mask",
+                    "rmb_err", "rmb_general_purpose", "rmb_err_spare2";
+        interrupts = <0 352 1>;
+
+        cx-supply = <&VDD_CX_LEVEL>;
+        cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+
+        sensors-supply = <&L2I>;
+        sensors-uV-uA = <1200000 100000>;
+
+        clocks = <&rpmhcc RPMH_CXO_CLK>;
+        clock-names = "xo";
+        qcom,proxy-clock-names = "xo";
+        status = "ok";
+
+        memory-region = <&spss_region_mem>;
+        qcom,spss-scsr-bits = <24 25>;
+        qcom,extra-size = <4096>;
+
+        interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+        interconnect-names = "crypto_ddr";
+
+        glink-edge {
+        qcom,remote-pid = <8>;
+            mboxes = <&ipcc_mproc IPCC_CLIENT_SPSS
+                IPCC_MPROC_SIGNAL_GLINK_QMP>;
+            mbox-names = "spss_spss";
+            interrupt-parent = <&ipcc_mproc>;
+            interrupts = <IPCC_CLIENT_SPSS
+                          IPCC_MPROC_SIGNAL_GLINK_QMP
+                          IRQ_TYPE_EDGE_RISING>;
+
+            reg = <0x1885008 0x8>,
+                  <0x1885010 0x4>;
+            reg-names = "qcom,spss-addr",
+                        "qcom,spss-size";
+
+            label = "spss";
+            qcom,glink-label = "spss";
+        };
+    };

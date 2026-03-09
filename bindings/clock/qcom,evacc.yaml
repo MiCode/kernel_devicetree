@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/qcom,evacc.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Eva Clock & Reset Controller
+
+maintainers:
+  - Dongfang Zhao <quic_doz@quicinc.com>
+
+description: |
+  Eva clock control module which supports the clocks, resets and
+  power domains.
+
+  See also:
+  - dt-bindings/clock/qcom,evacc-canoe.h
+
+properties:
+  compatible:
+    enum:
+      - qcom,canoe-evacc
+      - qcom,alor-evacc
+
+  clocks:
+    items:
+      - description: Board XO source
+
+  clock-names:
+    items:
+      - const: bi_tcxo
+
+  vdd_mm-supply:
+    description: Phandle pointer to the vdd_mm logic rail supply
+
+  vdd_mxc-supply:
+    description: Phandle pointer to the vdd_mxc logic rail supply
+
+  '#clock-cells':
+    const: 1
+
+  '#reset-cells':
+    const: 1
+
+  '#power-domain-cells':
+    const: 1
+
+  reg:
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+  - '#clock-cells'
+  - '#reset-cells'
+  - '#power-domain-cells'
+
+allOf:
+  - $ref: "qcom,gcc.yaml#"
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    evacc: clock-controller@24f0000 {
+      compatible = "qcom,canoe-evacc", "syscon";
+      reg = <0x0 0x24f0000 0x0 0x10000>;
+      reg-name = "cc_base";
+      vdd_mm-supply = <&VDD_MM_LEVEL>;
+      vdd_mxc-supply = <&VDD_MXC_LEVEL>;
+      clocks = <&rpmhcc RPMH_CXO_CLK>;
+      clock-names = "bi_tcxo";
+
+      #power-domain-cells = <1>;
+      #clock-cells = <1>;
+      #reset-cells = <1>;
+    };
+
+...
+

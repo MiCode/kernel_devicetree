@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,dcvs-fp.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) DCVS Fast Path Interface
+
+maintainers:
+  - avajid@quicinc.com <quic_avajid@quicinc.com>
+  - gurbaror@quicinc.com <quic_gurbaror@quicinc.com>
+
+description: |
+  The QTI DCVS Fast Path Interface utilizes the fast-path TCS hardware interface
+  provided by RPMH RSC. As such, this driver is a child node and client of an
+  RPMH RSC device that has a fast path TCS. The driver is intended to be used by
+  the QTI DCVS framework for DCVS_FAST_PATH voting on DDR and LLCC HW.
+
+properties:
+  compatible:
+    const: qcom,dcvs-fp
+
+  qcom,ddr-bcm-name:
+    $ref: /schemas/types.yaml#/definitions/string
+    description: ddr fast path bcm node name
+
+  qcom,llcc-bcm-name:
+    $ref: /schemas/types.yaml#/definitions/string
+    description: llcc fast path bcm node name
+
+required:
+  - compatible
+  - qcom,ddr-bcm-name
+  - qcom,llcc-bcm-name
+
+examples:
+  - |
+    apps_rsc: rsc@18200000 {
+        compatible = "qcom,rpmh-rsc";
+
+        dcvs_fp: qcom,dcvs-fp {
+        compatible = "qcom,dcvs-fp";
+        qcom,ddr-bcm-name = "MC3";
+        qcom,llcc-bcm-name = "SH8";
+      };
+    };

@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+&soc {
+};
+
+&qupv3_se19_spi  {
+	status = "ok";
+	qcom,touch-active = "st,fts";
+	required-subnodes = <&st_fts_0>;
+
+	st_fts_0: st_fts@0 {
+		compatible = "st,fts";
+		reg = <0x0>;
+		spi-max-frequency = <1000000>;
+		st,irq-gpio = <&tlmm 158 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 66 0x00>;
+
+		st,touch-type = "primary";
+		st,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <647>;
+		qts,trusted-touch-io-bases = <0x1a80000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+						&tlmm 51 0 &tlmm 66 0 &tlmm 158 0x2008>;
+	};
+};

@@ -1,0 +1,99 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "yupik-iot-idp.dtsi"
+
+&soc {
+};
+
+&tlmm {
+	edp_hpd_ctrl: hpd_ctrl@60 {
+		mux {
+			pins = "gpio60";
+			function = "edp_hot";
+		};
+
+		config {
+			pins = "gpio60";
+			bias-disable;
+			input-enable;
+			drive-strength = <2>;
+		};
+	};
+};
+
+&pm8350c_gpios {
+	pmic_edp_bl_pwm: pmic-edp-bl-pwm-state {
+		pins = "gpio8";
+		function = "func1";
+		bias-disable;
+		qcom,drive-strength = <PMIC_GPIO_STRENGTH_LOW>;
+		/* Force backlight to be disabled to match state at boot. */
+		output-low;
+	};
+};
+
+&pm8350c_pwm {
+	status = "ok";
+};
+
+&pcie0 {
+	status = "ok";
+};
+
+&pcie0_msi {
+	status = "ok";
+};
+
+&pcie1 {
+	status = "ok";
+	qcom,boot-option = <0x0>;
+	qcom,ep-gpio = <&tlmm 19 0>;
+	pinctrl-0 = <&pcie1_perst_default
+			&pcie1_clkreq_default
+			&pcie1_wake_default
+			&pcie1_ep_default>;
+	pinctrl-1 = <&pcie1_perst_default
+			&pcie1_clkreq_sleep
+			&pcie1_wake_default
+			&pcie1_ep_default>;
+};
+
+&pcie1_msi {
+	status = "ok";
+};
+
+&pm7325_gpios {
+	usb2_vbus_boost {
+		usb2_vbus_boost_default: usb2_vbus_boost_default {
+			pins = "gpio8";
+			function = "normal";
+			output-low;
+			power-source = <0>;	/* 1.8V input supply */
+		};
+	};
+};
+
+&soc {
+	usb2_vbus_boost_reg: usb2_vbus_boost_reg {
+		compatible = "regulator-fixed";
+		regulator-name = "usb2_vbus_boost_vreg";
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpios = <&pm7325_gpios 8 0>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb2_vbus_boost_default>;
+	};
+};
+
+&usb1 {
+	vbus_dwc3-supply = <&usb2_vbus_boost_reg>;
+	qcom,default-mode-none;
+};
+
+&usb2_phy1 {
+	status = "ok";
+};

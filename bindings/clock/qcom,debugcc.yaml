@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/qcom,debugcc.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Debug Clock Controller
+
+maintainers:
+  - Xubin Bai <quic_xubibai@quicinc.com>
+  - Vivek Aknurwar <quic_viveka@quicinc.com>
+  - Dongfang Zhao <quic_doz@quicinc.com>
+
+description: |
+  Debug Clock Controller module which support debug clock controllers.
+
+properties:
+  compatible:
+    enum:
+      - qcom,pineapple-debugcc
+      - qcom,sun-debugcc
+      - qcom,parrot-debugcc
+      - qcom,canoe-debugcc
+      - qcom,sm8150-debugcc
+      - qcom,sc8180x-debugcc
+      - qcom,vienna-debugcc
+      - qcom,alor-debugcc
+      - qcom,debugcc-sc7280
+
+  clocks:
+    items:
+      - description: Board XO source
+
+  clock-names:
+    items:
+      - const: xo_clk_src
+
+  qcom,gcc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the GCC device node
+
+  qcom,gpucc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the GPU CC device node
+
+  qcom,videocc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the Video CC device node
+
+  qcom,dispcc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the Display CC device node
+
+  qcom,camcc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the Camera CC device node
+
+  qcom,apsscc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the APSS CC device node
+
+  qcom,mccc:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: phandle to the Memory Controller CC device node
+
+required:
+  - compatible
+  - clocks
+  - clock-names
+
+allOf:
+  - $ref: "qcom,gcc.yaml#"
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    debugcc: qcom,cc-debug {
+        compatible = "qcom,pineapple-debugcc";
+        qcom,gcc = <&gcc>;
+        qcom,gpucc = <&gpucc>;
+        qcom,videocc = <&videocc>;
+        qcom,dispcc = <&dispcc>;
+        qcom,camcc = <&camcc>;
+        qcom,apsscc = <&apsscc>;
+        qcom,mccc = <&mccc>;
+        clock-names = "xo_clk_src";
+        clocks = <&rpmhcc RPMH_CXO_CLK>;
+        #clock-cells = <1>;
+    };
+...

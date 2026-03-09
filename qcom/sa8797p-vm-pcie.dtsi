@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+/ {
+	pcie2: pci@0x4000000000 {
+		compatible = "qcom,pcie-ecam-rc";
+		reg = <0x40 0x00000000 0x0 0x10000000>;
+
+		device_type = "pci";
+
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		ranges = <0x01000000 0x0 0x50000000 0x0 0x50000000 0x0 0x100000>,
+			<0x02000000 0x0 0x50100000 0x0 0x50100000 0x0 0x7000000>,
+			<0x43000000 0x40 0x10100000 0x40 0x10100000 0x0 0x100000>;
+		bus-range = <0x00 0xff>;
+
+		linux,pci-domain = <2>;
+
+		power-domains = <&scmi_power 7>;
+		power-domain-names = "power";
+
+		interrupts = <GIC_SPI 844 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 838 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 825 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 846 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 350 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 837 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-parent = <&intc>;
+
+		/*TODO: SMMU V3 is not yet enabled*/
+		/*
+		 *dma-coherent;
+		 *iommus = <&pcie_smmu 0x20000>;
+		 *iommu-map = <0x0 &pcie_smmu 0x20000 0x1>,
+		 *	    <0x100 &pcie_smmu 0x20001 0x1>,
+		 *	    <0x200 &pcie_smmu 0x20002 0x1>,
+		 *	    <0x300 &pcie_smmu 0x20003 0x1>;
+		 */
+
+		status = "disabled";
+	};
+
+	pcie3: pci@0x400000000 {
+		compatible = "qcom,pcie-ecam-rc";
+		reg = <0x4 0x00000000 0x0 0x10000000>;
+
+		device_type = "pci";
+
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		ranges = <0x01000000 0x0 0x58000000 0x0 0x58000000 0x0 0x100000>,
+			<0x02000000 0x0 0x58100000 0x0 0x58100000 0x0 0x7000000>,
+			<0x43000000 0x4 0x10100000 0x4 0x10100000 0x0 0x100000>;
+		bus-range = <0x00 0xff>;
+
+		linux,pci-domain = <3>;
+
+		power-domains = <&scmi_power 8>;
+		power-domain-names = "power";
+
+		interrupts = <GIC_SPI 364 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 287 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 831 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 659 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 840 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 823 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-parent = <&intc>;
+
+		/*TODO: SMMU V3 is not yet enabled*/
+		/*
+		 *dma-coherent;
+		 *iommus = <&pcie_smmu 0x30000>;
+		 *iommu-map = <0x0 &pcie_smmu 0x30000 0x1>,
+		 *	    <0x100 &pcie_smmu 0x30001 0x1>,
+		 *	    <0x200 &pcie_smmu 0x30002 0x1>,
+		 *	    <0x300 &pcie_smmu 0x30003 0x1>;
+		 */
+
+		status = "disabled";
+	};
+};

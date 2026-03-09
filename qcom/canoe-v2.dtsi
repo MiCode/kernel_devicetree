@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include "canoe.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Canoe v2 SoC";
+	compatible = "qcom,canoe";
+	qcom,msm-id = <660 0x20000>;
+
+	chosen: chosen {
+		bootargs = "android_arch_task_struct_size=512 cpufreq.default_governor=performance sysctl.kernel.sched_pelt_multiplier=4 no-steal-acc kpti=0 swiotlb=0 loop.max_part=7 irqaffinity=0-1 fw_devlink.strict=1 pcie_ports=compat pci-msm-drv.pcie_sm_regs=0x1D07000,0x1040,0x1048,0x3000,0x1 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup_disable=pressure kernel.panic_on_rcu_stall=1 disable_dma32=on  restrict_cma_redirect=false";
+	};
+
+};
+
+&soc {
+
+	qup1_gpi_iommu_region: qup1_gpi_iommu_region {
+		iommu-addresses =  <&gpi_dma1 0x0 0x0 0x0 0x100000>,
+				   <&gpi_dma1 0x0 0x200000 0xffffffff 0xffe00000>;
+	};
+
+	/* GPI Instance */
+	gpi_dma1: qcom,gpi-dma@a00000 {
+		iommus = <&apps_smmu 0xb6 0x0>;
+		memory-region = <&qup1_gpi_iommu_region>;
+		/delete-property/ qcom,use-smem;
+	};
+
+	qup1_se_iommu_region: qup1_se_iommu_region {
+		iommu-addresses =  <&qupv3_1 0x0 0x0 0x0 0x40000000>,
+				   <&qupv3_1 0x0 0x50000000 0xffffffff 0xb0000000>;
+	};
+
+	qupv3_1: qcom,qupv3_1_geni_se@ac0000 {
+		iommus = <&apps_smmu 0xa3 0x0>;
+		memory-region = <&qup1_se_iommu_region>;
+		qcom,iommu-geometry = <0x0 0x40000000 0x0 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+	};
+};
+
+&videocc {
+	compatible = "qcom,canoe-videocc-v2", "syscon";
+};

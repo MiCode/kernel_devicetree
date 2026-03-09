@@ -1,0 +1,258 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+	qcom,msm-id = <685 0x10000>;
+
+	host {
+		#address-cells = <0x2>;
+		#size-cells = <0x2>;
+
+		qcom,gh-qtimer@1781b000 {
+			reg = <0x0 0x1781b000 0x0 0x1000>;
+			android,pvmfw,target = <&gh_qtimer>;
+		};
+
+		qcom,wdt@17600000 {
+			reg = <0x0 0x17600000 0x0 0x1000>;
+			android,pvmfw,target = <&wdog>;
+		};
+
+		non-devices-common {
+			reg = <0x0 0x0 0x0 0x0>;
+			android,pvmfw,target = <&non_devices_common>;
+		};
+	};
+
+	qcom,vm-config {
+		compatible = "qcom,vm-1.0";
+		vm-type = "aarch64-guest";
+		boot-config = "fdt,unified";
+		os-type = "linux";
+		kernel-entry-segment = "kernel";
+		kernel-entry-offset = <0x0 0x0>;
+		vendor = "QTI";
+		image-name = "qcom,oemvm";
+		qcom,pasid = <0x0 0x22>;
+		qcom,qtee-config-info = "p=3,9,39,7C,8F,97,159,7F1,CDF;";
+		qcom,secdomain-ids = <49>;
+		qcom,primary-vm-index = <0>;
+		vm-uri = "vmuid/oemvm";
+		vm-guid = "847bfe26-0b12-5728-812a-06103f6bdec0";
+
+		vm-attrs = "context-dump", "crash-restart", "no-vpm-aggregation";
+
+		/*
+		 * Allow VMMIO traps. Currently doesn't include
+		 * PVTIME, VIRTFREQ and GIC virtual devices.
+		 * GIC is emulated by Gunyah.
+		 */
+		vmmio-ranges = <0x00 0x2e8 0x00 0x08            /* Serial[3] */
+			0x00 0x2f8 0x00 0x08            /* Serial[1] */
+			0x00 0x3e8 0x00 0x08            /* Serial[2] */
+			0x00 0x3f8 0x00 0x08            /* Serial[0] */
+			0x00 0x2000 0x00 0x1000         /* RTC */
+			0x00 0x3000 0x00 0x1000         /* VMWDT */
+			0x00 0x2c000000 0x00 0x2000000          /* PCI BAR */
+			0x00 0x2e000000 0x00 0x1000000>;                /* PCI CAM */
+
+		segments {
+			ramdisk = <2>;
+		};
+
+		vcpus {
+			affinity = "proxy";
+		};
+
+		vdevices {
+			generate = "/hypervisor";
+
+			minidump {
+				vdevice-type = "minidump";
+				push-compatible = "qcom,minidump_rm";
+				minidump_allowed;
+			};
+
+			rm-rpc {
+				vdevice-type = "rm-rpc";
+				generate = "/hypervisor/qcom,resource-mgr";
+				console-dev;
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				qcom,label = <0x1>;
+			};
+
+			mem-buf-message-queue-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/membuf-msgq-pair";
+				message-size = <0x000000f0>;
+				queue-depth = <0x00000008>;
+				peer-default;
+				qcom,label = <0x10c>;
+			};
+
+			qrtr-shm {
+				vdevice-type = "shm-doorbell";
+				generate = "/hypervisor/qrtr-shm";
+				push-compatible = "qcom,qrtr-gunyah-gen";
+				peer-default;
+				memory {
+					qcom,label = <0x108>;
+					#address-cells = <0x2>;
+					base = <0x0 0x64006000>;
+				};
+			};
+
+			test-dbl-oemvm {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/test-dbl-oemvm";
+				qcom,label = <0x105>;
+				peer-default;
+			};
+
+			test-dbl-oemvm-source {
+				vdevice-type = "doorbell-source";
+				generate = "/hypervisor/test-dbl-oemvm-source";
+				qcom,label = <0x105>;
+				peer-default;
+			};
+
+			test-msgq-oemvm {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/test-msgq-oemvm-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				qcom,label = <0x105>;
+				peer-default;
+			};
+
+			msgqsock-msgq-pair {
+				vdevice-type = "message-queue-pair";
+				generate = "/hypervisor/msgqsock-msgq-pair";
+				message-size = <0xf0>;
+				queue-depth = <0x8>;
+				peer = "vm-name:qcom,trustedvm";
+				qcom,label = <0x103>;
+			};
+		};
+	};
+};
+
+&{/} {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+
+	firmware: firmware {
+		qcom_scm: qcom_scm {
+			compatible = "qcom,scm";
+		};
+	};
+
+	soc: soc { };
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+	};
+};
+
+&soc {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges = <0x0 0x0 0x0 0x0 0x0 0xffffffff>;
+	compatible = "simple-bus";
+
+	non_devices_common: non-devices-common {
+		reg = <0x0 0x0 0x0 0x0>;
+		required-subnodes = <&qcom_scm
+				&qcom_mem_buf
+				&virtio_mem_device
+				&qcom_test_dbl_oemvm
+				&qcom_test_msgq_oemvm
+				&qmsgq_gunyah
+				&qcom_qrtr
+				&qrtr_gunyah
+				>;
+	};
+
+	wdog: qcom,wdt@17600000 {
+		compatible = "qcom,msm-watchdog";
+		reg = <0x0 0x17600000 0x0 0x1000>;
+		reg-names = "wdt-base";
+		interrupts = <GIC_SPI 0x3a0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0x3a1 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,bark-time = <11000>;
+		qcom,pet-time = <9360>;
+		qcom,ipi-ping;
+		qcom,wakeup-enable;
+	};
+
+	qcom_test_dbl_oemvm: qcom,test-dbl-oemvm {
+		compatible = "qcom,gh-dbl";
+		qcom,label = <0x105>;
+	};
+
+	qcom_test_msgq_oemvm: qcom,test-msgq-oemvm {
+		compatible = "qcom,gh-msgq-test";
+		gunyah-label = <0x105>;
+		affinity = <0>;
+	};
+
+	qmsgq_gunyah: msgq-gunyah {
+		compatible = "qcom,qmsgq-gh";
+		msgq-label = <0x103>;
+		peer = <2>;
+	};
+
+	gh_qtimer: qcom,gh-qtimer@1781b000 {
+		compatible = "qcom,gh-qtmr";
+		reg = <0x0 0x1781b000 0x0 0x1000>;
+		reg-names = "qtmr-base";
+		interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "qcom,qtmr-intr";
+		qcom,secondary;
+	};
+
+	qcom_qrtr: qcom,qrtr {
+		compatible = "qcom,qrtr";
+		qcom,node-id = <21>;
+	};
+
+	qrtr_gunyah: qrtr-gunyah {
+		compatible = "qcom,qrtr-gunyah";
+		gunyah-label = <0x108>;
+	};
+
+	qcom_mem_buf: qcom,mem-buf {
+		compatible = "qcom,mem-buf";
+		qcom,mem-buf-capabilities = "consumer";
+		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
+		qcom,dmabuf-ipa-size = <0x1 0x00000000>; /* 4GB IPA space for dmabuf */
+		qcom,vmid = <49>;
+	};
+
+	mem_buf_msgq: qcom,mem-buf-msgq {
+		compatible = "qcom,mem-buf-msgq";
+		qcom,msgq-names = "oem_vm";
+	};
+
+	virtio_mem_device: virtio_mem_device {
+		compatible = "qcom,virtio-mem";
+		depends-on-supply = <&mem_buf_msgq>;
+		/* Must be memory_block_size_bytes() aligned */
+		qcom,max-size = <0x0 0x18000000>;
+		qcom,ipa-range = <0x0 0x0 0xf 0xffffffff>;
+		qcom,block-size = <0x400000>;
+		qcom,initial-movable-zone-size = <0x2000000>;
+	};
+
+};
+
+#include "alor-oemvm-rm-info-avf.dtsi"

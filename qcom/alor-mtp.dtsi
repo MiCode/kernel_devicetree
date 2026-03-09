@@ -1,0 +1,172 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include "alor-pmic-overlay.dtsi"
+#include <dt-bindings/clock/qcom,alor-gcc.h>
+#include "alor-thermal-overlay.dtsi"
+
+&qupv3_se4_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "ok";
+	qcom,touch-active = "st,fts";
+
+	st_fts@49 {
+		compatible = "st,fts";
+		reg = <0x49>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <55 0x2008>;
+		vdd-supply = <&L4B>;
+		avdd-supply = <&L14B>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		st,irq-gpio = <&tlmm 55 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 161 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
+
+		st,touch-type = "primary";
+		st,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <538>;
+		qts,trusted-touch-io-bases = <0xA90000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+						&tlmm 51 0 &tlmm 161 0 &tlmm 55 0x2008>;
+	};
+};
+
+&usb0 {
+	usb-role-switch;
+	qcom,wcd_usbss = <&wcd_usbss>;
+
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		compatible = "usb-c-connector";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				usb_port0_connector: endpoint {
+					remote-endpoint = <&usb_port0>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				ucsi_audio_mux: endpoint {
+					remote-endpoint = <&wcd_usbss_mux>;
+				};
+			};
+		};
+	};
+};
+
+&sdhc_2 {
+	vdd-supply = <&L9B>;
+	qcom,vdd-voltage-level = <2950000 2960000>;
+	qcom,vdd-current-level = <33 977000>;
+
+	vdd-io-supply = <&L8B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 5830>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 84 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_SDCC2_BCR>;
+	reset-names = "core_reset";
+
+	status = "ok";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-canoe";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L1I>;
+	vdda-phy-max-microamp = <217500>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L2F>;
+	vdda-pll-max-microamp = <18340>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2I>;
+	vdda-qref-max-microamp = <850>;
+
+	/*
+	 * Refer to Alor's Power Grid Analysis document.
+	 * Add vote for REFGEN_VDD_A_0P9/VDD_A_PCIE_0_0P9 regulator.
+	 */
+	vdda-refgen-supply = <&L2I>;
+	vdda-refgen-max-microamp = <3310>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vcc-supply = <&L17B>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L3F>;
+	vccq-max-microamp = <1200000>;
+
+	qcom,vccq-proxy-vote-supply = <&L3F>;
+	qcom,vccq-proxy-vote-max-microamp = <1200000>;
+
+	/* UFS Rst pin is always on. It is shared with VDD_PX14 */
+	qcom,vddp-ref-clk-supply = <&L1F>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S4F>;
+	qcom,vccq-parent-max-microamp = <8176000>;
+
+	status = "ok";
+};
+
+
+&wcd_usbss {
+	status = "ok";
+	interrupt-parent = <&spmi0_bus>;
+	interrupts = <0x0 0xb6 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "usb_wcd";
+	nvmem-cells = <&usb_mode>;
+	nvmem-cell-names = "usb_mode";
+
+	mode-switch;
+
+	port {
+		wcd_usbss_mux: endpoint {
+			remote-endpoint = <&ucsi_audio_mux>;
+		};
+	};
+};
+

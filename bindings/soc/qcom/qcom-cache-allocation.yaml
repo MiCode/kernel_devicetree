@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom-cache-allocation.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. cache allocation
+
+maintainers:
+  - Minghao Zhang <quic_minghao@quicinc.com>
+
+description:
+  According to cpu/gpu frequency variations in runtime, this driver realizes a
+  algo to dynamically configures cache with different sizes for cpu/gpu. Also,
+  the algo in this driver can start/stop and the thresholds used in the algo
+  can be configured via sysfs nodes.
+
+properties:
+  compatible:
+    enum:
+      - qcom,cache-allocation-canoe
+
+  reg:
+    description: |
+      Address and size of CPUCP shared memory for MPAM monitor data.
+
+  reg-names:
+    $ref: /schemas/types.yaml#/definitions/string
+    items:
+      - const: mon-base
+
+  qcom,cluster-num:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      The quantity of cpu cluster.
+
+  qcom,devfreq:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: |
+      Phandle to the gpu devfreq. This will help get gpu resource.
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - qcom,cluster-num
+  - qcom,devfreq
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,cache-allocation {
+       compatible = "qcom,cache-allocation-canoe";
+       reg = <0x0 0x1d83a400 0x0 0x400>;
+       reg-names = "mon-base";
+       qcom,cluster-num = <2>;
+       qcom,devfreq = <&msm_gpu>;
+    };
