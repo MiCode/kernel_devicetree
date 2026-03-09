@@ -55,3 +55,4 @@
 | bixi-v-oss | Xiaomi MIX Flip 2 | Android V | LA.VENDOR.15.4.0.r1-10100-r1.0.r1_00025.1 |[bixi-v-oss](https://github.com/MiCode/kernel_devicetree/tree/bixi-v-oss) |
 | creek-v-oss | POCO M7 / Redmi 15 | Android V | Divar.LA.3.0.1 MPSS.HA.1.2-00060-KD_ALL_PACK-1 |[creek-v-oss](https://github.com/MiCode/kernel_devicetree/tree/creek-v-oss) |
 | kunzite-v-oss | REDMI Note 15 SE 5G / REDMI Note 15 | Android V | LA.VENDOR.15.4.1.r1-06600-r1.0.r1_00017.0 |[kunzite-v-oss](https://github.com/MiCode/kernel_devicetree/tree/kunzite-v-oss) |
+| popsicle-w-oss | Xiaomi 17 / Xiaomi 17 Pro / Xiaomi 17 Pro Max | Android W | release-w-qcom-sm8850 |[popsicle-w-oss](https://github.com/MiCode/kernel_devicetree/tree/popsicle-w-oss) |
