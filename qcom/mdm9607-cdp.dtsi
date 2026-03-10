@@ -1,0 +1,70 @@
+#include "mdm9607.dtsi"
+#include "mdm9x07-pinctrl.dtsi"
+#include "mdm9607-display.dtsi"
+#include "qpic-panel-ili-hvga.dtsi"
+
+&i2c_4 {
+	status = "ok";
+};
+
+&bluetooth {
+	status = "ok";
+};
+
+&blsp1_uart3 {
+	status = "ok";
+};
+
+&pm8019_mpps {
+
+	/* MPP 2 configs for SMB358 interrupt line */
+	smb_stat {
+		smb_stat_default: smb_stat_default {
+			pins = "mpp2";
+			function = "digital";
+			input-enable;
+			power-source = <3>;
+		};
+	};
+};
+
+&i2c_4 {
+	/* SMB358 charger configuration */
+	smb358_otg_supply: smb358-charger@57 {
+		compatible = "qcom,smb358-charger";
+		regulator-name = "smb358_otg_vreg";
+		reg = <0x57>;
+		interrupt-parent = <&spmi_bus>;
+		interrupts = <0x0 0xa1 0 IRQ_TYPE_LEVEL_HIGH>;        /* PMIC MPP 2 */
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_stat_default>;
+		io-channels = <&pm8019_vadc VADC_VBAT_SNS>,
+			<&pm8019_vadc VADC_LR_MUX2_BAT_ID>;
+		io-channel-names = "vbat_sns",
+				"batt_id_therm";
+		qcom,float-voltage-mv = <4200>;
+		qcom,irq-gpio = <&pm8019_mpps 2 0>;
+		qcom,chg-vadc = <&pm8019_vadc>;
+		qcom,batt-id-vref-uv = <1800000>;
+		qcom,batt-id-rpullup-kohm = <220>;
+	};
+};
+
+&usb_otg {
+	vbus_otg-supply = <&smb358_otg_supply>;
+	extcon = <&smb358_otg_supply>;
+};
+
+&emac0 {
+	status = "ok";
+};
+
+/* Display */
+&mdss_qpic {
+	pinctrl-names= "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_ldo_active &mdss_cs_active &mdss_te_active
+		&mdss_rs_active &mdss_ad_active &mdss_bl_active>;
+	pinctrl-1 = <&mdss_ldo_sleep &mdss_cs_sleep &mdss_te_sleep
+		&mdss_rs_sleep &mdss_ad_sleep &mdss_bl_sleep>;
+	status = "disabled";
+};

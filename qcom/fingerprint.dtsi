@@ -1,0 +1,78 @@
+&soc {
+	fpc1020{
+		compatible = "xiaomi,fpcfingerprint";
+		interrupt-parent = <&tlmm>;
+		interrupt = <17 0x1>;
+		fp-gpio-irq = <&tlmm 17 0x0>;
+		fp-gpio-reset = <&tlmm 18 0x0>;
+		fp_vdd_vreg-supply = <&L21A>;
+		fpc,enable-on-boot;
+		pinctrl-names = "xiaomifp_reset_outputlow",
+				"xiaomifp_reset_outputhigh",
+				"xiaomifp_irq_active";
+		pinctrl-0 = <&msm_gpio_18>;
+		pinctrl-1 = <&msm_gpio_18_output_high>;
+		pinctrl-2 = <&msm_gpio_17>;
+		status = "okay";
+	};
+	goodix_fp {
+		compatible = "xiaomi,goodixfingerprint";
+		interrupt-parent = <&tlmm>;
+		interrupt = <17 0x1>;
+		fp-gpio-irq = <&tlmm 17 0x0>;
+		fp-gpio-reset = <&tlmm 18 0x0>;
+		fp_vdd_vreg-supply = <&L21A>;
+		pinctrl-names = "xiaomifp_reset_outputlow",
+				"xiaomifp_reset_outputhigh",
+				"xiaomifp_irq_active";
+		pinctrl-0 = <&msm_gpio_18>;
+		pinctrl-1 = <&msm_gpio_18_output_high>;
+		pinctrl-2 = <&msm_gpio_17>;
+		status = "okay";
+	};
+	xiaomi_fingerprint {
+		compatible = "xiaomi-fingerprint";
+		status = "ok";
+		fingerprint,name = "xiaomi-fingerprint";
+	};
+};
+&tlmm {
+	/* GPIO_18 : FP_RESET_N, add for fingerprint */
+	msm_gpio_18: msm_gpio_18 {
+		mux {
+			 pins = "gpio18";
+			 function = "gpio";
+		};
+		config {
+			pins = "gpio18";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+	/* GPIO_18 : FP_RESET_N, state device active*/
+	msm_gpio_18_output_high: msm_gpio_18_output_high {
+		mux {
+			pins = "gpio18";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio18";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+	/* GPIO_17 : FP_INT_N */
+	msm_gpio_17: msm_gpio_17 {
+		mux {
+			pins = "gpio17";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio17";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};

@@ -1,0 +1,60 @@
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/misc/qcom,hall-gpio.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. Hall gpio control
+
+maintainers:
+  - Daqing Chen <daqingc@qti.qualcomm.com>
+
+description: |
+  The Hall GPIO enables powering up the Hall sensor VDD and configuring GPIO pull-up
+  and pull-down to control the Hall sensor’s active and sleep states.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,hall-gpio
+
+  pinctrl-names:
+    description: |
+      Pinctrl name set to sleep and active
+
+  pinctrl-0:
+    description: |
+      Set gpio to pinctrl0 sleep state
+
+  pinctrl-1:
+    description: |
+      Set gpio to pinctrl1 active state
+
+
+  vdd-supply:
+    description: |
+      Phandle refers to a regulator that supplies 3.0V power to the Hall sensor
+
+  label:
+    description: |
+      label associated with this hall sensor
+
+
+required:
+  - compatible
+  - pinctrl-names
+  - pinctrl
+  - vdd-supply
+
+additionalProperties: false
+
+examples:
+  - |
+    hall-gpio {
+      compatible = "qcom,hall-gpio";
+      label = "hall_gpio";
+      pinctrl-names = "sleep", "active";
+      pinctrl-0 = <&hall_gpio_sleep>;
+      pinctrl-1 = <&hall_gpio_active>;
+      vdd-supply = <&L14B>;
+      status = "ok";
+    };

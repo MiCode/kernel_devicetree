@@ -1,0 +1,58 @@
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/arm/msm/qcom,gh-panic-notifier.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. Gunyah Panic Notifier Driver
+
+description: |
+  Through the use of a Gunyah doorbell object to notify other VM do error
+  handle when Primary VM panic. This driver is to be enabled on both Primary
+  VM and the other VM who need do error handle.
+
+properties:
+  compatible:
+    const: qcom,gh-panic-notifier
+
+  qcom,primary-vm:
+    description: Specify if this device is on the primary virtual machine.
+
+  peer-name:
+    description: Other vm peer name number.
+
+  gunyah-label:
+    $ref: '/schemas/types.yaml#/definitions/u32'
+    maxItems: 1
+    description: The label qrtr should request interrupts with this label from
+                 the gunyah doorbell driver.
+
+  memory-region:
+    maxItems: 1
+    description: handle to memory reservation for shared memory region between
+                 PVM and other VM.
+
+  shared-buffer-size:
+    description: The size of shared memory which alloc from CMA.
+
+required:
+  -compatible
+  -gunyah-label
+
+examples:
+  - |
+    vm_comm_mem: vm_comm_mem_region {
+        compatible = "shared-dma-pool";
+        alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+        reusable;
+        alignment = <0x0 0x400000>;
+        size = <0x0 0x400000>;
+    };
+
+    qcom,gunyah-panic-notifier {
+        compatible = "qcom,gh-panic-notifier";
+        qcom,primary-vm;
+        peer-name = <2>;
+        gunyah-label = <9>;
+        memory-region = <&vm_comm_mem>;
+        shared-buffer-size = <0x1000>;
+    };

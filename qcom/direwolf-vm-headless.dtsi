@@ -1,0 +1,60 @@
+#include "quin-vm-common.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Direwolf Virtual Machine";
+	qcom,msm-name = "SA_DIREWOLF_IVI";
+	qcom,msm-id = <460 0x10000>;
+
+};
+
+&soc {
+	qtee_shmbridge {
+		compatible = "qcom,tee-shared-memory-bridge";
+		/*Boolean property to disable shmbridge*/
+		qcom,disable-shmbridge-support;
+	};
+
+	qcom_qseecom: qseecom@c1800000 {
+		compatible = "qcom,qseecom";
+		reg = <0xc1800000 0x3900000>;
+		reg-names = "secapp-region";
+		memory-region = <&qseecom_mem>;
+		qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		qcom,disk-encrypt-pipe-pair = <2>;
+		qcom,no-clock-support;
+		qcom,commonlib-loaded-by-hostvm;
+		qcom,qsee-reentrancy-support = <2>;
+	};
+
+	qcom_rng_ee3: qrng@10d3000 {
+		compatible = "qcom,msm-rng";
+		reg = <0x10d3000 0x1000>;
+		qcom,no-qrng-config;
+		clocks = <&dummycc RPMH_HWKM_CLK>;
+		clock-names = "km_clk_src";
+	};
+};
+
+&firmware {
+	scm {
+		compatible = "qcom,scm";
+	};
+};
+
+&spmi_bus {
+	status = "disabled";
+};
+
+&regulator {
+	status = "disabled";
+};
+
+&gcc {
+	status = "disabled";
+};
+
+&scc {
+	status = "disabled";
+};

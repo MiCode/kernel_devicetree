@@ -1,0 +1,39 @@
+Qualcomm Technologies, Inc. GPU dump skip cooling device
+
+The GPU dump skip cooling device, will be used to set WR_THERMAL_FLAG
+region in SDAM which is used by PMIC to disable GFX in SDI path, when
+SDI path reset is caused during high temperature. It also sets a SOC
+cookie in sys dbg imem region which is used to skip GPU scan dump
+collection in SDI path, when SDI path reset is triggered during high
+temperature.
+
+Required Parameters:
+- compatible:
+	Usage: required
+	Value type: <string>
+	Definition: should be "qcom,gpu-dump-skip-cdev"
+
+- nvmem-cells:
+	Usage: required
+	Definition: Phandle of the nvmem cell for the PMIC register region which
+		stores the PMIC WR thermal flag.
+
+- nvmem-cell-names:
+    enum:
+		- wr_thermal_flag
+		- alarm_log
+
+- #cooling-cells:
+	Usage: required
+	Value type: <integer>
+	Definition: Must be 2. This is required by of-thermal and refer the doc
+		<devicetree/bindings/thermal/thermal.txt> for more details.
+
+Example:
+
+	gpu_dump_skip_cdev: qcom,gpu-dump-skip-cdev {
+		compatible = "qcom,gpu-dump-skip-cdev";
+		nvmem-cells = <&wr_thermal_flag>;
+		nvmem-cell-names = "wr_thermal_flag";
+		#cooling-cells = <2>;
+	};

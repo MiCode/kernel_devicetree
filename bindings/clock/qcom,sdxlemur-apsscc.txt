@@ -1,0 +1,56 @@
+Qualcomm Technologies, Inc. SDXLEMUR CPU clock driver
+-----------------------------------------------------
+
+It is the clock controller driver which provides higher frequency
+clocks and allows CPU frequency scaling on qcs405 based platforms.
+
+Required properties:
+- compatible:	Shall contain following:
+		"qcom,sdxlemur-apsscc"
+		"qcom,sdxnightjar-apsscc"
+		"qcom,qcs404-apsscc"
+		"qcom,sdx55-apsscc"
+		"qcom,sdxpoorwills-apsscc"
+		"qcom,mdm9607-apsscc"
+
+- clocks:	Phandle to the clock device.
+- clock-names:	Names of the used clocks. Shall contain following:
+		"xo_ao", "gpll0_ao"
+- reg:	Shall contain base register offset and size.
+- reg-names:	Names of the bases for the above registers. Shall contain following:
+		"apcs_cmd", "apcs_pll"
+- vdd-pll-supply:	The regulator(active only) powering the Analog logic of APSS PLL.
+- cpu-vdd-supply:	The regulator(active only) powering the APSS RCG.
+- qcom,speedX-bin-vZ:	A table of CPU frequency (Hz) to regulator voltage (uV) mapping.
+			Format: <freq uV>
+			This represents the max frequency possible for each possible
+			power configuration for a CPU that's binned as speed bin X,
+			speed bin revision Z. Version can be between [0-3].
+- #clock-cells:	Shall contain 1.
+
+Optional properties:
+- reg-names:	"efuse"
+
+Example:
+	apsscc: clock-controller@0b010008 {
+		compatible = "qcom,mdm9607-apsscc";
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+			<&gcc GPLL0>;
+		clock-names = "bi_tcxo_ao", "gpll0_out_even";
+		reg = <0xb010008 0x8>,
+			<0xb008018 0x28>,
+			<0x000a412c 0x8>;
+		reg-names = "apcs_cmd" , "apcs_pll", "efuse";
+		vdd-pll-supply = <&mdm9607_s3_level_ao>;
+		cpu-vdd-supply = <&apc_vreg_corner>;
+		qcom,speed4-bin-v0 =
+			<          0 0>,
+			<  400000000 1>,
+			<  800000000 2>,
+			<  998400000 3>,
+			< 1094400000 4>,
+			< 1190400000 5>,
+			< 1248000000 6>,
+			< 1305600000 7>;
+		#clock-cells = <1>;
+	};

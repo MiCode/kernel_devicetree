@@ -1,0 +1,29 @@
+#include "neo-idp.dtsi"
+
+&soc {
+};
+
+&pm8150_vadc {
+	pm8150_wlan_therm {
+		reg = <ADC5_AMUX_THM2_100K_PU>;
+		label = "pm8150_wlan_temp";
+		qcom,hw-settle-time = <200>;
+		qcom,ratiometric;
+		qcom,pre-scaling = <1 1>;
+	};
+};
+
+&pm8150_adc_tm {
+	pm8150_wlan_therm {
+		reg=<1>;
+		io-channels = <&pm8150_vadc ADC5_AMUX_THM2_100K_PU>;
+		qcom,hw-settle-time-us = <200>;
+		qcom,ratiometric;
+	};
+};
+
+&thermal_zones {
+	sys-therm-1 {
+		thermal-sensors = <&pm8150_adc_tm 1>;
+	};
+};

@@ -1,0 +1,120 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,usb-m31-eusb2-phy.yaml##
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. eUSB2 M31 USB HSPHY
+
+maintainers:
+  - Ronak Vijay Raheja <quic_rraheja@quicinc.com>
+
+properties:
+  compatible:
+    const: qcom,usb-m31-eusb2-phy
+
+  reg:
+    description: |
+      Address and length of the register set for the device. Required regs are::
+       - eusb2_phy_base:: the base register for the PHY
+       - eud_detect_reg:: VIOCTL_EUD_DETECT register.
+      Optional regs are::
+       - eud_enable_reg:: register address to read eud enable/disable status.
+    minItems: 2
+
+  reg-names:
+    minItems: 2
+    items:
+      - const: eusb2_phy_base
+      - const: eud_detect_reg
+      - const: eud_enable_reg
+
+  vdd-supply:
+    description: phandle to the Vdd supply for HSPHY digital circuit operation
+
+  vdda12-supply:
+    description: phandle to the 1.2V supply for HSPHY digital circuit operation
+
+  clocks:
+    minItems: 2
+    items:
+      - description: RPMH_CXO_PAD_CLK clk
+      - description: TCSR_USB2_CLKREF_EN clk
+
+  clock-names:
+    minItems: 2
+    items:
+      - const: ref_clk_src # required
+      - const: ref_clk # required
+
+  qcom,vdd-voltage-level:
+    description: |
+      This property must be a list of three integer values (no, min, max) where
+      each value represents either a voltage in microvolts or a value
+      corresponding to voltage corner.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  resets:
+    description: |
+      Reset specifier pair consists of phandle for the reset controller and
+      reset lines used by this controller.
+
+  reset-names:
+    description: |
+      reset signal name strings sorted in the same order as the resets
+      property.
+
+  usb-repeater:
+    description: |
+      phandle to eUSB2 repeater which is used with eUSB2 HSPHY for USB
+      functionality.
+
+  qcom,param-override-seq:
+    description: parameter override sequence with value, reg offset pair
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  dummy-supply:
+    description: |
+      phandle to eUSB2 repeater for enforcing probe ordering for eUSB2 repeater
+      and eUSB2 PHY driver.
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - vdd-supply
+  - vdda12-supply
+  - clocks
+  - clock-names
+  - qcom,vdd-voltage-level
+  - resets
+  - reset-names
+  - usb-repeater
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    #include <dt-bindings/clock/qcom,gcc-sun.h>
+    #include <dt-bindings/clock/qcom,tcsrcc-sun.h>
+
+    eusb2_phy: hsphy@88e3000 {
+      compatible = "qcom,usb-m31-eusb2-phy";
+      reg = <0x88e3000 0x154>,
+            <0xc278000 0x4>;
+      reg-names = "eusb2_phy_base", "eud_detect_reg";
+
+      vdd-supply = <&pm_v8_l1>;
+      vdda12-supply = <&pm_v8_l3>;
+      qcom,vdd-voltage-level = <0 880000 880000>;
+
+      clocks = <&rpmhcc RPMH_CXO_PAD_CLK>,
+               <&tcsrcc TCSR_USB2_CLKREF_EN>;
+      clock-names = "ref_clk_src", "ref_clk";
+
+      resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+      reset-names = "phy_reset";
+
+      usb-repeater= <&pm8550b_eusb2_repeater>;
+    };
+...

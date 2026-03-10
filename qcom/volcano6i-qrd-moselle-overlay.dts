@@ -1,0 +1,26 @@
+/dts-v1/;
+/plugin/;
+
+#include "volcano6i-qrd-moselle.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Volcano6I QRD +  WCD9378 AMIC + Amoled (SPI) + Moselle";
+	compatible = "qcom,volcano-qrd", "qcom,volcano", "qcom,volcanop-qrd", "qcom,volcanop", "qcom,qrd";
+	qcom,board-id = <11 1>;
+	qcom,msm-id = <0X4000291 0x10000>, <0x4000292 0x10000>, <0x8000291 0x10000>, <0x8000292 0x10000>, <0xc000291 0x10000>, <0xc000292 0x10000>, <0x10000291 0x10000>, <0x10000292 0x10000>;
+};
+
+&pmiv0104_eusb2_repeater {
+	status = "ok";
+	vdd18-supply = <&L7B>;
+	vdd3-supply = <&L17B>;
+
+	qcom,param-override-seq =
+		<0xb 0x51
+		0x6 0x57>;
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pmiv0104_eusb2_repeater>;
+	usb-repeater = <&pmiv0104_eusb2_repeater>;
+};

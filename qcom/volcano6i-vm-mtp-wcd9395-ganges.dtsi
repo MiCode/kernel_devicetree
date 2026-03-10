@@ -1,0 +1,32 @@
+#include "volcano-vm-mtp-wcd9395-aatc.dtsi"
+
+&qupv3_se0_spi {
+	status = "disabled";
+};
+
+&qupv3_se0_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "ok";
+	qcom,i2c-touch-active = "focaltech,fts_ts";
+
+	focaltech@38 {
+		compatible = "focaltech,fts_ts";
+		reg = <0x38>;
+
+		focaltech,display-coords = <0 0 1080 2408>;
+		focaltech,max-touch-number = <10>;
+		focaltech,ic-type = <0x8726081C>;
+		focaltech,touch-type = "primary";
+		focaltech,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "tvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <598>;
+		qts,trusted-touch-io-bases = <0xa80000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 0 0 &tlmm 1 0 &tlmm 2 0
+						&tlmm 3 0 &tlmm 20 0 &tlmm 19 0x2008>;
+	};
+};

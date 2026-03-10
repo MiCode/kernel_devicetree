@@ -1,0 +1,102 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/usb/qcom,snps-hs-usb-femto.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Synopsis Femto High-Speed Phy
+
+maintainers:
+  - Wesley Cheng <quic_wcheng@quicinc.com>
+
+properties:
+  compatible:
+    items:
+      - enum:
+          - qcom,usb-hsphy-snps-femto
+  reg:
+    description: Address and length of the registers set for the phy.
+    minItems: 1
+    maxItems: 2
+
+  reg-names:
+    minItems: 1
+    items:
+      - const: hsusb_phy_base
+      - const: eud_enable_reg
+
+  vdd-supply:
+    description: vdd supply for HSPHY digital circuit operation
+
+  vdd18-supply:
+    description: 1.8 V for HSPHY.
+
+  vdd33-supply:
+    description: 3.3 V for HSPHY
+
+  qcom,vdd-voltage-level:
+    description: Voltage level of the vdd supply.
+                 This is set to min value to vote from usb.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  clocks:
+    description: |
+      A list of phandles to the phy clocks::
+      - ref_clk_src:: Reference clk source required for enumeration.
+      - ref_clk:: Reference clk required for enumeration.
+    minItems: 1
+    maxItems: 3
+
+  clock-names:
+    minItems: 1
+    items:
+      - const: ref_clk_src
+      - const: ref_clk
+
+  resets:
+    maxItems: 1
+
+  reset-names:
+    items:
+      - const: phy_reset
+
+  qcom,param-override-seq:
+    description: Required if override x0/1/2 need to be changed.
+    $ref: /schemas/types.yaml#/definitions/uint32-matrix
+    items:
+      items:
+        -
+          description: address
+        -
+          description: value
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmcc.h>
+    #include <dt-bindings/clock/qcom,gcc-blair.h>
+
+    usb2_phy0: hsphy@162b000 {
+          compatible = "qcom,usb-hsphy-snps-femto";
+          reg = <0x162B000 0x114>,
+                <0x0162A000 0x1000>;
+          reg-names = "hsusb_phy_base",
+                      "eud_enable_reg";
+
+          vdd-supply = <&L7A>;
+          vdda18-supply = <&L10A>;
+          vdda33-supply = <&L7E>;
+          qcom,vdd-voltage-level = <0 880000 880000>;
+
+          clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+          <&gcc GCC_USB3_PRIM_CLKREF_CLK>;
+          clock-names = "ref_clk_src", "ref_clk";
+
+          resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+          reset-names = "phy_reset";
+          qcom,param-override-seq =
+                     <0xa6 0x6c	/* override_x0 */
+                      0x85 0x70	/* override_x1 */
+                      0x16 0x74>;	/* override x2 */
+    };
+

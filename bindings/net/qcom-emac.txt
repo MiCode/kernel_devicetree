@@ -1,0 +1,218 @@
+Qualcomm Technologies EMAC Gigabit Ethernet Controller
+
+This network controller consists of two devices: a MAC and an SGMII
+internal PHY.  Each device is represented by a device tree node.  A phandle
+connects the MAC node to its corresponding internal phy node.  Another
+phandle points to the external PHY node.
+
+Required properties:
+
+MAC node:
+- compatible : Should be "qcom,mdm9607-emac" for mdm9607 based EMAC driver
+	Should be "qcom,emac" for other targets based EMAC driver
+- reg : Offset and length of the register regions for the device
+- reg-names : Register region names referenced in 'reg' above.
+	Required register resource entries are:
+	"emac"	: EMAC controller register block.
+	"emac_csr"	: EMAC wrapper register block.
+	Optional register resource entries are:
+	"emac_1588"	: EMAC 1588 (PTP) register block.
+			Required if 'qcom,emac-tstamp-en' is present.
+- interrupts : Interrupt number used by this controller
+- interrupt-names : Interrupt resource names referenced in 'interrupts' above.
+	Required interrupt resource entries are:
+	"emac_core0_irq" : EMAC core0 interrupt.
+	"emac_core1_irq" : EMAC core1 interrupt.
+	"emac_core2_irq" : EMAC core2 interrupt.
+	"emac_core3_irq" : EMAC core3 interrupt.
+	Optional interrupt resource entries are:
+	"emac_wol_irq"	: EMAC Wake-On-LAN (WOL) interrupt.
+			Required if WOL is supported.
+- phy-mode: String, operation mode of the PHY interface. See ethernet.txt in the
+		same directory.
+- internal-phy : phandle to the internal PHY node
+- phy-handle : phandle the external PHY node
+
+Internal PHY node:
+- compatible : Should be "qcom,mdm9607-emac-sgmii" for mdm9607.
+		Should be "qcom,qdf2432-emac-sgmii" for QDF2432
+		Should be "qcom,fsm9900-emac-sgmii" for FSM9900
+- reg : Offset and length of the register region(s) for the device
+- reg-names : Register region names referenced in 'reg' above.
+	"emac_sgmii" : EMAC SGMII PHY register block.
+		Required if 'phy-mode' is "sgmii".
+- interrupts : Interrupt number used by this controller
+- interrupt-names : Interrupt resource names referenced in 'interrupts' above.
+	"emac_sgmii_irq" : EMAC SGMII interrupt.
+		Required if 'phy-mode' is "sgmii".
+
+The external phy child node:
+- reg : The phy address
+
+Optional properties:
+
+MAC node:
+- compatible : Should be "qcom,fsm9900-emac".
+- reg : Offset and length of the register regions for the device
+- interrupts : Interrupt number used by this controller
+- mac-address : The 6-byte MAC address. If present, it is the default
+	MAC address.
+- internal-phy : phandle to the internal PHY node
+- phy-handle : phandle the the external PHY node
+
+Internal PHY node:
+- compatible : Should be "qcom,fsm9900-emac-sgmii" or "qcom,qdf2432-emac-sgmii".
+- reg : Offset and length of the register region(s) for the device
+- interrupts : Interrupt number used by this controller
+
+The external phy child node:
+- reg : The phy address
+
+Example:
+
+FSM9900:
+
+soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	emac0: ethernet@feb20000 {
+		compatible = "qcom,fsm9900-emac";
+		reg = <0xfeb20000 0x10000>,
+		      <0xfeb36000 0x1000>;
+		interrupts = <76>;
+
+		clocks = <&gcc 0>, <&gcc 1>, <&gcc 3>, <&gcc 4>, <&gcc 5>,
+			<&gcc 6>, <&gcc 7>;
+		clock-names = "axi_clk", "cfg_ahb_clk", "high_speed_clk",
+			"mdio_clk", "tx_clk", "rx_clk", "sys_clk";
+
+		internal-phy = <&emac_sgmii>;
+
+		phy-handle = <&phy0>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+		phy0: ethernet-phy@0 {
+			reg = <0>;
+		};
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&mdio_pins_a>;
+	};
+
+	emac_sgmii: ethernet@feb38000 {
+		compatible = "qcom,fsm9900-emac-sgmii";
+		reg = <0xfeb38000 0x1000>;
+		interrupts = <80>;
+	};
+
+	tlmm: pinctrl@fd510000 {
+		compatible = "qcom,fsm9900-pinctrl";
+
+		mdio_pins_a: mdio {
+			state {
+				pins = "gpio123", "gpio124";
+				function = "mdio";
+			};
+		};
+	};
+
+
+QDF2432:
+
+soc {
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	emac0: ethernet@38800000 {
+		compatible = "qcom,fsm9900-emac";
+		reg = <0x0 0x38800000 0x0 0x10000>,
+		      <0x0 0x38816000 0x0 0x1000>;
+		interrupts = <0 256 4>;
+
+		clocks = <&gcc 0>, <&gcc 1>, <&gcc 3>, <&gcc 4>, <&gcc 5>,
+			 <&gcc 6>, <&gcc 7>;
+		clock-names = "axi_clk", "cfg_ahb_clk", "high_speed_clk",
+			"mdio_clk", "tx_clk", "rx_clk", "sys_clk";
+
+		internal-phy = <&emac_sgmii>;
+
+		phy-handle = <&phy0>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+		phy0: ethernet-phy@4 {
+			reg = <4>;
+		};
+	};
+
+	emac_sgmii: ethernet@410400 {
+		compatible = "qcom,qdf2432-emac-sgmii";
+		reg = <0x0 0x00410400 0x0 0xc00>, /* Base address */
+		      <0x0 0x00410000 0x0 0x400>; /* Per-lane digital */
+		interrupts = <0 254 1>;
+	};
+
+
+MDM9607:
+
+	emac0: qcom,emac@7c40000 {
+		compatible = "qcom,mdm9607-emac";
+		reg-names = "emac", "emac_csr", "emac_1588";
+		reg = <0x7c40000 0x10000>,
+		<0x7c56000 0x1000>,
+		<0x7c5c000 0x4000>;
+
+		#address-cells = <0>;
+		interrupt-parent = <&emac0>;
+		#interrupt-cells = <1>;
+		interrupts = <0 1>;
+		interrupt-map-mask = <0xffffffff>;
+		interrupt-map = <0 &intc GIC_SPI 76 IRQ_TYPE_LEVEL_HIGH
+		1 &tlmm 30 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-names = "emac_core0_irq", "emac_wol_irq";
+
+		emac_vreg1-supply = <&mdm9607_l1>;
+		emac_vreg2-supply = <&mdm9607_l3>;
+		emac_vreg3-supply = <&mdm9607_l5>;
+		emac_vreg4-supply = <&mdm9607_l11>;
+		emac_vreg5-supply = <&emac_lan_vreg>;
+		qcom,vdd-voltage-level = <1250000 1800000 2850000 1800000 0>;
+		clocks = <&gcc GCC_EMAC_0_AXI_CLK>,
+			<&gcc GCC_EMAC_0_AHB_CLK>,
+			<&gcc GCC_EMAC_0_125M_CLK>,
+			<&gcc GCC_EMAC_0_SYS_25M_CLK>,
+			<&gcc GCC_EMAC_0_TX_CLK>,
+			<&gcc GCC_EMAC_0_RX_CLK>,
+			<&gcc GCC_EMAC_0_SYS_CLK>;
+		clock-names = "axi_clk", "cfg_ahb_clk", "high_speed_clk",
+			"mdio_clk", "tx_clk", "rx_clk", "sys_clk";
+		internal-phy = <&emac_sgmii>;
+		phy-handle = <&phy0>;
+		phy-mode = "sgmii";
+
+		pinctrl-names = "emac_mdio_clk_active", "emac_mdio_clk_sleep",
+			"emac_mdio_data_active", "emac_mdio_data_sleep",
+			"emac_ephy_active", "emac_ephy_sleep";
+		pinctrl-0 = <&emac0_mdio_clk_active>;
+		pinctrl-1 = <&emac0_mdio_clk_sleep>;
+		pinctrl-2 = <&emac0_mdio_data_active>;
+		pinctrl-3 = <&emac0_mdio_data_sleep>;
+		pinctrl-4 = <&emac0_ephy_active>;
+		pinctrl-5 = <&emac0_ephy_sleep>;
+		qcom,emac-tstamp-en;
+		qcom,emac-ptp-frac-ns-adj = <125000000 1>;
+		status = "ok";
+
+		phy0: ethernet-phy@0 {
+			reg = <0>;
+		};
+	};
+
+	emac_sgmii: ethernet@7c58000 {
+		compatible = "qcom,mdm9607-emac-sgmii";
+		reg-names = "emac_sgmii";
+		reg = <0x7c58000 0x400>;
+		interrupt-names = "emac_sgmii_irq";
+		};

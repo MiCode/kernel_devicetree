@@ -1,0 +1,58 @@
+GENI based Qualcomm Universal Peripheral (QUP) Qualcomm Host-Client 2-Way Transport (Q2SPI)
+
+Description: The QUPv3 controller allows Q2SPI protocol communication in single,
+or quad wire transmission modes for read/write access to Q2SPI slave.
+
+The QUP v3 core is a GENI based AHB slave that provides a common data path
+(an output FIFO and an input FIFO for Qualcomm xSPI) Host-Client 2-way Transport (Q2SPI)
+mini-core.
+
+Q2SPI in master mode supports up to 100MHz, up to four chip selects, programmable
+data path from 4 bits to 32 bits and numerous protocol variants.
+
+Required properties:
+- compatible:			Must contain "qcom,q2spi-msm-geni".
+- reg:					Must contain Q2SPI register location and length.
+- #address-cells:		Must be <1> to define a chip select address on
+						the Q2SPI bus.
+- #size-cells:			Must be <0>.
+- interrupts:			Must contain Q2SPI controller interrupts.
+- clock-names:			Must contain "se".
+- clocks:				Serial engine core clock needed by the device.
+- interconnects:		Phandles to the	interconnect paths.
+- interconnect-names:	List of interconnect path name strings,
+						property should contain "qup-core", "qup-config", "qup-memory"
+- pinctrl-names:		Property should contain "default" and "sleep" for the
+						pin configurations during the usecase and during idle.
+- pinctrl-x:			phandle to the default/sleep pin configurations.
+- q2spi-max-frequency: 	Specifies maximum SPI clock frequency, Units - Hz.
+
+Q2SPI Controller nodes must be child of GENI based Qualcomm Universal
+Peripharal. Please refer GENI based QUP wrapper controller node bindings
+described in Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.yaml.
+Please refer GSI DMA properties described in bindings/dma/qcom_gpi.txt
+
+Example:
+	q2spi0: q2spi@a84000 {
+		compatible = "qcom,q2spi-msm-geni";
+		reg = <0xa84000 0x4000>;
+		reg-names = "se_phys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 587 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "se-clk";
+		clocks = <&gcc GCC_QUPV3_WRAP2_S5_CLK>;
+		interconnects =
+		<&clk_virt MASTER_QUP_CORE_2 &clk_virt SLAVE_QUP_CORE_2>,
+		<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_2>,
+		<&aggre2_noc MASTER_QUP_2 &mc_virt  SLAVE_EBI1>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&qupv3_se13_q2spi_mosi_active>, <&qupv3_se13_q2spi_miso_active>
+					<&qupv3_se13_q2spi_clk_active>, <&qupv3_se13_q2spi_doorbell_active>;
+		pinctrl-1 = <&qupv3_se13_q2spi_sleep>, <&qupv3_se13_q2spi_miso_sleep>;
+		dmas = <&gpi_dma2 0 5 14 64 0>,
+				<&gpi_dma2 1 5 14 64 0>;
+		dma-names = "tx", "rx";
+		q2spi-max-frequency = <10000000>;
+		status = "ok";
+	};

@@ -1,0 +1,38 @@
+%YAML 1.2
+---
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: The Document describes the device tree binding for devfreq vdd cooling device
+
+The Devfreq Vdd cooling device, will be used to set minimum
+operating level for gfx rail using gpu devfreq interface
+during cold thermal condition. This cooling device will be
+used with cold temp monitor thermal zone. Whenever cold
+temperature triggers, it disables frequencies lower than
+the minimum operating level using devfreq opp API's.
+
+Required Parameters:
+- compatible:
+	Usage: required
+	Value type: <string>
+	Definition: should be "qcom,devfreq-vdd-cooling-device"
+
+- devfreq:
+	Usage: required
+	Value type: <devfreq phandle>
+	Definition: Phandle to the GPU devfreq. This will register the GPU
+		devfreq as a cooling device with thermal framework.
+
+- #cooling-cells:
+	Usage: required
+	Value type: <integer>
+	Definition: Must be 2. This is required by of-thermal and refer the doc
+		<devicetree/bindings/thermal/thermal.txt> for more details.
+
+Example:
+
+	devfreq_vdd_cdev: devfreq-vdd-cdev {
+		compatible = "qcom,devfreq-vdd-cooling-device";
+		devfreq = <&msm_gpu>;
+		#cooling-cells = <2>;
+	};

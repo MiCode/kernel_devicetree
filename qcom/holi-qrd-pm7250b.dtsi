@@ -1,0 +1,480 @@
+#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include "holi-pm7250b.dtsi"
+#include "charger/lc_charger_sysfs.dtsi"
+#include "charger/xm_smart_chg.dtsi"
+
+&soc {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "qg-batterydata-XM30-COS-6310mAh.dtsi"
+		#include "qg-batterydata-XM30-NVT-6310mAh.dtsi"
+		#include "qg-batterydata-XM81-SWD-6000mAh.dtsi"
+	};
+
+	usbpd_pm: usbpd_pm {
+		compatible = "xiaomi,usbpd-pm";
+		status = "ok";
+		#io-channel-cells = <1>;
+		io-channels = <&pm7250b_charger PSY_IIO_PD_ACTIVE>,
+					<&pm7250b_charger PSY_IIO_INPUT_SUSPEND>,
+					<&pm7250b_charger PSY_IIO_SW_CHARGING_ENABLED>,
+					<&pm7250b_charger PSY_IIO_APDO_VOLT>,
+					<&pm7250b_charger PSY_IIO_APDO_CURR>,
+					<&sc853x_standalone PSY_IIO_SC_PRESENT>,
+					<&sc853x_standalone PSY_IIO_SC_CHARGING_ENABLED>,
+					<&sc853x_standalone PSY_IIO_SC_BUS_VOLTAGE>,
+					<&sc853x_standalone PSY_IIO_SC_BUS_CURRENT>,
+					<&sc853x_standalone PSY_IIO_SC_ADC_CONTROL>,
+					<&sc853x_standalone PSY_IIO_SC_STATUS>,
+					<&bq25960_standalone PSY_IIO_SC_PRESENT>,
+					<&bq25960_standalone PSY_IIO_SC_CHARGING_ENABLED>,
+					<&bq25960_standalone PSY_IIO_SC_BUS_VOLTAGE>,
+					<&bq25960_standalone PSY_IIO_SC_BUS_CURRENT>,
+					<&bq25960_standalone PSY_IIO_SC_ADC_CONTROL>,
+					<&bq25960_standalone PSY_IIO_SC_STATUS>;
+		io-channel-names = "pd_active",
+					"input_suspend",
+					"sw_charging_enabled",
+					"apdo_volt",
+					"apdo_curr",
+					"sc_present",
+					"sc_charging_enabled",
+					"sc_bus_voltage",
+					"sc_bus_current",
+					"sc_adc_control",
+					"sc_status",
+					"bq_present",
+					"bq_charging_enabled",
+					"bq_bus_voltage",
+					"bq_bus_current",
+					"bq_adc_control",
+					"bq_status";
+	};
+	cp_qc30 {
+		compatible = "xiaomi,cp-qc30";
+		status = "ok";
+		mi,qc3-bat-volt-max = <4650>;
+		mi,qc3-ffc-bat-volt-max = <4650>;
+		mi,qc3-bat-curr-max = <5400>;
+		mi,qc3-bus-volt-max = <12000>;
+		mi,qc3-bus-curr-max = <2100>;
+		#io-channel-cells = <1>;
+		io-channels = <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>,
+			<&pm7250b_charger PSY_IIO_HVDCP3_TYPE>,
+			<&pm7250b_charger PSY_IIO_CP_INPUT_SUSPEND>,
+			<&pm7250b_charger PSY_IIO_SW_CHARGING_ENABLED>,
+			<&pm7250b_charger PSY_IIO_DP_DM>,
+			<&pm7250b_charger PSY_IIO_BATTERY_CHARGING_LIMITED>,
+			<&sc853x_standalone PSY_IIO_SC_PRESENT>,
+			<&sc853x_standalone PSY_IIO_SC_CHARGING_ENABLED>,
+			<&sc853x_standalone PSY_IIO_SC_BUS_VOLTAGE>,
+			<&sc853x_standalone PSY_IIO_SC_BUS_CURRENT>,
+			<&sc853x_standalone PSY_IIO_SC_ADC_CONTROL>,
+			<&bq25960_standalone PSY_IIO_SC_PRESENT>,
+			<&bq25960_standalone PSY_IIO_SC_CHARGING_ENABLED>,
+			<&bq25960_standalone PSY_IIO_SC_BUS_VOLTAGE>,
+			<&bq25960_standalone PSY_IIO_SC_BUS_CURRENT>,
+			<&bq25960_standalone PSY_IIO_SC_ADC_CONTROL>;
+		io-channel-names = "real_type",
+			"hvdcp3_type",
+			"cp_input_suspend",
+			"sw_charging_enabled",
+			"battery_dp_dm",
+			"battery_charging_limited",
+			"sc_present",
+			"sc_charging_enabled",
+			"sc_bus_voltage",
+			"sc_bus_current",
+			"sc_adc_control",
+			"bq_present",
+			"bq_charging_enabled",
+			"bq_bus_voltage",
+			"bq_bus_current",
+			"bq_adc_control";
+	};
+};
+
+&pm7250b_charger {
+	status = "ok";
+	dep-supply = <&pm7250b_vadc>;
+	#io-channel-cells = <1>;
+	io-channels = <&pm7250b_vadc ADC5_VBAT_SNS>,
+                <&pm7250b_vadc ADC5_USB_IN_V_16>,
+                <&pm7250b_vadc ADC5_USB_IN_I>,
+                <&pm7250b_vadc ADC5_CHG_TEMP>,
+                <&pm7250b_vadc ADC5_DIE_TEMP>,
+                <&pm7250b_vadc ADC5_AMUX_THM3_100K_PU>,
+                <&pm7250b_vadc ADC5_SBUx>,
+                <&pm7250b_vadc ADC5_VPH_PWR>,
+                <&pm7250b_vadc ADC5_AMUX_THM1_100K_PU>,
+                <&pm7250b_vadc ADC5_AMUX_THM2_100K_PU>,
+                <&pm7250b_qg PSY_IIO_RESISTANCE_ID>,
+                <&pm7250b_qg PSY_IIO_VOLTAGE_NOW>,
+                <&pm7250b_qg PSY_IIO_TEMP>,
+                <&pm7250b_qg PSY_IIO_CAPACITY>,
+                <&pm7250b_qg PSY_IIO_VOLTAGE_OCV>,
+                <&pm7250b_qg PSY_IIO_VOLTAGE_AVG>,
+                <&pm7250b_qg PSY_IIO_DEBUG_BATTERY>,
+                <&pm7250b_qg PSY_IIO_REAL_CAPACITY>,
+                <&pm7250b_qg PSY_IIO_CC_SOC>,
+                <&pm7250b_qg PSY_IIO_CURRENT_NOW>,
+                <&pm7250b_qg PSY_IIO_VOLTAGE_MAX>,
+                <&pm7250b_qg PSY_IIO_CHARGE_FULL>,
+                <&pm7250b_qg PSY_IIO_CHARGE_COUNTER>,
+                <&pm7250b_qg PSY_IIO_CYCLE_COUNT>,
+                <&pm7250b_qg PSY_IIO_CHARGE_FULL_DESIGN>,
+                <&pm7250b_qg PSY_IIO_TIME_TO_FULL_NOW>,
+                <&pm7250b_qg PSY_IIO_FASTCHARGE_MODE>,
+                <&pm7250b_qg PSY_IIO_FFC_CHG_TERMINATION_CURRENT>,
+                <&pm7250b_qg PSY_IIO_BATT_FULL_CURRENT>,
+		<&pm7250b_qg PSY_IIO_FG1_DF_CHECK>,
+		<&pm7250b_qg PSY_IIO_FG1_CHEMID>,
+		<&pm7250b_qg PSY_IIO_PACK_VENDOR>,
+                <&smb1394_div2_cp_primary PSY_IIO_PARALLEL_MODE>,
+                <&smb1394_div2_cp_primary PSY_IIO_PARALLEL_OUTPUT_MODE>,
+                <&smb1394_div2_cp_primary PSY_IIO_MIN_ICL>,
+                <&smb1394_div2_cp_primary PSY_IIO_CP_SWITCHER_EN>,
+                <&smb1394_div2_cp_primary PSY_IIO_CP_ENABLE>,
+                <&smb1394_div2_cp_primary PSY_IIO_CP_ILIM>,
+                <&smb1394_div2_cp_primary PSY_IIO_CP_DIE_TEMP>,
+                <&sc853x_standalone PSY_IIO_SC_OTG_CONTROL>,
+                <&sc853x_standalone PSY_IIO_SC_ADC_CONTROL>,
+                <&sc853x_standalone PSY_IIO_SC_OVP_GATE_CONTROL>,
+                <&bq25960_standalone PSY_IIO_SC_OTG_CONTROL>,
+                <&bq25960_standalone PSY_IIO_SC_ADC_CONTROL>,
+                <&bq25960_standalone PSY_IIO_SC_OVP_GATE_CONTROL>,
+                <&pm7250b_qg PSY_IIO_SOC_DECIMAL>,
+                <&pm7250b_qg PSY_IIO_SOC_DECIMAL_RATE>,
+                <&pm7250b_qg PSY_IIO_SHUTDOWN_DELAY>,
+                <&lc_chg_sysfs PSY_IIO_LC_TEST>,
+                <&lc_chg_sysfs PSY_IIO_SHIP_MODE>,
+				<&lc_chg_sysfs PSY_IIO_LC_CID_STA>,
+                <&lc_chg_sysfs PSY_IIO_SHIPMODE_COUNT_RESET>;
+	io-channel-names = "pmic_vbat",
+                "usb_in_voltage",
+                "usb_in_current",
+                "chg_temp",
+                "die_temp",
+                "conn_temp",
+                "sbux_res",
+                "vph_voltage",
+                "skin_temp",
+                "smb1390_temp",
+                "resistance_id",
+                "voltage_now",
+                "temp",
+                "capacity",
+                "voltage_ocv",
+                "voltage_avg",
+                "debug_battery",
+                "real_capacity",
+                "cc_soc",
+                "current_now",
+                "voltage_max",
+                "charge_full",
+                "charge_counter",
+                "cycle_count",
+                "charge_full_design",
+                "time_to_full_now",
+                "fastcharge_mode",
+                "ffc_chg_termination_current",
+                "batt_full_current",
+		"fg1_df_check",
+		"fg1_chemid",
+		"pack_vendor",
+                "cp_parallel_mode",
+                "cp_parallel_output_mode",
+                "cp_min_icl",
+                "cp_switcher_en",
+                "cp_enable",
+                "cp_ilim",
+                "cp_die_temp",
+                "sc_otg_control",
+                "sc_adc_control",
+                "sc_ovp_gate_control",
+                "bq_otg_control",
+                "bq_adc_control",
+                "bq_ovp_gate_control",
+                "soc_decimal",
+                "soc_decimal_rate",
+                "shutdown_delay",
+                "lc_test",
+                "set_ship_mode",
+				"cid_status",
+                "shipmode_count_reset";
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,sec-charger-config = <0>;
+	qcom,auto-recharge-soc = <98>;
+	qcom,step-charging-enable;
+	qcom,sw-jeita-enable;
+	qcom,lpd_enable;
+	mi,use_third_cp;
+	mi,support-ffc;
+	qcom,distinguish-qc-class-ab;
+	qcom,charger-temp-max = <800>;
+	qcom,smb-temp-max = <800>;
+	qcom,suspend-input-on-debug-batt;
+	qcom,fcc-stepping-enable;
+	qcom,fcc-step-delay-ms = <100>;
+	qcom,fcc-step-size-ua = <100000>;
+	qcom,chg-term-current-ma = <(-480)>;
+	qcom,fcc-max-ua = <6000000>;
+	qcom,fv-max-uv = <4780000>;
+	qcom,chg-inhibit-threshold-mv = <300>;
+	qcom,disable-suspend-on-collapse;
+	qcom,smb-internal-pull-kohm = <0>;
+	qcom,en-skin-therm-mitigation;
+	qcom,thermal-mitigation = <5950000 5400000 5000000 4500000 4000000
+				3700000 3300000 3000000 2800000 2600000 2400000 1500000
+				1000000 800000 500000 400000 400000 400000 400000
+				400000>;
+};
+
+&pm7250b_qg {
+	status = "ok";
+	#io-channel-cells = <1>;
+	io-channels = <&pm7250b_vadc ADC5_BAT_THERM_100K_PU>,
+                <&pm7250b_vadc ADC5_BAT_ID_100K_PU>,
+                <&pm7250b_charger PSY_IIO_INPUT_CURRENT_LIMITED>,
+                <&pm7250b_charger PSY_IIO_RECHARGE_SOC>,
+                <&pm7250b_charger PSY_IIO_FORCE_RECHARGE>,
+                <&pm7250b_charger PSY_IIO_CHARGE_DONE>,
+                <&smb1394_div2_cp_primary PSY_IIO_CP_ENABLE>,
+                <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>,
+                <&pm7250b_charger PSY_IIO_DISABLE_OTG>,
+                <&pm7250b_charger PSY_IIO_CONN_TEMP>,
+                <&pm7250b_charger PSY_IIO_SMB1390_TEMP>;
+	io-channel-names = "batt-therm",
+                "batt-id",
+                "input_current_limited",
+                "recharge_soc",
+                "force_recharge",
+                "charge_done",
+                "cp_charging_enabled",
+                "real_type",
+                "disable_otg",
+                "conn_temp",
+                "smb1390_temp";
+	qcom,qg-iterm-ma = <350>;
+	qcom,hold-soc-while-full;
+	qcom,linearize-soc;
+	qcom,cl-feedback-on;
+	qcom,tcss-enable;
+	qcom,fvss-enable;
+	qcom,fvss-vbatt-mv = <3300>;
+	qcom,bass-enable;
+	qcom,use-cp-iin-sns;
+	qcom,qg-ext-sns;
+	qcom,shutdown-delay-enable;
+};
+
+&pm7250b_charger {
+	dpdm-supply = <&qusb2_phy0>;
+
+	smb5_vbus: qcom,smb5-vbus {
+		regulator-name = "smb5-vbus";
+	};
+
+	smb5_vconn: qcom,smb5-vconn {
+		regulator-name = "smb5-vconn";
+	};
+};
+
+&pm7250b_pdphy {
+	vdd-pdphy-supply = <&L7E>;
+	vbus-supply = <&smb5_vbus>;
+	vconn-supply = <&smb5_vconn>;
+	mi,pd_curr_limit = <1>;
+	mi,pd_max_curr_limit = <4000000>;
+	mi,limit_pd_unverified_pps_vbus = <1>;
+	mi,pd_unverified_pps_max_vbus_limit = <9500000>;
+
+	#io-channel-cells = <1>;
+	io-channels = <&pm7250b_charger PSY_IIO_PD_ACTIVE>,
+                <&pm7250b_charger PSY_IIO_TYPEC_CC_ORIENTATION>,
+                <&pm7250b_charger PSY_IIO_CONNECTOR_TYPE>,
+                <&pm7250b_charger PSY_IIO_TYPEC_POWER_ROLE>,
+                <&pm7250b_charger PSY_IIO_PD_USB_SUSPEND_SUPPORTED>,
+                <&pm7250b_charger PSY_IIO_TYPEC_SRC_RP>,
+                <&pm7250b_charger PSY_IIO_PD_IN_HARD_RESET>,
+                <&pm7250b_charger PSY_IIO_PD_CURRENT_MAX>,
+                <&pm7250b_charger PSY_IIO_PR_SWAP>,
+                <&pm7250b_charger PSY_IIO_PD_VOLTAGE_MIN>,
+                <&pm7250b_charger PSY_IIO_PD_VOLTAGE_MAX>,
+                <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>,
+                <&pm7250b_charger PSY_IIO_TYPEC_MODE>,
+                <&pm7250b_charger PSY_IIO_PE_START>,
+                <&pm7250b_charger PSY_IIO_REVERSE_QUICK_CHARGE_EVENT>,
+                <&pm7250b_charger PSY_IIO_REVERSE_QUICK_CHARGE>,
+                <&lc_chg_sysfs PSY_IIO_LC_CID_STA>,
+                <&pm7250b_charger PSY_IIO_LIMIT_IBUS>,
+                <&pm7250b_charger PSY_IIO_DECREASE_VOLT>;
+	io-channel-names = "pd_active",
+                "typec_cc_orientation",
+                "connector_type",
+                "typec_power_role",
+                "pd_usb_suspend_supported",
+                "typec_src_rp",
+                "pd_in_hard_reset",
+                "pr_current_max",
+                "pr_swap",
+                "pd_voltage_min",
+                "pd_voltage_max",
+                "real_type",
+                "typec_mode",
+                "pe_start",
+                "reverse_quick_charge_event",
+                "reverse_quick_charge",
+                "cid_status",
+                "pd_ibus_limit",
+                "decrease_volt";
+};
+
+&pm7250b_gpios {
+	smb_stat {
+		smb_stat_default: smb_stat_default {
+			pins = "gpio6";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			qcom,pull-up-strength = <PMIC_GPIO_PULL_UP_30>;
+			power-source = <0>;
+		};
+	};
+        vbus_ctrl {
+		vbus_ctrl_default: vbus_ctrl_default {
+			pins = "gpio5";
+			function = "normal";
+			output-low;
+			bias-pull-up;
+			qcom,pull-up-strength = <PMIC_GPIO_PULL_UP_30>;
+			qcom,drive-strength = <PMIC_GPIO_STRENGTH_HIGH>;
+			power-source = <0>;
+		};
+	};
+};
+
+&qupv3_se10_i2c {
+	status = "ok";
+	#include "smb1394.dtsi"
+};
+
+&qupv3_se8_i2c {
+	status = "ok";
+	#include "charger/sc853x_charger.dtsi"
+	#include "charger/bq25960_charger.dtsi"
+	#include "charger/fg_bq28z610.dtsi"
+};
+
+&qupv3_se8_i2c {
+	status = "ok";
+	audio_switch: audio_switch@42 {
+		compatible = "qcom,fsa4480-i2c";
+		reg = <0x42>;
+		qcom,use-power-supply = <1>;
+		#io-channel-cells = <1>;
+		io-channels = <&pm7250b_charger PSY_IIO_TYPEC_ACCESSORY_MODE>;
+		io-channel-names = "typec_mode";
+	};
+};
+
+&smb1394 {
+	interrupts = <0x2 0xc5 0x0 IRQ_TYPE_LEVEL_LOW>;
+	interrupt-parent = <&spmi_bus>;
+	interrupt-names = "smb1394";
+	pinctrl-names = "default";
+	qcom,enable-toggle-stat;
+	pinctrl-0 = <&smb_stat_default>;
+	status = "disabled";
+};
+
+&smb1394_div2_cp_primary {
+	io-channels = <&pm7250b_vadc ADC5_AMUX_THM2>,
+                <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>,
+                <&pm7250b_charger PSY_IIO_ADAPTER_CC_MODE>,
+                 <&pm7250b_charger PSY_IIO_PD_CURRENT_MAX>,
+                <&pm7250b_charger PSY_IIO_USB_INPUT_CURRENT_SETTLED>,
+                <&pm7250b_charger PSY_IIO_SMB_EN_MODE>,
+                <&pm7250b_charger PSY_IIO_SMB_EN_REASON>;
+	io-channel-names = "die_temp",
+                "real_type",
+                "adapter_cc_mode",
+                "pd_current_max",
+                "input_current_settled",
+                "smb_en_mode",
+                "smb_en_reason";
+	qcom,parallel-input-mode = <1>; /* USBIN */
+	qcom,parallel-output-mode = <2>; /* VBAT */
+	status = "disabled";
+};
+
+&usb0 {
+	extcon = <&pm7250b_pdphy>, <&pm7250b_charger>, <&eud>;
+	#io-channel-cells = <1>;
+	io-channels= <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>;
+	io-channel-names = "chg_type";
+
+	dwc3@4e00000 {
+		dr_mode = "otg";
+	};
+
+};
+
+&lc_chg_sysfs {
+	io-channels = <&pm7250b_charger PSY_IIO_TYPEC_CC_ORIENTATION>,
+                <&pm7250b_charger PSY_IIO_QUICK_CHARGE_TYPE>,
+                <&pm7250b_charger PSY_IIO_SET_SHIP_MODE>,
+                <&pm7250b_qg PSY_IIO_SOC_DECIMAL>,
+                <&pm7250b_qg PSY_IIO_SOC_DECIMAL_RATE>,
+                <&pm7250b_qg PSY_IIO_SHUTDOWN_DELAY>,
+                <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>,
+                <&pm7250b_charger PSY_IIO_INPUT_SUSPEND>,
+                <&pm7250b_charger PSY_IIO_MTBF_CURRENT>,
+                <&pm7250b_charger PSY_IIO_APDO_VOLT>,
+                <&pm7250b_charger PSY_IIO_APDO_CURR>,
+                <&sc853x_standalone PSY_IIO_SC_CHIP_VENDOR>,
+                <&bq25960_standalone PSY_IIO_SC_CHIP_VENDOR>,
+                <&pm7250b_charger PSY_IIO_TYPEC_MODE>,
+                <&pm7250b_charger PSY_IIO_TYPEC_POWER_ROLE>,
+                <&pm7250b_charger PSY_IIO_FORCE_SOURCE>,
+                <&pm7250b_charger PSY_IIO_PD_ACTIVE>,
+                <&pm7250b_charger PSY_IIO_LPD_CONTROL>,
+                <&pm7250b_charger PSY_IIO_LPD_CHARGING>;
+	io-channel-names = "typec_cc_orientation",
+                "quick_charge_type",
+                "set_ship_mode",
+                "soc_decimal",
+                "soc_decimal_rate",
+                "shutdown_delay",
+                "usb_real_type",
+                "input_suspend",
+                "mtbf_current",
+                "apdo_volt",
+                "apdo_curr",
+                "sc_manufacturer",
+                "bq_manufacturer",
+                "typec_mode",
+                "typec_power_role",
+                "force_source",
+                "pd_active",
+                "lpd_control",
+                "lpd_charging";
+};
+
+&xm_smart_chg {
+        io-channels = <&pm7250b_qg PSY_IIO_CAPACITY>,
+                <&pm7250b_charger PSY_IIO_PD_ACTIVE>,
+                <&pm7250b_qg PSY_IIO_CAPACITY_RAW>,
+                <&lc_chg_sysfs PSY_IIO_LC_SCREEN_STA>,
+                <&pm7250b_charger PSY_IIO_USB_REAL_TYPE>,
+		<&sc853x_standalone PSY_IIO_SC_CHARGING_ENABLED>,
+		<&bq25960_standalone PSY_IIO_SC_CHARGING_ENABLED>;
+        io-channel-names = "capacity",
+                "pd_active",
+                "capacity_raw",
+                "lc_screen_status",
+                "usb_real_type",
+                "sc_charging_enabled",
+                "bq_charging_enabled";
+};
