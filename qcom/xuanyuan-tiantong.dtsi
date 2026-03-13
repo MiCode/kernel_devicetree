@@ -1,0 +1,473 @@
+#include <dt-bindings/clock/qcom,gcc-sun.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/interconnect/qcom,sun.h>
+#include <dt-bindings/gpio/gpio.h>
+
+&aliases {
+    hsuart5 = "/soc/qcom,qupv3_1_geni_se@ac0000/qcom,qup_uart@a98000";
+};
+
+&tlmm {
+    qupv3_se6_4uart_pins: qupv3_se6_4uart_pins {
+        qupv3_se6_default_cts: qupv3_se6_default_cts {
+            mux {
+                pins = "gpio56";
+                function = "gpio";
+            };
+
+            config {
+                pins = "gpio56";
+                drive-strength = <2>;
+                bias-disable;
+            };
+        };
+
+        qupv3_se6_default_rts: qupv3_se6_default_rts {
+            mux {
+                pins = "gpio57";
+                function = "gpio";
+            };
+
+            config {
+                pins = "gpio57";
+                drive-strength = <2>;
+                bias-pull-down;
+            };
+        };
+
+        qupv3_se6_default_tx: qupv3_se6_default_tx {
+            mux {
+                pins = "gpio58";
+                function = "gpio";
+            };
+
+            config {
+                pins = "gpio58";
+                drive-strength = <2>;
+                bias-pull-up;
+            };
+        };
+
+        qupv3_se6_default_rx: qupv3_se6_default_rx {
+            mux {
+                pins = "gpio59";
+                function = "gpio";
+            };
+
+            config {
+                pins = "gpio59";
+                drive-strength = <2>;
+                bias-pull-down;
+            };
+        };
+
+        qupv3_se6_cts: qupv3_se6_cts {
+            mux {
+                pins = "gpio56";
+                function = "qup1_se6_l0";
+            };
+
+            config {
+                pins = "gpio56";
+                drive-strength = <2>;
+                bias-disable;
+            };
+        };
+
+        qupv3_se6_rts: qupv3_se6_rts {
+            mux {
+                pins = "gpio57";
+                function = "qup1_se6_l1";
+            };
+
+            config {
+                pins = "gpio57";
+                drive-strength = <2>;
+                bias-pull-down;
+            };
+        };
+
+        qupv3_se6_tx: qupv3_se6_tx {
+            mux {
+                pins = "gpio58";
+                function = "qup1_se6_l2";
+            };
+
+            config {
+                pins = "gpio58";
+                drive-strength = <2>;
+                bias-pull-up;
+            };
+        };
+
+        qupv3_se6_rx_active: qupv3_se6_rx_active {
+            mux {
+                pins = "gpio59";
+                function = "qup1_se6_l3";
+            };
+
+            config {
+                pins = "gpio59";
+                drive-strength = <2>;
+                bias-disable;
+            };
+        };
+
+        /* RX to be in gpio mode for sleep config */
+        qupv3_se6_rx_wake: qupv3_se6_rx_wake {
+            mux {
+                pins = "gpio59";
+                function = "gpio";
+            };
+
+            config {
+                pins = "gpio59";
+                drive-strength = <2>;
+                bias-disable;
+            };
+        };
+    };
+
+    satellite_msc06a_ap_sleep_bp_ctl: satellite_msc06a_ap_sleep_bp_ctl {
+        mux {
+            pins = "gpio112";
+            function = "gpio";
+        };
+
+        config {
+            pins = "gpio112";
+            drive-strength = <2>;
+            bias-disable;
+            output-low;
+        };
+    };
+
+    satellite_msc06a_rst_ctl: satellite_msc06a_rst_ctl {
+        mux {
+            pins = "gpio73";
+            function = "gpio";
+        };
+
+        config {
+            pins = "gpio73";
+            drive-strength = <2>;
+            bias-disable;
+            output-enable;
+        };
+    };
+
+    satellite_msc06a_rf_ctl: satellite_msc06a_rf_ctl {
+        mux {
+            pins = "gpio77", "gpio212";
+            function = "gpio";
+        };
+
+        config {
+            pins = "gpio77", "gpio212";
+            drive-strength = <2>;
+            bias-disable;
+            output-enable;
+        };
+    };
+
+    satellite_msc06a_sim_ctl: satellite_msc06a_sim_ctl {
+        mux {
+            pins = "gpio20", "gpio22";
+            function = "gpio";
+        };
+
+        config {
+            pins = "gpio20", "gpio22";
+            drive-strength = <2>;
+            bias-pull-down;
+            output-enable;
+        };
+    };
+
+    satellite_msc06a_qc_ctl: satellite_msc06a_qc_ctl {
+        mux {
+            pins = "gpio21";
+            function = "gpio";
+        };
+
+        config {
+            pins = "gpio21";
+            drive-strength = <2>;
+            bias-disable;
+            output-enable;
+            output-high;
+        };
+    };
+};
+
+&qupv3_1 {
+    qupv3_se6_4uart: qcom,qup_uart@a98000 {
+        compatible = "qcom,msm-geni-serial-hs";
+        reg = <0xa98000 0x4000>;
+        reg-names = "se_phys";
+        interrupts-extended = <&intc GIC_SPI 363 IRQ_TYPE_LEVEL_HIGH>,
+                <&tlmm 59 IRQ_TYPE_LEVEL_HIGH>;
+        clock-names = "se-clk";
+        clocks = <&gcc GCC_QUPV3_WRAP1_S6_CLK>;
+        interconnect-names = "qup-core", "qup-config", "qup-memory";
+        interconnects =
+        <&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
+        <&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_1>,
+        <&aggre1_noc MASTER_QUP_1 &mc_virt  SLAVE_EBI1>;
+        pinctrl-names = "default", "active", "sleep", "shutdown";
+        pinctrl-0 = <&qupv3_se6_default_cts>, <&qupv3_se6_default_rts>,
+        <&qupv3_se6_default_tx>, <&qupv3_se6_default_rx>;
+        pinctrl-1 = <&qupv3_se6_cts>, <&qupv3_se6_rts>,
+        <&qupv3_se6_tx>, <&qupv3_se6_rx_active>;
+        pinctrl-2 = <&qupv3_se6_cts>, <&qupv3_se6_rts>,
+        <&qupv3_se6_tx>, <&qupv3_se6_rx_wake>;
+        pinctrl-3 = <&qupv3_se6_default_cts>, <&qupv3_se6_default_rts>,
+        <&qupv3_se6_default_tx>, <&qupv3_se6_default_rx>;
+        qcom,auto-suspend-disable;
+        status = "ok";
+    };
+};
+
+&tlmm {
+    pmic_enable_active: pmic_enable_active {
+        mux {
+            pins = "gpio128";
+            function = "gpio";
+        };
+        config {
+            pins = "gpio128";
+            bias-disable;
+            drive-strength = <2>;
+            output-high;
+        };
+    };
+    pmic_enable_suspend: pmic_enable_suspend {
+        mux {
+            pins = "gpio128";
+            function = "gpio";
+        };
+        config {
+            pins = "gpio128";
+            bias-pull-down;
+            drive-strength = <2>;
+            output-low;
+        };
+    };
+    pmic_irq_active: pmic_irq_active {
+        mux {
+            pins = "gpio200";
+            function = "gpio";
+        };
+        config {
+            pins = "gpio200";
+            bias-pull-down;
+            drive-strength = <2>;
+            input-enable;
+        };
+    };
+};
+
+&qupv3_hub_i2c9 {
+    status = "ok";
+    et5907mv_pm:etek,ldo@35 {
+        compatible = "etek,et5907mv";
+        reg = <0x35>;/*slave address*/
+        index = <0>;
+        pinctrl-names = "et5907mv_enable", "et5907mv_disable";
+        pinctrl-0 = <&pmic_enable_active>, <&pmic_irq_active>;
+        pinctrl-1 = <&pmic_enable_suspend>;
+        et5907mv_msc06a_l1:etek,et5907mv@0{
+            offset = /bits/ 16 <0x0000>;
+            regulator-name ="et5907mv-msc06a-l1";
+            regulator-min-microvolt = <800000>;
+            regulator-max-microvolt = <1800000>;
+            min-dropout-voltage = <80000>;
+            init-voltage = <1200000>;
+            iout_ua = <1200000>;
+        };
+        et5907mv_msc06a_l2:etek,et5907mv@1{
+            offset = /bits/ 16 <0x0001>;
+            regulator-name ="et5907mv-msc06a-l2";
+            regulator-min-microvolt = <800000>;
+            regulator-max-microvolt = <1800000>;
+            min-dropout-voltage = <80000>;
+            init-voltage = <1200000>;
+            iout_ua = <1200000>;
+        };
+        et5907mv_msc06a_l3:etek,et5907mv@2{
+            offset = /bits/ 16 <0x0002>;
+            regulator-name ="et5907mv-msc06a-l3";
+            regulator-min-microvolt = <1500000>;
+            regulator-max-microvolt = <3750000>;
+            min-dropout-voltage = <85000>;
+            init-voltage = <3400000>;
+            iout_ua = <400000>;
+        };
+        et5907mv_msc06a_l4:etek,et5907mv@3{
+            offset = /bits/ 16 <0x0003>;
+            regulator-name ="et5907mv-msc06a-l4";
+            regulator-min-microvolt = <1500000>;
+            regulator-max-microvolt = <3750000>;
+            min-dropout-voltage = <85000>;
+            init-voltage = <1800000>;
+            iout_ua = <400000>;
+        };
+        et5907mv_msc06a_l5:etek,et5907mv@4{
+            offset = /bits/ 16 <0x0004>;
+            regulator-name ="et5907mv-msc06a-l5";
+            regulator-min-microvolt = <1500000>;
+            regulator-max-microvolt = <3750000>;
+            min-dropout-voltage = <85000>;
+            init-voltage = <1800000>;
+            iout_ua = <400000>;
+        };
+        et5907mv_msc06a_l6:etek,et5907mv@5{
+            offset = /bits/ 16 <0x0005>;
+            regulator-name ="et5907mv-msc06a-l6";
+            regulator-min-microvolt = <1500000>;
+            regulator-max-microvolt = <3750000>;
+            min-dropout-voltage = <85000>;
+            init-voltage = <1800000>;
+            iout_ua = <400000>;
+        };
+        et5907mv_msc06a_l7:etek,et5907mv@6{
+            offset = /bits/ 16 <0x0006>;
+            regulator-name ="et5907mv-msc06a-l7";
+            regulator-min-microvolt = <1500000>;
+            regulator-max-microvolt = <3750000>;
+            min-dropout-voltage = <85000>;
+            init-voltage = <2800000>;
+            iout_ua = <400000>;
+        };
+    };
+    hl7603_pm:halo,ldo@77 {
+        compatible = "halo,hl7603-msc06a";
+        reg = <0x77>;/*slave address*/
+        index = <0>;
+        pinctrl-names = "hl7603_enable", "hl7603_disable";
+        pinctrl-0 = <&pmic_enable_active>, <&pmic_irq_active>;
+        pinctrl-1 = <&pmic_enable_suspend>;
+        hl7603_msc06a_l1:etek,hl7603@0{
+            offset = /bits/ 16 <0x0006>;
+            regulator-name ="hl7603-msc06a-l1";
+            regulator-min-microvolt = <2850000>;
+            regulator-max-microvolt = <5500000>;
+            min-dropout-voltage = <50000>;
+            init-voltage = <4500000>;
+            iout_ua = <400000>;
+        };
+    };
+};
+
+
+&pm8550_gpios {
+    pm8550_gpio11_dig_out {
+        pm8550_gpio11_dig_out_default: pm8550_gpio11_dig_out_default {
+            pins = "gpio11";
+            function = "normal";
+            power-source = <1>; /* 1.8v */
+            output-low;
+            input-disable;
+            bias-pull-down;
+        };
+    };
+};
+
+&pmih010x_gpios {
+    pmih010x_gpio3_dig_out {
+        pmih010x_gpio3_dig_out_default: pmih010x_gpio3_dig_out_default {
+            pins = "gpio3";
+            function = "normal";
+            power-source = <2>; /* 1.2v */
+            output-high;
+            input-disable;
+            bias-disable;
+        };
+    };
+    pmih010x_gpio5_dig_out {
+        pmih010x_gpio5_dig_out_default: pmih010x_gpio5_dig_out_default {
+            pins = "gpio5";
+            function = "normal";
+            power-source = <1>; /* 1.8v */
+            output-low;
+            input-disable;
+            bias-disable;
+        };
+    };
+    pmih010x_gpio7_dig_out {
+        pmih010x_gpio7_dig_out_default: pmih010x_gpio7_dig_out_default {
+            pins = "gpio7";
+            function = "normal";
+            power-source = <1>; /* 1.8v */
+            output-low;
+            input-disable;
+            bias-disable;
+        };
+    };
+    pmih010x_gpio8_dig_out {
+        pmih010x_gpio8_dig_out_default: pmih010x_gpio8_dig_out_default {
+            pins = "gpio8";
+            function = "normal";
+            power-source = <1>; /* 1.8v */
+            output-low;
+            input-disable;
+            bias-pull-down;
+        };
+    };
+    pmih010x_gpio14_dig_out {
+        pmih010x_gpio14_dig_out_default: pmih010x_gpio14_dig_out_default {
+            pins = "gpio14";
+            function = "normal";
+            power-source = <0>; /* 1.8v */
+            output-low;
+            input-disable;
+            bias-pull-down;
+        };
+    };
+};
+
+&soc {
+    tiantong_mdm {
+        compatible = "mdm,gpio-tiantong-msc06a";
+        interrupt-parent = <&tlmm>;
+        interrupts = <28 0x0>;
+        debounce-time = <30>;
+        ttvddsw1p2_vdd-supply   = <&et5907mv_msc06a_l1>;
+        ttvdd1p2_vdd-supply     = <&et5907mv_msc06a_l2>;
+        ttbbic3p4_vdd-supply    = <&et5907mv_msc06a_l3>;
+        ttvddsim1p8_vdd-supply  = <&et5907mv_msc06a_l4>;
+        ttvddiosw1p8_vdd-supply = <&et5907mv_msc06a_l5>;
+        ttavdd1p8_vdd-supply    = <&et5907mv_msc06a_l6>;
+        ttlna2p8_vdd-supply     = <&et5907mv_msc06a_l7>;
+        ttlna4p5_vdd-supply     = <&hl7603_msc06a_l1>;
+        gpio-boot-mode0         = <&pmih010x_gpios 5 GPIO_ACTIVE_LOW>;
+        gpio-boot-mode1         = <&pmih010x_gpios 7 GPIO_ACTIVE_LOW>;
+        gpio-ap-sleep-bp        = <&tlmm 112 0x0>;
+        gpio-bp-sleep-ap        = <&tlmm 28 0x0>;
+        gpio-rst                = <&tlmm 73 0x0>;
+        gpio-sim1-en            = <&pmih010x_gpios 8 GPIO_ACTIVE_LOW>;
+        gpio-sim2-en            = <&pmih010x_gpios 14 GPIO_ACTIVE_LOW>;
+        gpio-sim1-vdd-qc-en     = <&pmih010x_gpios 3 GPIO_ACTIVE_LOW>;
+        gpio-sim1-vdd-tt-en     = <&tlmm 20 0x0>;
+        gpio-sim2-vdd-qc-en     = <&tlmm 21 0x0>;
+        gpio-sim2-vdd-tt-en     = <&tlmm 22 0x0>;
+        gpio-pa-boost-en        = <&tlmm 109 0x0>;
+        gpio-tt-1p8-en          = <&pm8550_gpios 11 GPIO_ACTIVE_LOW>;
+        gpio-sp4t-en            = <&tlmm 212 0x0>;
+        gpio-pmic-en            = <&tlmm 128 0x0>;
+        gpio-pmic-irq           = <&tlmm 200 0x0>;
+        gpio-gps-ant            = <&tlmm 77 0x0>;
+        pinctrl-names           = "default";
+        pinctrl-0   = <&satellite_msc06a_ap_sleep_bp_ctl>,
+                <&satellite_msc06a_rst_ctl>,
+                <&satellite_msc06a_rf_ctl>,
+                <&satellite_msc06a_sim_ctl>,
+                <&satellite_msc06a_qc_ctl>,
+                <&pm8550_gpio11_dig_out_default>,
+                <&pmih010x_gpio3_dig_out_default>,
+                <&pmih010x_gpio5_dig_out_default>,
+                <&pmih010x_gpio7_dig_out_default>,
+                <&pmih010x_gpio8_dig_out_default>,
+                <&pmih010x_gpio14_dig_out_default>;
+    };
+};

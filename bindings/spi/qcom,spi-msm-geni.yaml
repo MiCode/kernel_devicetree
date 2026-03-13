@@ -1,0 +1,111 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/spi/qcom,spi-msm-geni.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies Inc GENI based Serial Peripheral Interface (SPI)
+
+maintainers:
+  - Mukesh Kumar Savaliya <quic_msavaliy@quicinc.com>
+
+description:
+   GENI based Qualcomm Technologies Inc Universal Peripheral version 5 (QUPv3)
+   Serial Peripheral Interface (SPI)
+   The QUP v3 core is a GENI based AHB slave that provides a common data path
+   (an output FIFO and an input FIFO) for serial peripheral interface (SPI) mini-core.
+
+   SPI in master mode supports up to 50MHz, up to four chip selects, programmable
+   data path from 4 bits to 32 bits and numerous protocol variants.
+
+allOf:
+  - $ref: /schemas/spi/spi-controller.yaml#
+
+properties:
+  compatible:
+    const: qcom,spi-geni
+
+  clocks:
+    maxItems: 1
+
+  clock-names:
+    const: se-clk
+
+  pinctrl-0: true
+  pinctrl-1: true
+
+  pinctrl-names:
+    minItems: 1
+    items:
+      - const: default
+      - const: sleep
+
+  dmas:
+    maxItems: 2
+
+  dma-names:
+    items:
+      - const: tx
+      - const: rx
+
+  interconnects:
+    minItems: 2
+    maxItems: 3
+
+  interconnect-names:
+    minItems: 2
+    items:
+      - const: qup-core
+      - const: qup-config
+      - const: qup-memory
+
+  interrupts:
+    maxItems: 1
+
+  reg:
+    maxItems: 1
+
+  reg-names:
+    maxItems: 1
+
+  spi-max-frequency:
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+  - interrupts
+  - pinctrl-names
+  - spi-max-frequency
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,gcc-sun.h>
+    #include <dt-bindings/interconnect/qcom,sun.h>
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+    qupv3_se0_spi: spi@a80000 {
+	compatible = "qcom,spi-geni";
+	reg = <0xa80000 0x4000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	reg-names = "se_phys";
+	interrupts = <GIC_SPI 353 IRQ_TYPE_LEVEL_HIGH>;
+	clock-names = "se-clk";
+	clocks = <&gcc GCC_QUPV3_WRAP1_S0_CLK>;
+	interconnect-names = "qup-core", "qup-config", "qup-memory";
+	interconnects = <&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
+                        <&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_QUP_1>,
+                        <&aggre1_noc MASTER_QUP_1 &mc_virt  SLAVE_EBI1>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&qupv3_se0_spi_mosi_active>, <&qupv3_se0_spi_miso_active>,
+		        <&qupv3_se0_spi_clk_active>, <&qupv3_se0_spi_cs_active>;
+	pinctrl-1 = <&qupv3_se0_spi_sleep>;
+	dmas = <&gpi_dma1 0 0 1 64 0>,
+		<&gpi_dma1 1 0 1 64 0>;
+	dma-names = "tx", "rx";
+	spi-max-frequency = <50000000>;
+    };
+...
