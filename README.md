@@ -57,3 +57,4 @@
 | kunzite-v-oss | REDMI Note 15 SE 5G / REDMI Note 15 | Android V | LA.VENDOR.15.4.1.r1-06600-r1.0.r1_00017.0 |[kunzite-v-oss](https://github.com/MiCode/kernel_devicetree/tree/kunzite-v-oss) |
 | popsicle-w-oss | Xiaomi 17 / Xiaomi 17 Pro / Xiaomi 17 Pro Max | Android W | release-w-qcom-sm8850 |[popsicle-w-oss](https://github.com/MiCode/kernel_devicetree/tree/popsicle-w-oss) |
 | spring-v-oss | Redmi 15 5G / Redmi Note 15R / POCO M7 Plus 5G | Android V | LA.VENDOR.14.3.1.r1-03700-MANNAR.QSSI15.0-1.107589.1.111280.1 |[spring-v-oss](https://github.com/MiCode/kernel_devicetree/tree/spring-v-oss) |
+| annibale-w-oss | REDMI K90 / POCO F8 Pro | Android W | LA.VENDOR.15.4.0.r1-15000-r1.0.r1_00044.1 |[annibale-w-oss](https://github.com/MiCode/kernel_devicetree/tree/annibale-w-oss) |
