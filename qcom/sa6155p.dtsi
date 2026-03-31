@@ -1,0 +1,412 @@
+#include "sm6150.dtsi"
+#include "sa6155-pmic.dtsi"
+#include "sa6155-pcie.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. SA6155P";
+	qcom,msm-name = "SA6155P";
+	qcom,msm-id = <377 0>, <380 0>;
+};
+
+&soc {
+	/* PWR_CTR2_VDD_1P8 supply */
+	vreg_conn_1p8: vreg_conn_1p8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_conn_1p8";
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&pm6155_1_gpios 1 0>;
+	};
+
+	/* PWR_CTR1_VDD_PA supply */
+	vreg_conn_pa: vreg_conn_pa {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_conn_pa";
+		startup-delay-us = <4000>;
+		enable-active-high;
+		gpio = <&pm6155_1_gpios 6 0>;
+	};
+
+	hsi2s: qcom,hsi2s@1b40000 {
+		compatible = "qcom,sa6155-hsi2s", "qcom,hsi2s";
+		number-of-interfaces = <2>;
+		reg = <0x1b40000 0x28000>;
+		reg-names = "lpa_if";
+		interrupts = <GIC_SPI 267 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&gcc GCC_SDR_CORE_CLK>,
+			 <&gcc GCC_SDR_WR0_MEM_CLK>,
+			 <&gcc GCC_SDR_WR1_MEM_CLK>,
+			 <&gcc GCC_SDR_WR2_MEM_CLK>,
+			 <&gcc GCC_SDR_CSR_HCLK>;
+		clock-names = "core_clk", "wr0_mem_clk",
+			      "wr1_mem_clk", "wr2_mem_clk",
+			      "csr_hclk";
+		number-of-rate-detectors = <2>;
+		rate-detector-interfaces = <0 1>;
+		iommus = <&apps_smmu 0x035C 0x1>;
+		qcom,iommu-dma-addr-pool = <0x0 0xFFFFFFFF>;
+
+		sdr0: qcom,hs0_i2s {
+			compatible = "qcom,hsi2s-interface";
+			minor-number = <0>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&hs0_i2s_sck_active &hs0_i2s_data0_active
+				     &hs0_i2s_data1_active>;
+			pinctrl-1 = <&hs0_i2s_sck_sleep &hs0_i2s_data0_sleep
+				     &hs0_i2s_data1_sleep>;
+			clocks = <&gcc GCC_SDR_PRI_MI2S_CLK>;
+			clock-names = "pri_mi2s_clk";
+			bit-clock-hz = <12288000>;
+			data-buffer-ms = <10>;
+			bit-depth = <32>;
+			spkr-channel-count = <2>;
+			mic-channel-count = <2>;
+			pcm-rate = <2>;
+			pcm-sync-src = <0>;
+			aux-mode = <0>;
+			rpcm-width = <1>;
+			tpcm-width = <1>;
+			enable-tdm = <1>;
+			tdm-rate = <32>;
+			tdm-rpcm-width = <16>;
+			tdm-tpcm-width = <16>;
+			tdm-sync-delay = <2>;
+			tdm-inv-sync = <0>;
+			pcm-lane-config = <1>;
+		};
+
+		sdr1: qcom,hs1_i2s {
+			compatible = "qcom,hsi2s-interface";
+			minor-number = <1>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&hs1_i2s_sck_active &hs1_i2s_data0_active
+				     &hs1_i2s_data1_active>;
+			pinctrl-1 = <&hs1_i2s_sck_sleep &hs1_i2s_data0_sleep
+				     &hs1_i2s_data1_sleep>;
+			clocks = <&gcc GCC_SDR_SEC_MI2S_CLK>;
+			clock-names = "sec_mi2s_clk";
+			bit-clock-hz = <12288000>;
+			data-buffer-ms = <10>;
+			bit-depth = <32>;
+			spkr-channel-count = <2>;
+			mic-channel-count = <2>;
+			pcm-rate = <2>;
+			pcm-sync-src = <0>;
+			aux-mode = <0>;
+			rpcm-width = <1>;
+			tpcm-width = <1>;
+			enable-tdm = <1>;
+			tdm-rate = <32>;
+			tdm-rpcm-width = <16>;
+			tdm-tpcm-width = <16>;
+			tdm-sync-delay = <2>;
+			tdm-inv-sync = <0>;
+			pcm-lane-config = <1>;
+		};
+	};
+};
+
+&apps_rsc_drv2 {
+	/delete-node/ rpmh-regulator-modemlvl;
+	/delete-node/ rpmh-regulator-ldoc2;
+	/delete-node/ rpmh-regulator-ldoc3;
+	/delete-node/ rpmh-regulator-ldoc4;
+	/delete-node/ rpmh-regulator-ldoc13;
+	/delete-node/ rpmh-regulator-ldoc14;
+	/delete-node/ rpmh-regulator-ldoc16;
+	/delete-node/ rpmh-regulator-ldoc17;
+	/delete-node/ rpmh-regulator-ldoc18;
+	/delete-node/ bt_wcn3990;
+};
+
+&qusb_phy0 {
+	vdd-supply = <&L5A>;
+	vdda18-supply = <&L12A>;
+	vdda33-supply = <&L13A>;
+};
+
+&usb_qmp_phy {
+	vdd-supply = <&L5A>;
+	core-supply = <&L12A>;
+};
+
+&qusb_phy1 {
+	vdd-supply = <&L5A>;
+	vdda18-supply = <&L12A>;
+	vdda33-supply = <&L13A>;
+};
+
+&gcc {
+	compatible = "qcom,sa6155-gcc", "syscon";
+	/delete-property/ protected-clocks;
+};
+
+&camcc {
+	compatible = "qcom,sa6155-camcc", "syscon";
+	vdd_mx-supply = <&VDD_CX_LEVEL>;
+};
+
+&dispcc {
+	compatible = "qcom,sa6155-dispcc", "syscon";
+};
+
+&gpucc {
+	compatible = "qcom,sa6155-gpucc", "syscon";
+	vdd_mx-supply = <&VDD_CX_LEVEL>;
+};
+
+&scc {
+	vdd_cx-supply = <&VDD_CX_LEVEL>;
+	status = "ok";
+};
+
+&videocc {
+	compatible = "qcom,sa6155-videocc", "syscon";
+};
+
+&slpi_tlmm {
+	status = "ok";
+};
+
+&thermal_zones {
+	/delete-node/ qcom,cpu-pause;
+
+	cpuss-0 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu45-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			/delete-node/ cpu45_cdev;
+			cpu4_cdev {
+				trip = <&cpu45_config>;
+				cooling-device = <&cpu4_hotplug 1 1>;
+			};
+
+			cpu5_cdev {
+				trip = <&cpu45_config>;
+				cooling-device = <&cpu5_hotplug 1 1>;
+			};
+		};
+	};
+
+	cpuss-1 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu23-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			/delete-node/ cpu23_cdev;
+			cpu2_cdev {
+				trip = <&cpu23_config>;
+				cooling-device = <&cpu2_hotplug 1 1>;
+			};
+
+			cpu3_cdev {
+				trip = <&cpu23_config>;
+				cooling-device = <&cpu3_hotplug 1 1>;
+			};
+		};
+	};
+
+	cpuss-2 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu01-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			/delete-node/ cpu01_cdev;
+			cpu0_cdev {
+				trip = <&cpu01_config>;
+				cooling-device = <&cpu0_hotplug 1 1>;
+			};
+
+			cpu1_cdev {
+				trip = <&cpu01_config>;
+				cooling-device = <&cpu1_hotplug 1 1>;
+			};
+		};
+	};
+
+	cpu-1-0 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu6-0-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			cpu6_cdev {
+				cooling-device = <&cpu6_hotplug 1 1>;
+			};
+		};
+	};
+
+	cpu-1-1 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu6-1-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			cpu6_cdev {
+				cooling-device = <&cpu6_hotplug 1 1>;
+			};
+		};
+	};
+
+	cpu-1-2 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu7-0-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			cpu7_cdev {
+				cooling-device = <&cpu7_hotplug 1 1>;
+			};
+		};
+	};
+
+	cpu-1-3 {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			cpu7-1-config {
+				temperature = <115000>;
+			};
+		};
+
+		cooling-maps {
+			cpu7_cdev {
+				cooling-device = <&cpu7_hotplug 1 1>;
+			};
+		};
+	};
+
+	gpu {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			gpu-trip {
+				temperature = <105000>;
+			};
+
+			gpu-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+
+	q6-hvx {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			q6-hvx-trip1 {
+				temperature = <105000>;
+			};
+
+			q6-hvx-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+
+	mdm-core {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			mdm-core-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+
+	camera {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			camera-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+
+	wlan {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			wlan-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+
+	display {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			display-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+
+	video {
+		trips {
+			reset-mon-cfg {
+				temperature = <118000>;
+			};
+
+			video-cx-mon {
+				temperature = <110000>;
+			};
+		};
+	};
+};

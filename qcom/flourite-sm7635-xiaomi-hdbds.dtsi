@@ -1,0 +1,621 @@
+#include <dt-bindings/clock/qcom,camcc-volcano.h>
+#include <dt-bindings/clock/qcom,dispcc-volcano.h>
+#include <dt-bindings/clock/qcom,gcc-volcano.h>
+#include <dt-bindings/clock/qcom,gpucc-volcano.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/clock/qcom,tcsrcc-pineapple.h>
+#include <dt-bindings/clock/qcom,videocc-volcano.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/soc/qcom,rpmh-rsc.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,volcano.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm7550ba.h>
+
+&sdhc_2 {
+	status = "disabled";
+};
+
+/*for Beidou pinctrl */
+&tlmm {
+	/* BD Location HS UART */
+	qupv3_se9_2uart_pins: qupv3_se9_2uart_pins {
+		qupv3_se9_2uart_tx_active: qupv3_se9_2uart_tx_active {
+			mux {
+				pins = "gpio42";
+				function = "qup1_se2_l2";
+			};
+
+			config {
+				pins = "gpio42";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		qupv3_se9_2uart_rx_active: qupv3_se9_2uart_rx_active {
+			mux {
+				pins = "gpio43";
+				function = "qup1_se2_l3";
+			};
+
+			config {
+				pins = "gpio43";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		qupv3_se9_2uart_sleep: qupv3_se9_2uart_sleep {
+			mux {
+				pins = "gpio42", "gpio43";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio42", "gpio43";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	/* BD shortMsg HS UART */
+	qupv3_se13_2uart_pins: qupv3_se13_2uart_pins {
+		qupv3_se13_2uart_tx_active: qupv3_se13_2uart_tx_active {
+			mux {
+				pins = "gpio90";
+				function = "qup1_se6_l2_mirb";
+			};
+
+			config {
+				pins = "gpio90";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		qupv3_se13_2uart_rx_active: qupv3_se13_2uart_rx_active {
+			mux {
+				pins = "gpio91";
+				function = "qup1_se6_l3_mirb";
+			};
+
+			config {
+				pins = "gpio91";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		qupv3_se13_2uart_sleep: qupv3_se13_2uart_sleep {
+			mux {
+				pins = "gpio90","gpio91";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio90","gpio91";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	/* RN pinctrl begin*/
+	hdbds_l1_default: hdbds_l1_default{//L1_LNA_SWITCH_CTRL
+		mux {
+			pins = "gpio69";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio69";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_l1_disable: hdbds_l1_disable{//L1_LNA_SWITCH_CTRL
+		mux {
+			pins = "gpio69";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio69";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_l1_enable: hdbds_l1_enable{//L1_LNA_SWITCH_CTRL
+		mux {
+			pins = "gpio69";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio69";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	hdbds_l5_default: hdbds_l5_default{//L5_LNA_SWITCH_CTRL
+		mux {
+			pins = "gpio39";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio39";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_l5_disable: hdbds_l5_disable{//L5_LNA_SWITCH_CTRL
+		mux {
+			pins = "gpio39";
+				function = "gpio";
+		};
+
+		config {
+			pins = "gpio39";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_l5_enable: hdbds_l5_enable{//L5_LNA_SWITCH_CTRL
+		mux {
+			pins = "gpio39";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio39";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+
+	hdbds_rn_vdd_default: hdbds_rn_vdd_default{//RN_VDDE_LDO_EN
+		mux {
+			pins = "gpio71";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio71";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_rn_vdd_disable: hdbds_rn_vdd_disable{//RN_VDDE_LDO_EN
+		mux {
+			pins = "gpio71";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio71";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_rn_vdd_enable: hdbds_rn_vdd_enable{//RN_VDDE_LDO_EN
+		mux {
+			pins = "gpio71";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio71";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	hdbds_prrstx_default: hdbds_prrstx_default{//RN_PRRSTX
+		mux {
+			pins = "gpio133";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio133";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdbds_prrstx_reset_suspend: hdbds_prrstx_reset_suspend{//RN_PRRSTX
+		mux {
+			pins = "gpio133";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio133";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	hdbds_boot_default: hdbds_boot_default{//RN_PRRSTX_BOOT
+		mux {
+			pins = "gpio61";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio61";
+			drive-strength = <2>;
+			bias-disable;
+			input-enable;
+		};
+	};
+
+	hdbds_boot_suspend: hdbds_boot_suspend{//RN_PRRSTX_BOOT
+		mux {
+			pins = "gpio61";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio61";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	hdbds_boot_enable: hdbds_boot_enable{//RN_PRRSTX_BOOT
+		mux {
+			pins = "gpio61";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio61";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	/*RD pinctrl begin*/
+	hdsms_tcxo_default: hdsms_tcxo_default {
+		mux {
+			pins = "gpio17";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio17";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdsms_tcxo_disable: hdsms_tcxo_disable {
+		mux {
+			pins = "gpio17";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio17";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdsms_tcxo_enable: hdsms_tcxo_enable {
+		mux {
+			pins = "gpio17";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio17";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	hdsms_vdd_ldo_default: hdsms_vdd_ldo_default {//RD_VDDE_LDO_EN
+		mux {
+			pins = "gpio18";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio18";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdsms_vdd_ldo_disable: hdsms_vdd_ldo_disable {//RD_VDDE_LDO_EN
+		mux {
+			pins = "gpio18";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio18";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdsms_vdd_ldo_en: hdsms_vdd_ldo_en{//RD_VDDE_LDO_EN
+		mux {
+			pins = "gpio18";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio18";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	/*RD reset*/
+	hdsms_rd_prrstx_default: hdsms_rd_prrstx_default {
+		mux {
+			pins = "gpio127";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio127";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	hdsms_rd_reset_suspend: hdsms_rd_reset_suspend{//RD_PRRSTX
+		mux {
+			pins = "gpio127";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio127";
+			drive-strength = <2>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	/*RD BOOT*/
+	hdsms_rd_boot_default: hdsms_rd_boot_default{
+		mux {
+			pins = "gpio134";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio134";
+			drive-strength = <2>;
+			bias-disable;
+			input-enable;
+		};
+	};
+
+	hdsms_rd_boot_en: hdsms_rd_boot_en{//RD_PRRSTX_BOOT
+		mux {
+			pins = "gpio134";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio134";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	/*RD init*/
+	hdsms_rd_int_active: hdsms_rd_int_active{//RD_INT int_suspend 
+		mux {
+			pins = "gpio82";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio82";
+			drive-strength = <2>;
+			bias-pull-up;		 /* TODO */
+			input-enable;
+		};
+	};
+
+	hdsms_rd_int_suspend: hdsms_rd_int_suspend{//RD_INT
+		mux {
+			pins = "gpio82";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio82";
+			drive-strength = <2>;
+			bias-disable;
+			input-enable;
+		};
+	};
+
+	pmic_enable_active: pmic_enable_active {
+		mux {
+			pins = "gpio107";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio107";
+			bias-pull-up;
+			drive-strength = <2>;
+			output-high;
+		};
+	};
+	pmic_enable_suspend: pmic_enable_suspend {
+		mux {
+			pins = "gpio107";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio107";
+			bias-pull-down;
+			drive-strength = <2>;
+			output-low;
+		};
+	};
+}; //tlmm
+
+&qupv3_1 {
+	/*Huada BD Location 2 wires Uart*/
+	qupv3_se9_2uart: qcom,qup_uart@888000 {
+		compatible = "qcom,msm-geni-serial-hs";
+		reg = <0x888000 0x4000>;
+		reg-names = "se_phys";
+		interrupts-extended = <&intc GIC_SPI 584 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "se-clk";
+		clocks = <&gcc GCC_QUPV3_WRAP1_S2_CLK>;
+		interconnect-names = "qup-core", "qup-config", "qup-memory";
+		interconnects =
+		<&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
+		<&gem_noc MASTER_APPSS_PROC &cnoc_cfg SLAVE_QUP_1>,
+		<&aggre1_noc MASTER_QUP_1 &mc_virt SLAVE_EBI1>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&qupv3_se9_2uart_tx_active>, <&qupv3_se9_2uart_rx_active>;
+		pinctrl-1 = <&qupv3_se9_2uart_sleep>;
+		always-on-clock;
+		qcom,auto-suspend-disable;
+		status = "ok";
+	};
+
+	/* HD ShortMsg 2 wires UART Instance */
+	qupv3_se13_2uart: qcom,qup_uart@898000 {
+		compatible = "qcom,msm-geni-serial-hs";
+		reg = <0x898000 0x4000>;
+		reg-names = "se_phys";
+		interrupts-extended = <&intc GIC_SPI 461 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "se-clk";
+		clocks = <&gcc GCC_QUPV3_WRAP1_S6_CLK>;
+		interconnect-names = "qup-core", "qup-config", "qup-memory";
+		interconnects =
+		<&clk_virt MASTER_QUP_CORE_1 &clk_virt SLAVE_QUP_CORE_1>,
+		<&gem_noc MASTER_APPSS_PROC &cnoc_cfg SLAVE_QUP_1>,
+		<&aggre1_noc MASTER_QUP_1 &mc_virt SLAVE_EBI1>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&qupv3_se13_2uart_tx_active>, <&qupv3_se13_2uart_rx_active>;
+		pinctrl-1 = <&qupv3_se13_2uart_sleep>;
+		always-on-clock;
+		qcom,auto-suspend-disable;
+		status = "ok";
+	};
+};
+
+
+/*MXD8549KV*/
+&qupv3_se8_i2c {
+	status = "ok";
+	qcom,clk-freq-out = <100000>;
+	hl7603_pm:halo,ldo@77 {
+		compatible = "halo,hl7603-msc06a";
+		reg = <0x77>;/*slave address*/
+		index = <0>;
+		pinctrl-names = "hl7603_enable", "hl7603_disable";
+		pinctrl-0 = <&pmic_enable_active>;
+		pinctrl-1 = <&pmic_enable_suspend>;
+		hl7603_msc06a_l1:etek,hl7603@0{
+			offset = /bits/ 16 <0x0006>;
+			regulator-name ="hl7603-msc06a-l1";
+			regulator-min-microvolt = <2850000>;
+			regulator-max-microvolt = <5500000>;
+			min-dropout-voltage = <50000>;
+			init-voltage = <4500000>;
+			iout_ua = <400000>;
+		};
+	};
+};
+
+&soc {
+	huada_gnss {
+		status = "ok";
+		compatible = "xiaomi,huada_gnss";
+		hdbds_rn_vdd = <&tlmm 71 0x00>;
+		hdbds_prrstx = <&tlmm 133 0x00>;
+		hdbds_boot = <&tlmm 61 0x00>;
+		hdbds_l1 = <&tlmm 69 0x00>;
+		hdbds_l5 = <&tlmm 39 0x00>;
+		hdsms_tcxo = <&tlmm 17 0x00>;
+		hdsms_vdd_ldo = <&tlmm 18 0x00>;
+		hdsms_rd_prrstx= <&tlmm 127 0x00>;
+		hdsms_rd_boot = <&tlmm 134 0x00>;
+		hdsms_rd_int = <&tlmm 82 0x00>;
+		io-channels = <&pmk8550_vadc PM7550BA_ADC5_GEN3_AMUX4_GPIO4_100K_PU>;
+		io-channel-names = "hdsms_vdet";
+		pinctrl-names = "boot","hdsms_tcxo_disable","hdsms_tcxo_enable","hdsms_vdd_ldo_disable","hdsms_vdd_ldo_en","hdsms_rd_reset_suspend","hdbds_rn_vdd_disable","hdbds_rn_vdd_enable","hdbds_prrstx_reset_suspend",
+						"hdbds_boot_suspend","hdbds_boot_enable","hdbds_l1_disable","hdbds_l1_enable","hdbds_l5_disable","hdbds_l5_enable","hdsms_rd_boot_default","hdsms_rd_prrstx_default","hdsms_rd_boot_en","hdsms_rd_int_active",
+						"hdsms_rd_int_suspend","hdbds_prrstx_default","hdbds_boot_default";
+		pinctrl-0 = <&hdsms_tcxo_default &hdsms_vdd_ldo_default &hdsms_rd_prrstx_default &hdsms_rd_boot_default &hdbds_rn_vdd_default
+					&hdbds_prrstx_default &hdbds_boot_default &hdbds_l1_default &hdbds_l5_default &hdsms_rd_int_active>;
+		pinctrl-1 = <&hdsms_tcxo_disable>;
+		pinctrl-2 = <&hdsms_tcxo_enable>;
+		pinctrl-3 = <&hdsms_vdd_ldo_disable>;
+		pinctrl-4 = <&hdsms_vdd_ldo_en>;
+		pinctrl-5 = <&hdsms_rd_reset_suspend>;
+		pinctrl-6 = <&hdbds_rn_vdd_disable>;
+		pinctrl-7 = <&hdbds_rn_vdd_enable>;
+		pinctrl-8 = <&hdbds_prrstx_reset_suspend>;
+		pinctrl-9 = <&hdbds_boot_suspend>;
+		pinctrl-10 = <&hdbds_boot_enable>;
+		pinctrl-11 = <&hdbds_l1_disable>;
+		pinctrl-12 = <&hdbds_l1_enable>;
+		pinctrl-13 = <&hdbds_l5_disable>;
+		pinctrl-14 = <&hdbds_l5_enable>;
+		pinctrl-15 = <&hdsms_rd_boot_default>;
+		pinctrl-16 = <&hdsms_rd_prrstx_default>;
+		pinctrl-17 = <&hdsms_rd_boot_en>;
+		pinctrl-18 = <&hdsms_rd_int_active>;
+		pinctrl-19 = <&hdsms_rd_int_suspend>;
+		pinctrl-20 = <&hdbds_prrstx_default>;
+		pinctrl-21 = <&hdbds_boot_default>;
+	};
+};
+/*BD Location and shortMsg end*/
+
+&aliases {
+	hsuart6 = &qupv3_se9_2uart;
+	hsuart7 = &qupv3_se13_2uart;
+};

@@ -1,0 +1,52 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/remoteproc/qcom,virtio-glink-bridge.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. GLINK CMA bridge
+
+maintainers:
+  - Tony Truong <quic_truong@quicinc.com>
+
+description:
+  Configuration properties for virtio glink bridge. This configuration is
+  to instantiate a bridge for communicating between virtual machines and
+  primary host for passing information GLINK CMA transport needs to set up
+  communication with another remote edge.
+
+properties:
+  compatible:
+    const: virtio,device49162
+
+  glink-edge:
+    $ref: /schemas/remoteproc/qcom,glink-edge.yaml#
+    description:
+      GLINK subnode which represents communication edge, channels
+      and devices related to a remote processor.
+    unevaluatedProperties: false
+
+required:
+  - compatible
+  - glink-edge
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+    #include <dt-bindings/mailbox/qcom-ipcc.h>
+
+    virtio_glink_cma: virtio-glink-cma {
+        // ...
+
+        virtio-glink-bridge {
+                compatible = "virtio,device49162"; /* VIRTIO_ID: 0xC00A */
+
+                glink-edge {
+                        interrupt-parent = <&ipcc_mproc_apps_ns2>;
+                        interrupts = <IPCC_CLIENT_CDSP 0 IRQ_TYPE_EDGE_RISING>;
+                        mboxes = <&ipcc_mproc_apps_ns2 IPCC_CLIENT_CDSP 0>;
+                        label = "cdsp0";
+                };
+        };
+    };

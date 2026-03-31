@@ -1,0 +1,102 @@
+&soc {
+	/* QUPv3_0  wrapper  instance */
+	qupv3_0: qcom,qupv3_0_geni_se@9c0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0x9c0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x403 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		dma-coherent;
+		status = "ok";
+		/* HS UART Instance */
+		qupv3_se2_4uart: qcom,qup_uart@988000 {
+			compatible = "qcom,msm-geni-serial-hs";
+			reg = <0x988000 0x4000>;
+			reg-names = "se_phys";
+			interrupts-extended = <&intc GIC_SPI 529 IRQ_TYPE_LEVEL_HIGH>,
+					<&tlmm 36 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP0_S2_CLK>;
+			pinctrl-names = "default", "active", "sleep", "shutdown";
+			pinctrl-0 = <&qupv3_se2_default_cts>, <&qupv3_se2_default_rts>,
+			<&qupv3_se2_default_tx>, <&qupv3_se2_default_rx>;
+			pinctrl-1 = <&qupv3_se2_cts>, <&qupv3_se2_rts>,
+			<&qupv3_se2_tx>, <&qupv3_se2_rx>;
+			pinctrl-2 = <&qupv3_se2_cts>, <&qupv3_se2_rts>,
+			<&qupv3_se2_tx>, <&qupv3_se2_default_rx>;
+			pinctrl-3 = <&qupv3_se2_default_cts>, <&qupv3_se2_default_rts>,
+			<&qupv3_se2_default_tx>, <&qupv3_se2_default_rx>;
+			qcom,wakeup-byte = <0xFD>;
+			status = "disabled";
+		};
+		/* Debug UART Instance */
+		qupv3_se7_2uart: qcom,qup_uart@99c000 {
+			compatible = "qcom,geni-debug-uart";
+			reg = <0x99c000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se";
+			clocks = <&gcc GCC_QUPV3_WRAP0_S7_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se7_2uart_tx_active>, <&qupv3_se7_2uart_rx_active>;
+			pinctrl-1 = <&qupv3_se7_2uart_sleep>;
+			status = "disabled";
+		};
+	};
+
+	/* QUPv3_1  wrapper  instance */
+	qupv3_1: qcom,qupv3_1_geni_se@ac0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0xac0000 0x2000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x443 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		dma-coherent;
+		status = "ok";
+
+		qupv3_se9_i2c: i2c@a84000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0xa84000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			interrupts = <GIC_SPI 354 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S1_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se9_i2c_sda_active>, <&qupv3_se9_i2c_scl_active>;
+			pinctrl-1 = <&qupv3_se9_i2c_sleep>;
+			status = "disabled";
+		};
+
+		qupv3_se10_spi: spi@a88000 {
+			compatible = "qcom,spi-geni";
+			reg = <0xa88000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 355 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S2_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se10_spi_mosi_active>, <&qupv3_se10_spi_miso_active>,
+					<&qupv3_se10_spi_clk_active>, <&qupv3_se10_spi_cs_active>;
+			pinctrl-1 = <&qupv3_se10_spi_sleep>;
+			spi-max-frequency = <50000000>;
+			status = "disabled";
+		};
+	};
+};

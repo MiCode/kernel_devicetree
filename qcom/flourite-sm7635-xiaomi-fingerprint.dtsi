@@ -1,0 +1,70 @@
+&soc {
+        xiaomi_fingerprint {
+                compatible = "xiaomi,xiaomi-fp";
+                xiaomi,gpio_irq = <&tlmm 75 0x0>;
+                fp_goodix-supply = <&L16B>;
+                netlink-event = <25>;
+                pinctrl-names = "reset_high", "reset_low","irq_default";
+                pinctrl-0 = <&fingerprint_reset_high>;
+                pinctrl-1 = <&fingerprint_reset_low>;
+                pinctrl-2 = <&fingerprint_irq_default>;
+                status = "ok";
+        };
+};
+&L16B {
+        regulator-boot-on;
+        regulator-always-on;
+        regulator-min-microvolt = <3200000>;
+        regulator-max-microvolt = <3200000>;
+        qcom,init-voltage = <3200000>;
+};
+
+&qseecom_mem {
+	size = <0x0 0x4000000>;
+};
+&qseecom_ta_mem {
+	size = <0x0 0x3800000>;
+};
+
+&tlmm {
+        /* fix spi crash
+        qcom,gpios-reserved = <54 4 5 6 7 82 83 111 112 8 9 10 11>;
+        FP_RESET_HIGH, state device active */
+        fingerprint_reset_high: fingerprint_reset_high {
+                mux {
+                        pins = "gpio76";
+                        function = "gpio";
+                };
+                config {
+                        pins = "gpio76";
+                        drive-strength = <2>;
+                        bias-disable;
+                        output-high;
+                };
+        };
+        /* FP_RESET_LOW */
+        fingerprint_reset_low: fingerprint_reset_low {
+                mux {
+                        pins = "gpio76";
+                        function = "gpio";
+                };
+                config {
+                        pins = "gpio76";
+                        drive-strength = <2>;
+                        bias-disable;
+                        output-low;
+                };
+        };
+        /* FP_INT_N */
+        fingerprint_irq_default: fingerprint_irq_default {
+                mux {
+                        pins = "gpio75";
+                        function = "gpio";
+                };
+                config {
+                        pins = "gpio75";
+                        drive-strength = <2>;
+                        bias-pull-down;
+                };
+        };
+};
