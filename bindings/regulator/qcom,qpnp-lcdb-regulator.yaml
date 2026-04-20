@@ -1,0 +1,313 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/regulator/qcom,qpnp-lcdb-regulator.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. QPNP LCDB (LCD Bias) Regulator
+
+maintainers:
+  - Jishnu Prakash <quic_jprakash@quicinc.com>
+
+description: |
+  QPNP LCDB module provides voltage bias to the LCD display panel. The biases
+  are positive (VDISP - supported by LDO) and negative (VDISN - supported by
+  NCP) voltage signals. The module also supports TTW (touch-to-wake) capability.
+
+properties:
+  compatible:
+    enum:
+      - qcom,qpnp-lcdb-regulator
+      - qcom,lcdb-pm660
+      - qcom,lcdb-pmi632
+      - qcom,lcdb-pm6150l
+      - qcom,lcdb-pm7325b
+
+  reg:
+    description: Base address of the LCDB SPMI peripheral.
+
+  qcom,voltage-step-ramp:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: Required only if the voltage needs to be set in the
+                 steps of 500 mV starting from the 4500 mV. This needs
+                 to be enabled only on platforms where voltage needs to
+                 be ramped up with multiple steps.
+
+  qcom,ncp-symmetry:
+    type: boolean
+    description: Enabling this will make NCP voltage follow LDO voltage
+                 directly.
+
+  qcom,pwrdn-delay-ms:
+    description: Required to control the LDO power down delay.
+                 Possible values are 0, 1, 4, 8.
+
+  qcom,pwrup-delay-ms:
+    description: Required to control the LDO power up delay.
+                 Possible values are 0, 1, 4, 8.
+
+  qcom,pwrup-config:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: Controls the order of powering up BOOST, LDO AND NCP
+                 blocks. Applicable for PM7325B. Possible values are 0, 1, 2, 3, 4.
+                     0 - Boost, LDO, NCP
+                     1 - Boost, LDO
+                     2 - Boost, NCP
+                     3 - Boost only
+                     4 - Boost, NCP, LDO
+
+  qcom,high-p2-blank-time-ns:
+    description: Controls the higher clamp threshold for p2 minimum on time.
+                 Applicable for PM7325B. Possible values are 40, 69, 99, 129, 159,
+                 189, 220, 250.
+
+  qcom,low-p2-blank-time-ns:
+    description: Controls the lower clamp threshold for p2 minimum on time.
+                 Applicable for PM7325B. Possible values are 40, 69, 99, 129, 159,
+                 189, 220, 250.
+
+  qcom,mpc-current-thr-ma:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: Controls the mpc threshold for inductor current after start up
+                 is done. Applicable for PM7325B. Possible values are 160, 200, 240,
+                 280, 320, 360, 400, 440.
+
+
+  qcom,ttw-enable:
+    type: boolean
+    description: Touch to wake-up support enabled.
+
+  qcom,ttw-mode-sw:
+    type: boolean
+    description: Touch to wake supported in SW mode.
+                 If not defined, ttw is enabled by HW pin.
+
+  qcom,attw-toff-ms:
+    maxItems: 1
+    description: Off time (in mS) for the VDISP/VDISN signals.
+                 Possible values are 4, 8, 16, 32.
+
+  qcom,attw-ton-ms:
+    maxItems: 1
+    description: ON time (in mS) for the VDISP/VDISN signals.
+                 Possible values are 4, 8, 16, 32.
+
+patternProperties:
+  "^lcdb_[0-9a-f]+$":
+    type: object
+    $ref: /schemas/regulator/regulator.yaml#
+    unevaluatedProperties: false
+    description: LDO and NCP bias common properties
+
+    properties:
+      label:
+        description: |
+          A string used to describe the bias type.
+          Possible values are ldo, ncp, bst.
+        $ref: /schemas/types.yaml#/definitions/string
+
+      regulator-name:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Load current in uA which corresponds to the minimum load
+          which requires the regulator to be in high power mode.
+
+      regulator-min-microvolt:
+        description: |
+          Minimum voltage (in uV) supported by the bias.
+
+      regulator-max-microvolt:
+        description: |
+          Maximum voltage (in uV) supported by the bias.
+
+  "^lcdb_ldo_[0-9a-f]+$":
+    type: object
+    $ref: /schemas/regulator/regulator.yaml#
+    unevaluatedProperties: false
+    description: LDO bias specific properties
+
+    properties:
+      qcom,ldo-voltage-mv:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Voltage (in mV) progammed for the LDO (VDISP).
+          Possile values are 4000mV to 6000mV. The range
+          4000mV to 4900mV is in 100mV steps and 4900mV to
+          6000mV is in 50mV steps.
+
+      qcom,ldo-pd:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Pull-down configuration of LDO. Possible values are
+           1 - Enable pull-down
+           0 - Disable pull-down
+
+      qcom,ldo-pd-strength:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Pull-down strength. Possible values are
+           0 - Weak pull-down
+           1 - Strong pull-down
+
+      qcom,ldo-ilim-ma:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Current limit (in mA) of the LDO bias. For PM7325B, possible
+          values are 35, 175, 280, 420, 455, 595, 700, 840. For other PMICs,
+          possible values are 110, 160, 210, 260, 310, 360, 410, 460.
+
+      qcom,ldo-soft-start-us:
+        description: |
+          Soft-start time (in uS) of the LDO bias.
+          Possible values are 0, 500, 1000, 2000.
+
+  "^lcdb_ncp_[0-9a-f]+$":
+    type: object
+    $ref: /schemas/regulator/regulator.yaml#
+    unevaluatedProperties: false
+    description: NCP bias specific properties
+
+    properties:
+      qcom,ncp-voltage-mv:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Voltage (in mV) progammed for the NCP (VDISN).
+          Possile values are 4000mV to 6000mV. The range
+          4000mV to 4900mV is in 100mV steps and 4900mV to
+          6000mV is in 50mV steps.
+
+      qcom,ncp-pd:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Pull-down configuration of NCP. Possible values are
+            1 - Enable pull-down
+            0 - Disable pull-down
+
+      qcom,ncp-pd-strength:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Pull-down strength. Possible values are
+            0 - Weak pull-down
+            1 - Strong pull-down
+
+      qcom,ncp-ilim-ma:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Current limit (in mA) of the NCP bias. For PM7325B, possible
+          values are 700, 80, 900, 1000. For other PMICs, possible values
+          are 260, 460, 640, 810.
+
+      qcom,ncp-soft-start-us:
+        description: |
+          Soft-start time (in uS) of the NCP bias.
+          Possible values are 0, 500, 1000, 2000.
+
+  "^lcdb_bst[0-9a-f]+$":
+    type: object
+    $ref: /schemas/regulator/regulator.yaml#
+    unevaluatedProperties: false
+    description: BOOST subnode specific properties
+
+    properties:
+      qcom,bst-pd:
+        type: boolean
+        description: Pull-down configuration of BOOST. Possible values are
+                     1 - Enable pull-down
+                     0 - Disable pull-down
+
+      qcom,bst-pd-strength:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Pull-down strength. Possible values are
+            0 - Weak pull-down
+            1 - Strong pull-down
+
+      qcom,bst-ps:
+        description: |
+          Pulse-skip configuration for boost. Possible values are
+            1 - Enable Pulse-skip
+            0 - Disable Pulse-skip
+
+      qcom,bst-ps-threshold-ma:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Current threshold (in mA) at which pulse-skip is entered.
+          Possible values are 50, 60, 70, 80.
+
+      qcom,bst-ps-threshold-mv:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Current threshold (in mv) at which pulse-skip is entered.
+          Applicable for PM7325B. Possible values are 360, 384, 408, 432,
+          456, 480, 504, 528.
+
+      qcom,bst-ilim-ma:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Current limit (in mA) of the BOOST rail. For PM7325B, possible
+          possible values are 1130 to 2250mA in 160mA steps. For other PMICs,
+          possible values are 200 to 1600mA in 200mA steps.
+
+      qcom,bst-headroom-mv:
+        $ref: /schemas/types.yaml#/definitions/uint16
+        description: |
+          Headroom of the boost (in mV). If not specified, then the
+          default value is 200 mV (PM660L) or 150 mV (for PM8150L or PMI632).
+
+    required:
+      - label
+      - regulator-name
+      - regulator-min-microvolt
+      - regulator-max-microvolt
+
+required:
+  - compatible
+  - reg
+  - qcom,ttw-enable
+
+additionalProperties: false
+
+examples:
+  - |
+
+    pm660l_lcdb: qpnp-lcdb@ec00 {
+      compatible = "qcom,qpnp-lcdb-regulator";
+      #address-cells = <1>;
+      #size-cells = <1>;
+      reg = <0xec00 0x100>;
+
+      qcom,ttw-enable;
+
+      lcdb_ldo_vreg: ldo {
+              label = "ldo";
+              regulator-name = "lcdb_ldo";
+              regulator-min-microvolt = <4000000>;
+              regulator-max-microvolt = <6000000>;
+
+              qcom,ldo-voltage-mv = <5400>;
+              qcom,ldo-pd = <1>;
+              qcom,ldo-pd-strength = <1>;
+      };
+
+      lcdb_ncp_vreg: ncp {
+              label = "ncp";
+              regulator-name = "lcdb_ncp";
+              regulator-min-microvolt = <4000000>;
+              regulator-max-microvolt = <6000000>;
+
+              qcom,ncp-voltage-mv = <5400>;
+              qcom,ncp-pd = <1>;
+              qcom,ncp-pd-strength = <1>;
+      };
+
+      lcdb_bst: bst {
+              label = "bst";
+
+              qcom,bst-pd = <1>;
+              qcom,bst-pd-strength = <1>;
+              qcom,bst-ps = <1>;
+              qcom,bst-ps-threshold-ma = <50>;
+              qcom,bst-headroom-mv = <200>;
+      };
+    };
+

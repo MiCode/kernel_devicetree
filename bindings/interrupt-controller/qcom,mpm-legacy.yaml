@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/interrupt-controller/qcom,mpm-legacy.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: MPM Interrupt Controller
+
+maintainers:
+  - Raghavendra Kakarla <quic_rkakarla@quicinc.com>
+
+description:
+  Qualcomm Technologies Inc. SoCs based on the RPM architecture have a
+  MSM Power Manager (MPM) that is in always-on domain. In addition to managing
+  resources during sleep, the hardware also has an interrupt controller that
+  monitors the interrupts when the system is asleep, wakes up the APSS when
+  one of these interrupts occur and replays it to GIC interrupt controller
+  after GIC becomes operational.
+
+properties:
+  compatible:
+    items:
+      - enum:
+          - "qcom,mpm-blair"
+          - "qcom,mpm-holi"
+          - "qcom,mpm-pitti"
+          - "qcom,mpm-monaco"
+      - const: qcom,mpm
+
+  reg:
+    minItems: 1
+    items:
+      - description: Specifies the base address and size of vMPM registers in RPM MSG RAM.
+      - description: Specifies the address and size of MPM timer registers in RPM MSG RAM.
+      - description: Timer frame register to read the aggregated time.
+
+  '#interrupt-cells':
+    const: 2
+
+  interrupt-controller: true
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - '#interrupt-cells'
+  - interrupt-controller
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    mpm: interrupt-controller@45f01b8 {
+        compatible = "qcom,mpm", "qcom,mpm-blair";
+        interrupts = <GIC_SPI 171 IRQ_TYPE_EDGE_RISING>;
+        reg = <0x45f01b8 0x1000>,
+              <0xb011008 0x4>,  /* MSM_APCS_GCC_BASE 4K */
+              <0xf121000 0x1000>; /* Timer Frame Register */
+        reg-names = "vmpm", "ipc", "timer";
+        interrupt-controller;
+        interrupt-parent = <&intc>;
+        interrupt-cells = <2>;
+    };
+
+    wake-device {
+        interrupts-extended = <&mpm 2 IRQ_TYPE_LEVEL_HIGH>;
+    };

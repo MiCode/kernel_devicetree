@@ -1,0 +1,200 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/regulator/qcom,amoled-regulator.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: Qualcomm Technologies, Inc. AMOLED Triple power supply regulator devices
+
+maintainers:
+  - Anjelique Melendez <quic_amelende@quicinc.com>
+
+description: |
+  OLED module provides AVDD voltage rail output for bias and AB/IBB
+  module provides ELVDD/ELVSS voltage rail output to power up AMOLED panels.
+
+properties:
+  compatible:
+    const: qcom,amoled-regulator
+
+  nvmem-cells:
+    items:
+      - description: IBB spur mitigation SQM timer value nvmem cell phandle.
+
+  nvmem-cell-names:
+    items:
+      - const: ibb_spur_sqm_timer
+
+  '#address-cells':
+    const: 1
+
+  '#size-cells':
+    const: 0
+
+patternProperties:
+  "^oledb@[0-9a-f]+$":
+    description: OLEDB regulator
+    type: object
+    $ref: "regulator.yaml#"
+    unevaluatedProperties: false
+
+    properties:
+      reg:
+        maxItems: 1
+
+      qcom,swire-control:
+        description: |
+            Boolean flag indicating that the regulator output is controlled by an SWIRE
+            signal, not software.
+        type: boolean
+
+    required:
+      - reg
+
+  "^ab@[0-9a-f]+$":
+    description: AB regulator
+    type: object
+    $ref: "regulator.yaml#"
+    unevaluatedProperties: false
+
+    properties:
+      reg:
+        maxItems: 1
+
+      qcom,swire-control:
+        description: |
+            Boolean flag indicating that the regulator output is controlled by an SWIRE
+            signal, not software.
+        type: boolean
+
+      qcom,aod-pd-control:
+        description: |
+            Boolean flag indicating that pull down control needs to be configured
+            during AOD mode.
+        type: boolean
+
+    required:
+      - reg
+
+  "^ibb@[0-9a-f]+$":
+    description: IBB regulator
+    type: object
+    $ref: "regulator.yaml#"
+    unevaluatedProperties: false
+
+    properties:
+      reg:
+        maxItems: 1
+
+      qcom,swire-control:
+        description: |
+            Boolean flag indicating that the regulator output is controlled by an SWIRE
+            signal, not software.
+        type: boolean
+
+      qcom,aod-pd-control:
+        description: |
+            Boolean flag indicating that pull down control needs to be configured
+            during AOD mode.
+        type: boolean
+
+      qcom,ibb-single-phase:
+        description: |
+            Boolean flag indicating that the IBB regulator needs to always be
+            configured for single phase.
+        type: boolean
+
+      qcom,ibb-spur-mitigation-level:
+        description: |
+            IBB spur mitigation level selection options.
+            0 - IBB spur mitigation disabled
+            1 - IBB spur mitigation enabled without SQM mode
+            2 - IBB spur mitigation enabled with SQM mode.
+        $ref: /schemas/types.yaml#/definitions/uint32
+        enum: [ 0, 1, 2 ]
+
+      qcom,ibb-spur-sqm-timer-ms:
+        description: |
+            Time HW stays in SQM mode before re-evulating the exit condition.
+            This property is only valid when qcom,ibb-spur-mitigation-level is set to 2.
+        default: 1000
+        minimum: 100
+        maximum: 10000
+
+      qcom,ibb-spur-2khz-step-size:
+        description: |
+            Boolean flag indicating that the frequency will use 2 kHz step size
+            instead of 1 kHz. This will double the frequency selection range from
+            1-248 kHz to 2-496 kHz, for all the frequency band thresholds.
+        type: boolean
+
+      qcom,ibb-spur-freq-thresholds:
+        description: |
+            Specifies the range of thresholds for 3 frequency bands
+            with each tuple representing a low and high threshold.
+            Valid ranges are from 1-248 kHz and 2-496 kHz(step size 2 kHz).
+            To disable a frequency band set both low and high thresholds to max
+            threshold value.
+        $ref: /schemas/types.yaml#/definitions/uint32-matrix
+        minItems: 3
+        maxItems: 3
+        items:
+          items:
+            - description: Frequency range min frequency (kHz)
+              minimum: 1
+              maximum: 496
+            - description: Frequency range max frequency (kHz)
+              minimum: 1
+              maximum: 496
+
+    required:
+      - reg
+
+required:
+  - compatible
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    qcom-amoled {
+      compatible = "qcom,amoled-regulator";
+      #address-cells = <1>;
+      #size-cells = <0>;
+
+      nvmem-cells = <&ibb_spur_sqm_timer>;
+      nvmem-cell-names = "ibb_spur_sqm_timer";
+
+      oledb_vreg: oledb@e000 {
+        reg = <0xe000>;
+        regulator-name = "oled_vreg";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <8000000>;
+        qcom,swire-control;
+      };
+
+      ab_vreg: ab@de00 {
+        reg = <0xde00>;
+        regulator-name = "ab_vreg";
+        regulator-min-microvolt = <4600000>;
+        regulator-max-microvolt = <5200000>;
+        qcom,swire-control;
+        qcom,aod-pd-control;
+      };
+
+      ibb_vreg: ibb@dc00 {
+        reg = <0xdc00>;
+        regulator-name = "ibb_vreg";
+        regulator-min-microvolt = <800000>;
+        regulator-max-microvolt = <5400000>;
+        qcom,swire-control;
+        qcom,aod-pd-control;
+
+        qcom,ibb-spur-mitigation-level = <2>;
+        qcom,ibb-spur-sqm-timer-ms = <1000>;
+        qcom,ibb-spur-2khz-step-size;
+        qcom,ibb-spur-freq-thresholds = <100 120>,
+                                        <150 170>,
+                                        <496 496>;
+      };
+    };

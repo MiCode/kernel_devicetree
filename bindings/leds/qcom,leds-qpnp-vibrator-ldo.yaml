@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/leds/qcom,leds-qpnp-vibrator-ldo.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Vibrator-LDO
+
+maintainers:
+  - Jishnu Prakash <quic_jprakash@quicinc.com>
+
+description: >
+  QPNP (Qualcomm Technologies, Inc. Plug N Play) Vibrator-LDO is a peripheral
+  on some QTI PMICs. It can be interfaced with the host processor via SPMI.
+
+properties:
+  compatible:
+    const: qcom,qpnp-vibrator-ldo
+
+  reg:
+    description: Base address of vibrator-ldo peripheral.
+
+  qcom,vib-ldo-volt-uv:
+    description: The optimal voltage requirement of the vibrator motor for
+                 a normal vibration. Value is specified in microvolts.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,disable-overdrive:
+    description: Do not apply overdrive voltage.
+    type: boolean
+
+  qcom,vib-overdrive-volt-uv:
+    description: The voltage in microvolts used as overdrive factor for
+                 improving motor reactivity at the start of vibration.
+                 If this property not specified, a default value of
+                 2 times the value specified in qcom,vib-ldo-volt-uv
+                 property is used.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+required:
+  - compatible
+  - reg
+  - qcom,vib-ldo-volt-uv
+
+allOf:
+  - $ref: common.yaml#
+
+additionalProperties: false
+
+examples:
+  - |
+    pmi632_vib: qcom,vibrator@5700 {
+        compatible = "qcom,qpnp-vibrator-ldo";
+        reg = <0x5700 0x100>;
+        qcom,vib-ldo-volt-uv = <1504000>;
+        qcom,disable-overdrive;
+        qcom,vib-overdrive-volt-uv = <3544000>;
+    };
+...

@@ -1,0 +1,149 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,crm.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) CESTA Resource Manager
+
+maintainers:
+  - Maulik Shah <quic_mkshah@quicinc.com>
+
+description:
+  Support for communication with the hardened-CRM blocks. A set of HW and
+  SW client DRVs in CRM provides interface to vote desired power state of
+  resources local to a subsystem.
+
+properties:
+  label:
+    $ref: /schemas/types.yaml#/definitions/string-array
+    oneOf:
+      - description: Specifies the name of the CRM.
+        items:
+          - enum:
+              - cam_crm
+              - pcie_crm
+              - disp_crm
+
+  compatible:
+    oneOf:
+      - description: v1 of CESTA HW
+        items:
+          - enum:
+              - qcom,cam-crm
+              - qcom,pcie-crm
+
+      - description: v2 of CESTA HW
+        items:
+          - enum:
+              - qcom,cam-crm-v2
+              - qcom,pcie-crm-v2
+              - qcom,disp-crm-v2
+
+  reg:
+    minItems: 6
+
+  reg-names:
+    items:
+      - const: base
+      - const: crm_b
+      - const: crm_b_pt
+      - const: crm_c
+      - const: crm_v
+      - const: common
+
+  interrupts:
+    maxItems: 1
+
+  interrupt-names:
+    maxItems: 1
+
+  qcom,hw-drv-ids:
+    description: List of HW DRV IDs.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    minItems: 1
+    maxItems: 3
+    items:
+      minimum: 0
+      maximum: 2
+
+  qcom,sw-drv-ids:
+    description: List of SW DRV IDs.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    minItems: 1
+    maxItems: 2
+    items:
+      minimum: 0
+      maximum: 1
+
+  clocks:
+    items:
+      - description: Bus Clock
+
+required:
+  - label
+  - compatible
+  - reg
+  - reg-names
+  - clocks
+
+oneOf:
+  - required:
+      - qcom,hw-drv-ids
+  - required:
+      - qcom,sw-drv-ids
+
+if:
+  required:
+    - qcom,sw-drv-ids
+then:
+  required:
+    - interrupts
+    - interrupt-names
+
+additionalProperties: false
+
+examples:
+  # Example of Camera CRM device with HW DRVs
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    #include <dt-bindings/clock/qcom,camcc-sun.h>
+    cam_crm: crm@adcb000 {
+      label = "cam_crm";
+      compatible = "qcom,cam-crm";
+      reg = <0xadcb000 0x1e00>, <0xadcce00 0x400>, <0xadcd600 0x2000>,
+            <0xadcf600 0x700>, <0xadcfd00 0x100>;
+      reg-names = "base", "crm_b", "crm_c", "crm_v", "common";
+      clocks = <&camcc CAM_CC_DRV_AHB_CLK>;
+      qcom,hw-drv-ids = <0 1 2>;
+    };
+  # Example of PCIe CRM device with SW DRVs
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    pcie_crm: crm@1d01000 {
+      label = "pcie_crm";
+      compatible = "qcom,pcie-crm";
+      reg = <0x1d01000 0x2000>, <0x1d03000 0x400>, <0x1d03800 0x2000>,
+            <0x1d05800 0x700>, <0x1d05f00 0x100>;
+      reg-names = "base", "crm_b", "crm_c", "crm_v", "common";
+      interrupts = <GIC_SPI 248 IRQ_TYPE_EDGE_RISING>;
+      interrupt-names = "pcie_crm";
+      clocks = <&pcie_0_pipe_clk>;
+      qcom,sw-drv-ids = <0>;
+    };
+  # Example of Disp CRM device with SW DRVs
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    #include <dt-bindings/clock/qcom,dispcc-sun.h>
+    disp_crm: crm@af21000 {
+      label = "disp_crm";
+      compatible = "qcom,disp-crm-v2";
+      reg = <0xaf21000 0x6000>, <0xaf27000 0x400>, <0xaf27800 0x2000>,
+            <0xaf29800 0x700>, <0xaf29f00 0x100>;
+      reg-names = "base", "crm_b", "crm_c", "crm_v", "common";
+      interrupts = <GIC_SPI 703 IRQ_TYPE_EDGE_RISING>;
+      interrupt-names = "disp_crm";
+      clocks = <&dispcc DISP_CC_MDSS_AHB_CLK>;
+      qcom,sw-drv-ids = <0>;
+    };
+...

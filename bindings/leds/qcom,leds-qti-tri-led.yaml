@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/leds/qcom,leds-qti-tri-led.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. TRI_LED driver specific document
+
+maintainers:
+  - Subbaraman Narayanamurthy <subbaram@quicinc.com>
+
+description: >
+  This binding document describes the properties of TRI_LED module in
+  Qualcomm Technologies, Inc. PMIC chips.
+
+properties:
+  compatible:
+    const: qcom,tri-led
+
+  reg:
+    description: Register base of the TRI_LED module.
+
+  nvmem-names:
+    description: Nvmem device name for SDAM to do PBS trigger. It must be
+                 defined as "pbs_sdam". This is required only for HR_LEDs.
+
+  nvmem:
+    description: Phandle of the nvmem device name to access SDAM to do PBS
+                 trigger. This is required only for HR_LEDs.
+patternProperties:
+  "^led@[0-9a-z]+$":
+    type: object
+    $ref: common.yaml#
+    unevaluatedProperties: false
+
+    properties:
+      pwms:
+        description: The PWM device (phandle) used for controlling LED.
+
+      led-sources:
+        description: see Documentation/devicetree/bindings/leds/common.txt;
+                 Device current output identifiers are 0 - LED1_EN,
+                 1 - LED2_EN, 2 - LED3_EN.
+      label:
+        description: see Documentation/devicetree/bindings/leds/common.txt;
+
+      linux,default-trigger:
+        description: see Documentation/devicetree/bindings/leds/common.txt;
+
+    required:
+      - pwms
+      - led-sources
+
+required:
+  - compatible
+  - reg
+
+allOf:
+  - $ref: common.yaml#
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    pmi8998_rgb: tri-led@d000 {
+            compatible = "qcom,tri-led";
+            reg = <0xd000>;
+
+            led@1 {
+                 label = "red";
+                 pwms = <&pmi8998_lpg 4 1000000>;
+                 led-sources = <0>;
+            };
+            led@2 {
+                   label = "green";
+                   pwms = <&pmi8998_lpg 3 1000000>;
+                   led-sources = <1>;
+            };
+            led@3 {
+                  label = "blue";
+                  pwms = <&pmi8998_lpg 2 1000000>;
+                  led-sources = <2>;
+             };
+    };
+...

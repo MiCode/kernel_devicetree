@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/sound/qcom,usb-audio-qmi-dev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: QTI USB Audio QMI Device
+
+maintainers:
+  - Wesley Cheng <quic_wcheng@quicinc.com>
+
+properties:
+  compatible:
+    items:
+      - enum:
+          - qcom,usb-audio-qmi-dev
+
+  iommus:
+    maxItems: 1
+
+  qcom,usb-audio-stream-id:
+    description:
+      Stream id is prepended to iova before passing
+      iova to remote processor. This allows remote processor to access iova.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,usb-audio-intr-num:
+    description:
+      Interrupter number for external sub system
+      destination.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+additionalProperties: false
+
+required:
+  - compatible
+  - iommus
+  - qcom,usb-audio-stream-id
+
+examples:
+  - |
+    usb_audio_qmi_dev {
+      compatible = "qcom,usb-audio-qmi-dev";
+      iommus = <&lpass_q6_smmu 12>;
+      qcom,usb-audio-stream-id = <12>;
+      qcom,usb-audio-intr-num = <1>;
+    };
