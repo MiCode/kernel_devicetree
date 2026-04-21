@@ -1,0 +1,122 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,mpam-msc.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) MPAM MSC
+
+maintainers:
+  - Avinash Philip <quic_avinashp@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. (QTI) MPAM MSC abstraction to
+  describe MPAM MSC topology. MPAM (Memory System Resource
+  Partitioning and Monitoring) specification is supporting
+  different type of MSC (Memory System Component) to control the
+  resources like cache allocation, bandwidth etc and monitoring
+  the utilization. MPAM MSC child node for SLC (System Level Cache)
+  defines SLC side support for MPAM  gear (capacity) configuration
+  and monitor side support. Child node abstraction helps to understand
+  system level MPAM topology.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,mpam-msc
+
+  child-node:
+    description: |
+      Child node for mpam slc msc device
+    type: object
+    properties:
+      compatible:
+        items:
+          - const: qcom,slc-mpam
+
+      reg:
+        items:
+          - description: |
+              address and size of CPUCP DTIM area for CPUCP SLC monitor data
+
+      reg-names:
+        items:
+          - const: mon-base
+
+      qcom,msc-id:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          MSC id of the child node.
+
+      qcom,msc-name:
+        $ref: '/schemas/types.yaml#/definitions/string'
+        description: |
+          MSC name of the child node.
+
+      qcom,dev-index:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          Device index for the MSC device
+
+      qcom,num-read-miss-cfg:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          Number of read miss configurations present.
+
+      qcom,num-cap-cfg:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          Number of capacity configrurations present,
+
+      qcom,slc-clients:
+        $ref: '/schemas/types.yaml#/definitions/string-array'
+        description: |
+          APPS_CLIENT
+            APPS SLC Client
+          GPU_CLIENT
+            GPU SLC Client
+          NSP_CLIENT
+            NSP SLC client
+
+    required:
+      - compatible
+      - reg
+      - reg-names
+      - qcom,msc-id
+      - qcom,msc-name
+      - qcom,dev-index
+      - qcom,num-read-miss-cfg
+      - qcom,num-cap-cfg
+      - qcom,slc-clients
+
+    additionalProperties: false
+
+required:
+  - compatible
+  - address-cells
+  - size-cells
+  - ranges
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom-mpam-msc {
+         compatible = "qcom,mpam-msc";
+         #address-cells = <1>;
+         #size-cells = <1>;
+         ranges;
+
+          qcom-slc-mpam@17b6f800 {
+               compatible = "qcom,slc-mpam";
+               reg = <0x17b6f800 0x400>;
+               reg-names = "mon-base";
+               qcom,msc-id = <2>;
+               qcom,msc-name = "slc";
+               qcom,dev-index = <0>;
+               qcom,num-read-miss_cfg = <2>;
+               qcom,num-cap-cfg = <5>;
+               qcom,slc-clients = "APPS_CLIENT", "GPU_CLIENT",
+                               "NSP_CLIENT";
+         };
+    };

@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-userspace-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Userspace Cooling Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  Certain Cooling devices reside in userspace and they also needs to be
+  mitigated for thermal conditions. Thermal framework will send netlink message
+  to userspace, when a cooling device level changes for any cooling device.
+  This cooling device expects the userspace cooling device to listen to the
+  netlink message and take necessary action.
+
+  Devicetree will define the name of the cooling device and the max mitigation
+  level a cooling device can support. Each child node will be an individual
+  cooling device.
+
+properties:
+  compatible:
+    const: qcom,userspace-cooling-devices
+
+patternProperties:
+  "^display-fps":
+    type: object
+    description: |
+      This child node describes the maximum level supported.
+      Minimum one child node is required. Child node name is used as
+      cooling device name and phandle for that cooling device.
+
+    properties:
+      qcom,max-level:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        enum: [ 0, 4 ]
+        description: |
+          The max level this cooling device can support.
+          The cooling device levels start from 0 to max level
+          inclusive.
+
+      '#cooling-cells':
+        const: 2
+        description: |
+          Must be 2. Needed for of_thermal as cooling device identifier.
+          Please refer to <devicetree/bindings/thermal/thermal.txt> for
+          more details.
+
+    required:
+      - qcom,max-level
+
+    additionalProperties: false
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+
+      qcom,userspace-cdev {
+          compatible = "qcom,userspace-cooling-devices";
+
+          display_fps: display-fps {
+              qcom,max-level = <4>;
+              /* levels supported
+              * 0, 1, 2, 3, 4
+              */
+              #cooling-cells = <2>;
+          };
+      };
