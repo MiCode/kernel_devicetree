@@ -59,4 +59,5 @@
 | spring-v-oss | Redmi 15 5G / Redmi Note 15R / POCO M7 Plus 5G | Android V | LA.VENDOR.14.3.1.r1-03700-MANNAR.QSSI15.0-1.107589.1.111280.1 |[spring-v-oss](https://github.com/MiCode/kernel_devicetree/tree/spring-v-oss) |
 | annibale-w-oss | REDMI K90 / POCO F8 Pro | Android W | LA.VENDOR.15.4.0.r1-15000-r1.0.r1_00044.1 |[annibale-w-oss](https://github.com/MiCode/kernel_devicetree/tree/annibale-w-oss) |
 | flourite-v-oss | POCO M8 Pro 5G / REDMI Note 15 Pro+ / REDMI Note 15 Pro+ 5G Pro | Android V | LA.VENDOR.14.3.0.r1-14500-r1.0.r1_00042.0 |[flourite-v-oss](https://github.com/MiCode/kernel_devicetree/tree/flourite-v-oss) |
+| yupei-w-oss | Xiaomi Pad 8 | Android W | LA.VENDOR.15.4.0.r1-15000-r1.0.r1_00044.1 |[yupei-w-oss](https://github.com/MiCode/kernel_devicetree/tree/yupei-w-oss) |
 | piano-w-oss | Xiaomi Pad 8 Pro | Android W | LA.VENDOR.15.4.0.r1-15000-r1.0.r1_00044.1 |[piano-w-oss](https://github.com/MiCode/kernel_devicetree/tree/piano-w-oss) |
