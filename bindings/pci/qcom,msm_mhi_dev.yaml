@@ -1,0 +1,112 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/pci/qcom,msm_mhi_dev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) MSM MHI Device
+
+maintainers:
+  - Anvita T <quic_atadepal@quicinc.com>
+
+properties:
+  compatible:
+    enum:
+      - qcom,msm-mhi-dev
+
+  reg:
+    minItems: 1
+    items:
+      - description: MHI MMIO physical register space.
+      - description: IPA uC Command Ring doorbell mail box address.
+      - description: IPA uC Event Ring doorbell mail box address.
+
+  reg-names:
+    minItems: 1
+    items:
+      - const: mhi_mmio_base
+      - const: ipa_uc_mbox_crdb
+      - const: ipa_uc_mbox_erdb
+
+  interrupts:
+    items:
+      - description: Interrupt line for the device.
+
+  interrupt-names:
+    items:
+      - const: mhi-device-inta
+
+  qcom,mhi-ifc-id:
+    description: ID of HW interface via which MHI on device side communicates with host side.
+
+  qcom,mhi-ep-msi:
+    description: End point MSI number.
+
+  qcom,mhi-version:
+    description: MHI specification version supported by the device.
+
+  qcom,use-mhi-dma-software-channel:
+    description: Uses IPA hardware accelerated path for MHI software channel data transfers between host and device.
+
+  qcom,mhi-config-iatu:
+    description: Maps the control and data region between host and device using iatu.
+
+  qcom,mhi-interrupt:
+    description: Registers for mhi interrupt.
+
+  qcom,mhi-local-pa-base:
+    description: The physical base address on the device used by the MHI device driver to map
+                 the control and data region with the MHI driver on the host. This property is
+                 required if iatu property qcom,mhi-config-iatu is present.
+
+  qcom,enable-m2:
+    description: M2 autonomous is enabled.
+
+  qcom,mhi-has-smmu:
+    description: Uses mapped address to route the doorbell addresses to IPA.
+
+  qcom,mhi-num-ipc-pages-dev-fac:
+    description: Reduces the MHI ipc logging size based on the divisor factor.
+                 This property also represents the divisor factor.
+
+  qcom,no-m0-timeout:
+    description: Device waits for M0 state without any timeout period.
+
+  mhi-virt-device-int-x:
+    description: To be used if the target supports virtual functions.
+                 The property lists the interrupt number for the virtual functions.
+                 Replace x with the appropriate interrupt number.
+
+  qcom,use-pcie-edma:
+    description: Uses eDMA as DMA for MHI software channel data transfers between host and device.
+
+  qcom,mhi-chan-hw-base:
+    description: If the target uses any other h/w channel than ch-100 as the start of the hardware
+                 accelerated channel, then use this property to mention the start h/w channel.
+
+  qcom,mhi-is-flashless:
+    description: If the target uses flashless boot (boot over PCIe) then mention this property.
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - qcom,mhi-ifc-id
+  - qcom,mhi-ep-msi
+  - qcom,mhi-version
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    mhi: qcom,msm-mhi-dev {
+        compatible = "qcom,msm-mhi-dev";
+        reg = <0xfc527000 0x1000>,
+              <0xfd4fa000 0x1>,
+              <0xfd4fa080 0x1>;
+        reg-names = "mhi_mmio_base", "ipa_uc_mbox_crdb","ipa_uc_mbox_erdb";
+        qcom,mhi-ifc-id = <0x030017cb>;
+        qcom,mhi-ep-msi = <1>;
+        qcom,mhi-version = <0x1000000>;
+    };
+

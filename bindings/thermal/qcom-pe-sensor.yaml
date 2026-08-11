@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qcom-pe-sensor.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Policy Engine(PE) Sensor Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  The QTI Policy Engine sensor device will register the policy engine
+  recommendation with thermal framework as a sensor. This will enable
+  to provide configuration to mitigate cooling devices when a recommendation
+  is sent from Policy Engine hardware. The recommendations are mitigation
+  levels based on CX operating level.
+
+  There can be multiple Policy Engine hardwares for different rails.
+
+properties:
+  compatible:
+    const: qcom,policy-engine
+
+  '#thermal-sensor-cells':
+    const: 0
+    description: See thermal.txt for description.
+
+  reg:
+    maxItems: 1
+    description: |
+      <a b> where 'a' is the RDPM PE base register address and
+      'b' is the size of the RDPM PE address space.
+
+  interrupts:
+    maxItems: 1
+    description: Policy Engine master interrupt.
+
+required:
+  - compatible
+  - '#thermal-sensor-cells'
+  - reg
+  - interrupts
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+    cx_rdpm_pe@635000 {
+        compatible = "qcom,policy-engine";
+        #thermal-sensor-cells = <0>;
+        reg = <0x00635000 0x1000>;
+        interrupts = <GIC_SPI 243 IRQ_TYPE_EDGE_RISING>;
+    };

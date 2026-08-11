@@ -1,0 +1,35 @@
+#include "tuna-mtp.dtsi"
+
+&soc {
+	mtdoops_pmsg@0xa3500000 {
+		compatible = "xiaomi,mtdoops_pmsg";
+		reg = <0xa3500000 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	bootmonitor_pmsg@0xa3500000 {
+		compatible = "xiaomi,bootmonitor_pmsg";
+		reg = <0xa3500000 0x400000>;
+		console-size = <0x200000>;
+		pmsg-size = <0x200000>;
+	};
+
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmxr2230_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <32>;
+			linux,can-disable;
+		};
+	};
+};
+

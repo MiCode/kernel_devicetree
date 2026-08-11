@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "monaco-idp-v1-common.dtsi"
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm5100.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
+#include "slate.dtsi"
+
+&pm5100_charger {
+	qcom,remote-fg;
+	#io-channel-cells = <1>;
+	io-channels = <&pm5100_adc PM5100_ADC5_GEN3_USB_SNS_V_16>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_USB_IN_I>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_CHG_TEMP>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_DIE_TEMP>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_VPH_PWR>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_BAT_ID_100K_PU>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_BATT_THM_100K_PU>,
+		      <&pm5100_adc PM5100_ADC5_GEN3_VBAT_SNS_QBG>;
+
+	io-channel-names = "usb_in_voltage",
+			   "usb_in_current",
+			   "chg_temp",
+			   "die_temp",
+			   "vph_voltage",
+			   "batt-id",
+			   "batt-temp",
+			   "batt-volt";
+};
+
+
+&pm5100_gpios {
+	nfc_clk {
+		nfc_clk_default: nfc_clk_default {
+		pins = "gpio4";
+		function = "normal";
+		input-enable;
+		power-source = <1>;
+		};
+	};
+};

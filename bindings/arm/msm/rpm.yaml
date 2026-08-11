@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/arm/msm/rpm.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. RPM-SMD device
+
+maintainers:
+  - Raghavendra Kakarla <quic_rkakarla@quicinc.com>
+
+description:
+  RPM is a dedicated hardware engine for managing shared SoC resources,
+  which includes buses, clocks, power rails, etc.  The goal of RPM is
+  to achieve the maximum power savings while satisfying the SoC's
+  operational and performance requirements.  RPM accepts resource
+  requests from multiple RPM masters.  It arbitrates and aggregates
+  the requests, and configures the shared resources. The RPM masters
+  are the application processor, the modem processor, as well as hardware
+  accelerators. The RPM driver communicates with the hardware engine using
+  SMD.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,rpm-smd
+
+  interrupts:
+    maxItems: 1
+
+required:
+  - compatible
+  - interrupts
+
+additionalProperties: false
+
+examples:
+  - |
+
+    rpm_bus: qcom,rpm-smd {
+            compatible = "qcom,rpm-smd";
+            interrupts = <IPCC_CLIENT_AOP
+                          IPCC_MPROC_SIGNAL_GLINK_QMP
+                          IRQ_TYPE_EDGE_RISING>;
+    };

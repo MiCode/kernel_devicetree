@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/qcom,tcsrcc.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Top-Level CSR Clock & Reset Controller
+
+maintainers:
+  - Xubin Bai <quic_xubibai@quicinc.com>
+
+description: |
+  Top-Level CSR Clock & Reset Controller Binding
+
+  See also:
+  - dt-bindings/clock/qcom,tcsrcc-pineapple.h
+  - dt-bindings/clock/qcom,tcsrcc-sun.h
+
+properties:
+  compatible:
+    enum:
+      - qcom,pineapple-tcsrcc
+      - qcom,sun-tcsrcc
+      - qcom,tuna-tcsrcc
+      - qcom,kera-tcsrcc
+
+required:
+  - compatible
+  - reg
+  - reg-name
+
+allOf:
+  - $ref: "qcom,gcc.yaml#"
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    tcsrcc: clock-controller@1f40000 {
+      compatible = "qcom,pineapple-tcsrcc", "syscon";
+      reg = <0x1f40000 0xc0000>;
+      reg-name = "cc_base";
+      #clock-cells = <1>;
+      #reset-cells = <1>;
+    };
+
+...

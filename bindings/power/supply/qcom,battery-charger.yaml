@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/power/supply/qcom,battery-charger.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Battery Charger Glink Device
+
+maintainers:
+  - Subbaraman Narayanamurthy <quic_subbaram@quicinc.com>
+
+description: |
+  This binding describes the Qualcomm Technologies, Inc. battery charger device.
+  The QTI battery charger gets and sets power supply properties by communicating
+  with charger firmware running on a remote subsystem (e.g. DSP) over PMIC
+  Glink.
+
+properties:
+  compatible:
+    const: qcom,battery-charger
+
+  qcom,thermal-mitigation:
+    description: |
+      Array of fast charge current limit values for different system thermal
+      mitigation levels. This should be a flat array that denotes the maximum
+      charging current (in uA) for each thermal level. Elements should be listed
+      in monotonically decreasing (non-increasing) order.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,thermal-mitigation-step:
+    description: |
+      Fast charging current step (in uA) which if specified would be used to
+      calculate different system thermal mitigation levels based on the maximum
+      charging current provided by the charger firmware. This property can be
+      specified only if "qcom,thermal-mitigation" property is not specified.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 500000
+
+  qcom,wireless-fw-name:
+    description: |
+      Firmware name that is used for updating wireless charger firmware.
+    $ref: /schemas/types.yaml#/definitions/string
+
+  qcom,shutdown-voltage:
+    description: |
+      Battery voltage (in mV) when shutdown needs to be initiated when battery
+      SOC reaches 0 and device is not charging.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,display-panels:
+    description: |
+      Array of one or more phandles of the display panel(s) that sends the DRM
+      blank/unblank notifications.
+    $ref: /schemas/types.yaml#/definitions/phandle-array
+    minItems: 1
+
+  qcom,ship-mode-immediate:
+    description: |
+      Flag indicating that ship mode will be configured immediately and enabled
+      after shut down is initiated.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+required:
+  - compatible
+
+allOf:
+  - if:
+      required:
+        - qcom,thermal-mitigation
+    then:
+      properties:
+        qcom,thermal-mitigation-step: false
+
+  - if:
+      required:
+        - qcom,thermal-mitigation-step
+    then:
+      properties:
+        qcom,thermal-mitigation: false
+
+additionalProperties: false
+
+examples:
+  - |
+    pmic_glink {
+      battery_charger {
+        compatible = "qcom,battery-charger";
+        qcom,thermal-mitigation = <3000000 1500000 1000000 500000>;
+        qcom,wireless-fw-name = "idt9412.bin";
+        qcom,shutdown-voltage = <3100>;
+      };
+    };

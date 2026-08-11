@@ -1,0 +1,90 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/regulator/qcom,proxy-consumer.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Regulator Proxy Consumer Bindings
+
+maintainers:
+  - David Collins <quic_collinsd@quicinc.com>
+
+description: |
+  Regulator proxy consumers provide a means to use a default regulator state
+  during bootup only which is removed at the end of boot.  This feature can be
+  used in situations where a shared regulator can be scaled between several
+  possible voltages and hardware requires that it be at a high level at the
+  beginning of boot before the consumer device responsible for requesting the
+  high level has initialized.
+
+properties:
+  qcom,proxy-consumer-enable:
+    description: Boolean flag indicating that the regulator must be kept enabled
+      during boot.
+    type: boolean
+
+  qcom,proxy-consumer-voltage:
+    description: Voltage constraints to enforce during boot.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    items:
+      - description: Minimum voltage in microvolts allowed during boot.
+      - description: Maximum voltage in microvolts allowed during boot.
+
+  qcom,proxy-consumer-current:
+    description: Minimum current in microamps required during boot.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,proxy-consumer-name:
+    description: Name of the proxy consumer supply.
+    $ref: /schemas/types.yaml#/definitions/string
+    default: proxy
+
+patternProperties:
+  ".*-supply$":
+    description: |
+      phandle of the regulator's own device node.  If qcom,proxy-consumer-name
+      is specified, then this property should be <proxy-consumer-name>-supply;
+      otherwise, it should be proxy-supply.
+
+      This property must be specified in the regulator device node (or its
+      parent node) if qcom,proxy-consumer-enable, qcom,proxy-consumer-voltage,
+      or qcom,proxy-consumer-current is specified.
+
+additionalProperties: true
+
+examples:
+  - |
+    foo_vreg: regulator {
+        regulator-name = "foo";
+        regulator-min-microvolt = <1000000>;
+        regulator-max-microvolt = <2000000>;
+        proxy-supply = <&foo_vreg>;
+        qcom,proxy-consumer-voltage = <1500000 2000000>;
+        qcom,proxy-consumer-current = <25000>;
+        qcom,proxy-consumer-enable;
+    };
+
+    pmic {
+        ldo1-proxy-supply = <&ldo1>;
+        ldo2-proxy-supply = <&ldo2>;
+
+        ldo1: ldo1 {
+            regulator-name = "ldo1";
+            regulator-min-microvolt = <1000000>;
+            regulator-max-microvolt = <2000000>;
+            qcom,proxy-consumer-name = "ldo1-proxy";
+            qcom,proxy-consumer-voltage = <1500000 2000000>;
+            qcom,proxy-consumer-current = <25000>;
+            qcom,proxy-consumer-enable;
+        };
+
+        ldo2: ldo2 {
+            regulator-name = "ldo2";
+            regulator-min-microvolt = <2000000>;
+            regulator-max-microvolt = <3000000>;
+            qcom,proxy-consumer-name = "ldo2-proxy";
+            qcom,proxy-consumer-voltage = <2500000 3000000>;
+            qcom,proxy-consumer-current = <50000>;
+            qcom,proxy-consumer-enable;
+        };
+    };

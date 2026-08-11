@@ -1,0 +1,143 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/qseecom/qcom,qseecom.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: "QSEECOM driver to provide transport between TZ and Linux."
+
+description: |
+   The QSEECOM driver facilitates the communication and data transfer between
+   Trust Zone and Linux OS.
+
+maintainers:
+  - Vikas Kumar Sharma <quic_vksharma@quicinc.com>
+
+properties:
+  compatible:
+    const: qcom,qseecom
+  reg:
+    description: "Should contain memory region address reserved for loading secure apps."
+    maxItems: 2
+
+  qcom,disk-encrypt-pipe-pair:
+    description: "Indicates what CE HW pipe pair is used for disk encryption."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,file-encrypt-pipe-pair:
+    description: "Indicates what CE HW pipe pair is used for file encryption."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,support-multiple-ce-hw-instance:
+    description: "Indicates if multicore CE support is supported."
+    type: boolean
+
+  qcom,hlos-num-ce-hw-instances:
+    description: "Indicates number of CE HW instances hlos can use."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,qsee-ce-hw-instance:
+    description: "Indicates what CE HW is used by secure domain (TZ) crypto driver."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,msm_bus,name:
+    description: "Should be 'qseecom-noc'."
+    const: "qseecom-noc"
+
+  qcom,msm_bus,num_cases:
+    description: "Depends on the use cases for bus scaling."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,msm_bus,num_paths:
+    description: "The paths for source and destination ports."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,msm_bus,vectors:
+    description: "Vectors for bus topology."
+    $ref: "/schemas/types.yaml#/definitions/uint32-array"
+
+  qcom,ce-opp-freq:
+    description: "Indicates the CE operating frequency in Hz, changes from target to target."
+    $ref: "/schemas/types.yaml#/definitions/uint32"
+
+  qcom,full-disk-encrypt-info:
+    description: "Vectors defining full disk encryption unit, crypto engine, pipe pair configuration in <unit#, ce#, pipe-pair#>."
+    $ref: "/schemas/types.yaml#/definitions/uint32-array"
+
+  qcom,per-file-encrypt-info:
+    description: "Vectors defining per file encryption unit, crypto engine, pipe pair configuration in <unit#, ce#, pipe-pair#>."
+    $ref: "/schemas/types.yaml#/definitions/uint32-array"
+
+  qcom,support-bus-scaling:
+    description: "Indicates if driver supports scaling the bus for crypto operation."
+    type: boolean
+
+  qcom,support-fde:
+    description: "Indicates if driver supports key managing for full disk encryption feature."
+    type: boolean
+
+  qcom,support-pfe:
+    description: "Indicates if driver supports key managing for per file encryption feature."
+    type: boolean
+
+  qcom,no-clock-support:
+    description: "Indicates clocks are not handled by qseecom (could be handled by RPM)."
+    type: boolean
+
+  qcom,appsbl-qseecom-support:
+    description: "Indicates if there is qseecom support in apps bootloader."
+    type: boolean
+
+  qcom,qsee-reentrancy-support:
+    description: "Indicates the qsee reentrancy phase supported by the target."
+    type: boolean
+
+  qcom,commonlib64-loaded-by-uefi:
+    description: "Indicates commonlib64 is loaded by UEFI already."
+    type: boolean
+
+  qcom,fde-key-size:
+    description: "Indicates which FDE key size is used in device."
+    type: boolean
+
+required:
+  - compatible
+  - reg
+  - qcom,disk-encrypt-pipe-pair
+  - qcom,file-encrypt-pipe-pair
+  - qcom,support-multiple-ce-hw-instance
+  - qcom,hlos-num-ce-hw-instances
+  - qcom,qsee-ce-hw-instance
+  - qcom,msm_bus,name
+  - qcom,msm_bus,num_cases
+  - qcom,msm_bus,num_paths
+  - qcom,msm_bus,vectors
+  - qcom,ce-opp-freq
+  - qcom,full-disk-encrypt-info
+  - qcom,per-file-encrypt-info
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,qseecom@7f00000:
+      compatible: "qcom,qseecom"
+      reg: <0x7f00000 0x500000>
+      reg-names: "secapp-region"
+      qcom,disk-encrypt-pipe-pair: <2>
+      qcom,file-encrypt-pipe-pair: <0>
+      qcom,support-multiple-ce-hw-instance: true
+      qcom,hlos-num-ce-hw-instances: <2>
+      qcom,qsee-ce-hw-instance: <0>
+      qcom,support-fde: true
+      qcom,support-pfe: true
+      qcom,msm_bus,name: "qseecom-noc"
+      qcom,msm_bus,num_cases: <4>
+      qcom,msm_bus,active_only: <0>
+      qcom,msm_bus,num_paths: <1>
+      qcom,no-clock-support: true
+      qcom,appsbl-qseecom-support: true
+      qcom,fde-key-size: true
+      qcom,msm_bus,vectors: [<55, 512, 0, 0>, <55, 512, 3936000000, 393600000>, <55, 512, 3936000000, 393600000>, <55, 512, 3936000000, 393600000>]
+      qcom,ce-opp-freq: <100000000>
+      vdd-hba-supply: "&gdsc_ufs"

@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/soc/qcom/qcom,coresight-uetm.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: The document describes the device tree binding for coresight-uetm
+
+maintainers:
+  - Yuanfang Zhang <quic_yuanfang@quicinc.com>
+
+description:
+    This binding describes the coresight component responsible for controlling
+    coresight uetm trace, used to enable/disable uetm.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,coresight-uetm
+
+  out-ports:
+    $ref: /schemas/graph.yaml#/properties/ports
+    additionalProperties: false
+
+    properties:
+      port:
+        description: Output connection from the UETM to CoreSight Trace bus.
+        $ref: /schemas/graph.yaml#/properties/port
+
+required:
+  - compatible
+  - out-port
+
+additionalProperties: false
+
+examples:
+  - |
+    uetm0 {
+        compatible = "qcom,coresight-uetm";
+
+        out-ports {
+            port {
+                uetm0_out_funnel_qdss: endpoint {
+                    remote-endpoint =
+                       <&funnel_qdss_in_uetm0>;
+                };
+            };
+        };
+    };

@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/qcom,gx_clkctl.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. GPU GX_CLKCTL controller
+
+maintainers:
+  - Jagadeesh Kona <quic_jkona@quicinc.com>
+
+description: |
+  Graphics GX_CLKCTL clock controller binding which supports
+  GX_CLKCTL GDSC power domain.
+
+  See also:
+    dt-bindings/clock/qcom,gxclkctl-sun.h
+    dt-bindings/clock/qcom,gpucc-tuna.h
+
+properties:
+  compatible:
+    enum:
+      - qcom,sun-gx_clkctl
+      - qcom,tuna-gx_clkctl
+  reg:
+    maxItems: 1
+
+  power-domains:
+    description:
+      A phandle and PM domain specifier for the GPU CX GDSC power domain.
+    maxItems: 1
+
+  vdd_gx-supply:
+    description: Phandle pointer to the parent logic rail supply
+
+  '#power-domain-cells':
+    const: 1
+
+required:
+  - compatible
+  - reg
+  - power-domains
+  - vdd_gx-supply
+  - '#power-domain-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,gxclkctl-sun.h>
+    gxclkctl: clock-controller@3d68024 {
+      compatible = "qcom,sun-gx_clkctl";
+      reg = <0x3d68024 0x8>;
+      reg-name = "cc_base";
+      power-domains = <&gpucc GPU_CC_CX_GDSC>;
+      vdd_gx-supply = <&VDD_GFX_GFX_MXC_VOTER_LEVEL>;
+      #power-domain-cells = <1>;
+    };
+...

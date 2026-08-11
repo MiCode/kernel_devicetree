@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/bindings/soc/qcom/qcom,health_monitor.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies Inc System Health Monitor (SHM)
+
+maintainers:
+  - Unnathi Chalicheemala <quic_uchalich@quicinc.com>
+
+description: |+
+  Information about subsystems that are monitored by System Health
+  Monitor. Subsystems include modem, adsp, wcnss, external MDM(esoc).
+
+[Root level node]
+properties:
+    compatible:
+      - const: qcom,system-health-monitor
+
+required:
+  - compatible
+
+[Second level nodes]
+properties:
+    qcom,subsys-name:
+      description: Name as identified by a subsystem
+
+    qcom,ssrestart-string:
+      description: String used by subsystem restart to identify the subsystem
+
+    qcom,rproc_phandle:
+      description: Remoteproc phandle used by subsystem restart
+
+required:
+  - qcom,subsys-name
+  - qcom,ssrestart-string
+  - qcom,rproc_phandle
+
+example:
+	qcom,system-health-monitor {
+		compatible = "qcom,system-health-monitor";
+
+		qcom,modem {
+			qcom,subsys-name = "msm_mpss";
+			qcom,ssrestart-string = "mpss";
+			qcom,rproc_phandle = <&modem_pas>;
+		};
+	};
+...

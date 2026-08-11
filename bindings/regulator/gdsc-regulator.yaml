@@ -1,0 +1,170 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/regulator/gdsc-regulator.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Global Distributed Switch Controller Regulator
+
+maintainers:
+   - Xubin Bai <quic_xubibai@quicinc.com>
+
+description: |
+  The GDSC driver, implemented under the regulator framework,
+  is responsible for safely collapsing and restoring power to
+  peripheral and multimedia cores on chipsets for power savings.
+
+properties:
+  compatible:
+    const: qcom,gdsc
+
+  regulator-name:
+    description: A string used as a descriptive name for regulator outputs.
+
+  reg:
+    description: The address of the GDSCR register.
+
+  parent-supply:
+    description: phandle to the parent supply regulator node.
+
+  clocks:
+    description: phandle to clock used by GDSC.
+
+  clock-names:
+    description: List of string names for core clocks.
+
+  qcom,retain-regs:
+    description: |
+      Presence denotes a hardware requirement to enable the
+      usage of retention registers which maintain their state
+      after the GDSC is disabled and re-enabled.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,skip-logic-collapse:
+    description: |
+      Presence denotes a requirement to leave power to
+      the core's logic enabled.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,support-hw-trigger:
+    description: |
+      Presence denotes a hardware feature to switch on/off this
+      regulator based on internal HW signals to save more power.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,enable-root-clk:
+    description: |
+      Presence denotes that the clocks in the "clocks"
+      property are required to be enabled before gdsc is
+      turned on and disabled before turning off gdsc. This
+      will be used in subsystems where reset is synchronous
+      and root clk is active without sw being aware of its
+      state. The clock-name which denotes the root clock
+      should be named as "core_root_clk".
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,force-enable-root-clk:
+    description: |
+      If set, denotes that the root clock should be force enabled
+      before turning on the GDSC and then be immediately force
+      disabled. Likewise for GDSC disable. This is used in cases
+      where the core root clock needs to be force-enabled prior
+      to turning on the core. The clock-name which denotes the
+      root clock should be "core_root_clk".
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,clk-dis-wait-val:
+    description: |
+      Input value for CLK_DIS_WAIT controls state transition
+      delay after halting clock in the collapsible core.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  reg-names:
+    description: |
+      Names of the bases for the above "reg" registers.
+      Ex. "base", "domain-addr", "sw-reset", "hw-ctrl-addr".
+
+  qcom,no-status-check-on-disable:
+    description: Do not poll the status bit when GDSC is disabled.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,gds-timeout:
+    description: |
+      Maximum time (in usecs) that might be taken by a GDSC to enable.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,reset-aon-logic:
+    description: |
+      If present, the GPU DEMET cells need to be reset while
+      enabling the GX GDSC.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,support-cfg-gdscr:
+    description: |
+      Presence denotes HW supports CFG_GDSCR register
+      when checking the status of gdsc.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,collapse-vote:
+    description: |
+      Phandle pointer to the register APCS_GDSC_BRANCH_ENA_VOTE
+      that collapse GDSCs.
+    $ref: /schemas/types.yaml#/definitions/phandle
+
+  qcom,skip-disable:
+    description: |
+      If the disable skipping feature is allowed, then use mode
+      control to enable and disable the feature at runtime instead
+      of using it to enable and disable hardware triggering.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  vdd_parent-supply:
+    description: |
+      phandle to the regulator that this GDSC gates. If present,
+      need to vote for a minimum operational voltage (LOW_SVS) on
+      the GDSC parent regulator prior to configuring it. The vote
+      is removed once the GDSC FSM has latched on to the new state.
+
+  resets:
+    minItems: 1
+    maxItems: 2
+    description: |
+      reset specifier pair consisting of phandle for the reset
+      controller and reset lines used by this controller. These
+      can be supplied only if we support qcom,skip-logic-collapse.
+
+  reset-names:
+    description: |
+      reset signal name strings sorted in the same order as
+      the resets property. These can be supplied only if we
+      support qcom,skip-logic-collapse.
+
+  qcom,skip-disable-before-sw-enable:
+    description: |
+      Presence denotes a hardware requirement to leave the
+      GDSC on that has been enabled by an entity external to HLOS.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,no-config-gdscr:
+    description: |
+      Presence denotes HW only supports a single register per GDSC.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+required:
+  - compatible
+  - regulator-name
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    gdsc_oxili_gx: qcom,gdsc@fd8c4024 {
+      compatible = "qcom,gdsc";
+      regulator-name = "gdsc_oxili_gx";
+      parent-supply = <&pm8841_s4>;
+      reg = <0xfd8c4024 0x4>;
+      clock-names = "core_clk";
+    };
+...
+

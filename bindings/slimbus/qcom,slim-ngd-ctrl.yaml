@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/slimbus/qcom,slim-ngd-ctrl.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies Inc SLIMBus Non Generic Device (NGD) Controller
+
+maintainers:
+  - Mukesh Kumar Savaliya <quic_msavaliy@quicinc.com>
+
+allOf:
+  - $ref: "slimbus.yaml#"
+
+properties:
+  compatible:
+    enum:
+        # MSM8996
+      - qcom,slim-ngd-v1.5.0
+        # SDM845
+      - qcom,slim-ngd-v2.1.0
+
+  dmas:
+    type: array of phandles
+    description:
+      List of rx and tx dma channels
+
+  dma-names:
+    type: stringlist
+    description:
+      must be rx and tx
+
+  interrupts:
+    maxItems: 1
+
+  qcom,ea-pc:
+    description:
+      provides PC values for QCT SLIMbus Instances
+
+  "address-cells":
+    type: u32
+    description:
+      Should be 1, reflecting the instance id of ngd
+
+  "size-cells":
+    type: u32
+    description:
+      Should be 0
+
+  reg:
+    maxItems: 1
+
+required:
+  - compatible
+  - interrupts
+  - dmas
+  - dma-names
+  - reg
+  - "#address-cells"
+  - "#size-cells"
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    #include <dt-bindings/clock/qcom,gcc-sun.h>
+
+    slim_msm: slim@6C40000 {
+        compatible = "qcom,slim-ngd-v1.5.0";
+        reg = <0x6C40000 0x2C000>, <0x6C8E000 0x1000>;
+        reg-names = "ctrl", "slimbus_remote_mem";
+        interrupts = <0 163 IRQ_TYPE_LEVEL_HIGH>;
+        dmas = <&slimbam 3>, <&slimbam 4>;
+        dma-names = "rx", "tx";
+        #address-cells = <1>;
+        #size-cells = <0>;
+    };
+...
