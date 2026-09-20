@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/arm/arm,arch-cache.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: ARM Architectural Cache Properties
+
+maintainers:
+- Asit Shah <quic_asitshah@quicinc.com>
+
+description: |
+  Device tree binding for ARM architecture-level cache description.
+  This is typically used to describe system-wide cache properties
+  that are not specific to a single CPU core.
+
+properties:
+  compatible:
+    enum:
+      - "arm,arch-cache"
+
+  cache-level:
+    description: The cache level (L1, L2, etc.).
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  cache-size:
+    description: Total size of the cache in bytes.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  cache-line-size:
+    description: Cache line size in bytes.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  cache-sets:
+    description: Number of cache sets.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  cache-type:
+    description: Cache type (e.g., "unified", "instruction", "data").
+    enum:
+      - "unified"
+      - "instruction"
+      - "data"
+
+required:
+  - compatible
+  - cache-level
+  - cache-size
+  - cache-line-size
+  - cache-sets
+  - cache-type
+
+additionalProperties: false
+
+examples:
+  - |
+    cache-controller {
+        compatible = "arm,arch-cache";
+        cache-level = <2>;
+        cache-size = <524288>;      /* 512 KB */
+        cache-line-size = <64>;      /* 64 bytes */
+        cache-sets = <512>;
+        cache-type = "unified";
+    };

@@ -1,0 +1,467 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/pci/qcom,msm-ep-pcie.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) MSM PCI express Endpoint Controller
+
+maintainers:
+  - Anvita T <quic_atadepal@quicinc.com>
+
+properties:
+  compatible:
+    enum:
+      - qcom,pcie-ep
+
+  reg:
+    minItems: 7
+    items:
+      - description: PCIe MSM MSI address reserved space
+      - description: DesignWare PCIe core (dm_core) registers
+      - description: External local bus interface (elbi) registers
+      - description: Address Translation Unit (ATU) registers
+      - description: PCIe MSM specific (parf) registers
+      - description: PCIe Physical layer (phy) registers
+      - description: BAR memory region
+      - description: PCIe MSM MSI address reserved space for vf
+      - description: DesignWare PCIe core (dm_core) registers for vf
+      - description: DesignWare PCIe EDMA registers
+      - description: Register to avoid device reset during host reboot
+      - description: AOSS reset clear register
+      - description: PCIe RUMI (rumi) registers
+
+  reg-names:
+    minItems: 7
+    items:
+      - const: msi
+      - const: dm_core
+      - const: elbi
+      - const: iatu
+      - const: parf
+      - const: phy
+      - const: mmio
+      - const: msi_vf
+      - const: dm_core_vf
+      - const: edma
+      - const: tcsr_pcie_perst_en
+      - const: aoss_cc_reset
+      - const: rumi
+
+  interrupts:
+    minItems: 1
+    items:
+      - description: PCIe Global interrupt
+      - description: PCIe PME turnoff interrupt
+      - description: PCIe Dstate change interrupt
+      - description: PCIe L1ss timeout interrupt
+      - description: PCIe Link up interrupt
+      - description: PCIe Likk down interrupt
+      - description: PCIe bridge flush interrupt
+      - description: PCIe BME interrupt
+
+  interrupt-names:
+    minItems: 1
+    items:
+      - const: int_global
+      - const: int_pm_turnoff
+      - const: int_dstate_change
+      - const: int_l1sub_timeout
+      - const: int_link_up
+      - const: int_link_down
+      - const: int_bridge_flush_n
+      - const: int_bme
+
+  pinctrl-names:
+    description: GPIO configuration at the init time.
+    items:
+      - const: default
+
+  pinctrl-0:
+    description: Should contain default pinctrl.
+
+  perst-gpio:
+    description: GPIO used as PERST# input signal
+    maxItems: 1
+
+  wake-gpio:
+    description: GPIO used as WAKE# output signal
+    maxItems: 1
+
+  clkreq-gpio:
+    description: GPIO used to wake system in L1ss sleep
+    maxItems: 1
+
+  mdm2apstatus-gpio:
+    description: GPIO used to indicate mdm to ap status
+    maxItems: 1
+
+  gdsc-vdd-supply:
+    description: A phandle to the core gdsc power supply
+
+  gdsc-phy-vdd-supply:
+    description: A phandle to the phy gdsc power supply
+
+  vreg-1p2-supply:
+    description: A phandle to the 1.2v power supply
+
+  vreg-0p9-supply:
+    description: A phandle to the 0.9v power supply
+
+  vreg-qref-supply:
+    description: A phandle to the qref power supply
+
+  vreg-mx-supply:
+    description: A phandle to the mx power supply
+
+  vreg-cx-supply:
+    description: A phandle to the cx power supply
+
+  qcom,vreg-1p2-voltage-level:
+    description: Array containing the min, max supported voltage and current for 1.2v power supply.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,vreg-0p9-voltage-level:
+    description: Array containing the min, max supported voltage and current for 0.9v power supply.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,vreg-qref-voltage-level:
+    description: Array containing the min, max supported voltage and current for qref power supply.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  resets:
+    maxItems: 2
+
+  reset-names:
+    items:
+      - const: pcie_core_reset
+      - const: pcie_phy_reset
+
+  interconnects:
+    maxItems: 1
+
+  interconnect-names:
+    items:
+      - const: icc_path
+
+  # Common definitions for clocks, clock-names and reset.
+  # Platform constraints are described later.
+  clocks:
+    description: Phandles to the clocks.
+    minItems: 1
+    maxItems: 14
+    anyOf:
+      - items:
+          - description: PCIe PIPE clock
+          - description: PCIe reference clock source
+          - description: PCIe Auxiliary clock
+          - description: PCIe CFG AHB clock
+          - description: PCIe Master AXI clock
+          - description: PCIe Slave AXI clock
+          - description: PCIe low dropout regulator clock
+          - description: PCIe Slave Q2A AXI clock
+          - description: PCIe DDRS SF translational buffer unit clock
+          - description: PCIe aggregation NoC AXI clock
+          - description: PCIe CNOC SF AXI clock
+          - description: PCIe Multiplexer clock for the PIPE clock
+          - description: PCIe external source PIPE clock
+          - description: PCIe PHY Auxiliary clock
+
+  clock-names:
+    description: Names of the clocks.
+    minItems: 1
+    maxItems: 14
+    anyOf:
+      - items:
+          - const: pcie_pipe_clk
+          - const: pcie_0_ref_clk_src
+          - const: pcie_aux_clk
+          - const: pcie_cfg_ahb_clk
+          - const: pcie_mstr_axi_clk
+          - const: pcie_slv_axi_clk
+          - const: pcie_ldo
+          - const: pcie_slv_q2a_axi_clk
+          - const: pcie_ddrss_sf_tbu_clk
+          - const: pcie_aggre_noc_0_axi_clk
+          - const: gcc_cnoc_pcie_sf_axi_clk
+          - const: pcie_pipe_clk_mux
+          - const: pcie_pipe_clk_ext_src
+          - const: pcie_phy_aux_clk
+
+  qcom,pcie-vendor-id:
+    description: Vendor ID of the endpoint to be exposed
+
+  qcom,pcie-device-id:
+    description: Device ID of the endpoint to be exposed
+
+  qcom,pcie-link-speed:
+    description: This will override the max Gen speed
+                 - 0x1 GEN1
+                 - 0x2 GEN2
+                 - 0x3 GEN3
+                 - 0x4 GEN4
+    $ref: /schemas/types.yaml#/definitions/uint32
+    enum: [1, 2, 3, 4]
+
+  qcom,pcie-phy-ver:
+    description: States the PCIe PHY HSR version.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,no-path-from-ipa-to-pcie:
+    description: This will configure iatu for IPA transactions as there is no
+                 direct path from the IPA to PCIe.
+    type: boolean
+
+  qcom,pcie-aggregated-irq:
+    description: This will configure iatu for IPA transactions as there is no
+                 direct path from the IPA to PCIe.
+    type: boolean
+
+  qcom,pcie-mhi-a7-irq:
+    description: This will configure iatu for IPA transactions as there is no
+                 direct path from the IPA to PCIe.
+    type: boolean
+
+  qcom,tcsr-not-supported:
+    description: This will configure iatu for IPA transactions as there is no
+                 direct path from the IPA to PCIe.
+    type: boolean
+
+  qcom,phy-status-reg2:
+    description: Offset from PCIe PHY base to check the PCIe PHY status.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,mhi-soc-reset-offset:
+    description: Offset from PCIe PHY base to check the PCIe PHY status.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,aux-clk:
+    description: This sets the aux clock frequency value.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  iommu-map:
+    description: As described in the pci-iommu.txt.
+    maxItems: 1
+
+  qcom,phy-init:
+    description: PCIe PHY initialization sequence.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  '#address-cells':
+    description: Should provide a value of 0.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  '#interrupt-cells':
+    description: Should provide a value of 1.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  '#interrupt-map-mask':
+    description: should provide a value of 0xffffffff.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  interrupt-map:
+    description: Must create mapping for the number of interrupts
+                 that are defined in above interrupts property.
+                 For PCIe device node, it should define 6 mappings for
+                 the corresponding PCIe interrupts supporting the
+                 specification.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,vreg-mx-voltage-level:
+    description: Support PCIe Gen4 on sdxlemur by scaling MX to
+                 appropriate voltage.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  max-clock-frequency-hz:
+    description: list of the maximum operating frequencies stored
+                 in the same order of clock names.
+
+  qcom,tcsr-perst-separation-enable-offset:
+    description: Offset for TCSR perst seperation enable.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,tcsr-reset-separation-offset:
+    description: Offset for TCSR reset seperation.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,tcsr-perst-enable-offset:
+    description: Offset for TCSR perst enable.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,tcsr-hot-reset-offset:
+    description: Offset for TCSR hot reset enable.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,perst-raw-rst-status-b:
+    description: Bit for perset raw reset status.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,dbi-base-reg:
+    description: Register offset for DBI base address.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,slv-space-reg:
+    description: Register offset for slave address space size.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,pcie-active-config:
+    description: active configuration of PCIe addressing.
+    type: boolean
+
+  qcom,pcie-edma:
+    description: edma usage for PCIe.
+    type: boolean
+
+  qcom,pcie-cesta-clkreq-offset:
+    description: Offset from PCIe PARF base to PCIe CESTA CLKREQ register.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,pcie-perst-enum:
+    description: Link enumeration will be triggered by PERST deassertion.
+    type: boolean
+
+  qcom,pcie-m2-autonomous:
+    description: Enable L1ss sleep/exit to support M2 autonomous mode.
+    type: boolean
+
+  qcom,override-disable-sriov:
+    description: Set to report as SRIOV capability disable with client (MHI) driver.
+    type: boolean
+
+  nvmem-cells:
+    description: Phandle of nvmem cell containing the address for boot_config.
+    $ref: /schemas/types.yaml#/definitions/phandle-array
+
+  nvmem-cell-names:
+    description: nvmem cell name for boot_config.
+    $ref: /schemas/types.yaml#/definitions/string-array
+
+  qcom,fast-boot-mask:
+    description: Bitmask to read fast_boot value from boot_config cell.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,host-bypass-mask:
+    description: Bitmask to read host_bypass value from boot_config cell.
+                 Will work only when host_bypass is 1 bit in boot_config.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,fast-boot-values:
+    description: fast_boot values to check against boot_config based value for confirming
+                 that host-interface is PCIe.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,ep-pcie-num-ipc-pages-dev-fac:
+    description: If property is present reduce the ep pcie ipc logging size
+                 based on the divisor factor. This property also represents the divisor factor.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,pcie-sm-sequence:
+    description: PCIe State Manager sequence.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,pcie-sm-branch-sequence:
+    description: PCIe state manager branch sequence.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,pcie-sm-branch-offset:
+    description: Offset from PCIe state manager base to load the branch sequence.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,pcie-sm-start-offset:
+    description: Offset from PCIe state manager base to start/enable the state manager.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,pcie-disconnect-req-reg-b:
+    description: It specifies the register responsible for handling PCIe disconnect requests.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,aoss-rst-clr:
+    description: If present, indicates that the reset clear signal is enabled.
+                 It is used to clear and write reset signals to the specified register within the AOSS.
+    type: boolean
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - interrupt-names
+  - pinctrl-names
+  - pinctrl-0
+  - perst-gpio
+  - wake-gpio
+  - resets
+  - reset-names
+  - clocks
+  - clock-names
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    pcie_ep: qcom,pcie@bfffd000 {
+        compatible = "qcom,pcie-ep";
+
+        reg = <0xbfffd000 0x1000>,
+              <0xbfffe000 0x1000>,
+              <0xbffff000 0x1000>,
+              <0xfc520000 0x2000>,
+              <0xfc526000 0x1000>,
+              <0xfc527000 0x1000>,
+              <0x01fcb000 0x1000>;
+
+        reg-names = "msi", "dm_core", "elbi", "parf", "phy", "mmio",
+                    "tcsr_pcie_perst";
+
+        #address-cells = <0>;
+        interrupt-parent = <&pcie_ep>;
+        interrupts = <0 1 2 3 4 5>;
+        #interrupt-cells = <1>;
+        interrupt-map-mask = <0xffffffff>;
+        interrupt-map = <0 &intc 0 44 0
+                         1 &intc 0 46 0
+                         2 &intc 0 47 0
+                         3 &intc 0 50 0
+                         4 &intc 0 51 0
+                         5 &intc 0 52 0>;
+        interrupt-names = "int_pm_turnoff", "int_dstate_change",
+                          "int_l1sub_timeout", "int_link_up",
+                          "int_link_down", "int_bridge_flush_n";
+
+        perst-gpio = <&msmgpio 65 0>;
+        wake-gpio = <&msmgpio 61 0>;
+        clkreq-gpio = <&msmgpio 64 0>;
+        mdm2apstatus-gpio = <&tlmm_pinmux 16 0>;
+
+        gdsc-vdd-supply = <&gdsc_pcie_0>;
+        vreg-1.8-supply = <&pmd9635_l8>;
+        vreg-0.9-supply = <&pmd9635_l4>;
+
+        qcom,vreg-1.8-voltage-level = <1800000 1800000 1000>;
+        qcom,vreg-0.9-voltage-level = <950000 950000 24000>;
+
+        clock-names = "pcie_pipe_clk",
+                      "pcie_aux_clk", "pcie_cfg_ahb_clk",
+                      "pcie_mstr_axi_clk", "pcie_slv_axi_clk",
+                      "pcie_ldo";
+        max-clock-frequency-hz = <62500000>, <1000000>,
+                                 <0>, <0>, <0>, <0>;
+        resets = <&clock_gcc GCC_PCIE_BCR>,
+                 <&clock_gcc GCC_PCIE_PHY_BCR>;
+
+        reset-names = "pcie_core_reset", "pcie_phy_reset";
+
+        qcom,pcie-link-speed = <1>;
+        qcom,pcie-active-config;
+        qcom,pcie-aggregated-irq;
+        qcom,pcie-mhi-a7-irq;
+        qcom,pcie-perst-enum;
+        qcom,phy-status-reg = <0x728>;
+        qcom,dbi-base-reg = <0x168>;
+        qcom,slv-space-reg = <0x16c>;
+
+        qcom,phy-init = <0x604 0x03 0x0 0x1
+                         0x048 0x08 0x0 0x1
+                         0x64c 0x4d 0x0 0x1
+                         0x600 0x00 0x0 0x1
+    };

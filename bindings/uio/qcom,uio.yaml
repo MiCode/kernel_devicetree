@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/reserved-memory/qcom,uio.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: QTI MSM Shared Memory
+
+description: |
+  This binding describes the MSM Shared memory, which provides the
+  shared memory addresses for various clients in user-space
+
+maintainers:
+  - Bjorn Andersson <bjorn.andersson@linaro.org>
+
+properties:
+  compatible:
+    const: qcom,sharedmem-uio
+
+  reg:
+    minItems: 2
+    maxItems: 2
+    description: >
+      The address and size of the shared memory. The address/sizes may vary.
+      A reg address of Zero indicates that the shared memory is dynamically
+      allocated using dma_alloc_coherent. A non zero reg address is
+      used directly.
+
+  reg-names:
+    description: >
+      Indicates various client-names.
+
+  qcom,client-id:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: >
+      The client id for the QMI clients.
+
+  qcom,vm-nav-path:
+    description: >
+      If this dtsi property is set, then the shared memory region
+      will be given access to vm-nav-path also.
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - qcom,client-id
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    qcom,msm_sharedmem@0dc80000 {
+        compatible = "qcom,sharedmem-uio";
+        reg = <0x0dc80000 0x00180000>,
+        reg-names = "rmtfs";
+        qcom,client-id = <0x00000001>;
+        qcom,vm-nav-path;
+    };

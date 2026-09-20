@@ -1,0 +1,360 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include "sm6150.dtsi"
+#include "sm6150-pmic-overlay.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. QCS610";
+	qcom,msm-name = "QCS610";
+	qcom,msm-id = <401 0>;
+};
+
+&soc {
+	eud: qcom,msm-eud@88e0000 {
+		compatible = "qcom,msm-eud";
+		interrupt-names = "eud_irq";
+		interrupts = <GIC_SPI 492 IRQ_TYPE_LEVEL_HIGH>;
+		reg = <0x88e0000 0x2000>,
+		      <0x88e4000 0x1000>;
+		reg-names = "eud_base", "eud_mode_mgr2";
+		qcom,secure-eud-en;
+		qcom,eud-clock-vote-req;
+		clocks = <&gcc GCC_AHB2PHY_WEST_CLK>;
+		clock-names = "eud_ahb2phy_clk";
+		status = "ok";
+	};
+
+	modem_pas: remoteproc-mss@04080000 {
+		compatible = "qcom,sm6150-modem-pas";
+		reg = <0x4080000 0x10000>;
+		status = "ok";
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>;
+		clock-names = "xo";
+
+		cx-supply = <&VDD_CX_LEVEL>;
+		cx-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		mss-supply = <&VDD_MSS_LEVEL>;
+		mss-uV-uA = <RPMH_REGULATOR_LEVEL_TURBO 100000>;
+		reg-names = "cx", "mss";
+
+		mboxes = <&qmp_aop 0>;
+		interconnects = <&aggre1_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		interconnect-names = "crypto_ddr";
+
+		memory-region = <&pil_modem_mem>;
+
+		/* Inputs from mss */
+		interrupts-extended = <&intc GIC_SPI 266 IRQ_TYPE_EDGE_RISING>,
+					<&modem_smp2p_in 0 0>,
+					<&modem_smp2p_in 2 0>,
+					<&modem_smp2p_in 1 0>,
+					<&modem_smp2p_in 3 0>,
+					<&modem_smp2p_in 7 0>;
+
+		interrupt-names = "wdog",
+				"fatal",
+				"handover",
+				"ready",
+				"stop-ack",
+				"shutdown-ack";
+
+		/* Outputs to mss */
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "stop";
+
+		remoteproc_modem_glink: glink-edge {
+			qcom,remote-pid = <1>;
+			transport = "smem";
+			mboxes = <&apss_shared 12>;
+			mbox-names = "mpss_smem";
+			interrupts = <GIC_SPI 449 IRQ_TYPE_EDGE_RISING>;
+
+			label = "modem";
+			qcom,glink-label = "mpss";
+
+			qcom,modem_qrtr {
+				qcom,glink-channels = "IPCRTR";
+				qcom,low-latency;
+				qcom,intents = <0x800  5
+						0x2000 3
+						0x4400 2>;
+			};
+
+			qcom,modem_ds {
+				qcom,glink-channels = "DS";
+				qcom,intents = <0x4000 0x2>;
+			};
+		};
+	};
+
+	bluetooth: bt_wcn3990 {
+		compatible = "qcom,wcn3990";
+		qcom,bt-sw-ctrl-gpio = <&tlmm 80 GPIO_ACTIVE_HIGH>;
+		qcom,bt-vdd-io-supply = <&pm6150_l10>; /* IO */
+		qcom,bt-vdd-core-supply = <&pm6150l_l2>; /* RFA */
+		qcom,bt-vdd-pa-supply = <&pm6150l_l10>; /* CH0 */
+		qcom,bt-vdd-xtal-supply = <&pm6150l_l1>; /* XO */
+
+		qcom,bt-vdd-io-config = <1700000 1900000 1 0>;
+		qcom,bt-vdd-core-config = <1304000 1304000 1 0>;
+		qcom,bt-vdd-pa-config = <3000000 3312000 1 0>;
+		qcom,bt-vdd-xtal-config = <1700000 1900000 1 0>;
+	};
+
+	qcom_cedev: qcedev@1de0000 {
+		compatible = "qcom,qcedev";
+		reg = <0x1de0000 0x20000>,
+			<0x1dc4000 0x24000>;
+		reg-names = "crypto-base","crypto-bam-base";
+		interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,bam-pipe-pair = <3>;
+		qcom,ce-hw-instance = <0>;
+		qcom,ce-device = <0>;
+		qcom,ce-hw-shared;
+		qcom,bam-ee = <0>;
+		qcom,smmu-s1-enable;
+		qcom,no-clock-support;
+		interconnect-names = "data_path";
+		interconnects = <&aggre1_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+		iommus = <&apps_smmu 0x0106 0x0011>,
+			 <&apps_smmu 0x0116 0x0011>;
+		qcom,iommu-dma = "atomic";
+	};
+
+	mtl_rx_setup: rx-queues-config {
+		snps,rx-queues-to-use = <4>;
+		snps,rx-sched-sp;
+
+		queue0 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x0>;
+			snps,route-up;
+			snps,priority = <0x1>;
+		};
+
+		queue1 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x1>;
+			snps,route-ptp;
+		};
+
+		queue2 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x2>;
+			snps,route-avcp;
+		};
+
+		queue3 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x3>;
+			snps,priority = <0xc>;
+		};
+	};
+
+	mtl_tx_setup: tx-queues-config {
+		snps,tx-queues-to-use = <4>;
+		snps,tx-sched-sp;
+
+		queue0 {
+			snps,dcb-algorithm;
+		};
+
+		queue1 {
+			snps,dcb-algorithm;
+		};
+
+		queue2 {
+			snps,avb-algorithm;
+			snps,send_slope = <0x1000>;
+			snps,idle_slope = <0x1000>;
+			snps,high_credit = <0x3e800>;
+			snps,low_credit = <0xffc18000>;
+		};
+
+		queue3 {
+			snps,avb-algorithm;
+			snps,send_slope = <0x1000>;
+			snps,idle_slope = <0x1000>;
+			snps,high_credit = <0x3e800>;
+			snps,low_credit = <0xffc18000>;
+		};
+	};
+
+	ethqos_hw: qcom,ethernet@00020000 {
+		compatible = "qcom,stmmac-ethqos", "snps,dwmac-4.20a";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		qcom,arm-smmu;
+		emac-core-version = <0x20030001>;
+		reg = <0x20000 0x10000>,
+			<0x36000 0x100>,
+			<0x3d00000 0x300000>;
+		reg-names = "stmmaceth", "rgmii", "tlmm-central-base";
+		clocks = <&gcc GCC_EMAC_AXI_CLK>,
+			<&gcc GCC_EMAC_SLV_AHB_CLK>,
+			<&gcc GCC_EMAC_PTP_CLK>,
+			<&gcc GCC_EMAC_RGMII_CLK>;
+		clock-names = "stmmaceth", "pclk", "ptp_ref", "rgmii";
+		snps,ptp-ref-clk-rate = <250000000>;
+		snps,ptp-req-clk-rate = <96000000>;
+		interrupts-extended = <&intc 0 660 4>, <&intc 0 668 4>,
+			<&intc 0 669 4>;
+		interrupt-names = "macirq", "ptp_pps_irq_0",
+			"ptp_pps_irq_1";
+
+		snps,tso;
+		snps,pbl = <32>;
+		rx-fifo-depth = <16384>;
+		tx-fifo-depth = <20480>;
+		snps,mtl-rx-config = <&mtl_rx_setup>;
+		snps,mtl-tx-config = <&mtl_tx_setup>;
+		snps,reset-gpios = <&tlmm 104 GPIO_ACTIVE_HIGH>;
+		qcom,phy-intr-redirect = <&tlmm 121 GPIO_ACTIVE_LOW>;
+		gdsc-emac-supply = <&emac_gdsc>;
+
+		pinctrl-names = "dev-emac-mdc",
+			"dev-emac-mdio",
+			"dev-emac-rgmii_txd0_state",
+			"dev-emac-rgmii_txd1_state",
+			"dev-emac-rgmii_txd2_state",
+			"dev-emac-rgmii_txd3_state",
+			"dev-emac-rgmii_txc_state",
+			"dev-emac-rgmii_tx_ctl_state",
+			"dev-emac-rgmii_rxd0_state",
+			"dev-emac-rgmii_rxd1_state",
+			"dev-emac-rgmii_rxd2_state",
+			"dev-emac-rgmii_rxd3_state",
+			"dev-emac-rgmii_rxc_state",
+			"dev-emac-rgmii_rx_ctl_state",
+			"dev-emac-phy_intr",
+			"dev-emac-phy_reset_state",
+			"dev-emac_pin_pps_0";
+
+		pinctrl-0 = <&emac_mdc>;
+		pinctrl-1 = <&emac_mdio>;
+		pinctrl-2 = <&emac_rgmii_txd0>;
+		pinctrl-3 = <&emac_rgmii_txd1>;
+		pinctrl-4 = <&emac_rgmii_txd2>;
+		pinctrl-5 = <&emac_rgmii_txd3>;
+		pinctrl-6 = <&emac_rgmii_txc>;
+		pinctrl-7 = <&emac_rgmii_tx_ctl>;
+		pinctrl-8 = <&emac_rgmii_rxd0>;
+		pinctrl-9 = <&emac_rgmii_rxd1>;
+		pinctrl-10 = <&emac_rgmii_rxd2>;
+		pinctrl-11 = <&emac_rgmii_rxd3>;
+		pinctrl-12 = <&emac_rgmii_rxc>;
+		pinctrl-13 = <&emac_rgmii_rx_ctl>;
+		pinctrl-14 = <&emac_phy_intr>;
+		pinctrl-15 = <&emac_phy_reset_state>;
+		pinctrl-16 = <&emac_pin_pps_0>;
+
+		snps,reset-delay-us = <0 11000 70000>;
+		vreg_emac_phy-supply = <&L19A>;
+		qcom,phyad_change;
+		qcom,rgmii-config-loopback;
+		phy-mode = "rgmii";
+		eth-c22-mdio-probe;
+		gdsc-off-on-suspend;
+
+		ethqos_emb_smmu: ethqos_emb_smmu {
+			compatible = "qcom,emac-smmu-embedded";
+			iommus = <&apps_smmu 0x1c0 0x0>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-dma-addr-pool = <0x80000000 0x40000000>;
+		};
+
+		rgmii-io-macro-info {
+			config-cdr-en = <1>;
+			mclk-gating-en = <1>;
+			cdr-fine-phase = <1>;
+			skip-calc-traffic = <1>;
+			data-divide-clk-sel = <0>;
+			prg-rclk-dly = <1000>;
+			loopback-en = <1>;
+			rx-prog-swap = <1>;
+			tx-clk-phase-shift-en = <1>;
+			dll-clock-dis = <0>;
+			mclk-freq-calc = <0x1A>;
+			ddr-traffic-init-sel = <0>;
+			ddr-traffic-init-sw = <0>;
+			ddr-cal-en = <0>;
+			tcx0-cycles-dly-line = <64>;
+			tcx0-cycles-cnt = <4>;
+			test-ctl = <0xC1800000>;
+			usr-ctl = <0x2C010800>;
+			pps-create = <1>;
+			l3-master-dev = <1>;
+			ipv6-wq = <1>;
+		};
+
+	};
+};
+
+&qupv3_se3_i2c {
+	status = "ok";
+	#include "smb1390.dtsi"
+};
+
+&smb1390 {
+	/delete-property/ interrupts;
+	interrupts = <0x0 0xc2 0x0 IRQ_TYPE_LEVEL_LOW>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&smb_stat_default>;
+	status = "ok";
+};
+
+&smb1390_charger {
+	/delete-property/ compatible;
+	compatible = "qcom,smb1390-charger-psy";
+	io-channels = <&pm6150_vadc ADC5_AMUX_THM3>;
+	io-channel-names = "cp_die_temp";
+	status = "ok";
+};
+
+&L19A {
+	regulator-max-microvolt = <3304000>;
+};
+
+&emac_phy_intr {
+	mux {
+		pins = "gpio76";
+		function = "gpio";
+	};
+
+	config {
+		pins = "gpio76";
+		bias-disable;  /* NO pull */
+		drive-strength = <2>;
+	};
+};
+
+&emac_phy_reset_state {
+	mux {
+		pins = "gpio36";
+		function = "gpio";
+	};
+
+	config {
+		pins = "gpio36";
+		bias-pull-up;
+		drive-strength = <16>;
+	};
+};
+
+&emac_pin_pps_0 {
+	mux {
+		pins = "gpio77";
+		function = "rgmii_sync";
+	};
+
+	config {
+		pins = "gpio77";
+		bias-pull-up;
+		drive-strength = <16>;
+	};
+};

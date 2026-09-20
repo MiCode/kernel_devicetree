@@ -1,0 +1,94 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/crypto/qcom,ice.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) Inline Crypto Engine (ICE)
+
+maintainers:
+  - Neeraj Soni <quic_neersoni@quicinc.com>
+
+description: |
+  The ICE provides inline hardware encryption support for storage (UFS/eMMC).
+
+properties:
+  compatible:
+    const: qcom,ice
+
+  reg:
+    maxItems: 1
+    description: |
+      ICE register space.
+
+  clocks:
+    minItems: 1
+    maxItems: 4
+    description: |
+      Clocks required by the ICE block.
+
+  clock-names:
+    minItems: 1
+    maxItems: 4
+    description: |
+      Clock name identifiers corresponding to entries in `clocks`.
+
+  qcom,enable-ice-clk:
+    type: boolean
+    description: |
+      Indicates that ICE clocks are managed by HLOS and must be
+      enabled during ICE operation.
+
+  qcom,op-freq-hz:
+    description: |
+      Max frequency (Hz) of the listed clocks, in the same order as `clock-names`.
+      Use 0 to let the driver choose/default.
+
+  vdd-hba-supply:
+    description: |
+      Phandle to the regulator that powers the associated host bus
+      adapter (typically only used for UFS ICE).
+
+  qcom,instance-type:
+    $ref: /schemas/types.yaml#/definitions/string
+    enum:
+      - ufs
+      - sdcc
+    description: |
+      Storage instance associated with this ICE block:
+      "ufs" for UFS controllers and "sdcc" for eMMC/SD controllers.
+
+  qcom,num-fde-slots:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Number of FDE (Full Disk Encryption) slots supported by ICE.
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+
+additionalProperties: false
+
+examples:
+  - |
+    ufs_ice: ufsice@1d90000 {
+      compatible = "qcom,ice";
+      reg = <0x1d90000 0x8000>;
+
+      qcom,enable-ice-clk;
+
+      clock-names = "ufs_core_clk", "bus_clk",
+                    "iface_clk", "ice_core_clk";
+      clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
+               <&gcc GCC_UFS_MEM_CLKREF_CLK>,
+               <&gcc GCC_UFS_PHY_AHB_CLK>,
+               <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
+
+      qcom,op-freq-hz = <0>, <0>, <0>, <300000000>;
+
+      vdd-hba-supply = <&ufs_phy_gdsc>;
+      qcom,instance-type = "ufs";
+      qcom,num-fde-slots = <31>;
+    };

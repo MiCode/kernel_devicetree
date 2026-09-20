@@ -1,0 +1,189 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "pm6150.dtsi"
+#include "pm6150l.dtsi"
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
+
+&pm6150_vadc {
+	sdm_therm {
+		reg = <ADC5_AMUX_THM2_100K_PU>;
+		label = "sdm_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	smb1390_therm {
+		reg = <ADC5_AMUX_THM3>;
+		label = "smb1390_therm";
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	conn_therm {
+		reg = <ADC5_AMUX_THM4_100K_PU>;
+		label = "conn_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+};
+
+&pm6150_adc_tm {
+	/* Channel nodes */
+	xo_therm {
+		reg = <0>;
+		io-channels = <&pm6150_vadc ADC5_XO_THERM_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+
+	sdm_therm {
+		reg = <1>;
+		io-channels = <&pm6150_vadc ADC5_AMUX_THM2_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+
+	conn_therm {
+		reg = <2>;
+		io-channels = <&pm6150_vadc ADC5_AMUX_THM4_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+};
+
+&pm6150l_4 {
+	qcom,power-on@800 {
+		status = "disabled";
+	};
+};
+
+&pm6150l_vadc {
+	emmc_ufs_therm {
+		reg = <ADC5_AMUX_THM1_100K_PU>;
+		label = "emmc_ufs_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	rf_pa0_therm {
+		reg = <ADC5_AMUX_THM2_100K_PU>;
+		label = "rf_pa0_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	rf_pa1_therm {
+		reg = <ADC5_AMUX_THM3_100K_PU>;
+		label = "rf_pa1_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	camera_flash_therm {
+		reg = <ADC5_GPIO1_100K_PU>;
+		label = "camera_flash_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+
+	quiet_therm {
+		reg = <ADC5_GPIO4_100K_PU>;
+		label = "quiet_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+	};
+};
+
+&pm6150l_adc_tm {
+	/* Channel nodes */
+	emmc_ufs_therm {
+		reg = <0>;
+		io-channels = <&pm6150l_vadc ADC5_AMUX_THM1_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+
+	rf_pa0_therm {
+		reg = <1>;
+		io-channels = <&pm6150l_vadc ADC5_AMUX_THM2_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+
+	camera_flash_therm {
+		reg = <2>;
+		io-channels = <&pm6150l_vadc ADC5_GPIO1_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+
+	quiet_therm {
+		reg = <3>;
+		io-channels = <&pm6150l_vadc ADC5_GPIO4_100K_PU>;
+		qcom,ratiometric;
+		qcom,hw-settle-time-us = <200>;
+	};
+};
+
+&spmi_bus {
+	qcom,pm6150@0 {
+		pm6150_clkdiv: clock-controller@5b00 {
+			compatible = "qcom,spmi-clkdiv";
+			reg = <0x5b00>;
+			#clock-cells = <1>;
+			qcom,num-clkdivs = <1>;
+			clock-output-names = "pm6150_div_clk1";
+			clocks = <&rpmhcc RPMH_CXO_CLK>;
+			clock-names = "xo";
+			assigned-clocks = <&pm6150_clkdiv 1>;
+			assigned-clock-rates = <19200000>;
+		};
+	};
+
+	qcom,pm6150l@4 {
+		pm6150l_clkdiv: clock-controller@5b00 {
+			compatible = "qcom,spmi-clkdiv";
+			reg = <0x5b00>;
+			#clock-cells = <1>;
+			qcom,num-clkdivs = <1>;
+			clock-output-names = "pm6150l_div_clk1";
+			clocks = <&rpmhcc RPMH_CXO_CLK>;
+			clock-names = "xo";
+		};
+	};
+};
+
+&pm6150_gpios {
+	wcd934x_mclk {
+		wcd934x_mclk_default: wcd934x_mclk_default {
+			pins = "gpio8";
+			function = "func1";
+			qcom,drive-strength = <2>;
+			power-source = <0>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	smb_stat {
+		smb_stat_default: smb_stat_default {
+			pins = "gpio3";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			qcom,pull-up-strength = <PMIC_GPIO_PULL_UP_30>;
+			power-source = <0>;
+		};
+	};
+};

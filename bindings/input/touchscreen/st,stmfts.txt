@@ -1,0 +1,44 @@
+* ST-Microelectronics FingerTip touchscreen controller
+
+The ST-Microelectronics FingerTip device provides a basic touchscreen
+functionality. Along with it the user can enable the touchkey which can work as
+a basic HOME and BACK key for phones.
+
+The driver supports also hovering as an absolute single touch event with x, y, z
+coordinates.
+
+Required properties:
+- compatible		: must be "st,stmfts" OR "st,fts" OR "st,fts2"
+- reg			: I2C slave address, (e.g. 0x49). Or 0 for SPI interface
+- interrupts		: interrupt specification
+- avdd-supply		: analogic power supply
+- vdd-supply		: power supply
+- st,irq-gpio		: interrupt gpio.
+- st,irq-flags		: irq trigger type config, , value should be:
+				1 - rising edge,
+				2 - falling edge,
+				4 - high level,
+				8 - low level.
+- st,reset-gpio		: reset gpio
+- st,regulator_dvdd	: dvdd regulator name
+- st,regulator_avdd	: avdd regulator name
+
+Example:
+
+&i2c_6 {
+	status = "ok";
+	st_fts@49 {
+		compatible = "st,fts";
+		reg = <0x49>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <162 0x2008>;
+		vdd-supply = <&L4B>;
+		avdd-supply = <&L14B>;
+		st,irq-gpio = <&tlmm 162 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 161 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
+	};
+};

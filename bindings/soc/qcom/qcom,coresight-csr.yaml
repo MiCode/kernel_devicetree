@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/soc/qcom/qcom,coresight-csr.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: The document describes the device tree binding for coresight-csr
+
+maintainers:
+  - Yuanfang Zhang <quic_yuanfang@quicinc.com>
+
+description:
+    This binding describes the coresight component responsible for controlling
+    coresight behavior, used for setting etr atid filter, etr eth enable/disable,
+    byte-cntr configuration and setting msr for tpdm.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,coresight-csr
+
+  reg:
+    maxItems: 1
+
+  clocks:
+    minItems: 1
+    maxItems: 2
+
+  clock-names:
+    minItems: 1
+    items:
+      - const: apb_pclk
+      - const: atclk
+
+  qcom,usb-bam-support:
+    type: boolean
+    description:
+      boolean, indicates CSR has the ability to operate on usb bam,
+      include enable,disable and flush.
+
+  qcom,hwctrl-set-support:
+    type: boolean
+    description:
+      indicates CSR has the ability to operate on to "HWCTRL" register.
+
+  qcom,msr-support:
+    type: boolean
+    description:
+      indicates that CSR supports configure msr config for tpdm.
+
+  qcom,set-byte-cntr-support:
+    type: boolean
+    description:
+      indicates CSR has the ability to operate on to "BYTECNT" register.
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+    csr: csr@10001000 {
+        compatible = "qcom,coresight-csr";
+        reg = <0x10001000 0x1000>;
+
+        qcom,hwctrl-set-support;
+        qcom,set-byte-cntr-support;
+    };

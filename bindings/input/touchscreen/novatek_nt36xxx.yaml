@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/input/touchscreen/novatek_nt36xxx.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Novatek nt36xxx touch controller DTB
+
+maintainers:
+  - Maulik Shah <quic_mkshah@quicinc.com>
+
+allOf:
+  - $ref: touchscreen.yaml#
+
+properties:
+  compatible:
+    enum:
+       - novatek,NVT-ts
+
+  reg:
+    maxItems: 1
+
+  novatek,reset-gpios:
+    maxItems: 1
+
+  novatek,irq-gpio:
+    description: GPIO pin used for IRQ. The driver uses the interrupt gpio pin
+      as output to reset the device.
+
+  irq-flags:
+    description: IRQ trigger type config.
+                1 - rising edge,
+                2 - falling edge,
+                4 - high level,
+                5 - low level.
+
+  vdd-supply:
+    description: digital voltage power supply needed to power device.
+
+  avdd-supply:
+    description: analog voltage power supply needed to power device
+
+unevaluatedProperties: false
+
+required:
+  - compatible
+  - reg
+  - vdd-supply
+  - avdd-supply
+  - reset-gpios
+  - irq-gpio
+
+examples:
+  - |
+    #include <dt-bindings/gpio/gpio.h>
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+     i2c_1 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        /* Novatek device tree node */
+        novatek@62 {
+                compatible = "novatek,NVT-ts";
+                reg = <0x62>;
+                status = "ok";
+                vdd-supply = <&pm8994_lvs2>;
+                avdd-supply = <&pm8994_l22>;
+                novatek,reset-gpio = <&msm_gpio 102 0x00>;
+                novatek,irq-gpio = <&msm_gpio 65 0x2001>;
+      };
+    };

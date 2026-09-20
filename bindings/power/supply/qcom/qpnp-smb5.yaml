@@ -1,0 +1,696 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/power/supply/qcom/qpnp-smb5.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. QPNP-SMB5 Charger
+
+maintainers:
+  - Kamal Wadhwa <quic_kamalw@quicinc.com>
+
+description: |
+  SMB5 Charger is an efficient programmable battery charger capable of charging a
+  high-capacity lithium-ion battery over micro-USB or USB Type-C ultrafast with
+  Quick Charge 2.0, Quick Charge 3.0, and USB Power Delivery support. Wireless
+  charging features full A4WP Rezence 1.2, WPC 1.2, and PMA support.
+
+  Required Node Structure:
+  SMB5 Charger must be described in two levels of devices nodes.
+
+properties:
+  compatible:
+    enum:
+      - qcom,pm8150-smb5
+      - qcom,pm7250b-smb5
+      - qcom,pm6150-smb5
+      - qcom,pmi632-smb5
+      - qcom,qpnp-smb5
+
+  "#io-channel-cells":
+    const: 1
+
+  "#address-cells":
+    const: 1
+
+  "#size-cells":
+    const: 0
+
+  qcom,sec-charger-config:
+    description: |
+      Specify how the secondary chargers are configured.
+      0 - No secondary charger.
+      1 - Charge Pump SMB1390.
+      2 - SMB1355 parallel charger.
+      3 - Both Charge Pump and SMB1355.
+      If the value is not present, 0 is used as default
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  io-channels:
+    description: From common IIO bindings. Used to specify the ADC channel to get the required data.
+
+  io-channel-names:
+    description: |
+      From common IIO binding. Use to specify the name of IIO channel to be obtained.
+
+  qcom,batteryless-platform:
+    description: |
+      Boolean flag which indicates that the platform does not have a
+      battery, and therefore charging should be disabled. In
+      addition battery properties will be faked such that the device
+      assumes normal operation.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,charger-temp-max:
+    description: |
+      Specifies the charger temp REG_H_THRESHOLD for PM8150B in deciDegC.
+      If the value is not present, use the setting read from the device.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,smb-temp-max:
+    description: |
+      Specifies the charger temp REG_H_THRESHOLD for SMB1355 in deciDegC.
+      If the value is not present, use the setting read from the device.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,fcc-max-ua:
+    description: |
+      Specifies the maximum fast charge current in micro-amps.
+      If the value is not present, 1Amp is used as default.
+    default: 1000000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,fv-max-uv:
+    description: |
+      Specifies the maximum float voltage in micro-volts.
+      If the value is not present, 4.35V is used as default.
+    default: 4350000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,usb-icl-ua:
+    description: |
+      Specifies the USB input current limit in micro-amps.
+      If the value is not present, 1.5Amps is used as default.
+    default: 1500000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,usb-ocl-ua:
+    description: |
+      Specifies the OTG output current limit in micro-amps.
+      If the value is not present, 1.5Amps is used as default
+    default: 1500000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,dc-icl-ua:
+    description: |
+      Specifies the DC input current limit in micro-amps.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,boost-threshold-ua:
+    description: |
+      Specifies the boost current threshold in micro-amps.
+      If the value is not present, 100mA is used as default.
+    default: 100000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,thermal-mitigation:
+    description: |
+      Array of fast charge current limit values for
+      different system thermal mitigation levels.
+      This should be a flat array that denotes the
+      maximum charge current in mA for each thermal
+      level.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+
+  qcom,float-option:
+    description: |
+      Configures how the charger behaves when a float charger is
+      detected by APSD.
+      1 - Treat as a DCP.
+      2 - Treat as a SDP.
+      3 - Disable charging.
+      4 - Suspend USB input.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,hvdcp-disable:
+    description: |
+      Specifies if hvdcp charging is to be enabled or not.
+      If this property is not specified hvdcp will be enabled.
+      If this property is specified, hvdcp 2.0 detection will still
+      happen but the adapter won't be asked to switch to a higher
+      voltage point.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,chg-inhibit-threshold-mv:
+    description: |
+      Charge inhibit threshold in milli-volts. Charging will be
+      inhibited when the battery voltage is within this threshold
+      from Vfloat at charger insertion. If this is not specified
+      then charge inhibit will be disabled by default.
+      Allowed values are: 50, 100, 200, 300.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,chg-term-src:
+    description: |
+      Specify either the ADC or analog comparators to be used in order
+      to set threshold values for charge termination current.
+      0 - Unspecified
+      1 - Select ADC comparator
+      2 - Select ANALOG comparator
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,chg-term-current-ma:
+    description: |
+      When ADC comparator is selected as qcom,chg-term-src, this
+      parameter should be set to the desired upper threshold.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,chg-term-base-current-ma:
+    description: |
+      When ADC comparator is selected as qcom,chg-term-src, this
+      parameter should be set to the desired lower threshold.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,auto-recharge-soc:
+    description: |
+      Specifies the SOC threshold at which the charger will
+      restart charging after termination. The value specified
+      ranges from 0 - 100. The feature is enabled if this
+      property is specified with a valid SOC value.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,auto-recharge-vbat-mv:
+    description: |
+      Specifies the battery voltage threshold at which the charger
+      will restart charging after termination. The value specified
+      is in milli-volts.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,suspend-input-on-debug-batt:
+    description: |
+      Boolean flag which when present enables input suspend for
+      debug battery.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,fake-chg-status-on-debug-batt:
+    description: |
+      Boolean flag which when present shows charging status as
+      unknown for debug battery. This needs to be specified only if
+      the device needs to be kept powered on always with
+      "svc power stayon true".
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,min-freq-khz:
+    description: |
+      Specifies the minimum charger buck/boost switching frequency
+      in KHz. It overrides the min frequency defined for the charger
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,max-freq-khz:
+    description: |
+      Specifies the maximum charger buck/boost switching frequency in
+      KHz. It overrides the max frequency defined for the charger.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,otg-deglitch-time-ms:
+    description: |
+      Specifies the deglitch interval for OTG detection.
+      If the value is not present, 50 msec is used as default.
+    default: 50
+
+  qcom,step-charging-enable:
+    description: |
+      Boolean flag which when present enables step-charging.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,typec-legacy-rp-icl:
+    description: |
+      Boolean property to enable setting ICL based on Rp for
+      Type-C non-compliant legacy cables.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,wd-bark-time-secs:
+    description: |
+      WD bark-timeout in seconds. The possible values are
+      16, 32, 64, 128. If not defined it defaults to 64.
+    default: 64
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,sw-jeita-enable:
+    description: |
+      Boolean flag which when present enables sw compensation for
+      jeita.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,flash-derating-soc:
+    description: |
+      SOC threshold in percentage below which hardware will start
+      derating flash. This is only applicable to certain PMICs like
+      PMI632 which has SCHGM_FLASH peripheral.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,flash-disable-soc:
+    description: |
+      SOC threshold in percentage below which hardware will disable
+      flash. This is only applicable to certain PMICs like PMI632
+      which has SCHGM_FLASH peripheral.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,headroom-mode:
+    description: |
+      Specifies flash hardware headroom management policy. The
+      possible values are:
+      <0>: Fixed mode, constant 5V at flash input.
+      <1>: Adaptive mode allows charger output voltage to be
+      dynamically controlled by the flash module based on the
+      required flash headroom.
+      This is only applicable to certain PMICs like PMI632 which
+      has SCHGM_FLASH peripheral.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,fcc-stepping-enable:
+    description: |
+      Boolean flag which when present enables stepwise change in FCC.
+      The default stepping rate is 100mA/sec.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,disable-suspend-on-collapse:
+    description: |
+      Boolean flag which when present disables suspend on collapse
+      feature of charger hardware.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,uusb-moisture-protection-enable:
+    description: |
+      Boolean flag which when present enables mositure protection
+      feature for uUSB connector type.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,hvdcp-autonomous-enable:
+    description: |
+      Boolean flag which when present enables hardware-controlled
+      operation of HVDCP.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,usb-pd-disable:
+    description: |
+      Boolean flag which when present disables USB-PD operation.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,lpd-disable:
+    description: |
+      Boolean flag which when present disables liquid presence
+      detection.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,hw-die-temp-mitigation:
+    description: |
+      Boolean flag which when present enables h/w based thermal
+      mitigation.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,hw-connector-mitigation:
+    description: |
+      Boolean flag which when present enables h/w based
+      connector temperature mitigation.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,hw-skin-temp-mitigation:
+    description: |
+      Boolean flag which when present enables h/w based skin
+      temperature mitigation.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,en-skin-therm-mitigation:
+    description: |
+      Boolean flag which when present enables skin
+      thermal mitigation.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,connector-internal-pull-kohm:
+    description: |
+      Specifies internal pull-up configuration to be applied to
+      connector THERM. The only valid values are (0/30/100/400).
+      If not specified 100K is used as default pull-up.
+    default: 100
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,smb-internal-pull-kohm:
+    description: |
+      Specifies internal pull-up configuration to be applied to
+      connector THERM, only valid values are (0/30/100/400).
+      If not specified 100K is used as default pull-up.
+    default: 100
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,wd-snarl-time-config:
+    description: |
+      WDOG snarl timeout configuration value. The possible values are
+      0 to 7, where 0 = 62.5ms, 1 = 125ms, 2 = 250ms, 3 = 500ms,
+      4 = 1s, 5 = 2s, 6 = 4s and 7 = 8s. If not defined, wdog-snarl
+      irq is disabled by default.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,adc-based-aicl:
+    description: |
+      Boolean flag which when present enables ADC based AICL.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,wls-current-max-ua:
+    description: |
+      Upper limit of charging current supplied by the wireless charger.
+      If left unspecified, the HW min value of 1.5 A is applied by
+      default.
+    default: 1500000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,fcc-step-delay-ms:
+    description: |
+      Specifies the delay between each step of FCC stepper algorithm.
+      If left unspecified, the default value is 1 Sec.
+    default: 1000
+
+  qcom,fcc-step-size-ua:
+    description: |
+      Specifies the step size of each step of FCC stepper algorithm.
+      If left unspecified, the default value is 100mA.
+    default: 100000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,hvdcp2-max-icl-ua:
+    description: |
+      Specifies the maximum input current limit that can be configured
+      for HVDCP2 adapter.
+      If left unspecified, the default value is 3000mA.
+    default: 3000000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,hvdcp3-max-icl-ua:
+    description: |
+      Specifies the maximum input current limit that can be configured
+      for HVDCP3 adapter.
+      If left unspecified, the default value is 3000mA.
+    default: 3000000
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  qcom,hvdcp3-standalone-config:
+    description: |
+      Boolean flag which when present indicates that the charging is
+      only done by the main charger (standalone, no CP) with a QC 3.0
+      adapter.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+  qcom,disable-fcc-restriction:
+    description: |
+      Boolean flag which when present disables FCC restriction.
+    $ref: /schemas/types.yaml#/definitions/flag
+
+additionalProperties: false
+
+required:
+  - compatible
+
+patternProperties:
+  "^qcom,chgr@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+        maxItems: 1
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+  "^qcom,otg@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+  "^qcom,bat-if@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+  "^qcom,usb-chgpth@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+  "^qcom,dc-chgpth@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+  "^qcom,chgr-misc@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+  "^qcom,schgm-flash@[0-9a-f].*$":
+    type: object
+
+    properties:
+      reg:
+        description: Address and size of the peripheral's register block.
+
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: |
+          Interrupt names.  This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    additionalProperties: false
+
+    required:
+      - reg
+      - interrupts
+      - interrupt-names
+
+examples:
+  - |
+    pmic {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        pm8150b_charger {
+          compatible = "qcom,qpnp-smb5";
+          #io-channel-cells = <1>;
+          #address-cells = <1>;
+          #size-cells = <0>;
+          qcom,chgr@1000 {
+            reg = <0x1000>;
+            interrupts = <0x2 0x10 0x0 0>,
+                <0x2 0x10 0x1 0>,
+                <0x2 0x10 0x2 0>,
+                <0x2 0x10 0x3 0>,
+                <0x2 0x10 0x4 0>;
+
+            interrupt-names = "chg-error",
+                    "chg-state-change",
+                    "step-chg-state-change",
+                    "step-chg-soc-update-fail",
+                    "step-chg-soc-update-request";
+         };
+
+         qcom,otg@1100 {
+          reg = <0x1100>;
+          interrupts = <0x2 0x11 0x0 0>,
+                <0x2 0x11 0x1 0>,
+                <0x2 0x11 0x2 0>,
+                <0x2 0x11 0x3 0>;
+
+          interrupt-names = "otg-fail",
+                    "otg-overcurrent",
+                    "otg-oc-dis-sw-sts",
+                    "testmode-change-detect";
+         };
+
+        qcom,bat-if@1200 {
+          reg = <0x1200>;
+          interrupts = <0x2 0x12 0x0 0>,
+                <0x2 0x12 0x1 0>,
+                <0x2 0x12 0x2 0>,
+                <0x2 0x12 0x3 0>,
+                <0x2 0x12 0x4 0>,
+                <0x2 0x12 0x5 0>;
+
+         interrupt-names = "bat-temp",
+                    "bat-ocp",
+                    "bat-ov",
+                    "bat-low",
+                    "bat-therm-or-id-missing",
+                    "bat-terminal-missing";
+        };
+
+       qcom,usb-chgpth@1300 {
+         reg = <0x1300>;
+         interrupts = <0x2 0x13 0x0 0>,
+                <0x2 0x13 0x1 0>,
+                <0x2 0x13 0x2 0>,
+                <0x2 0x13 0x3 0>,
+                <0x2 0x13 0x4 0>,
+                <0x2 0x13 0x5 0>,
+                <0x2 0x13 0x6 0>,
+                <0x2 0x13 0x7 0>;
+
+        interrupt-names = "usbin-collapse",
+                    "usbin-lt-3p6v",
+                    "usbin-uv",
+                    "usbin-ov",
+                    "usbin-plugin",
+                    "usbin-src-change",
+                    "usbin-icl-change",
+                    "type-c-change";
+       };
+
+      qcom,dc-chgpth@1400 {
+        reg = <0x1400>;
+        interrupts = <0x2 0x14 0x0 0>,
+                <0x2 0x14 0x1 0>,
+                <0x2 0x14 0x2 0>,
+                <0x2 0x14 0x3 0>,
+                <0x2 0x14 0x4 0>,
+                <0x2 0x14 0x5 0>,
+                <0x2 0x14 0x6 0>;
+
+        interrupt-names = "dcin-collapse",
+                    "dcin-lt-3p6v",
+                    "dcin-uv",
+                    "dcin-ov",
+                    "dcin-plugin",
+                    "div2-en-dg",
+                    "dcin-icl-change";
+      };
+
+      qcom,chgr-misc@1600 {
+        reg = <0x1600 0x100>;
+        interrupts = <0x2 0x16 0x0 0>,
+              <0x2 0x16 0x1 0>,
+              <0x2 0x16 0x2 0>,
+              <0x2 0x16 0x3 0>,
+              <0x2 0x16 0x4 0>,
+              <0x2 0x16 0x5 0>,
+              <0x2 0x16 0x6 0>,
+              <0x2 0x16 0x7 0>;
+
+        interrupt-names = "wdog-snarl",
+                  "wdog-bark",
+                  "aicl-fail",
+                  "aicl-done",
+                  "high-duty-cycle",
+                  "input-current-limiting",
+                  "temperature-change",
+                  "switcher-power-ok";
+      };
+
+    qcom,schgm-flash@a600 {
+      reg = <0xa600>;
+      interrupts = <0x2 0xa6 0x0 0>,
+              <0x2 0xa6 0x1 0>,
+              <0x2 0xa6 0x2 0>,
+              <0x2 0xa6 0x3 0>,
+              <0x2 0xa6 0x4 0>,
+              <0x2 0xa6 0x5 0>,
+              <0x2 0xa6 0x6 0>,
+              <0x2 0xa6 0x7 0>;
+
+      interrupt-names = "flash-en",
+                  "torch-req",
+                  "flash-state-change",
+                  "vout-up",
+                  "vout-down",
+                  "ilim1-s1",
+                  "ilim2-s2",
+                  "vreg-ok";
+       };
+      };
+    };
+...

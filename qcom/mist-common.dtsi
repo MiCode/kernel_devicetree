@@ -1,0 +1,35 @@
+/* And public attribution of mist platforms */
+#include "mist-sensor.dtsi"
+#include "fingerprint.dtsi"
+
+&sdhc_1 {
+	status = "disable";
+};
+
+&sdhc_2 {
+	status = "ok";
+
+	cd-gpios = <&tlmm 101 GPIO_ACTIVE_HIGH>;
+};
+
+&ufshc_mem {
+	spm-level = <3>;
+	rpm-level = <3>;
+};
+
+&soc {
+	/*add simtray status*/
+	simtray {
+		compatible = "xiaomi,simtray-status";
+		status-gpio = <&tlmm 101 0x00>;
+	};
+
+	mtdoops_pmsg@0x80D00000 {
+	        compatible = "xiaomi,mtdoops_pmsg";
+	        reg = <0x80D00000 0x00200000>;
+	        console-size = <0x80000>;
+	        pmsg-size = <0x100000>;
+	};
+};
+
+#include "radio_cable_det/radio_cable_det.dtsi"

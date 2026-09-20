@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/qcom,dispcc-parrot.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Display Clock & Reset Controller
+
+maintainers:
+  - Jagadeesh Kona <quic_jkona@quicinc.com>
+
+description: |
+  Qualcomm Technologies, Inc. display clock control module which supports the clocks and
+  power domains on Parrot.
+
+  See also:
+    dt-bindings/clock/qcom,dispcc-parrot.h
+
+properties:
+  compatible:
+    enum:
+      - qcom,parrot-dispcc
+
+  clocks:
+    items:
+      - description: Brard XO source
+      - description: Brard XO_AO source
+      - description: Sleep clock source
+      - description: AHB config clock from GCC
+
+  clock-names:
+    items:
+      - const: bi_tcxo
+      - const: bi_tcxo_ao
+      - const: sleep_clk
+      - const: iface
+
+  vdd_cx-supply:
+    description: Phandle pointer to the vdd_cx logic rail supply
+
+  vdd_mxa-supply:
+    description: Phandle pointer to the vdd_mxa logic rail supply
+
+  '#clock-cells':
+    const: 1
+
+  reg:
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+  - '#clock-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/clock/qcom,rpmh.h>
+    #include <dt-bindings/clock/qcom,gcc-parrot.h>
+    dispcc: clock-controller@af00000 {
+        compatible = "qcom,parrot-dispcc", "syscon";
+        reg = <0xaf00000 0x20000>;
+        reg-name = "cc_base";
+        vdd_cx-supply = <&VDD_CX_LEVEL>;
+        vdd_mxa-supply = <&VDD_MXA_LEVEL>;
+        clocks = <&rpmhcc RPMH_CXO_CLK>,
+            <&rpmhcc RPMH_CXO_CLK_A>,
+            <&sleep_clk>,
+            <&gcc GCC_DISP_AHB_CLK>;
+        clock-names = "bi_tcxo", "bi_tcxo_ao", "sleep_clk", "iface";
+        #clock-cells = <1>;
+        #reset-cells = <1>;
+    };
+...

@@ -1,0 +1,434 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,gcc-sm6150.h>
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	model = "Qualcomm Technologies, Inc. QCS610 IOT";
+	compatible = "qcom,qcs610-iot", "qcom,qcs610", "qcom,iot";
+	qcom,board-id = <32 0>;
+};
+
+&pm6150l_gpios {
+	key_vol_up {
+		key_vol_up_default: key_vol_up_default {
+			pins = "gpio2";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			power-source = <0>;
+		};
+	};
+
+	irled {
+		irled_pwm: irled_pwm_default {
+			pins = "gpio6";
+			function = "func1";
+			qcom,drive-strength = <2>;
+			power-source = <0>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	cam_sensor_dvdd {
+		cam_sensor_dvdd_default: cam_sensor_dvdd_default {
+			pins = "gpio3";
+			function = "normal";
+			output-low;
+			power-source = <0>;
+		};
+	};
+
+	cam_sensor_1_vana {
+		cam_sensor_1_vana_default: cam_sensor_1_vana_default {
+			pins = "gpio8";
+			function = "normal";
+			output-low;
+			power-source = <0>;
+		};
+	};
+
+	cam_sensor_0_vana {
+		cam_sensor_0_vana_default: cam_sensor_0_vana_default {
+			pins = "gpio9";
+			function = "normal";
+			output-low;
+			power-source = <0>;
+		};
+	};
+
+	cam_sensor_1_2_vana {
+		cam_sensor_1_2_vana_default: cam_sensor_1_2_vana_default {
+			pins = "gpio4";
+			function = "normal";
+			output-low;
+			power-source = <0>;
+		};
+	};
+};
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm6150l_gpios 2 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			linux,can-disable;
+			debounce-interval = <15>;
+			gpio-key,wakeup;
+		};
+	};
+
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "qg-batterydata-alium-3600mah.dtsi"
+		#include "qg-batterydata-mlp356477-2800mah.dtsi"
+	};
+};
+
+&flash_led {
+	status = "ok";
+};
+
+&pm6150l_wled {
+	qcom,string-cfg= <1>;
+	qcom,leds-per-string = <7>;
+	status = "ok";
+	qcom,cabc-sel = <0>;
+	qcom,fs-current-limit = <20000>;
+	default-brightness = <2000>;
+};
+
+&pm6150l_lcdb {
+	status = "ok";
+};
+
+&pm6150l_pwm_1 {
+	status = "okay";
+};
+
+&pm6150_pdphy {
+	#io-channel-cells = <1>;
+	io-channels = <&pm6150_charger PSY_IIO_PD_ACTIVE>,
+		      <&pm6150_charger PSY_IIO_TYPEC_CC_ORIENTATION>,
+		      <&pm6150_charger PSY_IIO_CONNECTOR_TYPE>,
+		      <&pm6150_charger PSY_IIO_TYPEC_POWER_ROLE>,
+		      <&pm6150_charger PSY_IIO_PD_USB_SUSPEND_SUPPORTED>,
+		      <&pm6150_charger PSY_IIO_TYPEC_SRC_RP>,
+		      <&pm6150_charger PSY_IIO_PD_IN_HARD_RESET>,
+		      <&pm6150_charger PSY_IIO_PD_CURRENT_MAX>,
+		      <&pm6150_charger PSY_IIO_PR_SWAP>,
+		      <&pm6150_charger PSY_IIO_PD_VOLTAGE_MIN>,
+		      <&pm6150_charger PSY_IIO_PD_VOLTAGE_MAX>,
+		      <&pm6150_charger PSY_IIO_USB_REAL_TYPE>,
+		      <&pm6150_charger PSY_IIO_TYPEC_MODE>,
+		      <&pm6150_charger PSY_IIO_PE_START>;
+	io-channel-names = "pd_active",
+			   "typec_cc_orientation",
+			   "connector_type",
+			   "typec_power_role",
+			   "pd_usb_suspend_supported",
+			   "typec_src_rp",
+			   "pd_in_hard_reset",
+			   "pr_current_max",
+			   "pr_swap",
+			   "pd_voltage_min",
+			   "pd_voltage_max",
+			   "real_type",
+			   "typec_mode",
+			   "pe_start";
+};
+
+&pm6150_qg {
+	io-channels = <&pm6150_vadc ADC5_BAT_THERM_100K_PU>,
+			<&pm6150_vadc ADC5_BAT_ID_100K_PU>,
+			<&pm6150_charger PSY_IIO_INPUT_CURRENT_LIMITED>,
+			<&pm6150_charger PSY_IIO_RECHARGE_SOC>,
+			<&pm6150_charger PSY_IIO_FORCE_RECHARGE>,
+			<&pm6150_charger PSY_IIO_CHARGE_DONE>,
+			<&smb1390_charger PSY_IIO_CP_ENABLE>;
+	io-channel-names = "batt-therm",
+			"batt-id",
+			"input_current_limited",
+			"recharge_soc",
+			"force_recharge",
+			"charge_done",
+			"cp_charging_enabled";
+
+	qcom,battery-data = <&mtp_batterydata>;
+	qcom,qg-iterm-ma = <100>;
+	qcom,hold-soc-while-full;
+	qcom,linearize-soc;
+	qcom,cl-feedback-on;
+};
+
+&pm6150_charger {
+	depends-on-supply = <&pm6150_vadc>;
+	#io-channel-cells = <1>;
+	io-channels = <&pm6150_vadc ADC5_USB_IN_V_16>,
+		<&pm6150_vadc ADC5_USB_IN_I>,
+		<&pm6150_vadc ADC5_CHG_TEMP>,
+		<&pm6150_vadc ADC5_DIE_TEMP>,
+		<&pm6150_vadc ADC5_AMUX_THM4_100K_PU>,
+		<&pm6150_vadc ADC5_SBUx>,
+		<&pm6150_vadc ADC5_VPH_PWR>,
+		<&pm6150_qg PSY_IIO_CHARGE_FULL>,
+		<&pm6150_qg PSY_IIO_CHARGE_FULL_DESIGN>,
+		<&pm6150_qg PSY_IIO_RESISTANCE_ID>,
+		<&pm6150_qg PSY_IIO_VOLTAGE_NOW>,
+		<&pm6150_qg PSY_IIO_TEMP>,
+		<&pm6150_qg PSY_IIO_CAPACITY>,
+		<&pm6150_qg PSY_IIO_VOLTAGE_OCV>,
+		<&pm6150_qg PSY_IIO_VOLTAGE_AVG>,
+		<&pm6150_qg PSY_IIO_DEBUG_BATTERY>,
+		<&pm6150_qg PSY_IIO_REAL_CAPACITY>,
+		<&pm6150_qg PSY_IIO_CC_SOC>,
+		<&pm6150_qg PSY_IIO_CURRENT_NOW>,
+		<&pm6150_qg PSY_IIO_VOLTAGE_MAX>,
+		<&pm6150_qg PSY_IIO_CHARGE_COUNTER>,
+		<&pm6150_qg PSY_IIO_CYCLE_COUNT>,
+		<&pm6150_qg PSY_IIO_TIME_TO_FULL_NOW>,
+		<&smb1390_charger PSY_IIO_PARALLEL_MODE>,
+		<&smb1390_charger PSY_IIO_PARALLEL_OUTPUT_MODE>,
+		<&smb1390_charger PSY_IIO_MIN_ICL>,
+		<&smb1390_charger PSY_IIO_CP_SWITCHER_EN>,
+		<&smb1390_charger PSY_IIO_CP_ENABLE>,
+		<&smb1390_charger PSY_IIO_CP_ILIM>,
+		<&smb1390_charger PSY_IIO_CP_DIE_TEMP>;
+
+	io-channel-names = "usb_in_voltage",
+		"usb_in_current",
+		"chg_temp",
+		"die_temp",
+		"conn_temp",
+		"sbux_res",
+		"vph_voltage",
+		"charge_full",
+		"charge_full_design",
+		"resistance_id",
+		"voltage_now",
+		"temp",
+		"capacity",
+		"voltage_ocv",
+		"voltage_avg",
+		"debug_battery",
+		"real_capacity",
+		"cc_soc",
+		"current_now",
+		"voltage_max",
+		"charge_counter",
+		"cycle_count",
+		"time_to_full_now",
+		"cp_parallel_mode",
+		"cp_parallel_output_mode",
+		"cp_min_icl",
+		"cp_switcher_en",
+		"cp_enable",
+		"cp_ilim",
+		"cp_die_temp";
+
+	qcom,battery-data = <&mtp_batterydata>;
+	qcom,auto-recharge-soc = <98>;
+	qcom,step-charging-enable;
+	qcom,sw-jeita-enable;
+	qcom,fcc-stepping-enable;
+	qcom,suspend-input-on-debug-batt;
+	qcom,sec-charger-config = <0>;
+	qcom,thermal-mitigation = <4200000 3500000 3000000
+			2500000 2000000 1500000 1000000 500000>;
+	dpdm-supply = <&qusb_phy0>;
+	qcom,charger-temp-max = <800>;
+	qcom,smb-temp-max = <800>;
+};
+
+&qupv3_se0_2uart {
+	status = "ok";
+};
+
+&qupv3_se7_4uart {
+	status = "ok";
+};
+
+&ethqos_hw {
+	status = "disabled";
+};
+
+&pil_modem_mem {
+	reg = <0x0 0x8fd00000 0x0 0x3100000>;
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v3-660";
+
+	vdda-phy-supply = <&pm6150_l4>; /* 0.9v */
+	vdda-phy-always-on;
+	vdda-pll-supply = <&pm6150_l11>;
+	vdda-phy-max-microamp = <30000>;
+	vdda-pll-max-microamp = <12000>;
+
+	vdd-phy-gdsc-supply = <&ufs_phy_gdsc>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&ufs_phy_gdsc>;
+	vdd-hba-fixed-regulator;
+	vcc-supply = <&pm6150l_l11>;
+	vcc-voltage-level = <2960000 2960000>;
+	vccq2-supply = <&pm6150_l12>;
+	vccq2-voltage-level = <1800000 1800000>;
+	vcc-max-microamp = <600000>;
+	vccq2-max-microamp = <600000>;
+
+	qcom,vddp-ref-clk-supply = <&pm6150l_l3>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+	qcom,vddp-ref-clk-min-uV = <1232000>;
+	qcom,vddp-ref-clk-max-uV = <1260000>;
+
+	/*
+	 * QCS610 UFS 3.x uses PMIC Buck regulator which requires additional
+	 * delay to settle its voltage back to normal 2.5volts from
+	 * the power down, so below property is used to enable delay
+	 * before sending start stop unit command.
+	 */
+	qcom,delay-ssu;
+
+	status = "ok";
+};
+
+&L16A {
+	regulator-max-microvolt = <3304000>;
+};
+
+&L19A {
+	regulator-max-microvolt = <3304000>;
+};
+
+&L4C {
+	regulator-max-microvolt = <2912000>;
+};
+
+&L5C {
+	regulator-max-microvolt = <2912000>;
+};
+
+&L13A {
+	regulator-always-on;
+};
+
+&L7C {
+	regulator-always-on;
+};
+
+&L10A {
+	regulator-always-on;
+};
+
+&L14A {
+	regulator-always-on;
+};
+
+&tlmm {
+	usb_typea_host {
+		usb_typea_host_en: usb_typea_host_en {
+			mux {
+				pins = "gpio54";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio54";
+				drive-strength = <2>;
+				bias-disable;
+				output-high;
+			};
+		};
+	};
+};
+
+&qusb_phy0 {
+	reg = <0x88e2000 0x180>,
+		<0x01fcb250 0x4>,
+		<0x007801f8 0x4>,
+		<0x01fcb3e4 0x4>;
+	reg-names = "qusb_phy_base",
+		"tcsr_clamp_dig_n_1p8",
+		"tune2_efuse_addr",
+		"tcsr_conn_box_spare_0";
+};
+
+&usb1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb_typea_host_en>;
+	status = "disabled";
+};
+
+&usb0 {
+	qcom,interconnect-values-nom = /* NOMINAL Votes */
+						<1000000 2500000>,
+						<0 2400>,
+						<0 40000>;
+	qcom,interconnect-values-svs = /* SVS Votes */
+						<240000 700000>,
+						<0 2400>,
+						<0 40000>;
+	extcon = <&pm6150_pdphy>, <&eud>;
+
+	#io-channel-cells = <1>;
+	io-channels= <&pm6150_charger PSY_IIO_USB_REAL_TYPE>;
+	io-channel-names = "chg_type";
+};
+
+&sdhc_1 {
+	vdd-supply = <&pm6150l_l11>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&pm6150_l12>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	resets = <&gcc GCC_SDCC1_BCR>;
+	reset-names = "core_reset";
+
+	status = "ok";
+};
+
+&sdhc_2 {
+	vdd-supply = <&pm6150l_l9>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&pm6150l_l6>;
+	qcom,vdd-io-voltage-level = <1800000 3100000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 99 GPIO_ACTIVE_LOW>;
+
+	status = "ok";
+};

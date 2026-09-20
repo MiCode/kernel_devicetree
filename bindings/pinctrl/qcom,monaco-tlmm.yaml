@@ -1,0 +1,155 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/pinctrl/qcom,monaco-tlmm.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Monaco TLMM block
+
+maintainers:
+  - Pradnya Dahiwale <quic_pdahiwal@quicinc.com>
+description: |
+  This binding describes the Top Level Mode Multiplexer (TLMM) block found
+  in the Monaco platform.
+
+allOf:
+  - $ref: /schemas/pinctrl/qcom,tlmm-common.yaml#
+properties:
+  compatible:
+    const: "qcom,monaco-tlmm"
+
+  reg:
+    maxItems: 1
+
+  interrupts: true
+  interrupt-controller: true
+  '#interrupt-cells': true
+  gpio-controller: true
+
+  gpio-reserved-ranges:
+    minItems: 1
+    maxItems: 105
+
+  gpio-line-names:
+    maxItems: 112
+
+  '#gpio-cells': true
+  gpio-ranges: true
+  wakeup-parent: true
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+# PIN CONFIGURATION NODES:
+patternProperties:
+  '-state$':
+    oneOf:
+      - $ref: "#/$defs/qcom-monaco-tlmm-state"
+      - patternProperties:
+          "-pins$":
+            $ref: "#/$defs/qcom-monaco-tlmm-state"
+        additionalProperties: false
+$defs:
+  qcom-monaco-tlmm-state:
+    type: object
+    description:
+      Pinctrl node's client devices use subnodes for desired pin configuration.
+      Client device subnodes use below standard properties.
+
+    properties:
+      pins:
+        description:
+          List of gpio pins affected by the properties specified in
+          this subnode.
+        items:
+          oneOf:
+            - pattern: "^gpio([0-9]|[1-9][0-9]|1[0-9][0-9]|20[0-9])"
+            - enum: [ ufs_reset, sdc2_clk, sdc2_cmd, sdc2_data ]
+        minItems: 1
+        maxItems: 36
+      function:
+        description:
+          Specify the alternative function to be configured for the
+          specified pins. Functions are only valid for gpio pins.
+        enum: [ AGERA_PLL, CCI_TIMER0, CCI_TIMER1, CCI_TIMER2, CCI_TIMER3,
+                CRI_TRNG, CRI_TRNG0, CRI_TRNG1, GCC_GP1, GCC_GP2, GCC_GP3,
+		GP_PDM0, GP_PDM1, GP_PDM2, JITTER_BIST, PA_INDICATOR, PLL_BIST,
+                QUP0_L0, QUP0_L1, QUP0_L2, QUP0_L3, SDC1_TB, SDC2_TB,
+                SSBI_WTR1, adsp_ext, atest_bbrx0, atest_bbrx1, atest_char,
+                atest_char0, atest_char1, atest_char2, atest_char3,
+                atest_gpsadc_dtest0_native, atest_gpsadc_dtest1_native,
+                atest_tsens, atest_tsens2, atest_usb1, atest_usb10,
+                atest_usb11, atest_usb12, atest_usb13, atest_usb2,
+                atest_usb20, atest_usb21, atest_usb22, atest_usb23,
+                cam_mclk, cci_async, cci_i2c, dac_calib0, dac_calib1,
+                dac_calib10, dac_calib11, dac_calib12, dac_calib13,
+                dac_calib14, dac_calib15, dac_calib16, dac_calib17,
+                dac_calib18, dac_calib19, dac_calib2, dac_calib20,
+                dac_calib21, dac_calib22, dac_calib23, dac_calib24,
+                dac_calib25, dac_calib3, dac_calib4, dac_calib5,
+                dac_calib6, dac_calib7, dac_calib8, dac_calib9,
+                dbg_out, ddr_bist, ddr_pxi0, ddr_pxi1, ddr_pxi2,
+                ddr_pxi3, gsm0_tx, gsm1_tx, m_voc, mdp_vsync, mpm_pwr,
+                nav_gpio0, nav_gpio1, nav_gpio2, pbs0, pbs1, pbs10,
+                pbs11, pbs12, pbs13, pbs14, pbs15, pbs2, pbs3, pbs4,
+                pbs5, pbs6, pbs7, pbs8, pbs9, pbs_out, phase_flag0,
+                phase_flag1, phase_flag10, phase_flag11, phase_flag12,
+                phase_flag13, phase_flag14, phase_flag15, phase_flag16,
+                phase_flag17, phase_flag18, phase_flag19, phase_flag2,
+                phase_flag20, phase_flag21, phase_flag22, phase_flag23,
+                phase_flag24, phase_flag25, phase_flag26, phase_flag27,
+                phase_flag28, phase_flag29, phase_flag3, phase_flag30,
+                phase_flag31, phase_flag4, phase_flag5, phase_flag6,
+                phase_flag7, phase_flag8, phase_flag9, pll_bypassnl,
+                pll_clk, pll_reset, prng_rosc0, prng_rosc1, prng_rosc2,
+                prng_rosc3, pwm_0, pwm_1, pwm_2, pwm_3, pwm_4, pwm_5,
+                pwm_6, pwm_7, pwm_8, pwm_9, qdss_cti, qdss_gpio,
+                qdss_gpio0, qdss_gpio1, qdss_gpio10, qdss_gpio11,
+                qdss_gpio12, qdss_gpio13, qdss_gpio14, qdss_gpio15,
+                qdss_gpio2, qdss_gpio3, qdss_gpio4, qdss_gpio5,
+                qdss_gpio6, qdss_gpio7, qdss_gpio8, qdss_gpio9,
+                qup00, qup01, qup02, qup03, qup04, qup05, qup06,
+                sdc3_clk, sdc3_cmd, sdc3_data, tgu_ch0, tgu_ch1
+                tgu_ch2, tgu_ch3, tsense_pwm, uim0_clk, uim0_data,
+                uim0_present, uim0_reset, usb2phy_ac, vfr_1,
+                vsense_trigger, wci_uart, wlan1_adc0, wlan1_adc1]
+
+
+      bias-disable: true
+      bias-pull-down: true
+      bias-pull-up: true
+      drive-strength: true
+      input-enable: true
+      output-high: true
+      output-low: true
+
+    required:
+      - pins
+
+    allOf:
+      - $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
+      - if:
+          properties:
+            pins:
+              pattern: "^gpio([0-9]|[1-9][0-9]|1[0-9][0-9]|20[0-9])$"
+        then:
+          required:
+            - function
+
+    additionalProperties: false
+
+examples:
+  - |
+    tlmm: pinctrl@500000 {
+      compatible = "qcom,monaco-pinctrl";
+      reg = <0x500000 0x300000>;
+      interrupts = <GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+      gpio-controller;
+      #gpio-cells = <2>;
+      interrupt-controller;
+      #interrupt-cells = <2>;
+    };
+

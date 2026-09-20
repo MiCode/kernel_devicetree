@@ -1,0 +1,235 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/phy/qcom,usb3-4nm-qmp-uni.h>
+#include <dt-bindings/clock/qcom,sdx75-gcc.h>
+
+&soc {
+	usb: ssusb@a600000 {
+		compatible = "qcom,dwc-usb3-msm";
+		reg = <0x0 0xa600000 0x0 0x100000>;
+		reg-names = "core_base";
+
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		interrupts-extended = <&intc GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 10 IRQ_TYPE_EDGE_RISING>,
+			<&pdc 9 IRQ_TYPE_EDGE_RISING>,
+			<&pdc 17 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "pwr_event_irq", "dp_hs_phy_irq",
+				"dm_hs_phy_irq", "ss_phy_irq";
+		qcom,use-pdc-interrupts;
+
+		USB3_GDSC-supply = <&gcc_usb30_gdsc>;
+		clocks = <&gcc GCC_USB30_MASTER_CLK>,
+			<&gcc GCC_USB30_SLV_AHB_CLK>,
+			<&gcc GCC_USB30_MSTR_AXI_CLK>,
+			<&gcc GCC_USB30_MOCK_UTMI_CLK>,
+			<&gcc GCC_USB30_SLEEP_CLK>;
+		clock-names = "core_clk", "iface_clk",
+					"bus_aggr_clk", "utmi_clk",
+					"sleep_clk";
+
+		resets = <&gcc GCC_USB30_BCR>;
+		reset-names = "core_reset";
+
+		qcom,sleep-clk-bcr;
+		qcom,core-clk-rate = <200000000>;
+		qcom,core-clk-rate-hs = <66666667>;
+		qcom,core-clk-rate-disconnected = <133333333>;
+
+		dwc3: dwc3@a600000 {
+			compatible = "snps,dwc3";
+			reg = <0x0 0xa600000 0x0 0xd93c>;
+
+			iommus = <&apps_smmu 0x80 0x0>;
+			qcom,iommu-dma = "atomic";
+			memory-region = <&dwc3_mem_region>;
+			dma-coherent;
+
+			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&usb_nop_phy>, <&usb_qmp_phy>;
+			snps,has-lpm-erratum;
+			snps,is-utmi-l1-suspend;
+			snps,dis-u1-entry-quirk;
+			snps,dis-u2-entry-quirk;
+			snps,dis_u2_susphy_quirk;
+			snps,hird-threshold = /bits/ 8 <0x10>;
+			tx-fifo-resize;
+			/* set host mode interrupt moderation to 1 us */
+			imod-interval-ns = <1000>;
+			maximum-speed = "super-speed-plus";
+			usb-role-switch;
+			dr_mode = "peripheral";
+		};
+
+	};
+
+	dwc3_mem_region: dwc3_mem_region {
+		iommu-addresses = <&dwc3 0x0 0x0 0x0 0x90000000>,
+					<&dwc3 0x0 0xf0000000 0xffffffff 0x10000000>;
+	};
+
+	/* USB port related QMP USB UNI PHY */
+	usb_qmp_phy: ssphy@ff6000 {
+		compatible = "qcom,usb-ssphy-qmp-v2";
+		reg = <0x0 0xff6000 0x0 0x2000>,
+			<0x0 0xff7400 0x0 0x4>;
+		reg-names = "qmp_phy_base",
+			"pcs_clamp_enable_reg";
+
+		vdd-supply = <&L4B>;
+		qcom,vdd-voltage-level = <0 880000 880000>;
+		qcom,vdd-max-load-uA = <47000>;
+		core-supply = <&L1B>;
+		qcom,core-max-load-uA = <15000>;
+
+		usb3_dp_phy_gdsc-supply = <&gcc_usb3_phy_gdsc>;
+		clocks = <&gcc GCC_USB3_PHY_AUX_CLK>,
+			 <&gcc GCC_USB3_PHY_PIPE_CLK>,
+			 <&gcc GCC_USB3_PHY_PIPE_CLK_SRC>,
+			 <&usb3_phy_wrapper_gcc_usb30_pipe_clk>,
+			<&gcc GCC_USB3_PRIM_CLKREF_EN>,
+			 <&rpmhcc RPMH_CXO_CLK>,
+			 <&gcc GCC_USB_PHY_CFG_AHB2PHY_CLK>;
+		clock-names = "aux_clk", "pipe_clk", "pipe_clk_mux",
+				"pipe_clk_ext_src", "ref_clk", "ref_clk_src",
+				"cfg_ahb_clk";
+
+		resets = <&gcc GCC_USB3_PHY_BCR>,
+				<&gcc GCC_USB3PHY_PHY_BCR>;
+		reset-names = "phy_reset", "phy_phy_reset";
+
+		qcom,qmp-phy-init-seq =
+			/* <reg_offset, value> */
+		       <QSERDES_COM_SSC_STEP_SIZE1_MODE1 0x9E
+			QSERDES_COM_SSC_STEP_SIZE2_MODE1 0x06
+			QSERDES_COM_CP_CTRL_MODE1 0x02
+			QSERDES_COM_PLL_RCTRL_MODE1 0x16
+			QSERDES_COM_PLL_CCTRL_MODE1 0x36
+			QSERDES_COM_CORECLK_DIV_MODE1 0x04
+			QSERDES_COM_LOCK_CMP1_MODE1 0x2E
+			QSERDES_COM_LOCK_CMP2_MODE1 0x82
+			QSERDES_COM_DEC_START_MODE1 0x82
+			QSERDES_COM_DIV_FRAC_START1_MODE1 0xAB
+			QSERDES_COM_DIV_FRAC_START2_MODE1 0xEA
+			QSERDES_COM_DIV_FRAC_START3_MODE1 0x02
+			QSERDES_COM_HSCLK_SEL_1 0x01
+			QSERDES_COM_VCO_TUNE1_MODE1 0x25
+			QSERDES_COM_VCO_TUNE2_MODE1 0x02
+			QSERDES_COM_BIN_VCOCAL_CMP_CODE1_MODE1 0xB7
+			QSERDES_COM_BIN_VCOCAL_CMP_CODE2_MODE1 0x1E
+			QSERDES_COM_BIN_VCOCAL_CMP_CODE1_MODE0 0xB7
+			QSERDES_COM_BIN_VCOCAL_CMP_CODE2_MODE0 0x1E
+			QSERDES_COM_SSC_STEP_SIZE1_MODE0 0x9E
+			QSERDES_COM_SSC_STEP_SIZE2_MODE0 0x06
+			QSERDES_COM_CP_CTRL_MODE0 0x02
+			QSERDES_COM_PLL_RCTRL_MODE0 0x16
+			QSERDES_COM_PLL_CCTRL_MODE0 0x36
+			QSERDES_COM_LOCK_CMP1_MODE0 0x12
+			QSERDES_COM_LOCK_CMP2_MODE0 0x34
+			QSERDES_COM_DEC_START_MODE0 0x82
+			QSERDES_COM_DIV_FRAC_START1_MODE0 0xAB
+			QSERDES_COM_DIV_FRAC_START2_MODE0 0xEA
+			QSERDES_COM_DIV_FRAC_START3_MODE0 0x02
+			QSERDES_COM_VCO_TUNE1_MODE0 0x25
+			QSERDES_COM_VCO_TUNE2_MODE0 0x02
+			QSERDES_COM_BG_TIMER 0x0E
+			QSERDES_COM_SSC_EN_CENTER 0x01
+			QSERDES_COM_SSC_PER1 0x31
+			QSERDES_COM_SSC_PER2 0x01
+			QSERDES_COM_SYSCLK_BUF_ENABLE 0x0A
+			QSERDES_COM_SYSCLK_EN_SEL 0x1A
+			QSERDES_COM_LOCK_CMP_CFG 0x14
+			QSERDES_COM_VCO_TUNE_MAP 0x04
+			QSERDES_COM_CORE_CLK_EN 0x20
+			QSERDES_COM_CMN_CONFIG_1 0x16
+			QSERDES_COM_AUTO_GAIN_ADJ_CTRL_1 0xB6
+			QSERDES_COM_AUTO_GAIN_ADJ_CTRL_2 0x4B
+			QSERDES_COM_AUTO_GAIN_ADJ_CTRL_3 0x37
+			QSERDES_COM_ADDITIONAL_MISC 0x0C
+			PCIE_USB3_UNI_PCS_LOCK_DETECT_CONFIG1 0xC4
+			PCIE_USB3_UNI_PCS_LOCK_DETECT_CONFIG2 0x89
+			PCIE_USB3_UNI_PCS_LOCK_DETECT_CONFIG3 0x20
+			PCIE_USB3_UNI_PCS_LOCK_DETECT_CONFIG6 0x13
+			PCIE_USB3_UNI_PCS_REFGEN_REQ_CONFIG1 0x21
+			PCIE_USB3_UNI_PCS_RX_SIGDET_LVL 0xAA
+			PCIE_USB3_UNI_PCS_RCVR_DTCT_DLY_P1U2_L 0xE7
+			PCIE_USB3_UNI_PCS_RCVR_DTCT_DLY_P1U2_H 0x03
+			PCIE_USB3_UNI_PCS_CDR_RESET_TIME 0x0A
+			PCIE_USB3_UNI_PCS_ALIGN_DETECT_CONFIG1 0x88
+			PCIE_USB3_UNI_PCS_ALIGN_DETECT_CONFIG2 0x13
+			PCIE_USB3_UNI_PCS_PCS_TX_RX_CONFIG 0x0C
+			PCIE_USB3_UNI_PCS_EQ_CONFIG1 0x4B
+			PCIE_USB3_UNI_PCS_EQ_CONFIG5 0x10
+			QSERDES_TX_RES_CODE_LANE_TX 0x00
+			QSERDES_TX_RES_CODE_LANE_RX 0x00
+			QSERDES_TX_RES_CODE_LANE_OFFSET_TX 0x1F
+			QSERDES_TX_RES_CODE_LANE_OFFSET_RX 0x09
+			QSERDES_TX_LANE_MODE_1 0xF5
+			QSERDES_TX_LANE_MODE_3 0x3F
+			QSERDES_TX_LANE_MODE_4 0x3F
+			QSERDES_TX_LANE_MODE_5 0x5F
+			QSERDES_TX_RCV_DETECT_LVL_2 0x12
+			QSERDES_TX_PI_QEC_CTRL 0x21
+			QSERDES_RX_UCDR_FO_GAIN 0x0A
+			QSERDES_RX_UCDR_SO_GAIN 0x06
+			QSERDES_RX_UCDR_FASTLOCK_FO_GAIN 0x2F
+			QSERDES_RX_UCDR_SO_SATURATION_AND_ENABLE 0x7F
+			QSERDES_RX_UCDR_FASTLOCK_COUNT_LOW 0xFF
+			QSERDES_RX_UCDR_FASTLOCK_COUNT_HIGH 0x0F
+			QSERDES_RX_UCDR_PI_CONTROLS 0x99
+			QSERDES_RX_UCDR_SB2_THRESH1 0x08
+			QSERDES_RX_UCDR_SB2_THRESH2 0x08
+			QSERDES_RX_UCDR_SB2_GAIN1 0x00
+			QSERDES_RX_UCDR_SB2_GAIN2 0x0A
+			QSERDES_RX_AUX_DATA_TCOARSE_TFINE 0xA0
+			QSERDES_RX_VGA_CAL_CNTRL1 0x54
+			QSERDES_RX_VGA_CAL_CNTRL2 0x0F
+			QSERDES_RX_GM_CAL 0x13
+			QSERDES_RX_RX_EQU_ADAPTOR_CNTRL2 0x0F
+			QSERDES_RX_RX_EQU_ADAPTOR_CNTRL3 0x4A
+			QSERDES_RX_RX_EQU_ADAPTOR_CNTRL4 0x0A
+			QSERDES_RX_RX_IDAC_TSETTLE_LOW 0x07
+			QSERDES_RX_RX_IDAC_TSETTLE_HIGH 0x00
+			QSERDES_RX_RX_EQ_OFFSET_ADAPTOR_CNTRL1 0x47
+			QSERDES_RX_SIGDET_CNTRL 0x04
+			QSERDES_RX_SIGDET_DEGLITCH_CNTRL 0x0E
+			QSERDES_RX_RX_MODE_00_LOW 0x3F
+			QSERDES_RX_RX_MODE_00_HIGH 0xBF
+			QSERDES_RX_RX_MODE_00_HIGH2 0xFF
+			QSERDES_RX_RX_MODE_00_HIGH3 0xDF
+			QSERDES_RX_RX_MODE_00_HIGH4 0xED
+			QSERDES_RX_RX_MODE_01_LOW 0xDC
+			QSERDES_RX_RX_MODE_01_HIGH 0x5C
+			QSERDES_RX_RX_MODE_01_HIGH2 0x9C
+			QSERDES_RX_RX_MODE_01_HIGH3 0x1D
+			QSERDES_RX_RX_MODE_01_HIGH4 0x09
+			QSERDES_RX_DFE_EN_TIMER 0x04
+			QSERDES_RX_DFE_CTLE_POST_CAL_OFFSET 0x38
+			QSERDES_RX_DCC_CTRL1 0x0C
+			QSERDES_RX_VTH_CODE 0x10
+			QSERDES_RX_SIGDET_CAL_CTRL1 0x14
+			QSERDES_RX_SIGDET_CAL_TRIM 0x08
+			PCIE_USB3_UNI_PCS_USB3_LFPS_DET_HIGH_COUNT_VAL 0xF8
+			PCIE_USB3_UNI_PCS_USB3_RXEQTRAINING_DFE_TIME_S2 0x07
+			PCIE_USB3_UNI_PCS_USB3_RCVR_DTCT_DLY_U3_L 0x40
+			PCIE_USB3_UNI_PCS_USB3_RCVR_DTCT_DLY_U3_H 0x00>;
+
+		qcom,qmp-phy-reg-offset =
+		       <PCIE_USB3_UNI_PCS_PCS_STATUS1
+			PCIE_USB3_UNI_PCS_USB3_AUTONOMOUS_MODE_CTRL
+			PCIE_USB3_UNI_PCS_USB3_LFPS_RXTERM_IRQ_CLEAR
+			PCIE_USB3_UNI_PCS_POWER_DOWN_CONTROL
+			PCIE_USB3_UNI_PCS_SW_RESET
+			PCIE_USB3_UNI_PCS_START_CONTROL>;
+	};
+
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+};

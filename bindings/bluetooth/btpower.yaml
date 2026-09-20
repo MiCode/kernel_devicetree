@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.1
+---
+$id: http://devicetree.org/schemas/bluetooth/btpower.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Bluetooth Controller
+
+maintainers:
+  - Rajith Cherian <rajicher@qti.qualcomm.com>
+
+description: |
+  Bluetooth controller communicates with the Bluetooth Host using
+  HCI Transport layer. HCI Transport layer can be based on UART or
+  USB serial communication protocol.
+
+properties:
+  compatible:
+    const: qcom,wcn3990
+
+  qcom,bt-reset-gpio:
+    description: GPIO pin to bring BT Controller out of reset
+
+  qcom,xo-clk-gpio:
+    description: GPIO for enabling clock at bootstrap
+
+  qcom,bt-vdd-pa-supply:
+    description: Bluetooth VDD PA regulator handle
+
+  qcom,bt-vdd-io-supply:
+    description: Bluetooth VDD IO regulator handle
+
+  qcom,bt-vdd-ldo-supply:
+    description: Bluetooth VDD LDO regulator handle
+
+  qcom,bt-vdd-xtal-supply:
+    description: Bluetooth VDD XTAL regulator handle
+
+  qcom,bt-vdd-core-supply:
+    description: Bluetooth VDD CORE regulator handle
+
+  qcom,bt-vdd-asd-supply:
+    description: Bluetooth VDD regulator handle for antenna switch
+
+  reg:
+    description: Memory regions defined as starting address and size
+
+  reg-names:
+    description: Memory regions nMEs defined in reg entry diversity
+
+  qcom,bt-chip-pwd-supply:
+    description: Chip power down gpio
+
+  qcom,bt-vdd-io-config:
+    description: Specifies voltage/current levels for supply
+
+  qcom,bt-vdd-core-config:
+    description: Specifies voltage/current levels for supply
+
+  qcom,bt-vdd-pa-config:
+    description: Specifies voltage/current levels for supply
+
+  qcom,bt-vdd-xtal-config:
+    description: Specifies voltage/current levels for supply
+
+  mboxes:
+    description: Specifies mbox channel data for AOP messaging
+
+  qcom,vreg_ipa:
+    description: Specifies volt regulator used for QCA6490 Internal Power Amp config
+
+required:
+  - compatible
+  - qcom,bt-reset-gpio
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    bluetooth: bt_wcn3990 {
+                compatible = "qcom,wcn3990";
+                qcom,bt-sw-ctrl-gpio = <&tlmm 80 GPIO_ACTIVE_HIGH>;
+                qcom,bt-vdd-io-supply = <&pm6150_l10>; /* IO */
+                qcom,bt-vdd-core-supply = <&pm6150l_l2>; /* RFA */
+                qcom,bt-vdd-pa-supply = <&pm6150l_l10>; /* CH0 */
+                qcom,bt-vdd-xtal-supply = <&pm6150l_l1>; /* XO */
+
+                qcom,bt-vdd-io-config = <1700000 1900000 1 0>;
+                qcom,bt-vdd-core-config = <1304000 1304000 1 0>;
+                qcom,bt-vdd-pa-config = <3000000 3312000 1 0>;
+                qcom,bt-vdd-xtal-config = <1700000 1900000 1 0>;
+    };

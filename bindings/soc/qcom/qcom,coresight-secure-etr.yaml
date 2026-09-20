@@ -1,0 +1,86 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/soc/qcom/qcom,coresight-secure-etr.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title:  Qcom Coresight Secure ETR Controller
+
+maintainers:
+  - Yuanfang Zhang <quic_yuanfang@quicinc.com>
+
+description:
+    This binding describes the coresight component responsible for supporting modem ETM trace data encryption,
+    used for manage secure etr buffer and send command to modem to enable etr.
+
+allOf:
+  - $ref: /schemas/arm/primecell.yaml#
+
+properties:
+  compatible:
+    items:
+      - const: qcom,coresight-secure-etr
+
+  clocks:
+    minItems: 1
+    maxItems: 2
+
+  clock-names:
+    minItems: 1
+    items:
+      - const: apb_pclk
+      - const: atclk
+
+  real-name:
+    items:
+       - const: coresight-tmc-etr1
+
+  qdss,support-remote-etm:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    maxItems: 1
+
+  qcom,secure-component:
+    type: boolean
+    description:
+      boolean, indicates this commponet is secure.
+
+  in-ports:
+    $ref: /schemas/graph.yaml#/properties/ports
+    additionalProperties: false
+
+    properties:
+      port:
+        description: Input connections from CoreSight Trace bus
+        $ref: /schemas/graph.yaml#/properties/port
+
+required:
+  - compatible
+  - in-ports
+  - real-name
+  - qdss,support-remote-etm
+  - qcom,secure-component
+
+additionalProperties: false
+
+examples:
+  - |
+    tmc_modem: tmc_modem {
+        compatible = "qcom,coresight-secure-etr";
+
+        real-name = "coresight-tmc-etr1";
+        qdss,support-remote-etm = <2>;
+
+        qcom,secure-component;
+
+        clocks = <&aoss_qmp>;
+        clock-names = "apb_pclk";
+
+        in-ports {
+            port {
+                tmc_modem_in_replicator_dummy: endpoint {
+                    remote-endpoint =
+                    <&replicator_dummy_out_tmc_modem>;
+                };
+            };
+        };
+    };

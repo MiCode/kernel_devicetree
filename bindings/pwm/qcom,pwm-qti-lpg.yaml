@@ -1,0 +1,365 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/pwm/qcom,pwm-qti-lpg.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Light Pulse Generator
+
+maintainers:
+  - Subbaraman Narayanamurthy <quic_subbaram@quicinc.com>
+
+description: |
+  This binding document describes the properties of LPG (Light Pulse Generator)
+  device module in Qualcomm Technologies, Inc. PMIC chips.
+
+properties:
+  compatible:
+    const: qcom,pwm-lpg
+
+  reg:
+    minItems: 1
+    maxItems: 2
+    description: |
+      Register base for LPG and LUT modules.
+
+  reg-names:
+    oneOf:
+      - const: lpg-base
+      - items:
+        - const: lpg-base
+        - const: lut-base
+
+  "#pwm-cells":
+    const: 2
+
+  qcom,num-lpg-channels:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      The number of the consecutive LPG/PWM channels in the chip.
+
+  nvmem-names:
+    description: |
+      The nvmem device name(s) for the SDAM module(s) where the
+      LUT pattern data is stored. This property is required
+      only when LUT mode is supported with a SDAM module
+      instead of a LUT module. It can take the following
+      mutually exclusive sets of values
+    oneOf:
+    - const: ppg_sdam
+    - items:
+      - const: lut_sdam
+      - const: lpg_chan_sdam
+
+  nvmem:
+    minItems: 1
+    maxItems: 2
+    description: |
+      Phandle(s) of the nvmem device(s) to access the LUT stored
+      in the SDAM module(s). This property is required only when
+      LUT mode is supported and the LUT pattern is stored in
+      SDAM modules instead of a LUT module.
+
+  qcom,pbs-client:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Phandle of the PBS client used for sending the PBS
+      trigger. This property is required when LUT mode is
+      supported and the LUT pattern is stored in a single SDAM
+      module (not two) instead of a LUT module.
+
+  qcom,lut-sdam-base:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      The register base of the LUT entries stored in SDAM. This
+      property is required only when LUT mode is supported and
+      the LUT pattern is stored in a SDAM module instead of a
+      LUT module.
+
+  qcom,lut-patterns:
+    description: |
+      Duty ratios in percentages for LPG working at LUT mode.
+      These duty ratios will be translated into PWM values
+      and stored in LUT or SDAM module shared for all LPG
+      channels. The LUT module has resource to store 47 PWM
+      values at max while SDAM module can store up to 64 PWM
+      values. This property is required if any LPG channels
+      support LUT mode.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    maxItems: 64
+
+  qcom,mid-res-support:
+    description: |
+      The flag to indicate support for medium resolution pwm
+      for PMICs where the subtype detects high resolution, but
+      the high resolution clock source 76.8Mz is not supported.
+      This flag will ensure removal of 76.8MHz clock support and
+      usage of the other 3 clock sources.
+    type: boolean
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - "#pwm-cells"
+  - qcom,num-lpg-channels
+
+patternProperties:
+  "^lpg@[0-9a-f]$":
+    type: object
+    $ref: pwm.yaml#
+    unevaluatedProperties: false
+
+    properties:
+      qcom,lpg-chan-id:
+        minimum: 1
+        maximum: 8
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          The LPG channel's hardware ID indexed from 1. Allowed
+          range is 1 - 8. Maximum value depends on the number of
+          channels supported on PMIC. Cannot specify this property
+          for a channel that is PFM enabled.
+
+      qcom,lpg-sdam-base:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Register base address for LPG configuration in SDAM for
+          the LPG channel specified under "qcom,lpg-chan-id".
+          This property is required if LUT mode is supported with
+          a SDAM module.
+
+      qcom,ramp-step-ms:
+        description: |
+          The step duration in milliseconds for LPG staying at each
+          duty specified in the LUT pattern. Allowed range
+          1 - 511 when LUT module is used, and 8 - 2000 when SDAM is used.
+
+      qcom,ramp-high-index:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          The high index of the LUT pattern where LPG ends up
+          ramping to. Allowed range 1 - 47 when LUT module
+          is used, and 1 - 64 when SDAM module is used.
+
+      qcom,ramp-low-index:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          The low index of the LUT pattern from where LPG begins
+          ramping from. The ramp-low-index should be always less
+          than ramp-high-index when SDAM module is used. Allowed
+          range 0 - 46 when LUT module is used, and 0 - 63 when
+          SDAM module is used.
+
+      qcom,ramp-pattern-repeat:
+        description: |
+          The flag to specify if LPG would be ramping with the LUT
+          pattern repeatedly.
+        type: boolean
+
+      qcom,ramp-pause-hi-count:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          The number of step counts for which the LPG will continue
+          to hold the output after it has ramped up to the high
+          index of the LUT. Allowed range 0 - 254 if SDAM is used.
+
+      qcom,ramp-pause-lo-count:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          The number of step counts for which the LPG will continue
+          to hold the output after it has ramped down to the low
+          index of the LUT. Allowed range 0 - 254 if SDAM is used.
+
+      qcom,ramp-from-low-to-high:
+        description: |
+          The flag to specify the LPG ramping direction. The ramping
+          direction is from low index to high index of the LUT
+          pattern if it's specified. This property is not required
+          when SDAM module is used.
+        type: boolean
+
+    required:
+      - qcom,lpg-chan-id
+      - qcom,ramp-step-ms
+      - qcom,ramp-high-index
+      - qcom,ramp-low-index
+
+allOf:
+  - if:
+      properties:
+        nvmem: true
+
+    then:
+      patternProperties:
+        "^lpg@[0-9a-f]$":
+          properties:
+            qcom,lpg-sdam-base: true
+            qcom,ramp-step-ms:
+              minimum: 8
+              maximum: 2000
+
+            qcom,ramp-high-index:
+              minimum: 1
+              maximum: 64
+
+            qcom,ramp-low-index:
+              minimum: 0
+              maximum: 63
+
+            qcom,ramp-pause-lo-count:
+              minimum: 0
+              maximum: 254
+
+            qcom,ramp-pause-hi-count:
+              minimum: 0
+              maximum: 254
+
+    else:
+      patternProperties:
+        "^lpg@[0-9a-f]$":
+          properties:
+            qcom,lpg-sdam-base: false
+            qcom,ramp-step-ms:
+              minimum: 1
+              maximum: 511
+
+            qcom,ramp-high-index:
+              minimum: 1
+              maximum: 47
+
+            qcom,ramp-low-index:
+              minimum: 0
+              maximum: 46
+
+additionalProperties: false
+
+examples:
+  - |
+    pm8150l_lpg: lpg@b100 {
+            compatible = "qcom,pwm-lpg";
+            reg = <0xb100>, <0xb000>;
+            reg-names = "lpg-base", "lut-base";
+            qcom,num-lpg-channels = <6>;
+            #pwm-cells = <2>;
+            qcom,lut-patterns = <0 14 28 42 56 70 84 100
+                                 100 84 70 56 42 28 14 0>;
+            lpg@1 {
+                   qcom,lpg-chan-id = <1>;
+                   qcom,ramp-step-ms = <200>;
+                   qcom,ramp-pause-hi-count = <10>;
+                   qcom,ramp-pause-lo-count = <10>;
+                   qcom,ramp-low-index = <0>;
+                   qcom,ramp-high-index = <15>;
+                   qcom,ramp-from-low-to-high;
+                   qcom,ramp-pattern-repeat;
+            };
+            lpg@2 {
+                   qcom,lpg-chan-id = <2>;
+                   qcom,ramp-step-ms = <200>;
+                   qcom,ramp-pause-hi-count = <10>;
+                   qcom,ramp-pause-lo-count = <10>;
+                   qcom,ramp-low-index = <0>;
+                   qcom,ramp-high-index = <15>;
+                   qcom,ramp-from-low-to-high;
+                   qcom,ramp-pattern-repeat;
+            };
+            lpg@3 {
+                   qcom,lpg-chan-id = <3>;
+                   qcom,ramp-step-ms = <200>;
+                   qcom,ramp-pause-hi-count = <10>;
+                   qcom,ramp-pause-lo-count = <10>;
+                   qcom,ramp-low-index = <0>;
+                   qcom,ramp-high-index = <15>;
+                   qcom,ramp-from-low-to-high;
+                   qcom,ramp-pattern-repeat;
+            };
+    };
+  - |
+    pmi632_lpg: lpg@b100 {
+           compatible = "qcom,pwm-lpg";
+           reg = <0xb100>;
+           reg-names = "lpg-base";
+           qcom,num-lpg-channels = <3>;
+           #pwm-cells = <2>;
+           nvmem-names = "ppg_sdam";
+           nvmem = <&sdam7>;
+           qcom,pbs-client = <&pbs_client_3>;
+           qcom,lut-sdam-base = <0x80>;
+           qcom,lut-patterns = <0 14 28 42 56 70 84 100
+                               100 84 70 56 42 28 14 0>;
+           lpg@1 {
+                  qcom,lpg-sdam-base = <0x48>;
+                  qcom,lpg-chan-id = <1>;
+                  qcom,ramp-step-ms = <200>;
+                  qcom,ramp-low-index = <0>;
+                  qcom,ramp-high-index = <15>;
+                  qcom,ramp-pause-hi-count = <10>;
+                  qcom,ramp-pause-lo-count = <10>;
+                  qcom,ramp-pattern-repeat;
+           };
+           lpg@2 {
+                  qcom,lpg-sdam-base = <0x56>;
+                  qcom,lpg-chan-id = <2>;
+                  qcom,ramp-step-ms = <200>;
+                  qcom,ramp-low-index = <0>;
+                  qcom,ramp-high-index = <15>;
+                  qcom,ramp-pause-hi-count = <10>;
+                  qcom,ramp-pause-lo-count = <10>;
+                  qcom,ramp-pattern-repeat;
+           };
+           lpg@3 {
+                  qcom,lpg-sdam-base = <0x64>;
+                  qcom,lpg-chan-id = <3>;
+                  qcom,ramp-step-ms = <200>;
+                  qcom,ramp-low-index = <0>;
+                  qcom,ramp-high-index = <15>;
+                  qcom,ramp-pause-hi-count = <10>;
+                  qcom,ramp-pause-lo-count = <10>;
+                  qcom,ramp-pattern-repeat;
+           };
+    };
+  - |
+    pm8350c_pwm_1: pwms@e800 {
+           compatible = "qcom,pwm-lpg";
+           reg = <0xe800>;
+           reg-names = "lpg-base";
+           #pwm-cells = <2>;
+           qcom,num-lpg-channels = <3>;
+           nvmem = <&pmk8350_sdam_21 &pmk8350_sdam_22>;
+           nvmem-names = "lpg_chan_sdam", "lut_sdam";
+           qcom,lut-sdam-base = <0x45>;
+           qcom,lut-patterns = <0 10 20 30 40 50 60 70 80 90 100
+                                 90 80 70 60 50 40 30 20 10 0>;
+           lpg@1 {
+                  qcom,lpg-sdam-base = <0x48>;
+                  qcom,lpg-chan-id = <1>;
+                  qcom,ramp-step-ms = <200>;
+                  qcom,ramp-low-index = <0>;
+                  qcom,ramp-high-index = <19>;
+                  qcom,ramp-pause-hi-count = <10>;
+                  qcom,ramp-pause-lo-count = <10>;
+                  qcom,ramp-pattern-repeat;
+           };
+           lpg@2 {
+                  qcom,lpg-sdam-base = <0x56>;
+                  qcom,lpg-chan-id = <2>;
+                  qcom,ramp-step-ms = <200>;
+                  qcom,ramp-low-index = <0>;
+                  qcom,ramp-high-index = <19>;
+                  qcom,ramp-pause-hi-count = <10>;
+                  qcom,ramp-pause-lo-count = <10>;
+                  qcom,ramp-pattern-repeat;
+           };
+           lpg@3 {
+                  qcom,lpg-sdam-base = <0x64>;
+                  qcom,lpg-chan-id = <3>;
+                  qcom,ramp-step-ms = <200>;
+                  qcom,ramp-low-index = <0>;
+                  qcom,ramp-high-index = <19>;
+                  qcom,ramp-pause-hi-count = <10>;
+                  qcom,ramp-pause-lo-count = <10>;
+                  qcom,ramp-pattern-repeat;
+           };
+    };
+...

@@ -1,0 +1,81 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/power/supply/qcom/smb1390-charger-psy.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. SMB1390 Charger
+
+maintainers:
+  - Rakesh Kota <quic_kotarake@quicinc.com>
+  - Jishnu Prakash <quic_jprakash@quicinc.com>
+  - Kamal Wadhwa <quic_kamalw@quicinc.com>
+
+description: |
+  SMB1390 charge pump is paired with QTI family of standalone chargers to
+  enable a high current, high efficiency Li+ battery charging system.
+
+  Required Node Structure: |
+    SMB1390 Charger must be described in two levels of device nodes.
+
+properties:
+  compatible:
+    enum:
+      - qcom,smb1390-charger-psy
+      - qcom,smb1390-slave
+
+  "#io-channel-cells":
+    const: 1
+
+additionalProperties: false
+
+required:
+  - compatible
+  - "#io-channel-cells"
+
+patternProperties:
+  '^qcom,core[0-9a-f].*$':
+    type: object
+
+    properties:
+      interrupts:
+        description: Peripheral interrupt specifier.
+
+      interrupt-names:
+        description: Interrupt names. This list must match up 1-to-1 with the
+          interrupts specified in the 'interrupts' property.
+
+    required:
+      - interrupts
+      - interrupt-names
+
+    additionalProperties: false
+
+examples:
+  - |
+    smb1390_charger: qcom,charge_pump {
+      compatible = "qcom,smb1390-charger-psy";
+      #io-channel-cells = <1>;
+      interrupt-parent = <&smb1390>;
+      status = "disabled";
+
+      qcom,core {
+        interrupts = <0x10 0x0 IRQ_TYPE_EDGE_BOTH>,
+          <0x10 0x1 IRQ_TYPE_EDGE_BOTH>,
+          <0x10 0x2 IRQ_TYPE_EDGE_BOTH>,
+          <0x10 0x3 IRQ_TYPE_EDGE_BOTH>,
+          <0x10 0x4 IRQ_TYPE_EDGE_BOTH>,
+          <0x10 0x5 IRQ_TYPE_EDGE_RISING>,
+          <0x10 0x6 IRQ_TYPE_EDGE_RISING>,
+          <0x10 0x7 IRQ_TYPE_EDGE_RISING>;
+      interrupt-names = "switcher-off-window",
+        "switcher-off-fault",
+        "tsd-fault",
+        "irev-fault",
+        "vph-ov-hard",
+        "vph-ov-soft",
+        "ilim",
+        "temp-alarm";
+      };
+    };
+...

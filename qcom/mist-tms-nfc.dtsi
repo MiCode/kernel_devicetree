@@ -1,0 +1,82 @@
+&qupv3_se1_i2c {
+    status = "ok";
+    tms_nfc@28 {
+        clock-frequency = <400000>;
+        status = "ok";
+	compatible = "tms,nfc";
+        reg = <0x28>;
+        tms,irq-gpio      = <&tlmm 9 0x00>;
+        tms,ven-gpio      = <&tlmm 6 0x00>;
+	tms,download-gpio = <&tlmm 8 0x00>;
+        interrupt-parent = <&tlmm>;
+        interrupts = <9 0>;
+        interrupt-names = "nfc_irq";
+        pinctrl-names = "nfc_active", "nfc_suspend";
+        pinctrl-0 = <&nfc_int_active &nfc_enable_active>;
+        pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend>;
+        };
+};
+
+&tlmm {
+	nfc {
+		nfc_int_active: nfc_int_active {
+			/* active state */
+			mux {
+				/* GPIO 7 NFC Read Interrupt */
+				pins = "gpio6";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio6";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+
+		nfc_int_suspend: nfc_int_suspend {
+			/* sleep state */
+			mux {
+				/* GPIO 70 NFC Read Interrupt */
+				pins = "gpio6";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio6";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+
+		nfc_enable_active: nfc_enable_active {
+			/* active state */
+			mux {
+				/* 10: Enable */
+				pins = "gpio9";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio9";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+
+		nfc_enable_suspend: nfc_enable_suspend {
+			/* sleep state */
+			mux {
+				/* 10: Enable */
+				pins = "gpio9";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio9";
+				drive-strength = <2>; /* 2 MA */
+				bias-disable;
+			};
+		};
+	};
+}; //tlmm

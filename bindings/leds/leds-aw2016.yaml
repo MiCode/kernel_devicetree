@@ -1,0 +1,141 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/leds/leds-aw2016.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: AWINIC AW2016 3-channel LED Driver
+
+maintainers:
+  - Kamal Wadhwa <quic_kamalw@quicinc.com>
+
+description: |
+  AW2016 LED device supports 3 LED channels and the driver
+  register each channel as a single LED class device and
+  exports interfaces to update brightness, set timer trigger
+  and enable HW based blink functionalities.
+
+properties:
+  compatible:
+    const: awinic,aw2016_led
+
+  reg:
+    description: |
+      The 7-bit I2C address for AW2016 chip.
+
+patternProperties:
+  "^awinic,[0-9a-z]+$":
+    type: object
+    $ref: common.yaml#
+    unevaluatedProperties: false
+
+    properties:
+      awinic,name:
+        description: |
+          Name of the LED which will be register as the LED class
+          device name.
+        $ref: /schemas/types.yaml#/definitions/string
+
+      awinic,id:
+        description: |
+          It represents the LED hardware channel index. The valid
+          values are 0, 1, 2.
+        $ref: /schemas/types.yaml#/definitions/uint32
+
+      awinic,imax:
+        description: |
+          The setting of the maximum current for the given LED channel,
+          the valid values are 0, 1, 2, 3, and the corresponding current
+          setting are 15mA, 30mA, 5mA, 10mA.
+        $ref: /schemas/types.yaml#/definitions/uint32
+
+      awinic,led-current:
+        description: |
+          The setting of the current when the LED channel is enabled.
+        $ref: /schemas/types.yaml#/definitions/uint32
+
+      awinic,max-brightness:
+        description: |
+          The maximum brightness value for the LED class device.
+        $ref: /schemas/types.yaml#/definitions/uint32
+
+      awinic,rise-time-ms:
+        description: |
+          The duration of the led ramping from 0 to maximum brightness
+          when breath function is enabled.
+
+      awinic,hold-time-ms:
+        description: |
+          The duration of the led staying at the maximum brightness
+          when breath function is enabled.
+
+      awinic,fall-time-ms:
+        description: |
+          The duration of the led ramping down from maximum brightness
+          to 0 when breath function is enabled.
+
+      awinic,off-time-ms:
+        description: |
+          The duration of the led staying at 0 brightness when breath
+          function is enabled.
+
+    required:
+      - awinic,name
+      - awinic,id
+      - awinic,imax
+      - awinic,led-current
+      - awinic,max-brightness
+      - awinic,rise-time-ms
+      - awinic,hold-time-ms
+      - awinic,fall-time-ms
+      - awinic,off-time-ms
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    awinic@64 {
+            compatible = "awinic,aw2016_led";
+            reg = <0x64>;
+
+            awinic,red {
+                    awinic,name = "red";
+                    awinic,id = <0>;
+                    awinic,imax = <2>;
+                    awinic,led-current = <3>;
+                    awinic,max-brightness = <255>;
+                    awinic,rise-time-ms = <6>;
+                    awinic,hold-time-ms = <0>;
+                    awinic,fall-time-ms = <6>;
+                    awinic,off-time-ms = <4>;
+            };
+
+            awinic,green {
+                    awinic,name = "green";
+                    awinic,id = <1>;
+                    awinic,imax = <2>;
+                    awinic,led-current = <3>;
+                    awinic,max-brightness = <255>;
+                    awinic,rise-time-ms = <6>;
+                    awinic,hold-time-ms = <0>;
+                    awinic,fall-time-ms = <6>;
+                    awinic,off-time-ms = <4>;
+            };
+
+            awinic,blue {
+                    awinic,name = "blue";
+                    awinic,id = <2>;
+                    awinic,imax = <2>;
+                    awinic,led-current = <3>;
+                    awinic,max-brightness = <255>;
+                    awinic,rise-time-ms = <6>;
+                    awinic,hold-time-ms = <0>;
+                    awinic,fall-time-ms = <6>;
+                    awinic,off-time-ms = <4>;
+            };
+    };
+...

@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/pinctrl/qcom,sm6150-pinctrl.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. SM6150 TLMM block
+
+maintainers:
+  - Ankur Matariya <quic_amatariy@quicinc.com>
+
+description: |
+  This binding describes the Top Level Mode Multiplexer block found in the SM6150 platform.
+
+allOf:
+  - $ref: "pinctrl.yaml#"
+  - $ref: "/schemas/pinctrl/qcom,tlmm-common.yaml#"
+
+properties:
+  compatible:
+    description: Must be "qcom,sm6150-pinctrl"
+
+  reg:
+    description: The base address and size of the north, south, west, and east TLMM tiles.
+    minItems: 1
+    items:
+      - description: "North TLMM tile"
+      - description: "South TLMM tile"
+      - description: "West TLMM tile"
+      - description: "East TLMM tile"
+
+  reg-names:
+    description: Names for the reg cells, must contain "north", "south", "west", and "east".
+    items:
+      - const: "west"
+      - const: "south"
+      - const: "east"
+      - const: "north"
+
+  interrupts:
+    description: Specifies the TLMM summary IRQ.
+    maxItems: 1
+
+  interrupt-controller:
+    description: Identifies this node as an interrupt controller.
+    type: boolean
+
+  '#interrupt-cells':
+    description: Must be 2, specifying the pin number and flags.
+    const: 2
+
+  gpio-controller:
+    description: Identifies this node as a GPIO controller.
+    type: boolean
+
+  '#gpio-cells':
+    description: Must be 2, specifying the pin number and flags.
+    const: 2
+
+  gpio-ranges:
+    description: See ../gpio/gpio.txt.
+    maxItems: 1
+
+  gpio-reserved-ranges:
+    description: Optional reserved ranges of GPIOs.
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - interrupt-controller
+  - '#interrupt-cells'
+  - gpio-controller
+  - '#gpio-cells'
+  - gpio-ranges
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    tlmm: pinctrl@3000000 {
+      compatible = "qcom,sm6150-pinctrl";
+      reg = <0x03100000 0x300000>,
+            <0x03500000 0x300000>,
+            <0x03900000 0x300000>,
+            <0x03D00000 0x300000>;
+      reg-names = "west", "east", "north", "south";
+      interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+      gpio-controller;
+      #gpio-cells = <2>;
+      gpio-ranges = <&tlmm 0 0 175>;
+      gpio-reserved-ranges = <0 4>, <126 4>;
+      interrupt-controller;
+      #interrupt-cells = <2>;
+    };
