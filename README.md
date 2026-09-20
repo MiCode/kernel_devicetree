@@ -65,3 +65,4 @@
 | guitar-w-oss | REDMI Pad 2 SE | Android W | snapdragon-mid-2022-spf-2-0-2_00004.0 |[guitar-w-oss](https://github.com/MiCode/kernel_devicetree/tree/guitar-w-oss) |
 | erhu-w-oss | REDMI Pad 2 SE 4G | Android W | snapdragon-mid-2022-spf-2-0-2_00004.0 |[erhu-w-oss](https://github.com/MiCode/kernel_devicetree/tree/erhu-w-oss) |
 | warsaw-w-oss | REDMI K90 Ultra | Android W | LA.VENDOR.15.4.0.r1-15000-r1.0.r1_00044.1 |[warsaw-w-oss](https://github.com/MiCode/kernel_devicetree/tree/warsaw-w-oss) |
+| mist-w-oss | REDMI Note 17 5G/REDMI Note 17/POCO M8 Power 5G | Android W | snapdragon-high-mid-2024-spf-2-0_amss_standard_oem r2.0.r1_00009.1 |[mist-w-oss](https://github.com/MiCode/kernel_devicetree/tree/mist-w-oss) |
