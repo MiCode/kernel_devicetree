@@ -1,0 +1,72 @@
+&reserved_memory {
+	secure_display_memory: secure_display_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0x0 0x0a000000>;
+	};
+};
+
+&qcom_dma_heaps {
+	qcom,display {
+		qcom,dma-heap-name = "qcom,display";
+		qcom,dma-heap-type = <HEAP_TYPE_CMA>;
+		qcom,max-align = <9>;
+		memory-region = <&secure_display_memory>;
+	};
+};
+
+&qcom_rng_ee3 {
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+};
+
+&usb2_phy0 {
+	status = "okay";
+};
+
+&usb_qmp_dp_phy0 {
+	status = "okay";
+};
+
+&qupv3_0 {
+	iommus = <&apps_smmu 0x0578 0x0>;
+};
+
+&qupv3_1 {
+	iommus = <&apps_smmu 0x0098 0x0>;
+};
+
+&qupv3_2 {
+	iommus = <&apps_smmu 0x00BB 0x0>;
+};
+
+/ {
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup.memory=nokmem,nosocket kpti=0 qcom_dma_heaps.enable_bitstream_contig_heap=y arm64.nopauth kasan=off msm_show_resume_irq.debug_mask=1";
+		bootconfig = "androidboot.usbcontroller=a600000.dwc3 androidboot.fstab_suffix=gen4.qcom";
+	};
+
+	rename_devices: rename_devices {
+		compatible = "qcom,rename-devices";
+		rename_blk: rename_blk {
+			device-type = "block";
+			actual-dev = "vda", "vdb", "vdc",
+					"vdd", "vde", "vdf",
+					"vdg", "vdh", "vdi",
+					"vdj", "vdk", "vdl",
+					"vdm", "vdn", "vdo",
+					"vdp", "vdq";
+			rename-dev = "super", "userdata", "metadata",
+					"persist", "modem_a","bluetooth_a",
+					"misc", "vbmeta_a", "vbmeta_b",
+					"boot_a", "dtbo_a","dsp_a",
+					"modem_b", "bluetooth_b", "boot_b",
+					 "dtbo_b", "dsp_b";
+		};
+	};
+};

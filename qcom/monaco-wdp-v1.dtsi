@@ -1,0 +1,43 @@
+#include "monaco-idp-v1.dtsi"
+#include "monaco-thermal-wdp.dtsi"
+
+
+
+
+
+
+
+
+
+&qupv3_se1_i2c {
+	status = "ok";
+
+	tsc@24 {
+		compatible = "parade,pt_i2c_adapter";
+		reg = <0x24>;
+		status = "disabled";
+	};
+
+	raydium_ts@39 {
+		compatible = "raydium,raydium-ts";
+		reg = <0x39>;
+		status = "ok";
+		interrupt-parent = <&tlmm>;
+		interrupts = <13 0x2008>;
+		vdd_ana-supply = <&L29A>;
+		vcc_i2c-supply = <&L21A>;
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend","pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+		raydium,reset-gpio = <&tlmm 12 0x00>;
+		raydium,irq-gpio = <&tlmm 13 0x00>;
+		raydium,num-max-touches = <2>;
+		raydium,soft-reset-delay-ms = <50>;
+		raydium,hard-reset-delay-ms = <100>;
+		raydium,x_max = <320>;
+		raydium,y_max = <360>;
+		raydium,display-coords= <0 0 320 360>;
+	};
+};
+

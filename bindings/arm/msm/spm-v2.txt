@@ -1,0 +1,56 @@
+* MSM Subsystem Power Manager (spm-v2)
+
+S4 generation of MSMs have SPM hardware blocks to control the Application
+Processor Sub-System power. These SPM blocks run individual state machine
+to determine what the core (L2 or Krait/Scorpion) would do when the WFI
+instruction is executed by the core. The SAW hardware block handles SPM and
+AVS functionality for the cores.
+
+The devicetree representation of the SPM block should be:
+
+Required properties
+
+- compatible: "qcom,spm-v2"
+- reg: The physical address and the size of the SPM's memory mapped registers
+- qcom,cpu: phandle for the CPU that the SPM block is attached to.  This field
+	is required on only for SPMs that control the CPU. This field is not required
+	for SPMs that control L2/CCI/L3
+- qcom,saw2-ver-reg: The location of the version register
+- qcom,name: The name with which a SPM device is identified by the power
+	management code.
+
+Optional properties:
+
+- qcom,saw2-avs-ctl: The AVS control register
+- qcom,saw2-avs-hysterisis: The AVS hysterisis register to delay the AVS
+	controller requests
+- qcom,vctl-timeout-us: The timeout value in us to wait for voltage to change
+	after sending the voltage command to the PMIC
+- qcom,saw2-avs-limit: The AVS limit register
+- qcom,saw2-avs-dly: The AVS delay register is used to specify the delay values
+	between AVS controller requests
+- qcom,vctl-port: The PVC (PMIC Virtual Channel) port used for changing
+	voltage
+- qcom,vctl-port-ub: The PVC (PMIC Virtual Channel) port used for changing
+	voltage
+- qcom,phase-port: The PVC port used for changing the number of phases
+- qcom,pfm-port: The PVC port used for enabling PWM/PFM modes
+- qcom,cpu-vctl-list: List of cpu node phandles, whose voltage the spm device
+	can control.
+
+Example :
+	qcom,spm@9A10000 {
+		compatible = "qcom,spm-v2";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x9A10000 0x1000>;
+		qcom,name = "system-cbf"; /* CBF SAW */
+		qcom,saw2-ver-reg = <0xFD0>;
+		qcom,cpu-vctl-list = <&CPU0 &CPU1 &CPU2 &CPU3>;
+		qcom,vctl-timeout-us = <50>;
+		qcom,vctl-port = <0x0>;
+		qcom,phase-port = <0x1>;
+		qcom,saw2-avs-ctl = <0x1100>;
+		qcom,pfm-port = <0x2>;
+};
+

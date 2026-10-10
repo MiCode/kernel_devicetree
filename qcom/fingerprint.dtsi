@@ -1,0 +1,106 @@
+&soc {
+	fingerprint_xiaomi {
+		compatible = "xiaomi,xiaomi-fp";
+		xiaomi,gpio_irq = <&tlmm 83 0x0>;
+		netlink-event = <29>;
+		fp-gpio-pwr = <&tlmm 108 0x0>;
+		pinctrl-names = "reset_high", "reset_low", "eint_default", "eint_pulldown", "pwr_high", "pwr_low";
+	        pinctrl-0 = <&fingerprints_reset_high>;
+	        pinctrl-1 = <&fingerprints_reset_low>;
+	        pinctrl-2 = <&fingerprints_eint_default>;
+	        pinctrl-3 = <&fingerprints_eint_pulldown>;
+	        pinctrl-4 = <&fingerprints_pwr_high>;
+	        pinctrl-5 = <&fingerprints_pwr_low>;
+		status = "okay";
+	};
+};
+
+&tlmm {
+/* GPIO_104 : FP_RESET_N, add for fingerprint */
+	fingerprints_reset_high: fingerprints_reset_high {
+		mux {
+			 pins = "gpio104";
+			 function = "gpio";
+		};
+
+		config {
+			pins = "gpio104";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+
+	/* GPIO_104 : FP_RESET_N, state device active*/
+	fingerprints_reset_low: fingerprints_reset_low {
+		mux {
+			pins = "gpio104";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio104";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	/* GPIO_83 : FP_INT_N */
+	fingerprints_eint_default: fingerprints_eint_default {
+		mux {
+			pins = "gpio83";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio83";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+
+	/* GPIO_83 : FP_INT_N */
+	fingerprints_eint_pulldown: fingerprints_eint_pulldown {
+		mux {
+			pins = "gpio83";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio83";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	/* GPIO_108 : FP_LDO_EN */
+	fingerprints_pwr_high: fingerprints_pwr_high {
+		mux {
+			pins = "gpio108";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio108";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+
+	/* GPIO_108 : FP_LDO_EN */
+	fingerprints_pwr_low: fingerprints_pwr_low {
+		mux {
+			pins = "gpio108";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio108";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+};

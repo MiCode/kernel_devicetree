@@ -1,0 +1,47 @@
+===================================================================
+VIRTUAL sensor driver
+===================================================================
+
+Virtual sensor driver will be used to give maximum or minimum temperature of set of thermal zones.
+Generally this set of thermal zones are categorized based on the sensor present on that subsytem.
+
+Properties:
+- compatible:
+	Usage: required
+	Value type: <string>
+	Definition: must be "qcom,vs-sensor"
+
+	Virtual sensor driver properties:
+- sensor-names:
+	Usage: required
+	Value type: <List of Thermal Zones>
+	Definition: List of thermal zones whom maximum or minimum temperature need to find out.
+
+- qcom,logic:
+	Usage: optional
+	value type: <integer>
+	Definition: It can be 1 or 0. 1 is identifier for maximum temperature and 0 is identifier
+			for minimum temperature.
+
+Example:
+	virtual_sensor: virtual-sensor {
+		compatible = "qcom,vs-sensor";
+		#thermal-sensor-cells = <1>;
+
+		cpu_max: cpu-max{
+			sensor-names = "cpuss-0",
+				"cpuss-1",
+				"cpuss-2",
+				"cpuss-3";
+			qcom,logic = <1>;
+		};
+
+		modem_max: modem-max{
+			sensor-names = "modem_offline",
+				"modem_q6",
+				"modem_offline_fec",
+				"modem_offline_phy-0",
+				"modem_offline_phy-1";
+			qcom,logic = <1>;
+		};
+	};

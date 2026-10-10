@@ -1,0 +1,85 @@
+#include <dt-bindings/clock/qcom,gcc-khaje.h>
+&tlmm {
+	vib_out_gpio101_default: vib_out_gpio101_default {
+		mux {
+			pins = "gpio101";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio101";
+			bias-pull-down; /* PULL DOWN */
+			drive-strength = <2>; /* 2 MA */
+			output-low;
+		};
+	};
+	gpio_pwm {
+		irled_pwm_active: irled_pwm_active {
+			mux {
+				pins = "gpio69";
+				function = "GCC_GP2";
+			};
+			config {
+				pins = "gpio69";
+				drive-strength = <4>;
+				// bias-disable; /* NO PULL */
+				// output-low;
+			};
+		};
+		irled_pwm_sleep: irled_pwm_sleep {
+			mux {
+				pins = "gpio69";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio69";
+				drive-strength = <2>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+	};
+};
+
+&soc {
+	vibrator_gpio {
+		status = "ok";
+		compatible = "qcom,qpnp-vibrator-ldo";
+		pinctrl-names = "default";
+		pinctrl-0 = <&vib_out_gpio101_default>;
+		vib,en-gpio = <&tlmm 101 1>;
+	};
+	irled_pwm_38k: irled_pwm_38k {
+		status = "disbaled";
+		compatible = "qcom-ir-pwm";
+		lct,use_cal_mode;
+		lct,cal_enable_time_with_us = <105>;
+		lct,cal_disable_time_with_us = <30>;
+		clock-names = "gp2_clk";
+		clocks = <&gcc GCC_GP2_CLK>;
+		pinctrl-names = "active", "sleep";
+		pinctrl-0 = <&irled_pwm_active>;
+		pinctrl-1 = <&irled_pwm_sleep>;
+	};
+};
+
+/* IR SPI Bringup */
+&qupv3_se4_2uart {
+	status = "disabled";
+};
+&qupv3_se4_spi {
+	status = "ok";
+	/* Add slave device config here */
+	ir_spi@1 {
+		compatible = "lc,ir-spi";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <1>; /* Chip select 0 */
+		spi-max-frequency = <1000000>;
+		spi-cpol;
+		status = "ok";
+	};
+};
+&qupv3_se1_spi_pins {
+	status = "disabled";
+};

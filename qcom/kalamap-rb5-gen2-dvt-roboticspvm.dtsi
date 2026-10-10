@@ -1,0 +1,53 @@
+&soc {
+	qrtr-gunyah-tvm {
+		status = "disabled";
+	};
+
+	qrtr-gunyah-oemvm {
+		status = "disabled";
+	};
+
+	trust_ui_vm {
+		vm_name = "roboticsvm1";
+	};
+
+	oem_vm {
+		vm_name = "rdcapvm";
+	};
+
+	gh-secure-vm-loader@3 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <28>;
+		qcom,vmid = <52>;
+		qcom,firmware-name = "roboticsvm1";
+		memory-region = <&trust_ui_vm_mem>;
+		virtio-backends = <&trust_ui_vm_virt_be0 &trust_ui_vm_virt_be1>;
+	};
+
+	gh-secure-vm-loader@4 {
+		compatible = "qcom,gh-secure-vm-loader";
+		qcom,pas-id = <34>;
+		qcom,vmid = <53>;
+		qcom,firmware-name = "rdcapvm";
+		memory-region = <&oem_vm_mem>;
+		virtio-backends = <&oem_vm_virt_be0>;
+	};
+
+	vsock-gunyah {
+		compatible = "qcom,gunyah-vsock";
+		qcom,master;
+		msgq-label = <3>;
+	};
+
+	dmesg-dump {
+		peer-name = <6>;
+	};
+};
+
+&gpi_dma1 {
+	qcom,gpii-mask = <0x6>;
+};
+
+&gpi_dma2 {
+	qcom,gpii-mask = <0x1e>;
+};

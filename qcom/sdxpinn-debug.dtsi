@@ -1,0 +1,149 @@
+#include <dt-bindings/soc/qcom,dcc_v2.h>
+
+&reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	dump_mem: mem_dump_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		alignment = <0x0 0x400000>;
+		size = <0 0x800000>;
+	};
+};
+
+&soc {
+	dcc: dcc_v2@100ff000 {
+		compatible = "qcom,dcc-v2";
+		reg = <0x240ff000 0x1000>,
+		      <0x24080000 0x18000>;
+
+		qcom,transaction_timeout = <0>;
+		status = "disabled";
+		reg-names = "dcc-base", "dcc-ram-base";
+		dcc-ram-offset = <0>;
+	};
+
+	mem_dump {
+		compatible = "qcom,mem-dump";
+		memory-region = <&dump_mem>;
+
+		c0_context {
+			qcom,dump-size = <0x800>;
+			qcom,dump-id = <0x0>;
+		};
+
+		c100_context {
+			qcom,dump-size = <0x800>;
+			qcom,dump-id = <0x1>;
+		};
+
+		c200_context {
+			qcom,dump-size = <0x800>;
+			qcom,dump-id = <0x2>;
+		};
+
+		c300_context {
+			qcom,dump-size = <0x800>;
+			qcom,dump-id = <0x3>;
+		};
+
+		cpuss_reg {
+			qcom,dump-size = <0x30000>;
+			qcom,dump-id = <0xef>;
+		};
+
+		l1_icache0 {
+			qcom,dump-size = <0x21200>;
+			qcom,dump-id = <0x60>;
+		};
+
+		l1_icache100 {
+			qcom,dump-size = <0x21200>;
+			qcom,dump-id = <0x61>;
+		};
+
+		l1_icache200 {
+			qcom,dump-size = <0x21200>;
+			qcom,dump-id = <0x62>;
+		};
+
+		l1_icache300 {
+			qcom,dump-size = <0x21200>;
+			qcom,dump-id = <0x63>;
+		};
+
+		l1_dcache0 {
+			qcom,dump-size = <0x12200>;
+			qcom,dump-id = <0x80>;
+		};
+
+		l1_dcache100 {
+			qcom,dump-size = <0x12200>;
+			qcom,dump-id = <0x81>;
+		};
+
+		l1_dcache200 {
+			qcom,dump-size = <0x12200>;
+			qcom,dump-id = <0x82>;
+		};
+
+		l1_dcache300 {
+			qcom,dump-size = <0x12200>;
+			qcom,dump-id = <0x83>;
+		};
+
+		l2_tlb0 {
+			qcom,dump-size = <0x5b00>;
+			qcom,dump-id = <0x120>;
+		};
+
+		l2_tlb100 {
+			qcom,dump-size = <0x5b00>;
+			qcom,dump-id = <0x121>;
+		};
+
+		l2_tlb200 {
+			qcom,dump-size = <0x5b00>;
+			qcom,dump-id = <0x122>;
+		};
+
+		l2_tlb300 {
+			qcom,dump-size = <0x5b00>;
+			qcom,dump-id = <0x123>;
+		};
+
+		rpmh {
+			qcom,dump-size = <0x400000>;
+			qcom,dump-id = <0xec>;
+		};
+
+		pmic {
+			qcom,dump-size = <0x200000>;
+			qcom,dump-id = <0xe4>;
+		};
+
+		etr_reg {
+			qcom,dump-size = <0x1000>;
+			qcom,dump-id = <0x100>;
+		};
+
+		etr1_reg {
+			qcom,dump-size = <0x1000>;
+			qcom,dump-id = <0x105>;
+		};
+
+		etfswao_reg {
+			qcom,dump-size = <0x1000>;
+			qcom,dump-id = <0x102>;
+		};
+
+		etf_swao {
+			qcom,dump-size = <0x10000>;
+			qcom,dump-id = <0xf1>;
+		};
+	};
+};
+

@@ -1,0 +1,26 @@
+hdmi_input_mux device
+
+Required properties:
+- compatible: Should be "hdmi_input_mux"
+- interrupt-parent: the phandle for the gpio controller
+- interrupts: description of interrupt line
+- hdmi-detect-gpio: HDMI detect gpio mapping
+- hdmi-select-gpio: HDMI select gpio mapping
+- pinctrl-names: the pin control state names; should contain "default"
+- pinctrl-0: List of phandles to configure the GPIO pin used as interrupt line
+- hdmi-auto-switch: HDMI auto switch on-off
+
+Example:
+
+&soc {
+	hdmi_input_mux: hdmi_input_mux {
+		compatible = "hdmi_input_mux";
+		interrupt-parent = <&tlmm>;
+		interrupts = <55 IRQ_TYPE_EDGE_BOTH>;
+		hdmi-detect-gpio = <&tlmm 55 0>;
+		hdmi-select-gpio = <&tlmm 9 0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hdmi_input_detect &hdmi_input_select>;
+		hdmi-auto-switch = <1>;
+	};
+};

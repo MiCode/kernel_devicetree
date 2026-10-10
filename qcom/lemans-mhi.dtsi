@@ -1,0 +1,32 @@
+&pcie0_rp {
+	#address-cells = <5>;
+	#size-cells = <0>;
+
+	mhi_0: qcom,mhi@0 {
+		status = "disabled";
+		reg = <0 0 0 0 0 >;
+
+		pci-ids = "17cb:0116";
+
+		/* controller specific configuration */
+		qcom,iommu-group = <&mhi_0_iommu_group>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		interconnects = <&pcie_anoc MASTER_PCIE_0 &mc_virt SLAVE_EBI1>;
+		interconnect-names = "pcie_to_ddr";
+
+		qcom,mhi-bus-bw-cfg = <0 0>, /* no vote */
+				<250000 0>, /* avg bw / AB: 2 GBps, peak bw / IB: no vote */
+				<500000 0>, /* avg bw / AB: 4 GBps, peak bw / IB: no vote */
+				<1000000 0>, /* avg bw / AB: 8 GBps, peak bw / IB: no vote */
+				<2000000 0>; /* avg bw / AB: 16 GBps, peak bw / IB: no vote */
+
+		mhi_0_iommu_group: mhi_0_iommu_group {
+			qcom,iommu-dma-addr-pool = <0x20000000 0x1fffffff>;
+			qcom,iommu-dma = "atomic";
+			qcom,iommu-pagetable = "coherent";
+		};
+	};
+};

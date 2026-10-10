@@ -1,0 +1,119 @@
+#include "qcs605-lc-pmic-overlay.dtsi"
+
+&qupv3_se9_2uart {
+	status = "disabled";
+};
+
+&qupv3_se12_2uart {
+	status = "ok";
+};
+
+&sdhc_1 {
+	vdd-supply = <&pm660_l19>;
+	qcom,vdd-voltage-level = <2960000 2960000>;
+	qcom,vdd-current-level = <0 570000>;
+
+	vdd-io-supply = <&pm660_l8>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-lpm-sup;
+	qcom,vdd-io-voltage-level = <1800000 1800000>;
+	qcom,vdd-io-current-level = <0 325000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_on>;
+	pinctrl-1 = <&sdc1_off>;
+
+	status = "ok";
+};
+
+&tlmm {
+	sdc2_cd_on: cd_on {
+		mux {
+			pins = "gpio116";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio116";
+			drive-strength = <2>;
+			bias-pull-up;
+			};
+		};
+
+	sdc2_cd_off: cd_off {
+		mux {
+			pins = "gpio116";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio116";
+			drive-strength = <2>;
+			bias-disable;
+			};
+	};
+
+	usb_det_default: usb_det_default {
+		usb_id_det_default: usb_id_det_default {
+			mux {
+				pins = "gpio131";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio131";
+				drive-strength = <2>;
+				bias-pull-down;
+				output-enable;
+			};
+		};
+
+		usb_vbus_det_default: usb_vbus_det_default {
+			config {
+				pins = "gpio26";
+				drive-strength = <2>;
+				bias-pull-up;
+				input-enable;
+			};
+		};
+	};
+};
+
+&sdhc_2 {
+	/* VDD external regulator is enabled/disabled by pm660_l18 regulator */
+	vdd-io-supply = <&pm660_l18>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 116 0x1>;
+
+	status = "ok";
+};
+
+&soc {
+	extcon_usb1: extcon_usb1 {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&tlmm 26 0x1>;
+		trig-gpio = <&tlmm 131 0x0>;
+		gpio-names = "gpio131";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb_vbus_det_default &usb_id_det_default>;
+	};
+};
+
+&usb0 {
+	extcon = <&extcon_usb1>;
+};
+
+&qupv3_se8_spi {
+	status = "okay";
+};
+
+&slim_aud {
+	status = "okay";
+};

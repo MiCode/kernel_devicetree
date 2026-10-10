@@ -1,0 +1,38 @@
+#include "kalamap-aim300.dtsi"
+
+&soc {
+	rlt8211_3p3: rlt8211_3v3_vreg {
+		compatible = "regulator-fixed";
+		regulator-name = "rtl8211_3p3";
+		gpio = <&tlmm 106 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-enable-ramp-delay = <74000>;
+	};
+};
+
+&pcie1_bus2_dev3_fn0 {
+	reg = <0x1800 0x0 0x0 0x0 0x0>;
+	rlt8211_eth1: rlt8221_eth1 {
+		reg = <0x100 0x0 0x0 0x0 0x0>;
+		qcom,phy-rst-gpio = <1>;
+		qcom,phy-rst-delay-us = <82000>;
+		qcom,phy-port-interface = <2>;
+		qcom,phy-built-in-wol;
+		qcom,phy-reverse-rst;
+		phy-supply = <&rlt8211_3p3>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		mdio {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			phy0: ethernet-phy@0 {
+				reg = <0>;
+				realtek,aldps-enable;
+			};
+		};
+	};
+
+	/delete-node/ qps615_eth1;
+};

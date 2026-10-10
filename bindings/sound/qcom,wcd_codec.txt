@@ -1,0 +1,79 @@
+Qualcomm Technologies, Inc. WCD audio CODEC
+
+PM5100 SPMI node
+
+pm5100_spmi: Child node of SPMI bus required for besbev codec
+	     in order to access SPMI register to reset the peripheral.
+
+Required properties:
+ -compatible: "qcom,pm5100-spmi";
+
+&spmi_bus {
+	pm5100_cdc: qcom,pm5100-cdc {
+	compatible = "qcom,pm5100-spmi";
+	};
+};
+
+Besbev Codec
+
+Required properties:
+ - compatible: "qcom,besbev-codec";
+ - qcom,split-codec: Property to check on split codec support.
+ - qcom,swr_ch_map: mapping of swr tx/rx slave port configuration to port_type and also
+		corresponding master port type it need to attach.
+		format: <port_id, slave_port_type, ch_mask, ch_rate, master_port_type>
+		same port_id configurations have to be grouped, and in ascending order.
+ - qcom,pmic-spmi-node: Phandle reference to the PMIC SPMI DT node.
+ - qcom,wcd-reset-reg: Reset register address in PMIC for rouleur codec.
+ - qcom,besbev-slave: phandle reference of Soundwire Tx/Rx slave device.
+ - qcom,speaker-present: Property to check besbev is connected RX SWR or TX SWR of bolero codec.
+
+Optional properties:
+
+ - cdc-mic-bias-supply: phandle of mic bias supply's regulator device tree node.
+ - qcom,cdc-mic-bias-voltage: mic bias supply's voltage level min and max in mV.
+ - qcom,cdc-mic-bias-current: mic bias supply's max current in mA.
+
+ - qcom,cdc-mic-bias-lpm-supported: mic bias supply's LPM mode.
+
+ - qcom,cdc-static-supplies: List of supplies to be enabled prior to codec
+			     hardware probe.  Supplies in this list will be
+			     stay enabled.
+
+Example:
+
+besbev_codec: besbev-codec {
+	compatible = "qcom,besbev-codec";
+	qcom,split-codec = <1>;
+	qcom,pmic-spmi-node = <&pm2250_cdc>;
+	qcom,wcd-reset-reg = <0x0000FCDB>;
+	qcom,foundry-id-reg = <0x0000704D>;
+	qcom,swr_ch_map = <0 SPKR_L 0x1 0 LO>,
+			<3 SPKR_L_VI 0x3 0 PCM_IN>;
+
+	qcom,besbev-slave = <&besbev_rx_slave>;
+	qcom,speaker-present = <1>;
+
+	cdc-mic-bias-supply = <&L28A>;
+	qcom,cdc-mic-bias-voltage = <2904000 2904000>;
+	qcom,cdc-mic-bias-current = <1180>
+
+	qcom,cdc-micbias1-mv = <1800>;
+	qcom,cdc-micbias2-mv = <1800>;
+
+	qcom,cdc-static-supplies = "cdc-mic-bias";
+};
+
+PM2250 SPMI node
+
+pm2250_spmi: Child node of SPMI bus required for rouleur codec
+             in order to access SPMI register to reset the peripheral.
+
+Required properties:
+ -compatible: "qcom,pm2250-spmi";
+
+&spmi_bus {
+                pm2250_cdc: qcom,pm2250-cdc {
+                        compatible = "qcom,pm2250-spmi";
+                };
+};

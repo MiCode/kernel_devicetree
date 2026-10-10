@@ -1,0 +1,45 @@
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/bindings/soc/qcom/qti-pmic-lpm.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. PMIC low power mode (PMIC LPM) binding
+
+description: |
+  Qualcomm Technologies, Inc. PMIC low power mode (PMIC LPM) reports entry and
+  exit of PMIC's low power modes DeepSleep/Hibernate/TWM to a companion chip
+  through the SDAM interface.
+
+properties:
+  compatible:
+    const: qti,pmic-lpm
+
+  reg:
+    description: Base address of the SDAM peripheral.
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+
+examples:
+  - |
+    spmi_bus {
+      #address-cells = <2>;
+      #size-cells = <0>;
+      interrupt-controller;
+      #interrupt-cells = <4>;
+
+      qcom,pm5100@0 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        pmic-lpm@7200 {
+          compatible = "qti,pmic-lpm";
+          reg = <0x7200>;
+          #address-cells = <1>;
+          #size-cells = <1>;
+        };
+      };
+    };
+...

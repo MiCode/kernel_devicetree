@@ -1,0 +1,207 @@
+#include "kalamap-iot.dtsi"
+#include "kalamap-iot-vc-qps615.dtsi"
+
+&chosen {
+	bootargs = "console=ttyMSM0,115200n8 loglevel=6 kpti=0 log_buf_len=256K kernel.panic_on_rcu_stall=1 service_locator.enable=1 msm_rtb.filter=0x237 rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops swiotlb=noforce loop.max_part=7 fw_devlink.strict=1 allow_mismatched_32bit_el0 cpufreq.default_governor=performance printk.console_no_auto_verbose=1 kasan=off sysctl.kernel.sched_pelt_multiplier=4 can.stats_timer=0 pcie_ports=compat irqaffinity=0-2 disable_dma32=on no-steal-acc cgroup.memory=nokmem,nosocket slub_debug=- firmware_class.path=/vendor/firmware";
+};
+
+&qupv3_se4_spi {
+	status = "disabled";
+};
+
+&tlmm {
+	ktm5030_rst: ktm5030_rst {
+		mux {
+			pins = "gpio90";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio90";
+			drive-strength = <8>;
+			bias-pull-low;
+		};
+	};
+
+
+	lt8711uxe2_dp_lane_sel: lt8711uxe2_dp_lane_sel {
+		mux {
+			pins = "gpio50";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio50";
+			drive-strength = <8>;
+			bias-disable;
+		};
+	};
+
+
+	lt8711uxe2_dp_alt_en: lt8711uxe2_dp_alt_en {
+		mux {
+			pins = "gpio51";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio51";
+			drive-strength = <8>;
+			bias-disable;
+		};
+	};
+
+
+	lt8711uxe2_rst: lt8711uxe2_rst {
+		mux {
+			pins = "gpio46";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio46";
+			drive-strength = <8>;
+			bias-disable;
+		};
+	};
+
+	lt8711uxe2_int: lt8711uxe2_int {
+		mux {
+			pins = "gpio31";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio31";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	hdmi_input_detect: hdmi_input_detect {
+		mux {
+			pins = "gpio55";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio55";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+
+	hdmi_input_select: hdmi_input_select {
+		mux {
+			pins = "gpio9";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio9";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+};
+
+&qupv3_se0_i2c {
+	status = "okay";
+	qcom,clk-freq-out = <400000>;
+
+	extcon_ktm5030: extcon_ktm5030@73 {
+		status = "okay";
+		compatible = "kinet,ktm5030";
+		reg = <0x73>;
+		img-fw-rev = <0xd110100>;
+		reset-gpio = <&tlmm 90 0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&ktm5030_rst>;
+	};
+};
+
+&qupv3_hub_i2c3 {
+	status = "ok";
+	extcon_lt8711uxe2: lt8711uxe2@3f {
+		compatible = "lt,lt8711uxe2";
+		reg = <0x3f>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <31 IRQ_TYPE_LEVEL_HIGH>;
+		lt,irq-gpio = <&tlmm 31 0>;
+		lt,dp-lane-sel = <&tlmm 50 0>;
+		lt,dp-alt-en = <&tlmm 51 0>;
+		lt,reset-gpio = <&tlmm 46 0>;
+		with-hdmi-switch;
+		lt,cc-gpio = <&tlmm 18 0>;
+		usb-ss-support;
+		pinctrl-names = "default";
+		pinctrl-0 = <&lt8711uxe2_int &lt8711uxe2_dp_alt_en
+			&lt8711uxe2_dp_lane_sel &lt8711uxe2_rst>;
+		img-fw-rev = <0x000004>;
+		status = "okay";
+	};
+};
+
+&usb0 {
+	extcon = <&extcon_lt8711uxe2>, <&eud>;
+	snps,dwc3_guctl_resbwhseps_quirk;
+};
+
+&L6M {
+	regulator-always-on;
+};
+
+&pcie0 {
+	qcom,config-recovery;
+	qcom,drv-name = "lpass";
+	msi-map = <0x0 &gic_its 0x1400 0x1>,
+	<0x100 &gic_its 0x1401 0x1>; /* 32 event IDs */
+};
+
+&aliases {
+	i2c0 = "/soc/qcom,qupv3_i2c_geni_se@9c0000/i2c@988000";
+	i2c1 = "/soc/qcom,qupv3_1_geni_se@ac0000/i2c@a80000";
+	i2c2 = "/soc/qcom,qupv3_i2c_geni_se@9c0000/i2c@98c000";
+};
+
+&soc {
+	hdmi_input_mux: hdmi_input_mux {
+		compatible = "hdmi_input_mux";
+		interrupt-parent = <&tlmm>;
+		interrupts = <55 IRQ_TYPE_EDGE_BOTH>;
+		hdmi-detect-gpio = <&tlmm 55 0>;
+		hdmi-select-gpio = <&tlmm 9 0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hdmi_input_detect &hdmi_input_select>;
+		hdmi-auto-switch = <1>;
+	};
+
+	gpio_led {
+		compatible = "gpio-leds";
+		led0 {
+			label = "led_0";
+			gpios = <&tlmm 44 GPIO_ACTIVE_HIGH>;
+		};
+
+		led1 {
+			label = "led_1";
+			gpios = <&tlmm 45 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};
+
+&gpio_keys {
+	mute {
+		label = "mute";
+		gpios = <&pm8550_gpios 1 GPIO_ACTIVE_LOW>;
+		linux,input-type = <1>;
+		linux,code = <KEY_MUTE>;
+		gpio-key,wakeup;
+		debounce-interval = <15>;
+		linux,can-disable;
+	};
+};
+
+&L1B {
+	regulator-always-on;
+};

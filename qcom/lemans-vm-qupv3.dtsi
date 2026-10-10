@@ -1,0 +1,102 @@
+&soc {
+
+	/* QUPv3_1  wrapper  instance */
+	qupv3_1: qcom,qupv3_1_geni_se@ac0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0xac0000 0x6000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x443 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		status = "ok";
+
+		qupv3_se11_i2c: i2c@a90000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0xa90000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S4_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se11_i2c_active>;
+			pinctrl-1 = <&qupv3_se11_i2c_sleep>;
+			status = "disabled";
+		};
+
+		/* Debug UART Instance */
+		qupv3_se10_2uart: qcom,qup_uart@a8c000 {
+			compatible = "qcom,geni-debug-uart";
+			reg = <0xa8c000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 356 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S3_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se10_2uart_active>;
+			pinctrl-1 = <&qupv3_se10_2uart_sleep>;
+			status = "disabled";
+		};
+	};
+
+	/* QUPv3_2  wrapper  instance */
+	qupv3_2: qcom,qupv3_2_geni_se@8c0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0x8c0000 0x6000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_2_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_2_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x5a3  0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		status = "ok";
+
+		qupv3_se14_spi: spi@880000 {
+			compatible = "qcom,spi-geni";
+			reg = <0x880000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 373 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S0_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se14_spi_active>;
+			pinctrl-1 = <&qupv3_se14_spi_sleep>;
+			spi-max-frequency = <50000000>;
+			status = "disabled";
+		};
+
+		/* BT UART Instance */
+		qupv3_se17_4uart: qcom,qup_uart@88c000 {
+			compatible = "qcom,msm-geni-serial-hs";
+			reg = <0x88c000 0x4000>;
+			reg-names = "se_phys";
+			interrupts-extended = <&intc GIC_SPI 585 IRQ_TYPE_LEVEL_HIGH>,
+					<&tlmm 94 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S3_CLK>;
+			pinctrl-names = "default", "active", "sleep", "shutdown";
+			pinctrl-0 = <&qupv3_se17_default_cts>,
+					<&qupv3_se17_default_rtsrx>, <&qupv3_se17_default_tx>;
+			pinctrl-1 = <&qupv3_se17_ctsrx>, <&qupv3_se17_rts>,
+					<&qupv3_se17_tx>;
+			pinctrl-2 = <&qupv3_se17_ctsrx>, <&qupv3_se17_rts>,
+					<&qupv3_se17_tx>;
+			pinctrl-3 = <&qupv3_se17_default_cts>,
+					<&qupv3_se17_default_rtsrx>, <&qupv3_se17_default_tx>;
+			qcom,wakeup-byte = <0xFD>;
+			status = "disabled";
+		};
+	};
+};

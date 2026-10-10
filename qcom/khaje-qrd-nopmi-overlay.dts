@@ -1,0 +1,27 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include "khaje-qrd-nopmi.dtsi"
+#include "lx_chg/lx_chg.dtsi"
+#include "lx_sensor/lx-sensor.dtsi"
+#include "byp/byp_charger.dtsi"
+#include "zephyr-tms-nfc.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. KHAJE QRD nopmi overlay";
+	compatible = "qcom,khaje-qrd", "qcom,khaje", "qcom,qrd";
+	qcom,msm-id = <518 0x10000>, <586 0x10000>;
+	qcom,board-id = <0x1000B 0>;
+	qcom,pmic-id = <0x2D 0x0 0x0 0x0>;
+};
+
+&soc {
+	mtdoops_pmsg@0x48000000 {
+		compatible = "mtdoops_pmsg";
+		reg = <0x48000000 0x00200000>;
+		console-size = <0x80000>;
+		pmsg-size = <0x100000>;
+	};
+};
+#include "radio_cable_det/radio_cable_det.dtsi"

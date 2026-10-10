@@ -1,0 +1,34 @@
+ #include "kona-iot-v2.1.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. kona-iot RB5 Platform";
+	compatible = "qcom,kona-iot";
+	qcom,msm-id = <455 0x0>;
+};
+
+&soc {
+	clk40M: can_clock {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <40000000>;
+	};
+};
+
+&qupv3_se0_spi {
+	status = "okay";
+	can@0 {
+		compatible = "microchip,mcp2518fd";
+		reg = <0>;
+		clocks = <&clk40M>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <15 0>;
+		interrupt-names = "can_irq";
+		spi-max-frequency = <10000000>;
+		gpio-controller;
+		status = "okay";
+	};
+};
+
+&tlmm {
+	qcom,gpios-reserved = <40 41 42 43>;
+};

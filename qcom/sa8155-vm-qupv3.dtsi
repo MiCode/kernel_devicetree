@@ -1,0 +1,139 @@
+&soc {
+	/* QUPv3 SE Instances
+	 * Qup0 0: SE 0
+	 * Qup0 1: SE 1
+	 * Qup0 2: SE 2
+	 * Qup0 3: SE 3
+	 * Qup0 4: SE 4
+	 * Qup0 5: SE 5
+	 * Qup0 6: SE 6
+	 * Qup0 7: SE 7
+	 * Qup1 0: SE 8
+	 * Qup1 1: SE 9
+	 * Qup1 2: SE 10
+	 * Qup1 3: SE 11
+	 * Qup1 4: SE 12
+	 * Qup1 5: SE 13
+	 * Qup2 0: SE 14
+	 * Qup2 1: SE 15
+	 * Qup2 2: SE 16
+	 * Qup2 3: SE 17
+	 * Qup2 4: SE 18
+	 * Qup2 5: SE 19
+	 */
+	/* QUPv3_0 wrapper instance */
+	qupv3_0: qcom,qupv3_0_geni_se@8c0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0x8c0000 0x6000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
+		iommus = <&apps_smmu 0xc3 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		status = "ok";
+
+		/* I2C instance for SDR Card*/
+		qupv3_se2_i2c: i2c@888000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0x888000 0x4000>;
+			interrupts = <GIC_SPI 603 IRQ_TYPE_LEVEL_HIGH>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP0_S2_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se2_i2c_active>;
+			pinctrl-1 = <&qupv3_se2_i2c_sleep>;
+			status = "disabled";
+		};
+	};
+	/* QUPv3_1  wrapper  instance */
+	qupv3_1: qcom,qupv3_1_geni_se@ac0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0xac0000 0x6000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x603 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		status = "ok";
+
+		/* Debug UART Instance */
+		qupv3_se12_2uart: qcom,qup_uart@a90000 {
+			compatible = "qcom,geni-debug-uart";
+			reg = <0xa90000 0x4000>;
+			reg-names = "se_phys";
+			interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se";
+			clocks = <&gcc GCC_QUPV3_WRAP1_S4_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se12_2uart_active>;
+			pinctrl-1 = <&qupv3_se12_2uart_sleep>;
+			status = "disabled";
+		};
+	};
+
+	/* QUPv3_2  wrapper  instance */
+	qupv3_2: qcom,qupv3_2_geni_se@cc0000 {
+		compatible = "qcom,geni-se-qup";
+		reg = <0xcc0000 0x6000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		clock-names = "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP_2_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_2_S_AHB_CLK>;
+		iommus = <&apps_smmu 0x7a3  0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0x10000000>;
+		qcom,iommu-geometry = <0x40000000 0x10000000>;
+		qcom,iommu-dma = "fastmap";
+		status = "ok";
+
+		/* HS UART Instance */
+		qupv3_se17_4uart: qcom,qup_uart@c8c000 {
+			compatible = "qcom,msm-geni-serial-hs";
+			reg = <0xc8c000 0x4000>;
+			reg-names = "se_phys";
+			interrupts-extended = <&intc GIC_SPI 585 IRQ_TYPE_LEVEL_HIGH>,
+					<&tlmm 46 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S3_CLK>;
+			pinctrl-names = "default", "active", "sleep", "shutdown";
+			pinctrl-0 = <&qupv3_se17_default_ctsrtsrx>,
+						<&qupv3_se17_default_tx>;
+			pinctrl-1 = <&qupv3_se17_ctsrx>, <&qupv3_se17_rts>,
+						<&qupv3_se17_tx>;
+			pinctrl-2 = <&qupv3_se17_ctsrx>, <&qupv3_se17_rts>,
+						<&qupv3_se17_tx>;
+			pinctrl-3 = <&qupv3_se17_default_ctsrtsrx>,
+						<&qupv3_se17_default_tx>;
+			qcom,wakeup-byte = <0xFD>;
+			status = "disabled";
+		};
+
+		qupv3_se19_i2c: i2c@c94000 {
+			compatible = "qcom,i2c-geni";
+			reg = <0xc94000 0x4000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			interrupts = <GIC_SPI 587 IRQ_TYPE_LEVEL_HIGH>;
+			clock-names = "se-clk";
+			clocks = <&gcc GCC_QUPV3_WRAP2_S5_CLK>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&qupv3_se19_i2c_active>;
+			pinctrl-1 = <&qupv3_se19_i2c_sleep>;
+			status = "disabled";
+		};
+
+	};
+};
