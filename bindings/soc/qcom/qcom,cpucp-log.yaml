@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,cpucp-log.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. CPUCP Logging
+
+maintainers:
+  - Amir Vajid <quic_avajid@quicinc.com>
+  - Shivnandan Kumar <quic_kshivnan@quicinc.com>
+
+description:
+  CPUCP logging is a device that uses mailbox to collect the logs
+  generated from cpucp, and dump them into a dedicated log buffer
+  through ipc_logging framework.
+  An instance of cpucp-log should have the mailbox controller phandle and
+  addresses of log buffer set aside for this purpose.
+
+properties:
+  compatible:
+    enum:
+      - qcom,cpucp-log
+      - qcom,pdp-log
+  reg:
+    maxItems: 2
+
+  mboxes:
+    description:
+      reference to "cpucp" mailbox, as described in mailbox/mailbox.txt.
+
+  qcom,log-type:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      CPUCP log type as described in enum cpucp_log_type in cpucp_log.c.
+
+required:
+  - compatible
+  - mboxes
+  - reg
+  - qcom,log-type
+
+additionalProperties: false
+
+examples:
+  - |
+    cpucp_log: qcom,cpucp_log@fd04780 {
+      compatible = "qcom,cpucp-log";
+      reg = <0x0fd04580 0x200>,
+            <0x0fd04780 0x200>;
+      mboxes = <&cpucp 1>;
+      qcom,log-type = <0>;
+    };

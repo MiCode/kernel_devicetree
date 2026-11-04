@@ -1,0 +1,449 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/input/qcom,hv-haptics.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. PMIC High-Voltage Haptics
+
+maintainers:
+  - Fenglin Wu <quic_fenglinw@quicinc.com>
+
+description: |
+  The High-Voltage Haptics module in QTI PMICs can support either ERM or LRA
+  actuators with drive voltage up to 10 V. It has several pattern sources (such
+  as DIRECT_PLAY, PATTERN1, PATTERN2, FIFO, and SWR) which can be used for
+  playing different vibration effects.
+
+  This haptics device supports two levels of nodes. The main node defines the
+  hardware configuration based on the actuator used in the platform. Child nodes
+  define the configurations for different haptics effects that can be supported.
+
+properties:
+  compatible:
+    enum:
+      - qcom,hv-haptics
+      - qcom,pm8350b-haptics
+      - qcom,pm5100-haptics
+
+  reg:
+    minItems: 2
+    items:
+      - description: HAPTICS_CFG module register base address
+      - description: HAPTICS_PATTERN module register base address
+      - description: HAPTICS_BOOST module register base address (N/A for PM5100)
+
+  interrupts:
+    items:
+      - description: FIFO empty interrupt
+
+  interrupt-names:
+    items:
+      - const: fifo-empty
+
+  qcom,vmax-mv:
+    description: |
+      The maximum allowed actuator output voltage in millivolts. The value will
+      be rounded to the closest multiple of 50 mV.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 0
+    maximum: 11000
+    default: 5000
+
+  qcom,brake-mode:
+    description: |
+      Vibration brake mode. See "BRAKE_*" constants in
+      include/dt-bindings/input/qcom,hv-haptics.h.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    enum: [0, 1, 2, 3]
+    default: 3  # AUTO brake mode
+
+  qcom,brake-disable:
+    description: Boolean flag indicating that vibration brake is disabled.
+    type: boolean
+
+  qcom,brake-pattern:
+    description: |
+      Brake pattern byte array. The array needs to be specified as 8-bit using
+      '/bits/ 8' parameter. The pattern will be played at the end of the playing
+      waveform if manual brake mode (either open-loop or closed-loop) is
+      selected. If this property is not specified, or if it contains all zero
+      values, then manual brake is disabled.
+    $ref: /schemas/types.yaml#/definitions/uint8-array
+    minItems: 1
+    maxItems: 8
+
+  qcom,fifo-empty-threshold:
+    description: |
+      FIFO empty threshold. The "fifo-empty" IRQ will be triggered when the
+      number of the samples in the FIFO is less than the threshold.
+
+      PM8350B v1: allowed values: 0 - 104  (multiples of 4);  default: 48
+      PM8350B v2: allowed values: 0 - 640  (multiples of 40); default: 280
+      PM5100:     allowed values: 0 - 1024 (multiples of 32); default: 288
+      PM8550B:    allowed values: 0 - 2048 (multiples of 32); default: 288
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 0
+    maximum: 2048
+
+  qcom,use-erm:
+    description: |
+      Boolean flag indicating that the hardware is driving an ERM actuator. If
+      this is not specified, then an LRA actuator is assumed.
+    type: boolean
+
+  nvmem-cells:
+    items:
+      - description: |
+          Closed-loop brake calibration settings NVMEM cell phandle. Not
+          applicable for PM5100.
+
+  nvmem-cell-names:
+    items:
+      - const: hap_cl_brake
+
+  nvmem:
+    items:
+      - description:
+          Haptics configuration NVMEM phandle. Not applicable for PM5100.
+
+  nvmem-names:
+    items:
+      - const: hap_cfg_sdam
+
+  qcom,pbs-client:
+    description: |
+      PBS client phandle used for triggering PBS to configure haptics short
+      circuit current (ISC) during LRA impedance detection. Not applicable for
+      PM5100.
+    $ref: /schemas/types.yaml#/definitions/phandle
+
+  qcom,lra-period-us:
+    description: LRA actuator initial resonance period in microseconds.
+    minimum: 5
+    maximum: 20475
+
+  qcom,drv-sig-shape:
+    description: |
+      LRA drive signal shape. See "WF_*" constants in
+      include/dt-bindings/input/qcom,hv-haptics.h.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    enum: [0, 1, 2]
+    default: 1  # sine
+
+  qcom,brake-sig-shape:
+    description: |
+      LRA reverse brake signal shape. See "WF_*" constants in
+      include/dt-bindings/input/qcom,hv-haptics.h.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    enum: [0, 1, 2]
+    default: 1  # sine
+
+  qcom,brake-sine-gain:
+    description: |
+      LRA brake signal gain when using sine brake signal shape.  See
+      "BRAKE_SINE_GAIN_*" constants in
+      include/dt-bindings/input/qcom,hv-haptics.h.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    enum: [0, 1, 2, 3]
+    default: 0  # X1
+
+  qcom,rt-imp-detect:
+    description: |
+      Boolean flag indicating that hardware based real-time impedance
+      measurement is used when detecting LRA impedance. This is only applicable
+      for HAP525_HV haptics module.
+    type: boolean
+
+  qcom,sw-cmd-freq-detect:
+    description: |
+      Boolean flag indicating that software command based frequency detection
+      method is used for LRA resonant frequency detection.
+    type: boolean
+
+  qcom,hbst-ovp-trim:
+    description: |
+      Boolean flag indicating that the hBoost OVP trim PBS sequence would be
+      triggered during driver initialization. This is only applicable for HAP530_HV
+      haptics module.
+    type: boolean
+
+patternProperties:
+  ".*hap-swr-slave-reg$":
+    description: |
+      Haptics soundwire (SWR) slave regulator subnode.  Used by the swr-haptics
+      module to control the online status of the soundwire slave. This property
+      should be named "qcom,hap-swr-slave-reg".
+    $ref: /schemas/regulator/regulator.yaml#
+
+    properties:
+      regulator-name: true
+
+    additionalProperties: false
+
+  "^(effect|primitive)_[0-9]+$":
+    description: Vibration effect subnode
+    type: object
+
+    properties:
+      qcom,effect-id:
+        description: |
+          Effect ID that a client can request to play the corresponding effect
+          defined in this child node. The ID is normally defined and sent from
+          userspace for a certain user notification event.
+        $ref: /schemas/types.yaml#/definitions/uint32
+
+      qcom,primitive-id:
+        description: |
+          Effect primitive ID that a client can request to play the
+          corresponding primitive defined in this child node. The ID is normally
+          defined and sent from userspace for a certain user notification event.
+        $ref: /schemas/types.yaml#/definitions/uint32
+
+      qcom,wf-vmax-mv:
+        description: |
+          The maximum allowed actuator output voltage in millivolts for this
+          effect. The value will be rounded to the closest multiple of 50 mV.
+          If this property is not specified, then the top level limit specified
+          by the parent node "qcom,vmax-mv" property will be used.
+        $ref: /schemas/types.yaml#/definitions/uint32
+        minimum: 0
+        maximum: 11000
+
+      qcom,wf-pattern-data:
+        description: |
+          Pattern data specified via 8 3-tuples.  Each tuple will be played in
+          PATTERN1 source mode by default.
+        $ref: /schemas/types.yaml#/definitions/uint32-matrix
+        minItems: 1
+        maxItems: 8
+        items:
+          items:
+            - description: 9-bit pattern amplitude
+              minimum: 0
+              maximum: 0x1ff
+            - description: |
+                Play period for this pattern amplitude. See "S_PERIOD_*"
+                constants in include/dt-bindings/input/qcom,hv-haptics.h.
+              minimum: 0
+              maximum: 13
+            - description: |
+                Flag indicating that the frequency of the LRA drive signal will
+                be doubled when playing this pattern.
+              enum: [0, 1]
+
+      qcom,wf-pattern-preload:
+        description: |
+          Boolean flag indicating that the effect pattern should be preloaded
+          into PATTERN2 source during initialization and then never changed.
+          This is used to achieve a low latency response as register
+          configurations occur only once instead of for each play event. This
+          property may only be specified only in one effect subnode.
+        type: boolean
+
+      qcom,wf-pattern-period-us:
+        description: |
+          Play period in microseconds for each pattern entry specified in
+          "qcom,wf-pattern-data".
+        minimum: 5
+        maximum: 20475
+
+      qcom,wf-fifo-data:
+        description: |
+          Byte array of patterns which will be filled into the FIFO memory and
+          played when FIFO mode is selected. The array needs to be specified as
+          8-bit using '/bits/ 8' parameter, or using '[]' instead of '<>'.
+        $ref: /schemas/types.yaml#/definitions/uint8-array
+
+      qcom,wf-fifo-period:
+        description: |
+          Play period for each FIFO pattern entry specified in
+          "qcom,wf-fifo-data". See "S_PERIOD_*" constants in
+          include/dt-bindings/input/qcom,hv-haptics.h.
+        $ref: /schemas/types.yaml#/definitions/uint32
+        enum: [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]
+
+      qcom,wf-fifo-preload:
+        description: |
+          Boolean flag indicating that the FIFO effect data should be preloaded
+          into pattern memory during boot up.
+
+          In HAP525_HV PMIC haptics module, there are four pattern memory
+          partitions with configurable size. Each partition can be used for
+          preloading one FIFO effect.
+
+          The total FIFO memory space is 2K bytes. 640 bytes of this is reserved
+          for FIFO streaming mode which loads the FIFO data at runtime. The rest
+          of the FIFO space can be used for pattern memory partitions.
+
+          This feature is only available for HAP525_HV PMIC haptics module. This
+          module is present on PMICs like PM8550B.
+        type: boolean
+
+      qcom,wf-brake-mode:
+        description: |
+          Vibration brake mode for this effect. See "BRAKE_*" constants in
+          include/dt-bindings/input/qcom,hv-haptics.h.
+
+          If this property is not specified, then the top level brake mode
+          specified by the parent node "qcom,brake-mode" property will be used.
+        $ref: /schemas/types.yaml#/definitions/uint32
+        enum: [0, 1, 2, 3]
+
+      qcom,wf-brake-pattern:
+        description: |
+          Brake pattern byte array. The array needs to be specified as 8-bit
+          using '/bits/ 8' parameter. The pattern will be played at the end of
+          the playing waveform if manual brake mode (either open-loop or
+          closed-loop) is selected.
+
+          If this property is not specified, then the top level brake pattern
+          specified by the parent node "qcom,brake-pattern" property will be
+          used.
+        $ref: /schemas/types.yaml#/definitions/uint8-array
+        minItems: 1
+        maxItems: 8
+
+      qcom,wf-brake-disable:
+        description: |
+          Boolean flag indicating that vibration brake is disabled for this
+          effect.
+        type: boolean
+
+      qcom,wf-brake-sine-gain:
+        description: |
+          LRA brake signal gain when using sine brake signal shape.  See
+          "BRAKE_SINE_GAIN_*" constants in
+          include/dt-bindings/input/qcom,hv-haptics.h.
+        $ref: /schemas/types.yaml#/definitions/uint32
+        enum: [0, 1, 2, 3]
+
+      qcom,wf-auto-res-disable:
+        description: |
+          Boolean flag indicating that this effect is played with LRA auto
+          resonance feature disabled.
+        type: boolean
+
+    allOf:
+      - oneOf:
+          - required:
+              - qcom,effect-id
+          - required:
+              - qcom,primitive-id
+      - anyOf:
+          - required:
+              - qcom,wf-pattern-data
+          - required:
+              - qcom,wf-fifo-data
+
+    additionalProperties: false
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - interrupt-names
+
+allOf:
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: qcom,pm5100-haptics
+    then:
+      properties:
+        reg:
+          maxItems: 2
+        nvmem-cells: false
+        nvmem-cell-names: false
+        nvmem: false
+        nvmem-names: false
+        qcom,pbs-client: false
+  - if:
+      required:
+        - qcom,use-erm
+    then:
+      properties:
+        qcom,lra-period-us: false
+        qcom,drv-sig-shape: false
+        qcom,brake-sig-shape: false
+        qcom,brake-sine-gain: false
+    else:
+      required:
+        - qcom,lra-period-us
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/input/qcom,hv-haptics.h>
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    pmic {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        qcom,hv-haptics@f000 {
+            compatible = "qcom,hv-haptics";
+            reg = <0xf000>, <0xf100>, <0xf200>;
+            interrupts = <0x3 0xf0 0x1 IRQ_TYPE_EDGE_BOTH>;
+            interrupt-names = "fifo-empty";
+            nvmem-cell-names = "hap_cl_brake";
+            nvmem-cells = <&hap_cl_brake>;
+            nvmem-names = "hap_cfg_sdam";
+            nvmem = <&pmk8350_sdam_46>;
+            qcom,pbs-client = <&pm8350b_pbs2>;
+            qcom,vmax-mv = <900>;
+            qcom,brake-mode = <BRAKE_CLOSE_LOOP>;
+            qcom,brake-pattern = /bits/ 8 <0xff 0x3f 0x1f>;
+            qcom,lra-period-us = <5880>;
+            qcom,drv-sig-shape = <WF_SINE>;
+            qcom,brake-sig-shape = <WF_SINE>;
+
+            qcom,hap-swr-slave-reg {
+                regulator-name = "hap-swr-slave-reg";
+            };
+
+            effect_0 {
+                /* CLICK effect */
+                qcom,effect-id = <0>;
+                qcom,wf-vmax-mv = <8000>;
+                qcom,wf-pattern-data =
+                    <0x01f  S_PERIOD_T_LRA  0>,
+                    <0x03f  S_PERIOD_T_LRA  0>,
+                    <0x05f  S_PERIOD_T_LRA  0>,
+                    <0x07f  S_PERIOD_T_LRA  0>,
+                    <0x17f  S_PERIOD_T_LRA  0>,
+                    <0x15f  S_PERIOD_T_LRA  0>,
+                    <0x13f  S_PERIOD_T_LRA  0>,
+                    <0x11f  S_PERIOD_T_LRA  0>;
+                qcom,wf-pattern-period-us = <5000>;
+                qcom,wf-brake-pattern = /bits/ 8 <0xff 0x7f 0x3f>;
+                qcom,wf-pattern-preload;
+                qcom,wf-auto-res-disable;
+            };
+
+            effect_1 {
+                /* DOUBLE_CLICK effect */
+                qcom,effect-id = <1>;
+                qcom,wf-vmax-mv = <5000>;
+                qcom,wf-fifo-data = /bits/ 8
+                    <0xff 0xff 0xff 0xff 0xff 0xff 0xff 0xff
+                     0xff 0xff 0xff 0xff 0xff 0xff 0xff>;
+                qcom,wf-fifo-period = <S_PERIOD_F_8KHZ>;
+                qcom,wf-brake-pattern = /bits/ 8 <0x7f 0x5f 0x3f>;
+                qcom,wf-auto-res-disable;
+            };
+
+            primitive_0 {
+                qcom,primitive-id = <0>;
+                qcom,wf-vmax-mv = <8000>;
+                qcom,wf-pattern-data =
+                    <0x0ff  S_PERIOD_T_LRA  0>,
+                    <0x07f  S_PERIOD_T_LRA  0>;
+                qcom,wf-pattern-period-us = <5000>;
+                qcom,wf-brake-pattern = /bits/ 8 <0xff 0x7f 0x3f>;
+                qcom,wf-auto-res-disable;
+            };
+        };
+    };

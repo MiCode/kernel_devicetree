@@ -1,0 +1,279 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include "pm7550ba.dtsi"
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/iio/qcom,spmi-vadc.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pm7550ba.h>
+
+/ {
+	qcom,pmic-id-size = <8>;
+	qcom,pmic-id = <0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x4C>;
+};
+
+&spmi0_debug_bus {
+	qcom,pm7550ba-debug@7 {
+		compatible = "qcom,spmi-pmic";
+		reg = <7 SPMI_USID>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,can-sleep;
+	};
+};
+
+&pmic_glink_debug {
+	/* Primary SPMI bus */
+	glink_debug_spmi0: spmi@0 {
+		reg = <0>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		qcom,pm7550ba-debug@7 {
+			compatible = "qcom,spmi-pmic";
+			reg = <7 SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+
+	i2c_pmic:i2c@106 {
+		reg = <0x106>;  /* I2C instance 6 in ADSP for SE5 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		i2c_pmic_smb1398: qcom,smb1398@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+	};
+
+	/* SPMI bridge bus 1 with SMB1510 device */
+	spmi_pmic:spmi@200 {
+		reg = <0x200>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,bus-type = "spmi";
+
+		spmi_pmic_smb1510: qcom,smb1510@d {
+			compatible = "qcom,spmi-pmic";
+			reg = <13 SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1398_1_iin {
+		reg = <0x1063401>;
+		label = "smb1393_1_iin";
+	};
+
+	smb1398_1_ichg {
+		reg = <0x1063402>;
+		label = "smb1393_1_ichg";
+	};
+
+	smb1398_1_die_temp {
+		reg = <0x1063403>;
+		label = "smb1393_1_die_temp";
+	};
+};
+
+&pmk8550_vadc {
+	/* PM7550BA Channel nodes */
+	pm7550ba_offset_ref {
+		reg = <PM7550BA_ADC5_GEN3_OFFSET_REF>;
+		label = "pm7550ba_offset_ref";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm7550ba_vref_1p25 {
+		reg = <PM7550BA_ADC5_GEN3_1P25VREF>;
+		label = "pm7550ba_vref_1p25";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm7550ba_die_temp {
+		reg = <PM7550BA_ADC5_GEN3_DIE_TEMP>;
+		label = "pm7550ba_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm7550ba_vph_pwr {
+		reg = <PM7550BA_ADC5_GEN3_VPH_PWR>;
+		label = "pm7550ba_vph_pwr";
+		qcom,pre-scaling = <1 3>;
+	};
+
+	pm7550ba_chg_temp {
+		reg = <PM7550BA_ADC5_GEN3_CHG_TEMP_V>;
+		label = "pm7550ba_chg_temp";
+	};
+
+	pm7550ba_iin_fb {
+		reg = <PM7550BA_ADC5_GEN3_IIN_FB>;
+		label = "pm7550ba_iin_fb";
+	};
+
+	pm7550ba_ichg_fb {
+		reg = <PM7550BA_ADC5_GEN3_ICHG_FB>;
+		label = "pm7550ba_ichg_fb";
+	};
+};
+
+&pm7550ba_vib {
+	status = "okay";
+};
+
+&pm7550ba_amoled {
+	status = "okay";
+};
+
+&pm7550ba_tz {
+	io-channels = <&pmk8550_vadc PM7550BA_ADC5_GEN3_DIE_TEMP>;
+	io-channel-names = "thermal";
+};
+
+&battery_charger {
+	qcom,thermal-mitigation-step = <500000>;
+	#cooling-cells = <2>;
+};
+
+&pm7550ba_bcl {
+	nvmem-cells = <&sm1510_present>;
+	nvmem-cell-names = "sm1510_present";
+};
+
+&thermal_zones {
+	pm7550ba-ibat-lvl0 {
+		trips {
+			ibat-lvl0 {
+				temperature = <10000>;
+
+			};
+		};
+	};
+
+	pm7550ba-ibat-lvl1 {
+		trips {
+			ibat-lvl1 {
+				temperature = <11500>;
+			};
+		};
+	};
+
+	pm7550ba-2s-ibat-lvl0 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pm7550ba_bcl 8>;
+
+		trips {
+			ibat_2s_lvl0: ibat-2s-lvl0 {
+				temperature = <5000>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm7550ba-2s-ibat-lvl1 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pm7550ba_bcl 9>;
+
+		trips {
+			ibat_2s_lvl1: ibat-2s-lvl1 {
+				temperature = <7000>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pm7550ba-bcl-lvl0 {
+		cooling-maps {
+			lbat_0_nr_scg {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&modem_nr_scg_dsc 3 3>;
+			};
+
+			lbat_0_nr {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&modem_nr_dsc 6 6>;
+			};
+
+			lbat_0_mdm_lte {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&modem_lte_dsc 8 8>;
+			};
+
+			lbat_0_gpu {
+				trip = <&b_bcl_lvl0>;
+				cooling-device = <&msm_gpu 2 2>;
+			};
+		};
+	};
+
+	pm7550ba-bcl-lvl1 {
+		cooling-maps {
+			lbat_1_nr_scg {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&modem_nr_scg_dsc 10 10>;
+			};
+
+			lbat_1_nr {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&modem_nr_dsc 9 9>;
+			};
+
+			lbat_1_mdm_lte {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&modem_lte_dsc 10 10>;
+			};
+
+			lbat_1_gpu {
+				trip = <&b_bcl_lvl1>;
+				cooling-device = <&msm_gpu 3 3>;
+			};
+		};
+	};
+
+	pm7550ba-bcl-lvl2 {
+		cooling-maps {
+			lbat_2_gpu {
+				trip = <&b_bcl_lvl2>;
+				cooling-device = <&msm_gpu 7 7>;
+			};
+		};
+	};
+
+	socd {
+		cooling-maps {
+			socd_cdsp1 {
+				trip = <&socd_trip>;
+				cooling-device = <&cdsp_sw 4 4>;
+			};
+
+			socd_gpu0 {
+				trip = <&socd_trip>;
+				cooling-device = <&msm_gpu 4 4>;
+			};
+		};
+	};
+};
+
+&pm7550ba_eusb2_repeater {
+	vdd18-supply = <&L7B>;
+	vdd3-supply = <&L17B>;
+	status = "ok";
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pm7550ba_eusb2_repeater>;
+	usb-repeater = <&pm7550ba_eusb2_repeater>;
+};

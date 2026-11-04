@@ -1,0 +1,258 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pmxr2230.h>
+
+#include "pmk8550.dtsi"
+#include "pmxr2230.dtsi"
+#include "pm8550vs.dtsi"
+#include "pmr735d.dtsi"
+#include "pm8550ve.dtsi"
+#include "pm8010.dtsi"
+
+&pm8550vs_g {
+	status = "ok";
+};
+
+&pm8550vs_g_temp_alarm {
+	status = "ok";
+};
+
+&pm8550vs_d {
+	status = "ok";
+};
+
+&pm8550vs_d_temp_alarm {
+	status = "ok";
+};
+
+&pm8550ve_f {
+	status = "ok";
+};
+
+&pm8550ve_f_temp_alarm {
+	status = "ok";
+};
+
+&pmxr2230_switch0 {
+	qcom,led-mask = <9>; /* Channels 1 & 4 */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_switch1 {
+	qcom,led-mask = <6>; /* Channels 2 & 3 */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_switch2 {
+	qcom,led-mask = <15>; /* All Channels */
+	qcom,symmetry-en;
+};
+
+&pmxr2230_flash {
+	status = "ok";
+};
+
+&pmk8550_gpios {
+	pinctrl-0 = <&alt_sleep_clk_default>;
+	pinctrl-names = "default";
+
+	alt_sleep_clk {
+		alt_sleep_clk_default: alt_sleep_clk_default {
+			pins = "gpio3";
+			function = "func1";
+			input-disable;
+			output-enable;
+			bias-disable;
+			power-source = <0>;
+		};
+	};
+};
+
+&pmxr2230_gpios {
+	key_vol_up {
+		key_vol_up_default: key_vol_up_default {
+			pins = "gpio6";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			power-source = <1>;
+		};
+	};
+};
+
+&soc {
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmxr2230_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+
+	reboot_reason {
+		compatible = "qcom,reboot-reason";
+		nvmem-cells = <&restart_reason>;
+		nvmem-cell-names = "restart_reason";
+	};
+
+	pmic-pon-log {
+		compatible = "qcom,pmic-pon-log";
+		nvmem = <&pmk8550_sdam_5>, <&pmk8550_sdam_6>;
+		nvmem-names = "pon_log0", "pon_log1";
+		depends-on-supply = <&gh_watchdog>;
+	};
+};
+
+&thermal_zones {
+	sys-therm-0 {
+		polling-delay-passive = <5000>;
+		polling-delay = <0>;
+		thermal-sensors = <&pmk8550_vadc PMK8550_ADC5_GEN3_AMUX_THM1_XO_THERM_100K_PU>;
+		trips {
+			active-config0 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			active-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			trip_config0: trip-config0 {
+				temperature = <78000>;
+				hysteresis = <8000>;
+				type = "passive";
+			};
+
+			trip_config1: trip-config1 {
+				temperature = <80000>;
+				hysteresis = <10000>;
+				type = "passive";
+			};
+
+			display_test_config1: display-test-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config2: display-test-config2 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config3: display-test-config3 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config4: display-test-config4 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config5: display-test-config5 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+	};
+};
+
+&pmk8550_vadc {
+	/delete-node/ pm8550_offset_ref;
+	/delete-node/ pm8550_vref_1p25;
+	/delete-node/ pm8550_die_temp;
+	/delete-node/ pm8550_vph_pwr;
+
+	/* PMXR2230 Channel nodes */
+	pmxr2230_offset_ref {
+		reg = <PMXR2230_ADC5_GEN3_OFFSET_REF>;
+		label = "pmxr2230_offset_ref";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmxr2230_vref_1p25 {
+		reg = <PMXR2230_ADC5_GEN3_1P25VREF>;
+		label = "pmxr2230_vref_1p25";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmxr2230_die_temp {
+		reg = <PMXR2230_ADC5_GEN3_DIE_TEMP>;
+		label = "pmxr2230_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmxr2230_vph_pwr {
+		reg = <PMXR2230_ADC5_GEN3_VPH_PWR>;
+		label = "pmxr2230_vph_pwr";
+		qcom,pre-scaling = <1 3>;
+	};
+
+	pmk8550_sys_therm_0 {
+		reg = <PMK8550_ADC5_GEN3_AMUX_THM1_XO_THERM_100K_PU>;
+		label = "pmk8550_sys_therm_0";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550vs_d_die_temp {
+		reg = <PM8550VX_ADC5_GEN3_DIE_TEMP(3)>;
+		label = "pm8550vs_d_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm8550vs_g_die_temp {
+		reg = <PM8550VX_ADC5_GEN3_DIE_TEMP(6)>;
+		label = "pm8550vs_g_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm8550ve_f_die_temp: pm8550ve_f_die_temp {
+		reg = <PM8550VX_ADC5_GEN3_DIE_TEMP(5)>;
+		label = "pm8550ve_f_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+};
+
+&pm8550vs_g_tz {
+	io-channels = <&pmk8550_vadc PM8550VX_ADC5_GEN3_DIE_TEMP(6)>;
+	io-channel-names = "thermal";
+};
+
+&pm8550vs_d_tz {
+	io-channels = <&pmk8550_vadc PM8550VX_ADC5_GEN3_DIE_TEMP(3)>;
+	io-channel-names = "thermal";
+};
+
+&pm8550ve_f_tz {
+	io-channels = <&pmk8550_vadc PM8550VX_ADC5_GEN3_DIE_TEMP(5)>;
+	io-channel-names = "thermal";
+};
+
+&pmxr2230_tz {
+	io-channels = <&pmk8550_vadc PMXR2230_ADC5_GEN3_DIE_TEMP>;
+	io-channel-names = "thermal";
+};

@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,pmic-pon-log.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. PMIC PON Log
+
+maintainers:
+  - David Collins <quic_collinsd@quicinc.com>
+
+description: |
+  Certain Qualcomm Technologies, Inc. PMIC devices capture power-on, power-off,
+  and fault information in a binary log found within SDAM peripherals.  The PMIC
+  PON Log device accesses this log and parses it into a human readable format.
+
+$ref: /schemas/nvmem/nvmem-consumer.yaml#
+
+properties:
+  compatible:
+    const: qcom,pmic-pon-log
+
+  nvmem:
+    oneOf:
+      - items:
+          - description: PON log NVMEM phandle
+      - items:
+          - description: PON log 0 NVMEM phandle
+          - description: PON log 1 NVMEM phandle
+
+  nvmem-names:
+    oneOf:
+      - items:
+          - const: pon_log
+      - items:
+          - const: pon_log0
+          - const: pon_log1
+
+  qcom,pmic-fault-panic:
+    description: |
+      Boolean flag indicating that the device should trigger a controlled panic
+      shutdown if the preceding restart was caused by a PMIC fault.
+    type: boolean
+
+required:
+  - compatible
+  - nvmem
+  - nvmem-names
+
+additionalProperties: false
+
+examples:
+  - |
+    pmic-pon-log {
+        compatible = "qcom,pmic-pon-log";
+        nvmem = <&pmk8550_sdam_5>, <&pmk8550_sdam_6>;
+        nvmem-names = "pon_log0", "pon_log1";
+    };

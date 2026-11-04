@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-voltage-cooling.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. CPU Voltage Cooling Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  A single cluster can have CPUs with different frequency plans.
+  Mitigating individual CPU may or may not bring down the CPU cluster
+  voltage depending on the operating level of the other CPUs.
+
+  CPU voltage cooling device will provide support to apply CPU frequency
+  mitigation on the different CPUs in a cluster to achieve a reduction in
+  cluster voltage. This is achieved by building a mitigation table mapping
+  the CPU frequency levels to a voltage.
+
+properties:
+  compatible:
+    const: qcom,cc-cooling-devices
+
+patternProperties:
+  "^qcom,apc([0-9]*)-cluster$":
+    type: object
+    description: |
+      This child nodes describes the CPUs on the same APC rail to apply the
+      CPU frequency mitigation.
+
+    properties:
+      qcom,cpu:
+        $ref: /schemas/types.yaml#/definitions/phandle
+        description: |
+          Phandle to the CPU device that this cooling device will
+          mitigate.
+      qcom,cpus:
+        $ref: "/schemas/types.yaml#/definitions/phandle-array"
+        description: |
+          Specify array of 2 CPU phandles, which needs to be
+          used for building a voltage based mitigation table.
+
+      "#cooling-cells":
+        const: 2
+        description: |
+          Must be 2. Needed for of_thermal as cooling device identifier.
+          Please refer to <devicetree/bindings/thermal/thermal.txt> for
+          more details.
+
+    required:
+      - qcom,cpus
+      - "#cooling-cells"
+
+    additionalProperties: false
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+    qcom,cpu-voltage-cdev {
+      compatible = "qcom,cc-cooling-devices";
+
+        apc1_cluster: qcom,apc1-cluster {
+          qcom,cpus = <&CPU4 &CPU7>;
+          #cooling-cells = <2>;
+        };
+    };

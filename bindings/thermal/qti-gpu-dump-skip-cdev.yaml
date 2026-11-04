@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-gpu-dump-skip-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. GPU dump skip cooling device
+
+maintainers:
+  - Priyansh Jain <quic_priyjain@quicinc.com>
+
+description: |
+  The GPU dump skip cooling device, will be used to set WR_THERMAL_FLAG
+  region in SDAM which is used by PMIC to disable GFX in SDI path, when
+  SDI path reset is caused during high temperature. It also sets a SOC
+  cookie in sys dbg imem region which is used to skip GPU scan dump
+  collection in SDI path, when SDI path reset is triggered during high
+  temperature.
+
+properties:
+  compatible:
+    const: qcom,gpu-dump-skip-cdev
+
+  nvmem-cells:
+    maxItems: 2
+    description: |
+      Phandle of the nvmem cell for the PMIC register region which
+      stores the PMIC WR thermal flag.
+
+  nvmem-cell-names:
+    items:
+      - const: wr_thermal_flag
+
+  "#cooling-cells":
+    const: 2
+    description: |
+      Must be 2. Needed for of_thermal as cooling device identifier.
+      Please refer to <devicetree/bindings/thermal/thermal.txt> for
+      more details.
+
+required:
+  - compatible
+  - nvmem-cells
+  - nvmem-cell-names
+  - "#cooling-cells"
+
+additionalProperties: false
+
+examples:
+  - |
+
+    qcom,gpu-dump-skip-cdev {
+        compatible = "qcom,gpu-dump-skip-cdev";
+        nvmem-cells = <&wr_thermal_flag>;
+        nvmem-cell-names = "wr_thermal_flag";
+        #cooling-cells = <2>;
+    };

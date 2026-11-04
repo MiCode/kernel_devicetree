@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * DARWIN project NFC common configuration (SM7750 / ST54L)
+ *
+ * GPIO mapping:
+ *   GPIO_4  = NFC_I2C_I3C_SDA  (QUP2_SE1 L0 -> qupv3_se9_i2c)
+ *   GPIO_5  = NFC_I2C_I3C_SCL  (QUP2_SE1 L1)
+ *   GPIO_6  = NFC_CLK_REQ
+ *   GPIO_7  = NFC_INT_REQ
+ *   GPIO_57 = NFC_RESET_N
+ *   GPIO_117 = NFC_SE_SPI_RST_N (SE nRESET)
+ */
+
+#include "darwin-nfc-pinctrl.dtsi"
+
+&soc {
+	st54spi_gpio {
+		status = "ok";
+		compatible = "st,st54spi_gpio";
+		/* gpio used as SE_nRESET */
+		gpio-power_nreset = <&tlmm 117 0x00>;
+	};
+};
+
+/* NFC I2C on QUP2_SE1 (GPIO_4=SDA, GPIO_5=SCL) */
+&qupv3_se9_i2c {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	st21nfc: st21nfc@08 {
+		compatible = "st,st21nfc";
+		reg = <0x08>;
+		irq-gpios = <&tlmm 7 0x00>;
+		reset-gpios = <&tlmm 57 0x00>;
+		clkreq-gpios = <&tlmm 6 0x00>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <7 0>;
+		interrupt-names = "nfc_irq";
+		pinctrl-names = "nfc_active", "nfc_suspend";
+		pinctrl-0 = <&nfc_int_active &nfc_enable_active>;
+		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend>;
+	};
+};

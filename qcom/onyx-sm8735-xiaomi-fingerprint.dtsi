@@ -1,0 +1,68 @@
+&soc {
+        xiaomi_fingerprint {
+                compatible = "xiaomi,xiaomi-fp";
+                xiaomi,gpio_irq = <&tlmm 131 0x0>;
+                xiaomi,vendor_names = "O10U_n2_113_311"; //g3t && jv0301
+                fp_3v3_vreg-supply = <&L16B>;
+                netlink-event = <25>;
+                pinctrl-names = "reset_high", "reset_low","irq_default";
+                pinctrl-0 = <&fingerprint_reset_high>;
+                pinctrl-1 = <&fingerprint_reset_low>;
+                pinctrl-2 = <&fingerprint_irq_default>;
+                status = "ok";
+        };
+};
+
+&L16B {
+        /* power timing related because of no need fp ocp
+        regulator-boot-on;
+        regulator-always-on;
+        */
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        qcom,init-voltage = <3300000>;
+};
+
+&tlmm {
+        /*fix spi crash*/
+        qcom,gpios-reserved = <54 4 5 6 7 82 83 111 112 8 9 10 11>;
+
+        /* FP_RESET_HIGH, state device active*/
+        fingerprint_reset_high: fingerprint_reset_high {
+                mux {
+                        pins = "gpio130";
+                        function = "gpio";
+                };
+                config {
+                        pins = "gpio130";
+                        drive-strength = <2>;
+                        bias-disable;
+                        output-high;
+                };
+        };
+        /* FP_RESET_LOW */
+        fingerprint_reset_low: fingerprint_reset_low {
+                mux {
+                        pins = "gpio130";
+                        function = "gpio";
+                };
+                config {
+                        pins = "gpio130";
+                        drive-strength = <2>;
+                        bias-disable;
+                        output-low;
+                };
+        };
+        /* FP_INT_N */
+        fingerprint_irq_default: fingerprint_irq_default {
+                mux {
+                        pins = "gpio131";
+                        function = "gpio";
+                };
+                config {
+                        pins = "gpio131";
+                        drive-strength = <2>;
+                        bias-pull-down;
+                };
+        };
+};

@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qcom,bcl-off-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. BCL OFF cooling device
+
+maintainers:
+  - Nitesh Kumar <quic_nitekuma@quicinc.com>
+
+description: |
+ The BCL OFF cooling device, will be used to disable PMIC bcl.
+ This cooling device will be called when modem RF calibration
+ is performed using external power supply.
+
+ When external power supply is used for RF calibration, ibat current
+ can cross the battery specs and can trigger batfet issues. So pmic bcl
+ should be disabled as it is for protection for battery not external
+ power supply.
+
+
+properties:
+  compatible:
+    const: qcom,bcl-off
+
+  reg:
+    maxItems: 1
+    description: |
+     <a b> where 'a' is the starting register address of the PMIC
+     peripheral and 'b' is the size of the peripheral address space.
+
+  '#cooling-cells':
+    const: 2
+    description: |
+      Must be 2. Needed for of_thermal as cooling device identifier.
+      Please refer to <devicetree/bindings/thermal/thermal.txt> for
+      more details.
+
+required:
+  - compatible
+  - reg
+  - '#cooling-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+    bcl_off: bcl-off {
+      compatible = "qcom,bcl-off";
+      reg = <0x4700 0x100>;
+      #cooling-cells = <2>;
+    };

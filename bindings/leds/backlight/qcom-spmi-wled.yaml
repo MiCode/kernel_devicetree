@@ -1,0 +1,386 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/leds/backlight/qcom-spmi-wled.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. WLED (White Light Emitting Diode) driver
+
+maintainers:
+  - Jishnu Prakash <quic_jprakash@quicinc.com>
+
+description: >
+  WLED (White Light Emitting Diode) driver is used for controlling display
+  backlight that is part of PMIC on Qualcomm Technologies, Inc. reference
+  platforms. The PMIC is connected to the host processor via SPMI bus.
+
+properties:
+  compatible:
+    enum:
+      - qcom,pmi8998-spmi-wled
+      - qcom,pm8150l-spmi-wled
+      - qcom,pm6150l-spmi-wled
+      - qcom,pm660l-spmi-wled
+      - qcom,pm7325b-spmi-wled
+
+  reg:
+    minItems: 1
+    maxItems: 2
+    description: Base address and size of the WLED modules.
+
+  reg-names:
+    $ref: /schemas/types.yaml#/definitions/string
+    description: |
+      Names associated with base addresses. should be
+      "wled-ctrl-base", "wled-sink-base".
+
+  interrupts:
+    minItems: 1
+    maxItems: 2
+    description: |
+      Interrupts associated with WLED. Interrupts can be specified as per the encoding listed
+      under Documentation/devicetree/bindings/spmi/qcom,spmi-pmic-arb.txt.
+
+  interrupt-names:
+      items:
+        - const: sc-irq
+        - const: ovp-irq
+        - const: pre-flash-irq
+        - const: flash-irq
+
+  label: true
+
+  default-brightness:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Brightness value on boot. Default is 2048.
+      For pmi8998, it is 0-4095.
+      For pm8150l, this can vary from 0-4095 or 0-32767 depending
+      on the brightness control mode. If CABC is enabled, 0-4095
+      range is used.
+
+  max-brightness:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Maximum brightness level. Allowed values are
+      For pmi8998, it is 4095.
+      For pm8150l, this can be either 4095 or 32767.
+      If CABC is enabled, this is capped to 4095.
+
+  qcom,fs-current-limit:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      per-string full scale current limit in uA. value from
+      0 to 30000 with 5000 uA resolution.
+      default is 25000 uA
+
+  qcom,boost-current-limit:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      ILIM threshold in mA. values are 105, 280, 450, 620, 970,
+      1150, 1300, 1500.
+      default is 970 mA
+
+  qcom,switching-freq:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Switching frequency in KHz. values are
+      600, 640, 685, 738, 800, 872, 960, 1066, 1200, 1371,
+      1600, 1920, 2400, 3200, 4800, 9600.
+      default is 800 KHz
+
+  qcom,ovp:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Over-voltage protection limit in mV. values are 31100,
+      29600, 19600, 18100.
+      default is 29600 mV
+
+  qcom,string-cfg:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Bit mask of the WLED strings. Bit 0 to 3 indicates strings
+      0 to 3 respectively. WLED module has four strings of leds
+      numbered from 0 to 3. Each string of leds are operated
+      individually. Specify the strings using the bit mask. Any
+      combination of led strings can be used.
+      Default value is 15 (b1111).
+
+  qcom,en-cabc:
+    type: boolean
+    description: |
+      Specify if cabc (content adaptive backlight control) is
+      needed.
+
+  qcom,ext-pfet-sc-pro-en:
+    type: boolean
+    description: |
+      Specify if external PFET control for short circuit
+      protection is needed. This is not applicable for PM8150L.
+
+  qcom,auto-calibration:
+    type: boolean
+    description: |
+      Enables auto-calibration of the WLED sink configuration.
+
+  qcom,modulator-sel:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Selects the modulator used for brightness modulation.
+      Allowed values are
+      0 - Modulator A
+      1 - Modulator B
+      If not specified, then modulator A will be used by default.
+      This property is applicable only to WLED5 peripheral.
+
+  qcom,cabc-sel:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Selects the CABC pin signal used for brightness modulation.
+      Allowed values are
+      0 - CABC disabled
+      1 - CABC 1
+      2 - CABC 2
+      3 - External signal (e.g. LPG) is used for dimming
+      This property is applicable only to WLED5 peripheral.
+
+  qcom,leds-per-string:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      If specified, can be used to calculate available current
+      during selfie flash operation. If not specified, available
+      current calculated is simply the configured threshold.
+
+  io-channels:
+    maxItems: 3
+    description: |
+      IIO channel specifiers for each name in io-channel-names.
+
+  io-channel-names:
+    $ref: /schemas/types.yaml#/definitions/string-array
+    description: |
+      Names of the IIO channels that are used by WLED.
+      For details about IIO bindings refer below
+      Documentation/devicetree/bindings/iio/iio-bindings.txt
+
+  qcom,use-exp-dimming:
+    type: boolean
+    description: |
+      Specifies that exponential dimming lookup table values should be used.
+
+  qcom,exp-dimming-map:
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    description: |
+      It specifies a table of brightness values that can be programmed
+      into WLED_SINK for exponential dimming which provides smooth brightness
+      change. There should be exactly 256 values in the table and they should
+      be at most 15 bits long. This table would be used only if the
+      "qcom,use-exp-dimming" property is set. This feature is supported from
+      PM7325B onwards.
+
+  qcom,slew-ramp-time:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Software brightness slew ramp time values in ms. This is supported from
+      PM7325B onwards.
+      Valid values are 2, 4, 8, 64, 128, 192, 256, 320, 384, 448, 512, 704, 896,
+      1024, 2048, 4096.
+      default is 256
+
+patternProperties:
+  "^wled_torch[0-9a-f]+$":
+    type: object
+    $ref: common.yaml#
+    unevaluatedProperties: false
+    description: Properties for wled_torch.
+
+    properties:
+      label:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Should be "torch".
+
+      qcom,default-led-trigger:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Name for LED trigger. If unspecified, "wled_torch" is used.
+
+      qcom,wled-torch-fsc:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          WLED torch full scale current in mA. This configures the
+          maximum current allowed for torch device. Allowed values
+          are from 5 to 60 mA with a step of 5 mA. If not specified,
+          default value is set to 30 mA.
+
+      qcom,wled-torch-step:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          WLED torch step delay in us. This configures the step delay
+          when the output is ramped up to the desired target current.
+          Allowed values are from 50 to 400 us with a step of 50 us.
+          If not specified, default value is set to 200 us.
+
+      qcom,wled-torch-timer:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          WLED torch safety timer in ms. This configures the safety
+          timer to turn off torch automatically after timer expiry.
+          Allowed values are 50, 100, 200, 400, 600, 800, 1000 and
+          1200. If not specified, default value is set to 1200 ms.
+
+
+    required:
+      - label
+
+  "^wled_flash[0-9a-f]+$":
+    type: object
+    $ref: common.yaml#
+    unevaluatedProperties: false
+    description: wled_flash child subnode properties
+
+    properties:
+      label:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Should be "flash".
+
+      qcom,default-led-trigger:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Name for LED trigger. If unspecified, "wled_flash" is used.
+
+      qcom,wled-flash-fsc:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          WLED flash full scale current in mA. This configures the
+          maximum current allowed for flash device. Allowed values
+          are from 5 to 60 mA with a step of 5 mA. If not specified,
+          default value is set to 40 mA.
+
+      qcom,wled-flash-step:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          WLED flash step delay in us. This configures the step delay
+          when the output is ramped up to the desired target current.
+          Allowed values are from 50 to 400 us with a step of 50 us.
+          If not specified, default value is set to 200 us.
+
+      qcom,wled-flash-timer:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          WLED flash safety timer in ms. This configures the safety
+          timer to turn off flash automatically after timer expiry.
+          Allowed values are 50, 100, 200, 400, 600, 800, 1000 and
+          1200. If not specified, default value is set to 100 ms.
+
+    required:
+      - label
+
+  "^wled_switch[0-9a-f]+$":
+    type: object
+    $ref: common.yaml#
+    unevaluatedProperties: false
+    description: wled_switch child subnode properties
+
+    properties:
+      label:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Should be "switch".
+
+      qcom,default-led-trigger:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Name for LED trigger. If unspecified, "wled_switch" is used.
+
+    required:
+      - label
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - label
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    qcom-wled@d800 {
+         compatible = "qcom,pmi8998-spmi-wled";
+         #address-cells = <1>;
+         #size-cells = <0>;
+         reg = <0xd800 0xd900>;
+         reg-names = "wled-ctrl-base", "wled-sink-base";
+         label = "backlight";
+
+         interrupts = <0x3 0xd8 0x2 IRQ_TYPE_EDGE_RISING>,
+                      <0x3 0xd8 0x1 IRQ_TYPE_EDGE_RISING>;
+         interrupt-names = "sc-irq", "ovp-irq";
+         qcom,fs-current-limit = <25000>;
+         qcom,boost-current-limit = <970>;
+         qcom,switching-freq = <800>;
+         qcom,ovp = <29600>;
+         qcom,string-cfg = <15>;
+    };
+
+  - |
+    #include <dt-bindings/iio/qti_power_supply_iio.h>
+    #include <dt-bindings/interrupt-controller/irq.h>
+    qcom-wled@d800 {
+         compatible = "qcom,pm8150l-spmi-wled";
+         #address-cells = <2>;
+         #size-cells = <0>;
+         reg = <0xd800 0x100>, <0xd900 0x100>;
+         reg-names = "wled-ctrl-base", "wled-sink-base";
+         label = "backlight";
+
+         interrupts = <0x5 0xd8 0x1 IRQ_TYPE_EDGE_RISING>;
+         interrupt-names = "ovp-irq";
+         qcom,string-cfg = <7>;
+
+         io-channels = <&pm7250b_qg PSY_IIO_RESISTANCE>,
+                       <&pm7250b_qg PSY_IIO_VOLTAGE_OCV>,
+                       <&pm7250b_qg PSY_IIO_CURRENT_NOW>;
+
+         io-channel-names = "rbatt",
+                            "voltage_ocv",
+                            "current_now";
+
+         wled_torch: qcom,wled-torch {
+              label = "torch";
+              qcom,wled-torch-fsc = <40>;
+              qcom,wled-torch-step = <300>;
+              qcom,wled-torch-timer = <600>;
+         };
+
+         wled_flash: qcom,wled-flash {
+              label = "flash";
+              qcom,wled-flash-fsc = <60>;
+              qcom,wled-flash-step = <100>;
+              qcom,wled-flash-timer = <200>;
+         };
+
+         wled_switch: qcom,wled-switch {
+              label = "switch";
+              };
+
+    };
+
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+    qcom,leds@d800 {
+         compatible = "qcom,pm660l-spmi-wled";
+         reg = <0xd800 0x100>,
+               <0xd900 0x100>;
+         reg-names = "qpnp-wled-ctrl-base",
+                     "qpnp-wled-sink-base";
+         interrupts = <0x3 0xd8 0x1 IRQ_TYPE_EDGE_RISING>;
+         interrupt-names = "ovp-irq";
+         linux,name = "wled";
+         linux,default-led-trigger = "bkl-trigger";
+
+    };

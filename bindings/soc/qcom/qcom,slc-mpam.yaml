@@ -1,0 +1,102 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,slc-mpam.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. (QTI) SLC MPAM Driver
+
+maintainers:
+  - Huang Yiwei <quic_hyiwei@quicinc.com>
+
+description: |
+  The Qualcomm Technologies, Inc. (QTI) SLC MPAM Driver provides configfs
+  nodes for userspace clients to set MPAM configuration with CPUCP firmware via
+  consolidated SCMI protocol.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,mpam-slc
+
+  qcom,msc-name:
+    $ref: '/schemas/types.yaml#/definitions/string'
+    description: |
+      MSC name of the component.
+
+  child-node:
+    description: |
+      Available clients of the SLC MPAM.
+    type: object
+    properties:
+      qcom,client-id:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          MSC id of the child node.
+
+      qcom,client-name:
+        $ref: '/schemas/types.yaml#/definitions/string'
+        description: |
+          MSC name of the child node.
+
+      child-node:
+        description: |
+          Available partition of the client.
+        type: object
+        properties:
+          qcom,part-id:
+            $ref: '/schemas/types.yaml#/definitions/uint32'
+            description: |
+              Part-id of the child node.
+
+        required:
+          - qcom,part-id
+
+        additionalProperties: false
+
+    required:
+      - qcom,client-id
+      - qcom,client-name
+
+    additionalProperties: false
+
+required:
+  - compatible
+  - qcom,msc-name
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom_slc_mpam: qcom,slc_mpam {
+      compatible = "qcom,mpam-slc";
+      qcom,msc-name = "slc";
+
+      apps {
+        qcom,client-id = <0>;
+        qcom,client-name = "apps";
+
+        part-id0 {
+          qcom,part-id = <0>;
+        };
+
+        part-id1 {
+          qcom,part-id = <1>;
+        };
+
+        part-id2 {
+          qcom,part-id = <2>;
+        };
+      };
+
+      gpu {
+        qcom,client-id = <1>;
+        qcom,client-name = "gpu";
+      };
+
+      nsp {
+        qcom,client-id = <2>;
+        qcom,client-name = "nsp";
+      };
+    };
+...

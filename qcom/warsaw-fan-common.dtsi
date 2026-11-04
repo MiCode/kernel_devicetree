@@ -1,0 +1,101 @@
+&spmi_bus {
+	qcom,pm8550@1 {
+		pm8550_pwm: led-controller {
+			led@1 {
+				status = "disabled";
+			};
+			led@2 {
+				status = "disabled";
+			};
+			led@3 {
+				status = "disabled";
+			};
+		};
+	};
+};
+
+&L2B {
+	/* PM8550 L2B: set safe voltage 3.05V (3050000 uV) */
+	regulator-min-microvolt = <3056000>;
+	regulator-max-microvolt = <3056000>;
+	qcom,init-voltage = <3056000>;
+};
+
+&pm8550_gpios {
+	gpio11_pwm {
+		/* Configure PM8550 GPIO11 as PWM output */
+		gpio11_pwm_default: gpio11_pwm_default {
+			pins = "gpio11";
+			function = "func1"; /* PWM function */
+			bias-disable;
+			power-source = <1>; /* VIN1 */
+			output-low;
+			qcom,drive-strength = <3>;
+			drive-push-pull;
+			input-disable;
+		};
+	};
+};
+
+&tlmm {
+	fan_shifter_en_default: fan_shifter_en_default {
+		mux {
+			pins = "gpio22";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio22";
+			drive-strength = <2>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+};
+
+/* --- Fan Node --- */
+&soc {
+	xiaomi_fan: xiaomi_fan{
+		/* Enable the fan node */
+		status = "okay";
+
+		/* Compatible driver, can be adapted to qcom,pmic-fan if needed */
+		compatible = "xm,xm-pwm-fan";
+
+		/* Apply GPIO11 PWM pinctrl */
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio11_pwm_default &fan_shifter_en_default>;
+
+		/* PM8550 GPIO11 PWM channel 2, default period 1s/37khz */
+		pwms = <&pm8550_pwm 2 26667>;
+		pwm-freq = <37500>;   // 37.5KHz
+
+		/*LDO supply */
+		ldo-supply = <&L2B>;
+		ldo-type = <0>;  /* 0: pmic ldo 1: external ldo */
+
+		/* LDO voltage configuration */
+		ldo-voltage-microvolt = <3056000>;  /* 3.056V */
+
+		/*shifter control GPIOs */
+		shifter_en = <&tlmm 22 0>;    /* 0 = active high */
+
+		/* PWM duty cycle to fan speed mapping: duty speed */
+		duty_speed_map = <
+			0   0       /* OFF */
+			51  12000   /* LOW */
+			65  14000   /* MED */
+			73  16000   /* HIGH */
+			98  19800   /* TURBO */
+		>;
+
+		/* Speed adjustment configuration: min max gap count duty_min duty_max */
+		speed_adjust_cfg = <
+			0       /* min_speed */
+			40000   /* max_speed */
+			500     /* speed_gap_thres */
+			30      /* adjust_cnt_max */
+			0       /* duty_min */
+			99      /* duty_max */
+		>;
+	};
+};

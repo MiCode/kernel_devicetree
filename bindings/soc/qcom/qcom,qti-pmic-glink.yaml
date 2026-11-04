@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,qti-pmic-glink.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. PMIC Glink Firmware Interface Device
+
+maintainers:
+  - Subbaraman Narayanamurthy <quic_subbaram@quicinc.com>
+
+description: |
+  This binding describes the Qualcomm Technologies, Inc. PMIC GLink device.
+  PMIC Glink handles the communication between different clients (e.g. battery
+  charger, UCSI PPM) on the Application processor and charger firmware running
+  on a remote subsystem (e.g. DSP) over Glink channel.
+
+  Each subnode specifies a client of PMIC Glink device that will be instantiated
+  after the PMIC Glink device initializes.
+
+properties:
+  compatible:
+    const: qcom,qti-pmic-glink
+
+  qcom,pmic-glink-channel:
+    description: Glink channel name
+    $ref: /schemas/types.yaml#/definitions/string
+
+  qcom,subsys-name:
+    description: Subsystem name used for subsystem restart.
+    $ref: /schemas/types.yaml#/definitions/string
+
+  qcom,protection-domain:
+    description: Protection domain names used for protection domain restart.
+    $ref: /schemas/types.yaml#/definitions/string-array
+
+required:
+  - compatible
+  - qcom,pmic-glink-channel
+
+additionalProperties: false
+
+examples:
+  - |
+    pmic_glink {
+      compatible = "qcom,qti-pmic-glink";
+      qcom,pmic-glink-channel = "PMIC_RTR_ADSP_APPS";
+      qcom,subsys-name = "lpass";
+      qcom,protection-domain = "tms/servreg", "msm/adsp/charger_pd";
+    };

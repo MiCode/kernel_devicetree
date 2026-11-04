@@ -1,0 +1,71 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include "sdxkova-pmic-overlay.dtsi"
+#include "pm7550ba.dtsi"
+
+&sdhc_1 {
+	status = "disabled";
+
+	no-mmc;
+	max-frequency = <192000000>;
+
+	vdd-supply = <&vreg_sdc1_emmc_sd_vdd>;
+	qcom,vdd-voltage-level = <2950000 2950000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&vreg_sdc1_sd_ls_vccb>;
+	qcom,vdd-io-voltage-level = <1800000 2850000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_sd_on>;
+	pinctrl-1 = <&sdc1_sd_off>;
+
+	cd-gpios = <&tlmm 103 GPIO_ACTIVE_LOW>;
+
+	operating-points-v2 = <&sdhc2_opp_table>;
+};
+
+&qnand_1 {
+	status = "ok";
+};
+
+&pmk8550_vadc {
+	/* PM8550BA Channel nodes */
+	pm7550ba_offset_ref {
+		status = "ok";
+	};
+
+	pm7550ba_vref_1p25 {
+		status = "ok";
+	};
+
+	pm7550ba_die_temp {
+		status = "ok";
+	};
+
+	pm7550ba_vph_pwr {
+		status = "ok";
+	};
+
+	pm7550ba_chg_temp {
+		status = "ok";
+	};
+
+	pm7550ba_iin_fb {
+		status = "ok";
+	};
+
+	pm7550ba_ichg_fb {
+		status = "ok";
+	};
+};
+
+&pm7550ba_tz {
+	io-channels = <&pmk8550_vadc PM7550BA_ADC5_GEN3_DIE_TEMP>;
+	io-channel-names = "thermal";
+};

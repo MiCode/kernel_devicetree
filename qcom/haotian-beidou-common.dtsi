@@ -1,0 +1,192 @@
+&tlmm {
+	mi_se10_spi_cs_active: mi_se10_spi_cs_active{
+		mux{
+			pins = "gpio11";
+			function = "qup2_se2_l3";
+		};
+		config{
+			pins = "gpio11";
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+	};
+
+	mi_se10_spi_mosi_active: mi_se10_spi_mosi_active {
+		mux {
+			pins = "gpio9";
+			function = "qup2_se2_l1";
+		};
+
+		config {
+			pins = "gpio9";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+        
+	mi_se10_spi_miso_active: mi_se10_spi_miso_active {
+		mux {
+			pins = "gpio8";
+			function = "qup2_se2_l0";
+		};
+
+		config {
+			pins = "gpio8";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+        
+        mi_se10_spi_clk_active: mi_se10_spi_clk_active {
+		mux {
+			pins = "gpio10";
+			function = "qup2_se2_l2";
+		};
+
+		config {
+			pins = "gpio10";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+        mi_qupv3_se10_spi_sleep: mi_qupv3_se10_spi_sleep {
+		mux {
+			pins = "gpio8", "gpio9",
+				"gpio10";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio8", "gpio9",
+				"gpio10";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+        mi_qupv3_se10_spi_cs_sleep: mi_qupv3_se10_spi_cs_sleep {
+		mux {
+			pins = "gpio15";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio15";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+        
+        mi_se13_spi_cs_active: mi_se13_spi_cs_active{
+		mux{
+			pins = "gpio23";
+			function = "qup2_se5_l3";
+		};
+		config{
+			pins = "gpio23";
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+	};
+
+	mi_se13_spi_mosi_active: mi_se13_spi_mosi_active {
+		mux {
+			pins = "gpio21";
+			function = "qup2_se5_l1";
+		};
+
+		config {
+			pins = "gpio21";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+        
+	mi_se13_spi_miso_active: mi_se13_spi_miso_active {
+		mux {
+			pins = "gpio20";
+			function = "qup2_se5_l0";
+		};
+
+		config {
+			pins = "gpio20";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+        
+        mi_se13_spi_clk_active: mi_se13_spi_clk_active {
+		mux {
+			pins = "gpio22";
+			function = "qup2_se5_l2";
+		};
+
+		config {
+			pins = "gpio22";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+        interrupt_io: interrupt_io {
+		mux {
+			pins = "gpio171";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio171";
+			drive-strength = <2>;
+			bias-disable;
+			input-enable;
+			qcom,apps;
+		};
+	};
+};
+
+&qupv3_se10_spi {
+        status = "ok";
+        pinctrl-0 = <&mi_se10_spi_mosi_active>, <&mi_se10_spi_miso_active>,<&mi_se10_spi_clk_active>,<&mi_se10_spi_cs_active>,<&interrupt_io>;
+        //pinctrl-1 = <&mi_qupv3_se10_spi_sleep>, <&mi_qupv3_se10_spi_cs_sleep>;
+        //pinctrl-0 = <&mi_se13_spi_mosi_active>, <&mi_se13_spi_miso_active>,<&mi_se13_spi_clk_active>,<&mi_se13_spi_cs_active>;
+        //pinctrl-1 = <&mi_qupv3_se10_spi_sleep>, <&mi_qupv3_se10_spi_cs_sleep>;
+        xiaomi_rsmc@0 {
+		compatible = "xiaomi_rsmc";
+		status = "ok";
+		/* SPI Config */
+		spi-max-frequency = <5000000>;
+		spi-bus-id = <3>;
+		spi-mode = <0>;
+		bits-per-word = <8>;
+		reg = <0>;
+		/* Timing */
+		tcxo_pwr_after_delay_ms = <20>;
+		/* GPIO Config */
+		soc_pwr_gpio = <&tlmm 83 0>;
+		en_gpio = <&tlmm 125 0>;
+		mcu_rst_gpio = <&tlmm 214 0x00>;
+		pa_gpio = <&tlmm 126 0>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <171 0x2000>;
+		irq_gpio = <&tlmm 171 0x2000>;
+		rx_ant_gpio = <&tlmm 2 0x00>;
+		//tx_ant_gpio = <&tlmm 164 0x00>;
+                tt_bd_sel_gpio = <&tlmm 182 0>;
+		vdet_sel_gpio = <&tlmm 177 0>;
+		pa_enable_gpio = <&tlmm 178 0>;
+		rsmc_vc1_ant_gpio = <&tlmm 109 0>;
+		rsmc_vc2_ant_gpio = <&tlmm 164 0>;
+		tcxo_pwr_gpio = <&tlmm 14 0>;
+		/* Feature Config */
+		cpu-affinity-offset = <0>;
+		cpu-affinity-mask = <112>;
+                rsmc_vc1_default_value = <0>;
+                rsmc_vc2_default_value = <0>;
+		/* Power Config */
+		rsmc-tcxo-vcc-type = <1>;
+		//rsmc-tcxo-vcc-supply = <&L1C>;
+		rsmc-tcxo-vcc-value = <1800000>;
+		rsmc_enable_x801;
+		rf_file_name = "/odm/etc/rsmc/rf-para/rf.json";
+		config_name = "default";
+		tcxo_frequency = <1>;
+	};
+};

@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/regulator/qcom,pm8008-chip.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. PM8008 Regulator's top-level chip
+
+maintainers:
+  - Umang Chheda <quic_uchheda@quicinc.com>
+
+description: |
+  PM8008 is an I2C based PMIC regulator chip.
+
+properties:
+  compatible:
+    const: qcom,pm8008-chip
+
+  reg:
+    description:
+      Base address of the device.
+
+    maxItems: 1
+
+patternProperties:
+  "^qcom,pm8008-chip-en+$":
+    type: object
+    $ref: /schemas/regulator/regulator.yaml#
+
+    description: |
+      Chip enable regulator device to control chip enable functionality.
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    i2c1 {
+      status = "okay";
+      #address-cells = <1>;
+      #size-cells = <0>;
+
+      pm8008i_chip: pm8008i@8 {
+        compatible = "qcom,i2c-pmic";
+        reg = <0x8>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        pinctrl-names = "default";
+        pinctrl-0 = <&pm8008i_active>;
+
+        pm8008-chip@900 {
+          compatible = "qcom,pm8008-chip";
+          reg = <0x900>;
+
+          PM8008I_EN: qcom,pm8008-chip-en {
+            regulator-name = "pm8008i-chip-en";
+          };
+        };
+      };
+    };
+
+...
