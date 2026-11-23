@@ -1,0 +1,128 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/clock/qcom,chora-gcc.h>
+
+&soc {
+	usb0: hsusb@a600000 {
+		compatible = "qcom,dwc-usb3-msm";
+		reg = <0x0 0xa600000 0x0 0x100000>;
+		reg-names = "core_base";
+
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		power-domains = <&gcc GCC_USB20_GDSC>;
+		clocks = <&gcc GCC_USB20_MASTER_CLK>,
+			<&gcc GCC_SYS_NOC_USB_SF_AXI_CLK>,
+			<&gcc GCC_SNOC_CNOC_USB2_CLK>,
+			<&gcc GCC_USB20_MOCK_UTMI_CLK>,
+			<&gcc GCC_USB20_SLEEP_CLK>;
+		clock-names = "core_clk", "iface_clk", "bus_aggr_clk",
+					"utmi_clk", "sleep_clk";
+
+		resets = <&gcc GCC_USB20_BCR>;
+		reset-names = "core_reset";
+
+		interrupts-extended = <&intc GIC_SPI 578 IRQ_TYPE_LEVEL_HIGH>,
+					<&pdc 14 IRQ_TYPE_EDGE_RISING>,
+					<&pdc 15 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "pwr_event_irq", "dp_hs_phy_irq",
+				"dm_hs_phy_irq";
+
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnects = <&aggre_noc MASTER_USB2_0 &mc_virt SLAVE_EBI1>,
+				<&aggre_noc MASTER_USB2_0 &cnoc_main SLAVE_IPA_CFG>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB2_0>;
+
+		qcom,dis-sending-cm-l1-quirk;
+		qcom,core-clk-rate = <66666667>;
+		qcom,use-eusb2-phy;
+		qcom,use-pdc-interrupts;
+
+		extcon = <&eud>;
+		qcom,pm-qos-latency = <2>;
+
+		qcom,num-gsi-evt-buffs = <0x3>;
+		qcom,gsi-reg-offset =
+			<0x0fc /* GSI_GENERAL_CFG */
+			0x110 /* GSI_DBL_ADDR_L */
+			0x120 /* GSI_DBL_ADDR_H */
+			0x130 /* GSI_RING_BASE_ADDR_L */
+			0x144 /* GSI_RING_BASE_ADDR_H */
+			0x1a4>; /* GSI_IF_STS */
+
+		/*
+		 * Establish dependency on smmu driver so that depopulate path of
+		 * deferred probe doesn't run into existing bug in smmu driver.
+		 */
+		dummy-supply = <&apps_smmu>;
+
+		dwc3_0: dwc3@a600000 {
+			compatible = "snps,dwc3";
+			reg = <0x0 0xa600000 0x0 0xe000>;
+
+			iommus = <&apps_smmu 0x40 0x0>;
+			qcom,iommu-dma = "atomic";
+			memory-region = <&dwc3_mem_region>;
+
+			interrupts = <GIC_SPI 242 IRQ_TYPE_LEVEL_HIGH>;
+			usb-phy = <&eusb2_phy0>, <&usb_nop_phy>;
+			snps,disable-clk-gating;
+			snps,has-lpm-erratum;
+			snps,hird-threshold = /bits/ 8 <0x0>;
+			snps,is-utmi-l1-suspend;
+			snps,dis-u1-entry-quirk;
+			snps,dis-u2-entry-quirk;
+			snps,dis_u2_susphy_quirk;
+			snps,ssp-u3-u0-quirk;
+			dr_mode = "otg";
+			xhci-skip-phy-init-quirk;
+			maximum-speed = "high-speed";
+			usb-role-switch;
+		};
+
+	};
+
+	dwc3_mem_region: dwc3_mem_region {
+		iommu-addresses = <&dwc3_0 0x0 0x0 0x0 0x90000000>,
+					<&dwc3_0 0x0 0xf0000000 0xffffffff 0x10000000>;
+	};
+
+	/* USB port related High Speed PHY */
+	eusb2_phy0: hsphy@88e3000 {
+		compatible = "qcom,usb-snps-eusb2-phy";
+		reg = <0x0 0x88e3000 0x0 0x154>,
+			<0x0 0x88e2000 0x0 0x4>,
+			<0x0 0x0c278000 0x0 0x4>;
+		reg-names = "eusb2_phy_base",
+			"eud_enable_reg",
+			"eud_detect_reg";
+
+		vdd-supply = <&L2B_E0>;
+		qcom,vdd-voltage-level = <0 880000 950000>;
+		vdda12-supply = <&L3C_E0>;
+
+		clocks = <&rpmhcc RPMH_CXO_CLK>,
+			<&tcsrcc TCSR_USB2_CLKREF_EN>;
+		clock-names = "ref_clk_src", "ref_clk";
+
+		resets = <&gcc GCC_QUSB2PHY_PRIM_BCR>;
+		reset-names = "phy_reset";
+	};
+
+	usb_nop_phy: usb_nop_phy {
+		compatible = "usb-nop-xceiv";
+	};
+
+	usb_audio_qmi_dev {
+		compatible = "qcom,usb-audio-qmi-dev";
+		iommus = <&apps_smmu 0x80b 0x0>;
+		qcom,iommu-dma = "disabled";
+		qcom,usb-audio-stream-id = <0xb>;
+		qcom,usb-audio-intr-num = <2>;
+	};
+};

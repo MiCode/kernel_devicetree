@@ -1,0 +1,21 @@
+#include "shuntian-ntag-pinctrl.dtsi"
+
+&qupv3_se5_i2c {
+	status = "ok";
+	qcom,clk-freq-out = <400000>;
+	ntag@57 {
+		compatible = "fm,fm19511";
+		reg = <0x57>;
+		qcom,ntag-vdd-supply = <&L16B>;
+		qcom,ntag-vdd-voltage = <3300000 3300000>;
+		qcom,ntag-vdd-current = <60000>;
+		qcom,ntag-irq = <&tlmm 67 0x00>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <67 0>;
+		interrupt-names = "ntag_irq";
+		pinctrl-names = "default","suspend";
+		pinctrl-0 = <&ntag_int_default>;
+		pinctrl-1 = <&ntag_int_suspend>;
+	};
+};

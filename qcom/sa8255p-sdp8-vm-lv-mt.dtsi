@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/mailbox/qcom-ipcc.h>
+
+&soc {
+	ipcc_mproc_apps_ns2: qcom,ipcc@422000 {
+		compatible = "qcom,ipcc";
+		reg = <0x422000 0x1000>;
+		interrupts = <GIC_SPI 560 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		#mbox-cells = <2>;
+		status = "disabled";
+	};
+
+	virtio_glink_cma: virtio-glink-cma@2e000000 {
+		compatible = "virtio,mmio";
+		reg = <0x2e000000 0x1000>;
+		interrupts = <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+
+		glink_bridge: virtio-glink-bridge {
+			compatible = "virtio,device49162"; /* VIRTIO_ID: 0xC00A */
+
+			glink-edge {
+				interrupt-parent = <&ipcc_mproc_apps_ns2>;
+				interrupts = <IPCC_CLIENT_CDSP 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns2 IPCC_CLIENT_CDSP 0>;
+				label = "cdsp";
+				qcom,glink-label = "cdsp";
+			};
+
+			glink-edge1 {
+				interrupt-parent = <&ipcc_mproc_apps_ns2>;
+				interrupts = <IPCC_CLIENT_NSP1 0 IRQ_TYPE_EDGE_RISING>;
+				mboxes = <&ipcc_mproc_apps_ns2 IPCC_CLIENT_NSP1 0>;
+				label = "cdsp1";
+				qcom,glink-label = "cdsp1";
+			};
+		};
+	};
+};
+
+&reserved_memory {
+	va_md_mem: va_md_mem_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x1000000>;
+	};
+
+	kinfo_mem: debug_kinfo_region {
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x1000>;
+		no-map;
+	};
+};
+
+&soc {
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
+	};
+
+	va_mini_dump {
+		compatible = "qcom,va-minidump";
+		memory-region = <&va_md_mem>;
+	};
+
+	google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
+	};
+};
+
+&hab {
+	vmid = <3>;
+};
+
+&qcom_rng_ee3 {
+	status = "disabled";
+};
+
+&usb1 {
+	status = "disabled";
+};
+
+&usb2_phy1 {
+	status = "disabled";
+};
+
+&usb_qmp_phy1 {
+	status = "disabled";
+};
+
+&glink_cma_mem0 {
+	status = "okay";
+};
+

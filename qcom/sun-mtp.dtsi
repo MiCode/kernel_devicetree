@@ -1,0 +1,382 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/qcom,gcc-sun.h>
+
+#include "sun-pmic-overlay.dtsi"
+#include "sun-thermal-overlay.dtsi"
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8550_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1501_1_iin {
+		reg = <0x1066801>;
+		label = "smb1501_1_iin";
+	};
+
+	smb1501_1_ichg {
+		reg = <0x1066802>;
+		label = "smb1501_1_ichg";
+	};
+
+	smb1501_1_die_temp {
+		reg = <0x1066803>;
+		label = "smb1501_1_die_temp";
+	};
+
+	smb1501_2_iin {
+		reg = <0x1066901>;
+		label = "smb1501_2_iin";
+	};
+
+	smb1501_2_ichg {
+		reg = <0x1066902>;
+		label = "smb1501_2_ichg";
+	};
+
+	smb1501_2_die_temp {
+		reg = <0x1066903>;
+		label = "smb1501_2_die_temp";
+	};
+};
+
+&battery_charger {
+	qcom,thermal-mitigation-step = <500000>;
+	#cooling-cells = <2>;
+	qcom,wireless-fw-name = "idt9418.bin";
+	qcom,ship-mode-immediate;
+};
+
+&pmic_glink_debug {
+	i2c@106 {
+		reg = <0x106>;	/* I2C instance 6 in ADSP for SE5 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1501@68 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x68>;
+			qcom,can-sleep;
+		};
+
+		qcom,smb1501@69 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x69>;
+			qcom,can-sleep;
+		};
+
+		qcom,idt9418@3b {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x3b>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c4-supply = <&L4B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c6-supply = <&L6B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1cd-supply = <&L13B>;
+	periph-1ce-supply = <&L14B>;
+	periph-1cf-supply = <&L15B>;
+	periph-1d0-supply = <&L16B>;
+	periph-1d1-supply = <&L17B>;
+	periph-1e4-supply = <&BOB1>;
+	periph-1e6-supply = <&BOB2>;
+	periph-39b-supply = <&S1D>;
+	periph-39e-supply = <&S2D_LEVEL>;
+	periph-3a1-supply = <&S3D>;
+	periph-3a4-supply = <&S4D>;
+	periph-3a7-supply = <&S5D_LEVEL>;
+	periph-3c1-supply = <&L1D>;
+	periph-3c2-supply = <&L2D>;
+	periph-3c3-supply = <&L3D>;
+	periph-5aa-supply = <&S6F_LEVEL>;
+	periph-5c1-supply = <&L1F>;
+	periph-5c2-supply = <&L2F>;
+	periph-5c3-supply = <&L3F>;
+	periph-69b-supply = <&S1G>;
+	periph-69e-supply = <&S2G_LEVEL>;
+	periph-6a1-supply = <&S3G>;
+	periph-6a4-supply = <&S4G>;
+	periph-6a7-supply = <&S5G_LEVEL>;
+	periph-6ad-supply = <&S7G_LEVEL>;
+	periph-6c1-supply = <&L1G>;
+	periph-6c2-supply = <&L2G>;
+	periph-6c3-supply = <&L3G>;
+	periph-89b-supply = <&S1I_LEVEL>;
+	periph-8a1-supply = <&S3I_LEVEL>;
+	periph-8a7-supply = <&S5I_LEVEL>;
+	periph-8aa-supply = <&S6I_LEVEL>;
+	periph-8ad-supply = <&S7I>;
+	periph-8b0-supply = <&S8I>;
+	periph-8c1-supply = <&L1I>;
+	periph-8c2-supply = <&L2I>;
+	periph-8c3-supply = <&L3I>;
+	periph-99b-supply = <&S1J_LEVEL>;
+	periph-99e-supply = <&S2J>;
+	periph-9a1-supply = <&S3J>;
+	periph-9a4-supply = <&S4J>;
+	periph-9c1-supply = <&L1J>;
+	periph-9c2-supply = <&L2J>;
+	periph-9c3-supply = <&L3J_LEVEL>;
+	periph-ac1-supply = <&L1K>;
+	periph-ac2-supply = <&L2K>;
+	periph-ac3-supply = <&L3K>;
+	periph-ac4-supply = <&L4K>;
+	periph-ac5-supply = <&L5K>;
+	periph-ac6-supply = <&L6K>;
+	periph-ac7-supply = <&L7K>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c44-supply = <&L5M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
+	periph-d40-supply = <&L1N>;
+	periph-d41-supply = <&L2N>;
+	periph-d42-supply = <&L3N>;
+	periph-d43-supply = <&L4N>;
+	periph-d44-supply = <&L5N>;
+	periph-d45-supply = <&L6N>;
+	periph-d46-supply = <&L7N>;
+};
+
+&pm8550_switch0 {
+	qcom,led-mask = <9>; /* Channels 1 & 4 */
+	qcom,symmetry-en;
+};
+
+&pm8550_switch1 {
+	qcom,led-mask = <6>; /* Channels 2 & 3 */
+	qcom,symmetry-en;
+};
+
+&pm8550_switch2 {
+	qcom,led-mask = <15>; /* All Channels */
+	qcom,symmetry-en;
+};
+
+&pm8550_flash {
+	status = "ok";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-sun";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&pm_v6j_l1>;
+	vdda-phy-max-microamp = <213000>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&pm_v8g_l3>;
+	vdda-pll-max-microamp = <18300>;
+
+	/* Phy GDSC for VDD_MX, always on */
+	vdd-phy-gdsc-supply = <&gcc_ufs_mem_phy_gdsc>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&pm_v8i_l3>;
+	vdda-qref-max-microamp = <64500>;
+
+	/*
+	 * Refer to Sun's Power Grid Analysis document.
+	 * Add vote for REFGEN_VDD_A_0P9/VDD_A_PCIE_0_0P9 regulator.
+	 */
+	vdda-refgen-supply = <&pm_v6f_l1>;
+	vdda-refgen-max-microamp = <206000>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vdd-hba-supply = <&gcc_ufs_phy_gdsc>;
+
+	vcc-supply = <&pm_humu_l17>;
+	vcc-max-microamp = <1300000>;
+
+	vccq-supply = <&pm_v8d_l1>;
+	vccq-max-microamp = <1200000>;
+
+	qcom,vccq-proxy-vote-supply = <&pm_v8d_l1>;
+	qcom,vccq-proxy-vote-max-microamp = <1200000>;
+
+	/* UFS Rst pin is always on. It is shared with VDD_PX14 */
+	qcom,vddp-ref-clk-supply = <&pm_v8i_l2>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&pm_v8i_s7>;
+	qcom,vccq-parent-max-microamp = <210000>;
+
+	reset-gpios = <&tlmm 215 GPIO_ACTIVE_LOW>;
+	resets = <&gcc GCC_UFS_PHY_BCR>;
+	reset-names = "rst";
+
+	status = "ok";
+};
+
+&wcd_usbss {
+	interrupt-parent = <&spmi_bus>;
+	interrupts = <0x0 0xb6 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "usb_wcd";
+	nvmem-cells = <&usb_mode>;
+	nvmem-cell-names = "usb_mode";
+
+	mode-switch;
+
+	port {
+		wcd_usbss_mux: endpoint {
+			remote-endpoint = <&ucsi_audio_mux>;
+		};
+	};
+};
+
+&sdhc_2 {
+	status = "ok";
+	vdd-supply = <&pm_humu_l9>;
+	qcom,vdd-voltage-level = <2950000 2960000>;
+	qcom,vdd-current-level = <0 800000>;
+
+	vdd-io-supply = <&pm_humu_l8>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 55 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_SDCC2_BCR>;
+	reset-names = "core_reset";
+
+	qcom,uses_level_shifter;
+};
+
+&pmih010x_eusb2_repeater {
+	qcom,param-override-seq =
+		/* <value reg_offset> */
+		/* Adjust HS trasmit amplitude */
+		<0xa 0x51
+		/* Tx pre-emphasis tuning */
+		 0x3 0x57>;
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pmih010x_eusb2_repeater>;
+	usb-repeater = <&pmih010x_eusb2_repeater>;
+};
+
+&qupv3_se4_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "ok";
+	qcom,touch-active = "st,fts";
+
+	st_fts@49 {
+		compatible = "st,fts";
+		reg = <0x49>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <162 0x2008>;
+		vdd-supply = <&L4B>;
+		avdd-supply = <&L14B>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		st,irq-gpio = <&tlmm 162 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 161 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
+
+		st,touch-type = "primary";
+		st,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <652>;
+		qts,trusted-touch-io-bases = <0xa90000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+						&tlmm 51 0 &tlmm 161 0 &tlmm 162 0x2008>;
+	};
+};
+
+&usb0 {
+	qcom,wcd_usbss = <&wcd_usbss>;
+
+	usb-role-switch;
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		compatible = "usb-c-connector";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				usb_port0_connector: endpoint {
+					remote-endpoint = <&usb_port0>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				ucsi_audio_mux: endpoint {
+					remote-endpoint = <&wcd_usbss_mux>;
+				};
+			};
+		};
+	};
+};

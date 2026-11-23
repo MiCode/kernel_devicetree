@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "chora-qrd.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Chora QRD evros";
+	compatible = "qcom,chora-qrd", "qcom,chora", "qcom,chorap-qrd", "qcom,chorap", "qcom,qrd";
+	qcom,msm-id = <724 0x10000>, <744 0x10000>;
+	qcom,board-id = <0x1000b 0x0>;
+};
+
+&pmiv010x_eusb2_repeater {
+	status = "ok";
+	vdd18-supply = <&L7B_E0>;
+	vdd3-supply = <&L17B_E0>;
+	qcom,param-override-seq =
+		/* <value reg_offset> */
+		/* Adjust HS transmit amplitude */
+		<0xd 0x51
+		/* Tx pre-emphasis tuning */
+		 0x7 0x57>;
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pmiv010x_eusb2_repeater>;
+	usb-repeater = <&pmiv010x_eusb2_repeater>;
+};

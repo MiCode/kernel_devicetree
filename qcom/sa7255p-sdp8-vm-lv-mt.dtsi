@@ -1,0 +1,111 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+&reserved_memory {
+	va_md_mem: va_md_mem_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x1000000>;
+	};
+
+	kinfo_mem: debug_kinfo_region {
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x1000>;
+		no-map;
+	};
+};
+
+&soc {
+	logbuf: qcom,logbuf-vendor-hooks {
+		compatible = "qcom,logbuf-vendor-hooks";
+	};
+
+	va_mini_dump {
+		compatible = "qcom,va-minidump";
+		memory-region = <&va_md_mem>;
+	};
+
+	google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
+	};
+};
+
+&hab {
+	vmid = <3>;
+};
+
+&pcie0 {
+	status = "disabled";
+};
+
+&pcie0_msi_snps {
+	interrupt-parent = <&qvm_vdev_gic>;
+	status = "disabled";
+};
+
+&pcie1 {
+	interrupt-map = <0 0 0 0 &qvm_vdev_gic GIC_SPI 518 IRQ_TYPE_LEVEL_HIGH
+			0 0 0 1 &qvm_vdev_gic GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH
+			0 0 0 2 &qvm_vdev_gic GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH
+			0 0 0 3 &qvm_vdev_gic GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH
+			0 0 0 4 &qvm_vdev_gic GIC_SPI 151 IRQ_TYPE_LEVEL_HIGH>;
+	status = "disabled";
+};
+
+&pcie1_msi_snps {
+	interrupt-parent = <&qvm_vdev_gic>;
+	status = "disabled";
+};
+
+&usb0 {
+	interrupts-extended = <&pdc 14  IRQ_TYPE_EDGE_RISING>,
+			<&qvm_vdev_gic GIC_SPI 287 IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 12  IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 15  IRQ_TYPE_EDGE_RISING>;
+	status = "disabled";
+};
+
+&usb2_phy0 {
+	status = "disabled";
+};
+
+&usb_qmp_phy0 {
+	status = "disabled";
+};
+
+&usb2 {
+	interrupts-extended = <&pdc 10  IRQ_TYPE_EDGE_RISING>,
+			<&qvm_vdev_gic GIC_SPI 444 IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 9  IRQ_TYPE_EDGE_RISING>;
+	status = "disabled";
+};
+
+&usb2_phy2 {
+	status = "disabled";
+};
+
+&qupv3_se2_4uart {
+	interrupts-extended = <&qvm_vdev_gic GIC_SPI 529 IRQ_TYPE_LEVEL_HIGH>,
+					<&tlmm 36 IRQ_TYPE_LEVEL_HIGH>;
+	status = "disabled";
+};
+
+&gcc {
+	status = "ok";
+};
+
+&virtio_regulator {
+	status = "ok";
+};
+
+&virtio_spmi {
+	status = "ok";
+};
+
+&qcom_rng_ee3 {
+	status = "ok";
+};

@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/firmware/qcom,si-core.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Si-core driver to provide transport between Linux and QTEE.
+
+description: |
+  The Si-core driver facilitates the communication and data transfer between
+  Qualcomm Trusted Execution Environment and Linux OS.
+
+maintainers:
+  - Amirreza Zarrabi <quic_azarrabi@quicinc.com>
+  - Vikas Kumar Sharma <quic_vksharma@quicinc.com>
+
+properties:
+  compatible:
+    const: qcom,si-core
+
+  qcom,ffa-pool-size:
+    description:
+      Indicates the size of FFA pool to be supported in multiples of page size (4K by default).
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 32
+    maximum: 1024
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom_si_core {
+      compatible = "qcom,si-core";
+    };
+
+    When qcom,ffa-pool-size property is missing, a default FFA pool of size
+    4 MB is allocated. To allocate 1 MB of memory for FFA pool, we will have
+    an entry of 256, since 256 * 4 KB (page size) = 1 MB. Note that this
+    means the allocated memory depends on the value of kernel PAGE_SIZE macro.
+
+    qcom_si_core {
+      compatible = "qcom,si-core";
+      qcom,ffa-pool-size = <256>;
+    };

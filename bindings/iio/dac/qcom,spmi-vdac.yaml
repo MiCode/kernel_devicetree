@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/iio/dac/qcom,spmi-vdac.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm PMIC VDAC
+
+maintainers:
+  - Dhruvin Rajpura <drajpura@qti.qualcomm.com>
+
+description:
+  PMIC VDAC Peripheral to set voltage to VDAC and read back from VADC channels.
+
+properties:
+  compatible:
+    const: qcom,spmi-vdac
+
+  reg:
+    maxItems: 1
+
+  "#address-cells":
+    const: 1
+
+  "#size-cells":
+    const: 0
+
+  io-channels:
+    minItems: 1
+    maxItems: 2
+    description: ADC channels for ATEST1 and ATEST2
+
+  io-channel-names:
+    minItems: 1
+    maxItems: 2
+    items:
+      enum:
+        - ATEST1
+        - ATEST2
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    pmic {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        vdac@9600 {
+            compatible = "qcom,spmi-vdac";
+            reg = <0x9600>;
+            #address-cells = <1>;
+            #size-cells = <0>;
+            io-channels = <&pmar2230_vadc 0x01>,
+                         <&pmar2230_vadc 0x02>;
+            io-channel-names = "ATEST1", "ATEST2";
+        };
+    };

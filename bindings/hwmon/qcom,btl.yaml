@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/hwmon/qcom,btl.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Battery Temperature Logging (BTL)
+
+maintainers:
+  - Anjelique Melendez <anjelique.melendez@oss.qualcomm.com>
+
+description: |
+  Qualcomm Technologies, Inc. Battery Temperature Logging (BTL) supports measuring the time a
+  device spends within a specific temperature range. There are 8 adjacent temperature "thresholds"
+  ranging from -40000 to 98000 millicelsius. By default the lower limit of the thresholds are
+  -40000, -20000, 0, 15000, 30000, 45000, 60000, 75000 millicelsius. Temperature readings
+  are taken over an interval and the default interval is 100ms.
+
+properties:
+  compatible:
+    const: qcom,btl
+
+  nvmem:
+    description: QCOM BTL nvmem device phandle
+
+  nvmem-names:
+    const: btl-sdam
+
+  qcom,temperature-thresholds:
+    description: |
+      Array of temperature threshold lower limits to be set in millicelsius.
+      First element in array must always be -40000 millicelsius.
+      If this property is specified, then it will overwrite the default values during the
+      device's first boot up. The values will be saved for all following resets unless the
+      user overwrites them from sysfs.
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    minItems: 8
+    maxItems: 8
+
+  qcom,sample-interval-ms:
+    description: |
+      Interval time in ms that temperature readings are collected.
+      If this property is specified, then it will overwrite the default value during the
+      device's first boot up. The value will be saved for all following resets unless the
+      user overwrites it from sysfs.
+    minimum: 100
+    maximum: 25500
+    default: 100
+
+required:
+  - compatible
+  - nvmem
+  - nvmem-names
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,btl {
+        compatible = "qcom,btl";
+        nvmem = <&pmk8850_sdam_72>;
+        nvmem-names = "btl-sdam";
+        qcom,sample-interval-ms = <200>;
+        qcom,temperature-thresholds = <(-40000) (-30000) 0 18000 34000 50000 64000 72000>;
+    };

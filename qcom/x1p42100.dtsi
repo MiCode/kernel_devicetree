@@ -1,0 +1,261 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/* X1P42100 is heavily based on X1E80100, with some meaningful differences */
+#include "x1e80100.dtsi"
+#include "x1p42100-coresight.dtsi"
+#include "x1p42100-regulators.dtsi"
+#include "x1e80100-pmic-overlay.dtsi"
+#include "x1p42100-thermal-overlay.dtsi"
+#include "x1p42100-debug.dtsi"
+#include <dt-bindings/interconnect/qcom,icc.h>
+#include <dt-bindings/interconnect/qcom,x1p42100.h>
+#include <dt-bindings/clock/qcom,x1p42100-gcc.h>
+#include <dt-bindings/clock/qcom,x1p42100-videocc.h>
+
+/delete-node/ &CPU8;
+/delete-node/ &CPU9;
+/delete-node/ &CPU10;
+/delete-node/ &CPU11;
+/delete-node/ &cpu_map_cluster2;
+/delete-node/ &cluster_device2;
+
+&ddr_clusterX {
+	qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+};
+
+&ddr_clusterX_compute {
+	qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+};
+
+&ddrqos_clusterX_lat {
+	qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+};
+
+&llcc_clusterX {
+	qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+};
+
+&qcom_pmu {
+	qcom,pmu-events-tbl =
+		< 0x0008 0xff 0x02 0x02 >,
+		< 0x0011 0xff 0x01 0x00 >,
+		< 0x0017 0xff 0xff 0x05 >;
+};
+
+&gic_router {
+	qcom,gic-class1-cpus = <&CPU4 &CPU5 &CPU6 &CPU7>;
+	qcom,gic-cpulist = <&CPU0 &CPU1 &CPU2 &CPU3 &CPU4 &CPU5 &CPU6 &CPU7>;
+};
+
+&pdc {
+	compatible = "qcom,x1p42100-pdc", "qcom,pdc";
+};
+
+&soc {
+	clk_virt: interconnect@0 {
+		compatible = "qcom,x1p42100-clk_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	mc_virt: interconnect@1 {
+		compatible = "qcom,x1p42100-mc_virt";
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	config_noc: interconnect@1600000 {
+		compatible = "qcom,x1p42100-cnoc_cfg";
+		reg = <0x0 0x1600000 0x0 0x6400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	cnoc_main: interconnect@1500000 {
+		compatible = "qcom,x1p42100-cnoc_main";
+		reg = <0x0 0x1500000 0x0 0x14400>;
+		#interconnect-cells = <1>;
+		qcom,skip-qos;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+	};
+
+	system_noc: interconnect@1680000 {
+		compatible = "qcom,x1p42100-system_noc";
+		reg = <0x0 0x1680000 0x0 0x1c080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	pcie_center_anoc: interconnect@16d0000 {
+		compatible = "qcom,x1p42100-pcie_center_anoc";
+		reg = <0x0 0x16d0000 0x0 0x7000>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	pcie_south_anoc: interconnect@16c0000 {
+		compatible = "qcom,x1p42100-pcie_south_anoc";
+		reg = <0x0 0x16c0000 0x0 0xc080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	pcie_north_anoc: interconnect@1740000 {
+		compatible = "qcom,x1p42100-pcie_north_anoc";
+		reg = <0x0 0x1740000 0x0 0x9080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	aggre1_noc: interconnect@16e0000 {
+		compatible = "qcom,x1p42100-aggre1_noc";
+		reg = <0x0 0x16e0000 0x0 0x14400>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	aggre2_noc: interconnect@1700000 {
+		compatible = "qcom,x1p42100-aggre2_noc";
+		reg = <0x0 0x1700000 0x0 0x1c400>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	mmss_noc: interconnect@1780000 {
+		compatible = "qcom,x1p42100-mmss_noc";
+		reg = <0x0 0x1780000 0x0 0x5b800>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	gem_noc: interconnect@26400000 {
+		compatible = "qcom,x1p42100-gem_noc";
+		reg = <0x0 0x26400000 0x0 0x311200>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	nsp_noc: interconnect@320c0000 {
+		compatible = "qcom,x1p42100-nsp_noc";
+		reg = <0x0 0x320c0000 0x0 0xe080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	lpass_ag_noc: interconnect@7e40000 {
+		compatible = "qcom,x1p42100-lpass_ag_noc";
+		reg = <0x0 0x7e40000 0x0 0xe080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	lpass_lpiaon_noc: interconnect@7400000 {
+		compatible = "qcom,x1p42100-lpass_lpiaon_noc";
+		reg = <0x0 0x7400000 0x0 0x19080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	lpass_lpicx_noc: interconnect@7430000 {
+		compatible = "qcom,x1p42100-lpass_lpicx_noc";
+		reg = <0x0 0x7430000 0x0 0x3a200>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	usb_center_anoc: interconnect@1750000 {
+		compatible = "qcom,x1p42100-usb_center_anoc";
+		reg = <0x0 0x1750000 0x0 0x8800>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	usb_north_anoc: interconnect@1760000 {
+		compatible = "qcom,x1p42100-usb_north_anoc";
+		reg = <0x0 0x1760000 0x0 0x7080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+	usb_south_anoc: interconnect@1770000 {
+		compatible = "qcom,x1p42100-usb_south_anoc";
+		reg = <0x0 0x1770000 0x0 0xf080>;
+		#interconnect-cells = <1>;
+		qcom,bcm-voter-names = "hlos";
+		qcom,bcm-voters = <&apps_bcm_voter>;
+		qcom,skip-qos;
+	};
+
+};
+
+&gcc {
+	compatible = "qcom,x1p42100-gcc", "syscon";
+	protected-clocks = <GCC_SDCC1_AHB_CLK>, <GCC_SDCC1_APPS_CLK>,
+			<GCC_SDCC1_APPS_CLK_SRC>, <GCC_SDCC1_ICE_CORE_CLK>,
+			<GCC_SDCC1_ICE_CORE_CLK_SRC>;
+};
+
+&gpucc {
+	compatible = "qcom,x1p42100-gpucc", "syscon";
+};
+
+&camcc {
+	compatible = "qcom,x1p42100-camcc", "syscon";
+};
+
+&videocc {
+	compatible = "qcom,x1p42100-videocc", "syscon";
+};
+
+&adreno_smmu {
+	qcom,actlr =
+		<0x0000 0x0000 0x0000032b>,
+		<0x0002 0x0000 0x0000032b>,
+		<0x0004 0x0000 0x0000032b>,
+		<0x0005 0x0000 0x0000032b>,
+		<0x0007 0x0000 0x0000032b>;
+};
+
+&gpu_qtb {
+	qcom,num-qtb-ports = <2>;
+};
+
+

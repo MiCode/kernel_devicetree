@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-thermal-pause-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. CPU Pause Cooling Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  The CPU pause cooling device will be used for isolating a CPU on a thermal
+  condition. This cooling device driver can register one cooling device per
+  single or multiple CPUs, which can be used by thermal zone to mitigate.
+
+  Each child node will represent a cooling device and the child node should
+  point to the CPU mask, which will be mitigated by that cooling device instance.
+
+properties:
+  compatible:
+    const: qcom,thermal-pause
+
+patternProperties:
+  "^thermal-pause-[0-9a-fA-F][0-9a-fA-F]$":
+    type: object
+    description: This child nodes describes the group of CPUs to perform CPU
+      isolation as mitigation.
+
+    properties:
+      qcom,cpus:
+        $ref: "/schemas/types.yaml#/definitions/phandle-array"
+        description: |
+          List of Phandles to the CPUs that should be mitigated as
+          a part of this cooling device.
+
+      '#cooling-cells':
+        const: 2
+        description: |
+          Must be 2. Needed for of_thermal as cooling device identifier.
+          Please refer to <devicetree/bindings/thermal/thermal.txt> for
+          more details.
+
+      qcom,cdev-alias:
+        $ref: /schemas/types.yaml#/definitions/string
+        description: |
+          Alias name for the cooling device. When specified, this
+          name will be used to create a cooling device instead
+          of using the default name based on CPU mask.
+
+    required:
+      - qcom,cpus
+
+    additionalProperties: false
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+      #include <dt-bindings/interrupt-controller/arm-gic.h>
+
+      qcom,thermal-pause {
+          compatible = "qcom,thermal-pause";
+
+          /* pause a single cpu, cpu 0 */
+          thermal-pause-01 {
+            qcom,cpus = <&CPU0>;
+            qcom,cdev-alias = "pause_cpu0";
+          };
+
+          /* pause a group of cpus, cpus 0-3 */
+          thermal-pause-0F {
+              qcom,cpus = <&CPU0 &CPU1 &CPU2 &CPU3>;
+              #cooling-cells = <2>;
+          };
+
+          /* pause a group of cpus, cpus 6-7 */
+          thermal-pause-C0 {
+              qcom,cpus = <&CPU4 &CPU5 &CPU6 &CPU7>;
+              #cooling-cells = <2>;
+          };
+
+          /* pause a single cpu, cpu 7 */
+          thermal-pause-80 {
+              qcom,cpus = <&CPU7>;
+              #cooling-cells = <2>;
+          };
+      };
+

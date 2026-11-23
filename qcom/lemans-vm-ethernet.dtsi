@@ -1,0 +1,131 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/clock/qcom,gcc-lemans.h>
+
+&soc {
+
+	emac_mdio_fe: emac_mdio_drv@0x1e000000 {
+		compatible = "virtio,mmio";
+		reg =<0x1e000000 0x1000>;
+		interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+	};
+
+	emac1_mtl_rx_setup: rx-queues-config {
+		snps,rx-queues-to-use = <4>;
+		snps,rx-sched-sp;
+
+		queue0 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x0>;
+			snps,route-up;
+			snps,priority = <0x1>;
+		};
+
+		queue1 {
+			snps,dcb-algorithm;
+			snps,map-to-dma-channel = <0x1>;
+			snps,route-ptp;
+		};
+
+		queue2 {
+			snps,avb-algorithm;
+			snps,map-to-dma-channel = <0x2>;
+			snps,route-avcp;
+		};
+
+		queue3 {
+			snps,avb-algorithm;
+			snps,map-to-dma-channel = <0x3>;
+			snps,priority = <0xC>;
+		};
+	};
+
+	emac1_mtl_tx_setup: tx-queues-config {
+		snps,tx-queues-to-use = <4>;
+		snps,tx-sched-sp;
+
+		queue0 {
+			snps,dcb-algorithm;
+		};
+
+		queue1 {
+			snps,dcb-algorithm;
+		};
+
+		queue2 {
+			snps,avb-algorithm;
+			snps,send_slope = <0x1000>;
+			snps,idle_slope = <0x1000>;
+			snps,high_credit = <0x3E800>;
+			snps,low_credit = <0xFFC18000>;
+		};
+
+		queue3 {
+			snps,avb-algorithm;
+			snps,send_slope = <0x1000>;
+			snps,idle_slope = <0x1000>;
+			snps,high_credit = <0x3E800>;
+			snps,low_credit = <0xFFC18000>;
+		};
+	};
+
+	serdes1: phy@8902000 {
+		compatible = "qcom,sa8775p-dwmac-sgmii-phy";
+		reg = <0x8902000 0xe10>;
+		clocks = <&gcc GCC_SGMI_CLKREF_EN>;
+		clock-names = "sgmi_ref";
+		#phy-cells = <0>;
+		status = "disabled";
+	};
+
+	ethernet1: ethernet@23000000 {
+		compatible = "qcom,sa8775p-ethqos";
+		reg = <0x23000000 0x10000>,
+				<0x23016000 0x100>;
+		reg-names = "stmmaceth", "rgmii";
+
+		interrupts = <GIC_SPI 929 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "macirq";
+
+		clocks = <&gcc GCC_EMAC1_AXI_CLK>,
+				<&gcc GCC_EMAC1_SLV_AHB_CLK>,
+				<&gcc GCC_EMAC1_PTP_CLK>,
+				<&gcc GCC_EMAC1_PHY_AUX_CLK>;
+		clock-names = "stmmaceth",
+					"pclk",
+					"ptp_ref",
+					"phyaux";
+
+		qcom,cl22-phy-addr = <10>;
+		qcom,air-cl45-phy-addr = <0>;
+		qcom,star-cl45-phy-addr = <8>;
+
+		gdsc_emac-supply = <&gcc_emac1_gdsc>;
+		phys = <&serdes1>;
+		phy-names = "serdes";
+		phy-mode = "2500base-x";
+		iommus = <&apps_smmu 0x140 0xf>;
+		qcom,iommu-dma = "bypass";
+		dma-coherent;
+		snps,mtl-rx-config = <&emac1_mtl_rx_setup>;
+		snps,mtl-tx-config = <&emac1_mtl_tx_setup>;
+		snps,reset-gpios = <&pm8775_3_gpios 9 GPIO_ACTIVE_HIGH>;
+		snps,reset-delays-us = <0 11000 70000>;
+		vreg_emac_phy-supply = <&pm8775_a_l5>;
+		pinctrl-names = "dev-emac-mdc",
+			"dev-emac-mdio";
+		pinctrl-0 = <&emac1_mdc>;
+		pinctrl-1 = <&emac1_mdio>;
+		snps,ps-speed = <1000>;
+		snps,tso;
+		virtio-mdio;
+		snps,pbl = <32>;
+		rx-fifo-depth = <16384>;
+		tx-fifo-depth = <16384>;
+		status = "disabled";
+	};
+};

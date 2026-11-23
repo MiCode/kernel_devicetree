@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/qcom,cpucp_fast.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. CPUCP FAST driver
+
+maintainers:
+  - Chandrasekhar Lingutla <quic_lingutla@quicinc.com>
+
+description: |
+  This device listens interrupts from CPUCP via mailbox and
+  sends notification to scheduler.
+
+properties:
+  compatible:
+    const: qcom,cpucp_fast
+
+  mboxes:
+    description: Mailboxes used for Interrupt from CPUCP
+
+  qcom,policy-cpus:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: Base CPU index for cpufreq policy
+
+required:
+  - compatible
+  - mboxes
+  - qcom,policy-cpus
+
+additionalProperties: false
+
+examples:
+  - |
+    soc {
+      cpucp_fast: qcom,cpucp_fast {
+        compatible = "qcom,cpucp_fast";
+        mboxes = <&cpucp 5>;
+        qcom,policy-cpus = <6>;
+      };
+    };
+...

@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+&qupv3_se8_i2c {
+	status = "okay";
+
+	pm8011m: pmic@8 {
+		compatible = "qcom,pm8008";
+		reg = <0x8>;
+		interrupts-extended = <&pmar2230_gpios 5 IRQ_TYPE_EDGE_RISING>;
+		reset-gpios = <&pmar2230_gpios 7 GPIO_ACTIVE_LOW>;
+
+		/* L1-L4 supplies are from external KTB source, no supply needed here */
+		vdd-l5-supply = <&BOB>;
+		vdd-l6-supply = <&BOB>;
+		vdd-l7-supply = <&BOB>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pm8011m_active>, <&pm8011m_int_default>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-ranges = <&pm8011m 0 0 2>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		#thermal-sensor-cells = <0>;
+
+		regulators {
+			L1M: pm8011m_l1: ldo1 {
+				regulator-name = "pm8011m_l1";
+				regulator-min-microvolt = <1056000>;
+				regulator-max-microvolt = <1200000>;
+			};
+
+			L2M: pm8011m_l2: ldo2 {
+				regulator-name = "pm8011m_l2";
+				regulator-min-microvolt = <1144000>;
+				regulator-max-microvolt = <1304000>;
+			};
+
+			L3M: pm8011m_l3: ldo3 {
+				regulator-name = "pm8011m_l3";
+				regulator-min-microvolt = <1792000>;
+				regulator-max-microvolt = <1920000>;
+			};
+
+			L4M: pm8011m_l4: ldo4 {
+				regulator-name = "pm8011m_l4";
+				regulator-min-microvolt = <1792000>;
+				regulator-max-microvolt = <1920000>;
+			};
+
+			L5M: pm8011m_l5: ldo5 {
+				regulator-name = "pm8011m_l5";
+				regulator-min-microvolt = <2600000>;
+				regulator-max-microvolt = <2904000>;
+			};
+
+			L6M: pm8011m_l6: ldo6 {
+				regulator-name = "pm8011m_l6";
+				regulator-min-microvolt = <2704000>;
+				regulator-max-microvolt = <3000000>;
+			};
+
+			L7M: pm8011m_l7: ldo7 {
+				regulator-name = "pm8011m_l7";
+				regulator-min-microvolt = <2704000>;
+				regulator-max-microvolt = <3000000>;
+			};
+		};
+	};
+
+	pm8011n: pmic@c {
+		compatible = "qcom,pm8008";
+		reg = <0xc>;
+		interrupts-extended = <&pmar2230_gpios 13 IRQ_TYPE_EDGE_RISING>;
+		reset-gpios = <&pmar2230_gpios 12 GPIO_ACTIVE_LOW>;
+
+		/* L1, L2, L5 supplies are from external KTB source, no supply needed here */
+		vdd-l3-l4-supply = <&BOB>;
+		vdd-l6-supply = <&BOB>;
+		vdd-l7-supply = <&BOB>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pm8011n_active>, <&pm8011n_int_default>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-ranges = <&pm8011n 0 0 2>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		#thermal-sensor-cells = <0>;
+
+		regulators {
+			L1N: pm8011n_l1: ldo1 {
+				regulator-name = "pm8011n_l1";
+				regulator-min-microvolt = <1056000>;
+				regulator-max-microvolt = <1200000>;
+			};
+
+			L2N: pm8011n_l2: ldo2 {
+				regulator-name = "pm8011n_l2";
+				regulator-min-microvolt = <952000>;
+				regulator-max-microvolt = <1256000>;
+			};
+
+			L3N: pm8011n_l3: ldo3 {
+				regulator-name = "pm8011n_l3";
+				regulator-min-microvolt = <2704000>;
+				regulator-max-microvolt = <3000000>;
+			};
+
+			L4N: pm8011n_l4: ldo4 {
+				regulator-name = "pm8011n_l4";
+				regulator-min-microvolt = <2704000>;
+				regulator-max-microvolt = <2896000>;
+			};
+
+			L5N: pm8011n_l5: ldo5 {
+				regulator-name = "pm8011n_l5";
+				regulator-min-microvolt = <1792000>;
+				regulator-max-microvolt = <1896000>;
+			};
+
+			L6N: pm8011n_l6: ldo6 {
+				regulator-name = "pm8011n_l6";
+				regulator-min-microvolt = <2704000>;
+				regulator-max-microvolt = <3000000>;
+			};
+
+			L7N: pm8011n_l7: ldo7 {
+				regulator-name = "pm8011n_l7";
+				regulator-min-microvolt = <2704000>;
+				regulator-max-microvolt = <3000000>;
+			};
+		};
+	};
+};

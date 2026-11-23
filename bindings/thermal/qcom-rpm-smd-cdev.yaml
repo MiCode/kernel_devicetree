@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qcom-rpm-smd-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: QTI RPM SMD cooling device
+
+maintainers:
+  - Vijay Kumar Ganmoor <vganmoor@qti.qualcomm.com>
+
+description: |
+ The RPM shared memory(SMD) cooling device, will be used to set
+ different thermal band level to RPM hardware. When threshold violation
+ occurs, RPM SMD cooling device sends pre-configured thermal band level
+ to RPM hardware via SMD.
+
+properties:
+  compatible:
+    const: "qcom,rpm-smd-cooling-device"
+
+  "#cooling-cells":
+    const: 2
+    description: |
+        Must be 2. This is required by of-thermal and refer the doc
+        <devicetree/bindings/thermal/thermal.txt> for more details.
+
+required:
+  - compatible
+  - "#cooling-cells"
+
+additionalProperties: false
+
+examples:
+  - |
+    &rpm_bus {
+        rpm_smd_cdev: rpm-smd-cdev {
+            compatible = "qcom,rpm-smd-cooling-device";
+            #cooling-cells = <2>;
+        };
+    };

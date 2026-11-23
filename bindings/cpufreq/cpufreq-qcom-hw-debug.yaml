@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/cpufreq/cpufreq-qcom-hw-debug.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. CPUFREQ
+
+maintainers:
+  - Taniya Das <quic_tdas@quicinc.com>
+
+description: |
+
+  CPUFREQ HW debug provide support to print the CPUFREQ_HW debug registers.
+
+properties:
+  compatible:
+    oneOf:
+      - description: v1 of CPUFREQ HW
+        items:
+          - const: qcom,cpufreq-hw-debug
+
+      - description: v2 of CPUFREQ HW (EPSS)
+        items:
+          - const: qcom,cpufreq-hw-epss-debug
+
+  qcom,freq-hw-domain:
+    $ref: /schemas/types.yaml#/definitions/phandle-array
+    description: Frequency HW domain for each cpufreq policy
+
+required:
+  - compatible
+  - qcom,freq-hw-domain
+
+additionalProperties: false
+
+examples:
+  - |
+    cpufreq_hw_debug: qcom,cpufreq-hw-debug {
+        compatible = "qcom,cpufreq-hw-debug";
+        qcom,freq-hw-domain = <&cpufreq_hw 0>, <&cpufreq_hw 1>,
+                              <&cpufreq_hw 2>;
+     };
+...

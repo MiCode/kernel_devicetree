@@ -1,0 +1,369 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/input/linux-event-codes.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen3-pmc8380.h>
+
+&spmi0_bus {
+	#include "pmk8550.dtsi"
+	#include "pm8550.dtsi"
+	#include "pm8550ve.dtsi"
+	#include "pmc8380.dtsi"
+	#include "pm8010.dtsi"
+};
+
+&pm8550ve_c {
+	status = "ok";
+};
+
+&pm8550ve_i {
+	status = "ok";
+};
+
+&pm8550ve_j {
+	status = "ok";
+};
+
+&pmc8380_d {
+	status = "ok";
+};
+
+&pmc8380_e {
+	status = "ok";
+};
+
+&pmc8380_f {
+	status = "ok";
+};
+
+&pmc8380_g {
+	status = "ok";
+};
+
+&pm8010_n {
+	status = "disabled";
+};
+
+&pm8550_gpios {
+	key_vol_up {
+		key_vol_up_default: key_vol_up_default {
+			pins = "gpio6";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			power-source = <1>;
+		};
+	};
+
+	sys_therm_0_gpio3 {
+		sys_therm_0_gpio3_default: sys_therm_0_gpio3_default {
+			pins = "gpio3";
+			bias-high-impedance;
+		};
+	};
+
+	sys_therm_1_gpio4 {
+		sys_therm_1_gpio4_default: sys_therm_1_gpio4_default {
+			pins = "gpio4";
+			bias-high-impedance;
+		};
+	};
+};
+
+&pmk8550_rtc {
+	qcom,no-alarm; /* alarm owned by ADSP */
+};
+
+&soc {
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8550_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+
+	reboot_reason {
+		compatible = "qcom,reboot-reason";
+		nvmem-cells = <&restart_reason>;
+		nvmem-cell-names = "restart_reason";
+	};
+
+	pmic-pon-log {
+		compatible = "qcom,pmic-pon-log";
+		nvmem = <&pmk8550_sdam_5>, <&pmk8550_sdam_6>;
+		nvmem-names = "pon_log0", "pon_log1";
+	};
+};
+
+&pm8550_tz {
+	io-channels = <&pmk8550_vadc PM8550_ADC5_GEN3_DIE_TEMP>;
+	io-channel-names = "thermal";
+};
+
+
+&pm8550ve_c_tz {
+	io-channels = <&pmk8550_vadc PM8550VX_ADC5_GEN3_DIE_TEMP(2)>;
+	io-channel-names = "thermal";
+};
+
+&pm8550ve_i_tz {
+	io-channels = <&pmk8550_vadc PM8550VX_ADC5_GEN3_DIE_TEMP(8)>;
+	io-channel-names = "thermal";
+};
+
+&pm8550ve_j_tz {
+	io-channels = <&pmk8550_vadc PM8550VX_ADC5_GEN3_DIE_TEMP(9)>;
+	io-channel-names = "thermal";
+};
+
+
+&pmc8380_d_tz {
+	io-channels = <&pmk8550_vadc PMC8380_ADC5_GEN3_DIE_TEMP(3)>;
+	io-channel-names = "thermal";
+};
+
+&pmc8380_e_tz {
+	io-channels = <&pmk8550_vadc PMC8380_ADC5_GEN3_DIE_TEMP(4)>;
+	io-channel-names = "thermal";
+};
+
+&pmc8380_f_tz {
+	io-channels = <&pmk8550_vadc PMC8380_ADC5_GEN3_DIE_TEMP(5)>;
+	io-channel-names = "thermal";
+};
+
+&pmc8380_g_tz {
+	io-channels = <&pmk8550_vadc PMC8380_ADC5_GEN3_DIE_TEMP(6)>;
+	io-channel-names = "thermal";
+};
+
+&pmk8550_vadc {
+	pinctrl-0 = <&sys_therm_0_gpio3_default>, <&sys_therm_1_gpio4_default>;
+	pinctrl-names = "default";
+
+	pm8550_sys_therm_0 {
+		reg = <PM8550_ADC5_GEN3_AMUX1_GPIO3_100K_PU>;
+		label = "pm8550_sys_therm_0";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550_sys_therm_1 {
+		reg = <PM8550_ADC5_GEN3_AMUX2_GPIO4_100K_PU>;
+		label = "pm8550_sys_therm_1";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550_sys_therm_2 {
+		reg = <PM8550_ADC5_GEN3_AMUX_THM1_100K_PU>;
+		label = "pm8550_sys_therm_2";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550_sys_therm_3 {
+		reg = <PM8550_ADC5_GEN3_AMUX_THM2_100K_PU>;
+		label = "pm8550_sys_therm_3";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550_sys_therm_4 {
+		reg = <PM8550_ADC5_GEN3_AMUX_THM3_100K_PU>;
+		label = "pm8550_sys_therm_4";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550_sys_therm_5 {
+		reg = <PM8550_ADC5_GEN3_AMUX_THM4_100K_PU>;
+		label = "pm8550_sys_therm_5";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550_sys_therm_6 {
+		reg = <PM8550_ADC5_GEN3_AMUX_THM5_100K_PU>;
+		label = "pm8550_sys_therm_6";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	pm8550ve_c_die_temp {
+		reg = <PM8550VX_ADC5_GEN3_DIE_TEMP(2)>;
+		label = "pm8550ve_c_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm8550ve_i_die_temp {
+		reg = <PM8550VX_ADC5_GEN3_DIE_TEMP(8)>;
+		label = "pm8550ve_i_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pm8550ve_j_die_temp {
+		reg = <PM8550VX_ADC5_GEN3_DIE_TEMP(9)>;
+		label = "pm8550ve_j_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmc8380_d_die_temp {
+		reg = <PMC8380_ADC5_GEN3_DIE_TEMP(3)>;
+		label = "pmc8380_d_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmc8380_e_die_temp {
+		reg = <PMC8380_ADC5_GEN3_DIE_TEMP(4)>;
+		label = "pmc8380_e_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmc8380_f_die_temp {
+		reg = <PMC8380_ADC5_GEN3_DIE_TEMP(5)>;
+		label = "pmc8380_f_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+
+	pmc8380_g_die_temp {
+		reg = <PMC8380_ADC5_GEN3_DIE_TEMP(6)>;
+		label = "pmc8380_g_die_temp";
+		qcom,pre-scaling = <1 1>;
+	};
+};
+
+&spmi1_bus {
+	smb2360_0: pmic@7 {
+		compatible = "qcom,spmi-pmic";
+		reg = <7 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		smb2360_0_eusb2_repeater: phy@fd00 {
+			compatible = "qcom,smb2360-eusb2-repeater";
+			reg = <0xfd00>;
+			#phy-cells = <0>;
+		};
+
+		smb2360_0_bcl: bcl@4700 {
+			compatible = "qcom,bcl-v5";
+			reg = <0x4700 0x100>;
+			interrupts = <0x7 0x47 0x0 IRQ_TYPE_NONE>,
+					<0x7 0x47 0x1 IRQ_TYPE_NONE>,
+					<0x7 0x47 0x2 IRQ_TYPE_NONE>;
+			interrupt-names = "bcl-lvl0",
+					"bcl-lvl1",
+					"bcl-lvl2";
+			qcom,pmic7-threshold;
+			qcom,disable-vbat-level0-in-suspend;
+			#thermal-sensor-cells = <1>;
+		};
+
+		bcl_soc: bcl-soc {
+			compatible = "qcom,msm-bcl-soc";
+			#thermal-sensor-cells = <0>;
+		};
+	};
+
+	smb2360_1: pmic@a {
+		compatible = "qcom,spmi-pmic";
+		reg = <10 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		smb2360_1_eusb2_repeater: phy@fd00 {
+			compatible = "qcom,smb2360-eusb2-repeater";
+			reg = <0xfd00>;
+			#phy-cells = <0>;
+		};
+	};
+
+	smb2360_2: pmic@b {
+		compatible = "qcom,spmi-pmic";
+		reg = <11 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		smb2360_2_eusb2_repeater: phy@fd00 {
+			compatible = "qcom,smb2360-eusb2-repeater";
+			reg = <0xfd00>;
+			#phy-cells = <0>;
+		};
+	};
+
+	smb2360_3: pmic@c {
+		compatible = "qcom,spmi-pmic";
+		reg = <12 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "disabled";
+
+		smb2360_3_eusb2_repeater: phy@fd00 {
+			compatible = "qcom,smb2360-eusb2-repeater";
+			reg = <0xfd00>;
+			#phy-cells = <0>;
+		};
+	};
+};
+
+&pmic_glink_debug {
+	spmi@1 {
+		reg = <0>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		smb2360_0_debug: pmic@7 {
+			compatible = "qcom,spmi-pmic";
+			reg = <7 SPMI_USID>;
+			qcom,can-sleep;
+		};
+
+		smb2360_1_debug: pmic@a {
+			compatible = "qcom,spmi-pmic";
+			reg = <10 SPMI_USID>;
+			qcom,can-sleep;
+		};
+
+		smb2360_2_debug: pmic@b {
+			compatible = "qcom,spmi-pmic";
+			reg = <11 SPMI_USID>;
+			qcom,can-sleep;
+		};
+
+		smb2360_3_debug: pmic@c {
+			compatible = "qcom,spmi-pmic";
+			reg = <12 SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+};

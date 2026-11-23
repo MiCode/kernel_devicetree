@@ -1,0 +1,199 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-qmi-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. QMI Thermal Mitigation (TMD) Cooling Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  The QMI TMD cooling device, will be used for various mitigations for remote
+  subsystem including remote processor mitigation, rail voltage restriction etc.
+  This cooling device uses kernel qti QMI interface to send the message to
+  remote subsystem.
+
+  Each child node of the QMI TMD devicetree node represents each remote
+  subsystem and each child of this subsystem represents separate cooling
+  devices. It requires minimum one remote subsystem node and each subsystem
+  node requires minimum one cooling device node.
+
+properties:
+  $nodename:
+    const: qcom,qmi-cooling-devices
+
+patternProperties:
+  "^(modem|cdsp|adsp|slpi)":
+    type: object
+    description: This child nodes describes the subsystem properties.
+
+    properties:
+      qcom,instance-id:
+        $ref: /schemas/types.yaml#/definitions/uint32
+        description: |
+          Remote subsystem QMI server instance id to be used for
+          communicating with QMI.
+
+          Minimum one child node is required. Child node name and its alias are
+          used as cooling device name and phandle for that cooling device.
+
+    patternProperties:
+      "^[a-zA-Z0-9]*$":
+        type: object
+        description: This child nodes describes the subsystem properties.
+
+        properties:
+          qcom,qmi-dev-name:
+            $ref: /schemas/types.yaml#/definitions/string
+            description: |
+              Remote subsystem device identifier. Pick from the below accepted
+              cooling device in the list below.
+            oneOf:
+              - enum:
+                  - pa
+                  - pa_fr1
+                  - cpuv_restriction_cold
+                  - cx_vdd_limit
+                  - modem
+                  - modem_current
+                  - modem_bw
+                  - vbatt_low
+                  - mmw0
+                  - mmw1
+                  - mmw2
+                  - mmw3
+                  - modem_skin
+                  - mmw_skin0
+                  - mmw_skin1
+                  - mmw_skin2
+                  - mmw_skin3
+                  - cpr_cold
+                  - wlan
+                  - cdsp_sw
+                  - cdsp_sw_hvx
+                  - cdsp_sw_hmx
+                  - cdsp_hw
+                  - mmw_skin0_dsc
+                  - mmw_skin1_dsc
+                  - mmw_skin2_dsc
+                  - mmw_skin3_dsc
+                  - modem_skin_lte_dsc
+                  - modem_skin_nr_dsc
+                  - pa_dsc
+                  - pa_fr1_dsc
+                  - modem_lte_dsc
+                  - modem_nr_dsc
+                  - modem_nr_scg_dsc
+                  - sdr0_lte_dsc
+                  - sdr1_lte_dsc
+                  - sdr0_nr_dsc
+                  - sdr1_nr_dsc
+                  - sdr0_nr_scg_dsc
+                  - sdr1_nr_scg_dsc
+                  - pa_lte_sdr0_dsc
+                  - pa_lte_sdr1_dsc
+                  - pa_nr_sdr0_dsc
+                  - pa_nr_sdr1_dsc
+                  - pa_nr_sdr0_scg_dsc
+                  - pa_nr_sdr1_scg_dsc
+                  - mmw0_dsc
+                  - mmw1_dsc
+                  - mmw2_dsc
+                  - mmw3_dsc
+                  - mmw_ific_dsc
+                  - modem_lte_sub1_dsc
+                  - modem_nr_sub1_dsc
+                  - modem_nr_scg_sub1_dsc
+                  - sdr0_lte_sub1_dsc
+                  - sdr1_lte_sub1_dsc
+                  - sdr0_nr_sub1_dsc
+                  - sdr1_nr_sub1_dsc
+                  - pa_lte_sdr0_sub1_dsc
+                  - pa_lte_sdr1_sub1_dsc
+                  - pa_nr_sdr0_sub1_dsc
+                  - pa_nr_sdr1_sub1_dsc
+                  - pa_nr_sdr0_scg_sub1_dsc
+                  - pa_nr_sdr1_scg_sub1_dsc
+                  - mmw0_sub1_dsc
+                  - mmw1_sub1_dsc
+                  - mmw2_sub1_dsc
+                  - mmw3_sub1_dsc
+                  - mmw_ific_sub1_dsc
+                  - modem_nr_1rx_dsc
+                  - modem_nr_2rx_dsc
+
+          '#cooling-cells':
+            const: 2
+            description: |
+              Must be 2. Needed for of_thermal as cooling device identifier.
+              Please refer to <devicetree/bindings/thermal/thermal.txt> for
+              more details.
+
+        required:
+          - qcom,qmi-dev-name
+          - '#cooling-cells'
+
+        additionalProperties: false
+
+    required:
+      - qcom,instance-id
+
+    additionalProperties: false
+
+required:
+  - compatible
+
+additionalProperties: false
+
+examples:
+  - |
+        #include <dt-bindings/thermal/thermal_qti.h>
+
+        qmi-tmd-devices {
+            compatible = "qcom,qmi-cooling-devices";
+
+            modem {
+                qcom,instance-id = <QMI_MODEM_INST_ID>;
+
+                modem_vdd: modem_vdd {
+                    qcom,qmi-dev-name = "cpuv_restriction_cold";
+                    #cooling-cells = <2>;
+                };
+
+                modem_current: modem_current {
+                    qcom,qmi-dev-name = "modem_current";
+                    #cooling-cells = <2>;
+                };
+
+                modem_cpr_cold: modem_cpr_cold {
+                    qcom,qmi-dev-name = "cpr_cold";
+                    #cooling-cells = <2>;
+                };
+                modem_proc: modem_proc {
+                    qcom,qmi-dev-name = "modem";
+                    #cooling-cells = <2>;
+                };
+            };
+
+            cdsp {
+                qcom,instance-id = <0x43>;
+
+                cdsp_vdd: cdsp_vdd {
+                    qcom,qmi-dev-name = "cpuv_restriction_cold";
+                    #cooling-cells = <2>;
+                };
+
+                cdsp_sw: cdsp {
+                    qcom,qmi-dev-name = "cdsp_sw";
+                    #cooling-cells = <2>;
+                };
+
+                cdsp_hw: hvx {
+                    qcom,qmi-dev-name = "cdsp_hw";
+                    #cooling-cells = <2>;
+                };
+            };
+
+        };

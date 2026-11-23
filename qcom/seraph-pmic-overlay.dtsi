@@ -1,0 +1,125 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+&spmi0_bus {
+	#include "pm8010.dtsi"
+	#include "pmar2230.dtsi"
+};
+
+&spmi0_bus {
+	#address-cells = <2>;
+	#size-cells = <0>;
+	interrupt-controller;
+	#interrupt-cells = <4>;
+
+	qcom,pmg1110@a {
+		status = "disabled";
+		compatible = "qcom,spmi-pmic";
+		reg = <10 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		pmg1110_tz: qcom,temp-alarm@a00 {
+			compatible = "qcom,spmi-temp-alarm";
+			reg = <0xa00>;
+			interrupts = <0xa 0xa 0x0 IRQ_TYPE_EDGE_BOTH>;
+			#thermal-sensor-cells = <0>;
+		};
+	};
+};
+
+
+&spmi0_debug_bus {
+	qcom,pmg1110-debug@a {
+		status = "disabled";
+	};
+};
+
+
+&pmar2230_gpios {
+	key_vol_up {
+		key_vol_up_default: key_vol_up_default {
+			pins = "gpio6";
+			function = "normal";
+			input-enable;
+			bias-pull-up;
+			power-source = <1>;
+		};
+	};
+
+	pm8011m_reset {
+		pm8011m_active: pm8011m_active {
+			pins = "gpio7";
+			function = "normal";
+			bias-disable;
+			output-high;
+			power-source = <0>;
+		};
+	};
+
+	pm8011n_reset {
+		pm8011n_active: pm8011n_active {
+			pins = "gpio12";
+			function = "normal";
+			bias-disable;
+			output-high;
+			power-source = <0>;
+		};
+	};
+
+	pm8011m_int_default: pm8011m-int-default-state {
+		pins = "gpio5";
+		function = "normal";
+		bias-disable;
+		input-enable;
+		power-source = <0>;
+	};
+
+	pm8011n_int_default: pm8011n-int-default-state {
+		pins = "gpio13";
+		function = "normal";
+		bias-disable;
+		input-enable;
+		power-source = <0>;
+	};
+};
+
+&usb0 {
+	extcon = <&pmar2230_extcon>;
+};
+
+&soc {
+	reboot_reason {
+		compatible = "qcom,reboot-reason";
+		nvmem-cells = <&restart_reason>;
+		nvmem-cell-names = "restart_reason";
+	};
+
+	pmic-pon-log {
+		compatible = "qcom,pmic-pon-log";
+		nvmem = <&pmar2230_sdam_5>;
+		nvmem-names = "pon_log";
+	};
+
+	gpio_key {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pmar2230_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};

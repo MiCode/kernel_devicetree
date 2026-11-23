@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include "malabar-pmiv010x.dtsi"
+
+&pmiv010x_lcdb {
+	status = "ok";
+};
+
+&pmiv010x_wled {
+	interrupts = <0x7 0xf5 0x1 IRQ_TYPE_EDGE_RISING>,
+		     <0x7 0xf5 0x4 IRQ_TYPE_EDGE_BOTH>,
+		     <0x7 0xf5 0x5 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "ovp-irq", "pre-flash-irq", "flash-irq";
+	qcom,string-cfg = <2>;
+	qcom,leds-per-string = <8>;
+	qcom,fs-current-limit = <22500>;
+	status = "ok";
+};
+
+&pmic_glink_debug {
+	i2c@105 {
+		reg = <0x105>;  /* I2C instance 5 in ADSP for SE4 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1355@c {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x0c>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1355_1_iin {
+		reg = <0x1050c01>;
+		label = "smb1355_1_iin";
+	};
+
+	smb1355_1_ichg {
+		reg = <0x1050c02>;
+		label = "smb1355_1_ichg";
+	};
+
+	smb1355_1_die_temp {
+		reg = <0x1050c03>;
+		label = "smb1355_1_die_temp";
+	};
+};

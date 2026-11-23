@@ -1,0 +1,262 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/spmi/spmi.h>
+
+#include "canoe-qrd.dtsi"
+
+&redriver {
+	set-aux;
+};
+
+&qtm_therm {
+	status = "ok";
+};
+
+&xoagg_therm {
+	status = "ok";
+};
+
+&pmk8850_vadc {
+	pinctrl-0 = <&pa_therm2_default>, <&xoagg_therm_default>, <&qtm_therm_default>;
+	pinctrl-names = "default";
+};
+
+&pmic_glink_debug {
+	i2c@104 {
+		reg = <0x104>; /* I2C instance 4 in SOCCP for SE3 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		cps4061@30 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x30>;
+			qcom,can-sleep;
+		};
+	};
+
+	i2c@106 {
+		reg = <0x106>; /* I2C instance 6 in SOCCP for SE5 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		smb1396@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+
+		smb1396@35 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x35>;
+			qcom,can-sleep;
+		};
+	};
+
+	/* SPMI bridge bus 2 with SMB1510 device */
+	spmi@200 {
+		reg = <0x200>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,bus-type = "spmi";
+
+		smb1510@d {
+			compatible = "qcom,spmi-pmic";
+			reg = <0xd SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1396_1_iin {
+		reg = <0x1063401>;
+		label = "smb1396_1_iin";
+	};
+
+	smb1396_1_ichg {
+		reg = <0x1063402>;
+		label = "smb1396_1_ichg";
+	};
+
+	smb1396_1_die_temp {
+		reg = <0x1063403>;
+		label = "smb1396_1_die_temp";
+	};
+
+	smb1396_2_iin {
+		reg = <0x1063501>;
+		label = "smb1396_2_iin";
+	};
+
+	smb1396_2_ichg {
+		reg = <0x1063502>;
+		label = "smb1396_2_ichg";
+	};
+
+	smb1396_2_die_temp {
+		reg = <0x1063503>;
+		label = "smb1396_2_die_temp";
+	};
+};
+
+&pmih010x_bcl {
+	qcom,bcl-mon-vbat-only;
+	status = "okay";
+};
+
+&pmih010x_bcl2 {
+	qcom,bcl-mon-ibat-only;
+	status = "okay";
+};
+
+&thermal_zones {
+	pmih010x-ibat2-lvl0 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pmih010x_bcl2 0>;
+
+		trips {
+			ibat2_lvl0:ibat2-lvl0 {
+				temperature = <6500>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pmih010x-ibat2-lvl1 {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&pmih010x_bcl2 1>;
+
+		trips {
+			ibat2_lvl1:ibat2-lvl1 {
+				temperature = <7000>;
+				hysteresis = <200>;
+				type = "passive";
+			};
+		};
+	};
+
+	pmih010x-bcl2-lvl0 {
+		polling-delay-passive = <50>;
+		polling-delay = <0>;
+		thermal-sensors = <&pmih010x_bcl2 5>;
+
+		trips {
+			thermal-engine-trip {
+				temperature = <100>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			thermal-hal-trip {
+				temperature = <100>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			b_bcl2_lvl0: b-bcl2-lvl0 {
+				temperature = <1>;
+				hysteresis = <1>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			lbat2_modem0 {
+				trip = <&b_bcl2_lvl0>;
+				cooling-device = <&modem_bcl 1 1>;
+			};
+
+			lbat2_gpu0 {
+				trip = <&b_bcl2_lvl0>;
+				cooling-device = <&msm_gpu 1 1>;
+			};
+		};
+	};
+
+	pmih010x-bcl2-lvl1 {
+		polling-delay-passive = <50>;
+		polling-delay = <0>;
+		thermal-sensors = <&pmih010x_bcl2 6>;
+
+		trips {
+			thermal-engine-trip {
+				temperature = <100>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			thermal-hal-trip {
+				temperature = <100>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			b_bcl2_lvl1: b-bcl2-lvl1 {
+				temperature = <1>;
+				hysteresis = <1>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			lbat2_modem1 {
+				trip = <&b_bcl2_lvl1>;
+				cooling-device = <&modem_bcl 2 2>;
+			};
+
+			lbat2_gpu1 {
+				trip = <&b_bcl2_lvl1>;
+				cooling-device = <&msm_gpu 2 2>;
+			};
+		};
+	};
+
+	pmih010x-bcl2-lvl2 {
+		polling-delay-passive = <50>;
+		polling-delay = <0>;
+		thermal-sensors = <&pmih010x_bcl2 7>;
+
+		trips {
+			thermal-engine-trip {
+				temperature = <100>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			thermal-hal-trip {
+				temperature = <100>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			b_bcl2_lvl2: b-bcl2-lvl2 {
+				temperature = <1>;
+				hysteresis = <1>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			lbat2_gpu2 {
+				trip = <&b_bcl2_lvl2>;
+				cooling-device = <&msm_gpu 3 3>;
+			};
+		};
+	};
+};
+
+&pmih010x_eusb2_repeater {
+	qcom,param-override-seq =
+		<0xa 0x51
+		 0x5 0x57>;
+};

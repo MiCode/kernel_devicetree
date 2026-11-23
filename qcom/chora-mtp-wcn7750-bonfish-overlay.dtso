@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "chora-mtp.dtsi"
+#include "chora-pmiv010x.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Chora MTP wcn7750 + Bonfish";
+	compatible = "qcom,chora-mtp", "qcom,chora", "qcom,chorap-mtp", "qcom,chorap", "qcom,mtp";
+	qcom,msm-id = <724 0x10000>, <744 0x10000>;
+	qcom,board-id = <0x20208 0x0>;
+};
+
+&pmiv010x_lcdb {
+	status = "ok";
+};
+
+&pmiv010x_wled {
+	interrupts = <0x7 0xf5 0x1 IRQ_TYPE_EDGE_RISING>,
+		     <0x7 0xf5 0x4 IRQ_TYPE_EDGE_BOTH>,
+		     <0x7 0xf5 0x5 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "ovp-irq", "pre-flash-irq", "flash-irq";
+	qcom,string-cfg = <2>;
+	qcom,leds-per-string = <8>;
+	qcom,fs-current-limit = <22500>;
+	status = "ok";
+};
+
+&S6B_E0 {
+	regulator-min-microvolt = <2156000>;
+	regulator-max-microvolt = <2700000>;
+	qcom,init-voltage = <2156000>;
+};

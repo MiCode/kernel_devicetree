@@ -1,0 +1,133 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "malabar-cdp-4gb.dtsi"
+#include "malabar-pmiv010x.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Malabar CDP 4GB DDR";
+	compatible = "qcom,malabar-cdp", "qcom,malabar", "qcom,cdp";
+	qcom,msm-id = <733 0x10000>;
+	qcom,board-id = <0x10001 0x600>;
+};
+
+&pmiv010x_amoled {
+	status = "ok";
+};
+
+&pmiv010x_amoled_ecm {
+	status = "ok";
+	nvmem-names = "amoled-ecm-sdam0", "amoled-ecm-sdam1";
+	nvmem = <&pmk8350_sdam_13>, <&pmk8350_sdam_14>;
+	interrupt-names = "ecm-sdam0", "ecm-sdam1";
+	interrupts = <0x0 0x7c 0x1 IRQ_TYPE_EDGE_RISING>,
+		     <0x0 0x7d 0x1 IRQ_TYPE_EDGE_RISING>;
+};
+
+&tlmm {
+	pmx_ts_active {
+		ts_active: ts_active {
+			mux {
+				pins = "gpio12", "gpio13";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio12", "gpio13";
+				drive-strength = <8>;
+				bias-pull-up;
+			};
+		};
+	};
+
+	pmx_ts_reset_suspend {
+		ts_reset_suspend: ts_reset_suspend {
+			mux {
+				pins = "gpio12";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio12";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pmx_ts_int_suspend {
+		ts_int_suspend: ts_int_suspend {
+			mux {
+				pins = "gpio13";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio13";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pmx_ts_release {
+		ts_release: ts_release {
+			mux {
+				pins = "gpio12", "gpio13";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio12", "gpio13";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+};
+
+&qupv3_se3_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "okay";
+	qcom,touch-active = "goodix,gt9916S";
+
+	goodix-berlin@0 {
+		compatible = "goodix,gt9916S";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <13 0x2008>;
+		goodix,reset-gpio = <&tlmm 12 0x00>;
+		goodix,irq-gpio = <&tlmm 13 0x2008>;
+		goodix,irq-flags = <2>;
+		goodix,panel-max-x = <1080>;
+		goodix,panel-max-y = <2400>;
+		goodix,panel-max-w = <255>;
+		goodix,panel-max-p = <4096>;
+		goodix,firmware-name = "goodix_firmware_spi.bin";
+		goodix,config-name = "goodix_cfg_group_spi.bin";
+		goodix,avdd-name = "avdd";
+		goodix,iovdd-name = "iovdd";
+		avdd-supply = <&L4E>;
+		/* iovdd-spply is defined in display device-tree */
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend", "pmx_ts_release";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+		goodix,touch-type = "primary";
+		goodix,qts_en;
+	};
+};
+
+&L5E {
+	regulator-min-microvolt = <2952000>;
+	regulator-max-microvolt = <3544000>;
+	qcom,init-voltage = <2952000>;
+};

@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/soc/qcom/sleepstate-smp2p.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: SMSM Point-to-Point (SMP2P) Sleepstate driver
+
+maintainers:
+  - Lei Han <quic_leihan@quicinc.com>
+
+description: |
+  The SMP2P Sleepstate driver advertises (over SMP2P) whether
+  or not the Apps processor is in suspend. By reading this SMP2P
+  bit, the remote side can tell whether or not Apps is in
+  suspend, and thus know when to avoid sending data.
+
+properties:
+  compatible:
+    const: qcom,smp2p-sleepstate
+
+  qcom,smem-states:
+    $ref: '/schemas/types.yaml#/definitions/phandle-array'
+    description:
+      States used by the Apps to signal remote side about
+      suspend transitions.
+    items:
+      - description:
+          Represent Apps is going into suspend by unsetting the
+          SMP2P PROC_AWAKE_ID bit of Apps; notify remote processor
+          stop sending data.
+
+  interrupts:
+    maxItems: 1
+    description:
+      The interrupt number, the irq line to be used.
+
+  interrupt-names:
+    items:
+      - const: smp2p-sleepstate-in
+    description:
+      Interrupt name string.
+
+required:
+  - compatible
+  - qcom,smem-states
+  - interrupts
+  - interrupt-names
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,smp2p_sleepstate {
+        compatible = "qcom,smp2p-sleepstate";
+        qcom,smem-states = <&sleepstate_smp2p_out 0>;
+        interrupt-parent = <&sleepstate_smp2p_in>;
+        interrupts = <0 0>;
+        interrupt-names = "smp2p-sleepstate-in";
+    };

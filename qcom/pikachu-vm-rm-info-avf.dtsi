@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/ {
+	host {
+		buffer@81000c000 {
+			reg = <0x08 0x1000c000 0x00 0x9000>;
+			android,pvmfw,target = <&qrtr_buff>;
+		};
+
+		buffer@810015000 {
+			reg = <0x08 0x10015000 0x00 0x1000>;
+			android,pvmfw,target = <&gpn_buff>;
+		};
+
+		buffer@810016000 {
+			reg = <0x08 0x10016000 0x00 0x1000>;
+			android,pvmfw,target = <&ddump_buff>;
+		};
+
+		/* add apps-smmu here */
+	};
+};
+
+&firmware {
+	qcom_scm {
+		compatible = "qcom,scm-v1.1", "qcom,scm";
+	};
+
+};
+
+&reserved_memory {
+
+	qrtr_buff: buffer@81000c000 {
+		compatible = "qcom,qrtr-gunyah-gen";
+		reg = <0x08 0x1000c000 0x00 0x9000>;
+		no-map;
+		qcom,label = <0x103>;
+	};
+
+	gpn_buff: buffer@810015000 {
+		compatible = "qcom,gunyah-panic-gen";
+		reg = <0x08 0x10015000 0x00 0x1000>;
+		no-map;
+		qcom,label = <0x109>;
+	};
+
+	ddump_buff: buffer@810016000 {
+		compatible = "qcom,ddump-gunyah-gen";
+		reg = <0x08 0x10016000 0x00 0x1000>;
+		no-map;
+		qcom,label = <0x107>;
+	};
+
+};
+
+&{/}  {
+	ddump_shm: ddump-shm {
+		compatible = "qcom,ddump-gunyah-gen", "qcom,gunyah-shm-doorbell";
+		memory-region = <&ddump_buff>;
+		qcom,label = <0x107>;
+	};
+
+	gpn_shm: gpn-shm {
+		compatible = "qcom,gunyah-panic-gen", "qcom,gunyah-shm-doorbell";
+		memory-region = <&gpn_buff>;
+		qcom,label = <0x109>;
+	};
+
+	qrtr_shm: qrtr-shm {
+		compatible = "qcom,qrtr-gunyah-gen", "qcom,gunyah-shm-doorbell";
+		memory-region = <&qrtr_buff>;
+		qcom,label = <0x103>;
+	};
+
+	minidump: minidump {
+		compatible = "qcom,minidump_rm", "qcom,minidump-rm";
+	};
+
+	qcom_gunyah_vm: qcom,gunyah-vm {
+		compatible = "qcom,gunyah-vm-id-1.0", "qcom,gunyah-vm-id";
+		qcom,image-name = "qcom,trustedvm";
+		qcom,owner-vmid = <0x03>;
+		qcom,peers = "vm-name:qcom,oemvm";
+		qcom,vendor = "Qualcomm";
+		qcom,vm-guid = "598085da-c516-5b25-a9c1-927a02819770";
+		qcom,vm-signing-authority = "qcom,oem";
+		qcom,vm-uri = "vmuid/trusted-ui";
+		qcom,vmid = <0x2d>;
+	};
+};
+
+&non_devices_common {
+		required-subnodes-rm = <&ddump_shm
+				&gpn_shm
+				&qrtr_shm
+				&minidump
+				&qcom_gunyah_vm>;
+};

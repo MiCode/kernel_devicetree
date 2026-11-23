@@ -1,0 +1,116 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/soc/qcom/qcom,power-capable-zones.yaml#"
+$schema: http://devicetree.org/meta-schemas/base.yaml#
+
+title: Qualcomm Technologies, Inc. Power capable zones
+
+maintainers:
+  - Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+
+description: |
+  This enables Qualcomm Technologies, Inc. power telemetry framework power
+  capable zone bindings. It provides different pmic regulators or bucks power
+  and energy counter data. These data can be individual channel or aggregate
+  multiple devices based on power-zones devicetree hierarchy binding. It exposes
+  these data to userspace clients via powercap sysfs interface.
+
+  This binding describes the power telemetry power-zones.
+
+properties:
+  $nodename:
+    const: power-zones
+    description:
+      A power-zones node is actually describing power zone tree hierarchy for
+      a system. It will have a top level soc root child node. The root node
+      can have one or more than one child node and child node can have its own
+      child node based on how power hierarchy tree of the system power.
+
+      There can be two types of nodes under power-zones node.
+      - A devicetree node with one or more power capable devices attached to it.
+      - A plain devicetree node without any property except child nodes. This
+        node is treated as virtual power zones where it doesn't have directly
+        associated with power capable devices. But it can be parent of other
+        similar power zones or power zones with power capable devices.
+
+patternProperties:
+  $nodename:
+    type: string
+    description:
+      A power zone name which may be virtual power zone without any power capable
+      or zone with one or more power capable devices attached to it.
+
+    properties:
+      power-channels:
+        $ref: /schemas/types.yaml#/definitions/phandle-array
+        description:
+          See include/dt-bindings/soc/qcom,qpt-gen1-channels.h.
+          The power capable driver phandle and power device specifier used to monitor
+          this power zone.
+
+    additionalProperties: false
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+    #include <dt-bindings/soc/qcom,qpt-gen1-channels.h>
+
+    // Example 1: pmk8850 power capable devices
+    pmic {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        pmk8550_qpt: qcom,power-telemetry-device {
+                compatible = "qcom,power-telemetry";
+                interrupts = <0x0 0xa2 0x1 IRQ_TYPE_EDGE_RISING>,
+                                  <0x0 0xa1 0x1 IRQ_TYPE_EDGE_RISING>;
+                nvmem = <&pmk8850_sdam_49>, <&pmk8850_sdam_50>, <&pmk8850_sdam_51>;
+                nvmem-names = "qpt-config-sdam", "qpt-frac-sdam", "qpt-data-sdam";
+                #powerzone-cells = <1>;
+        };
+    };
+
+    /* ... */
+        power-zones {
+                soc {
+                        cpu-m {
+                                power-channels =
+                                        <&pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_G_SID, QPT_S10_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_I_SID, QPT_S8_REG)>;
+                        };
+
+                        cpu-l {
+                                power-channels =
+                                        <&pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_I_SID, QPT_S2_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_I_SID, QPT_S9_REG)>;
+                        };
+
+                        gpu {
+                                power-channels =
+                                        <&pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_F_SID, QPT_S1_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_F_SID, QPT_S10_REG)>;
+                        };
+
+                        nsp {
+                                power-channels =
+                                        <&pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_D_SID, QPT_S2_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_D_SID, QPT_S4_REG)>;
+                        };
+
+                        others {
+                                power-channels =
+                                        <&pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_G_SID, QPT_S5_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_D_SID, QPT_S7_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_F_SID, QPT_S9_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_I_SID, QPT_S10_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_D_SID, QPT_S1_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F10_I_SID, QPT_S1_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F4_J_SID, QPT_S1_REG)
+                                        &pmk8850_qpt QPT_GEN1_CHAN_ID(QPT_F4_J_SID, QPT_S2_REG)>;
+                        };
+                };
+        };
+...

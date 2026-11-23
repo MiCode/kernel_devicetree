@@ -1,0 +1,340 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,gcc-canoe.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/qcom,gcc-canoe.h>
+
+#include "canoe-pmic-overlay.dtsi"
+#include "canoe-qpt-overlay.dtsi"
+#include "canoe-thermal-overlay.dtsi"
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&tlmm 101 GPIO_ACTIVE_LOW>;
+			linux,input-type = <EV_KEY>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+	};
+};
+
+&eusb2_phy0 {
+	dummy-supply = <&pmih010x_eusb2_repeater>;
+	usb-repeater = <&pmih010x_eusb2_repeater>;
+};
+
+&pmih010x_haptics {
+	qcom,vmax-mv = <1850>;
+	qcom,lra-period-us = <7692>;
+};
+
+&battery_charger {
+	qcom,thermal-mitigation-step = <500000>;
+	#cooling-cells = <2>;
+	qcom,ship-mode-immediate;
+	qcom,wireless-fw-name = "cps4061.bin";
+};
+
+&pcie {
+	power-domains = <&gcc GCC_PCIE_0_PHY_GDSC>;
+	power-domain-names = "gdsc-phy-vdd";
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qmp-v4-canoe";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L4G>;
+	vdda-phy-max-microamp = <250220>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L1D>;
+	vdda-pll-max-microamp = <20840>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L3D>;
+	vdda-qref-max-microamp = <659720>;
+
+	/*
+	 * Refer to Canoe's Power Grid Analysis document.
+	 * Add vote for REFGEN_VDD_A_0P9/VDD_A_PCIE_0_0P9 regulator.
+	 */
+	vdda-refgen-supply = <&L3I>;
+	vdda-refgen-max-microamp = <883100>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	vcc-supply = <&L17B>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L4D>;
+	vccq-max-microamp = <1200000>;
+
+	qcom,vccq-proxy-vote-supply = <&L4D>;
+	qcom,vccq-proxy-vote-max-microamp = <1200000>;
+
+	/* UFS Rst pin is always on. It is shared with VDD_PX14 */
+	qcom,vddp-ref-clk-supply = <&L1G>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply = <&S7F>;
+	qcom,vccq-parent-max-microamp = <8176000>;
+
+	reset-gpios = <&tlmm 217 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_UFS_PHY_BCR>;
+	reset-names = "rst";
+
+	status = "ok";
+};
+
+&sdhc_2 {
+	vdd-supply = <&L9B>;
+	qcom,vdd-voltage-level = <2950000 2960000>;
+	qcom,vdd-current-level = <33 977000>;
+
+	vdd-io-supply = <&L8B>;
+	qcom,vdd-io-voltage-level = <1800000 2960000>;
+	qcom,vdd-io-current-level = <0 22000>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_on>;
+	pinctrl-1 = <&sdc2_off>;
+
+	cd-gpios = <&tlmm 55 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_SDCC2_BCR>;
+	reset-names = "core_reset";
+
+	/*
+	 * By default, the Canoe reference platforms use Level Shifter
+	 * devices with its Feedback Clock signal connects to the MSM.
+	 * Without the external feedback clock, the HS50 mode works at
+	 * reduced frequency at 37.5MHz.
+	 */
+	qcom,uses_level_shifter;
+	qcom,external-fb-clk;
+
+	status = "disabled";
+};
+
+&qupv3_se5_i2c {
+	status = "ok";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	redriver: redriver@1c {
+		compatible = "onnn,redriver";
+		reg = <0x1c>;
+
+		vdd-supply = <&pmh0101_l15>;
+
+		lane-channel-swap;
+
+		eq = /bits/ 8 <
+				/* Parameters for USB */
+				0x4 0x4 0x4 0x4
+				/* Parameters for DP */
+				0x5 0x7 0x7 0x5>;
+		flat-gain = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x1 0x1 0x3
+				/* Parameters for DP */
+				0x0 0x3 0x3 0x0>;
+		output-comp = /bits/ 8 <
+				/* Parameters for USB */
+				0x3 0x3 0x3 0x3
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+		loss-match = /bits/ 8 <
+				/* Parameters for USB */
+				0x1 0x3 0x3 0x1
+				/* Parameters for DP */
+				0x3 0x3 0x3 0x3>;
+	};
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "unused";
+};
+
+&usb0 {
+	usb-role-switch;
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb3phy_portselect_gpio>;
+	gpios = <&tlmm 60 0>;
+
+	ssusb_redriver = <&redriver>;
+
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		compatible = "usb-c-connector";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				usb_port0_connector: endpoint {
+					remote-endpoint = <&usb_port0>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				ucsi_audio_mux: endpoint {
+				};
+			};
+		};
+	};
+};
+/*
+&qupv3_se19_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+	qcom,touch-active = "st,fts";
+	qcom,la-vm;
+
+	st_fts@0 {
+		compatible = "st,fts";
+		reg = <0x0>;
+		spi-max-frequency = <1000000>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <158 0x2008>;
+		vdd-supply = <&L4B>;
+		avdd-supply = <&L14B>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		st,irq-gpio = <&tlmm 158 0x2008>;
+		st,irq-flags = <8>;
+		st,reset-gpio = <&tlmm 66 0x00>;
+		st,regulator_dvdd = "vdd";
+		st,regulator_avdd = "avdd";
+
+		st,touch-type = "primary";
+		st,qts_en;
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "pvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <647>;
+		qts,trusted-touch-io-bases = <0x1a80000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+						&tlmm 51 0 &tlmm 66 0 &tlmm 158 0x2008>;
+	};
+};
+*/
+
+&regulator_ocp_notifier {
+	periph-1c1-supply = <&L1B>;
+	periph-1c2-supply = <&L2B>;
+	periph-1c4-supply = <&L4B>;
+	periph-1c5-supply = <&L5B>;
+	periph-1c6-supply = <&L6B>;
+	periph-1c7-supply = <&L7B>;
+	periph-1c8-supply = <&L8B>;
+	periph-1c9-supply = <&L9B>;
+	periph-1ca-supply = <&L10B>;
+	periph-1cb-supply = <&L11B>;
+	periph-1cc-supply = <&L12B>;
+	periph-1cd-supply = <&L13B>;
+	periph-1ce-supply = <&L14B>;
+	periph-1cf-supply = <&L15B>;
+	periph-1d1-supply = <&L17B>;
+	periph-1d2-supply = <&L18B>;
+	periph-1e4-supply = <&BOB1>;
+	periph-1e6-supply = <&BOB2>;
+	periph-39b-supply = <&S1D_LEVEL>;
+	periph-39e-supply = <&S2D_LEVEL>;
+	periph-3a4-supply = <&S4D_LEVEL>;
+	periph-3ad-supply = <&S7D_LEVEL>;
+	periph-3b6-supply = <&S10D>;
+	periph-3c1-supply = <&L1D>;
+	periph-3c2-supply = <&L2D>;
+	periph-3c3-supply = <&L3D>;
+	periph-3c4-supply = <&L4D>;
+	periph-59b-supply = <&S1F_LEVEL>;
+	periph-5aa-supply = <&S6F>;
+	periph-5ad-supply = <&S7F>;
+	periph-5b0-supply = <&S8F>;
+	periph-5b3-supply = <&S9F_LEVEL>;
+	periph-5b6-supply = <&S10F_LEVEL>;
+	periph-5c1-supply = <&L1F>;
+	periph-5c2-supply = <&L2F>;
+	periph-5c3-supply = <&L3F>;
+	periph-5c4-supply = <&L4F>;
+	periph-6a7-supply = <&S5G_LEVEL>;
+	periph-6ad-supply = <&S7G>;
+	periph-6b0-supply = <&S8G_LEVEL>;
+	periph-6b3-supply = <&S9G>;
+	periph-6c1-supply = <&L1G>;
+	periph-6c2-supply = <&L2G>;
+	periph-6c3-supply = <&L3G>;
+	periph-6c4-supply = <&L4G>;
+	periph-89b-supply = <&S1I_LEVEL>;
+	periph-8ad-supply = <&S7I>;
+	periph-8b6-supply = <&S10I_LEVEL>;
+	periph-8c1-supply = <&L1I_LEVEL>;
+	periph-8c2-supply = <&L2I>;
+	periph-8c3-supply = <&L3I>;
+	periph-99b-supply = <&S1J>;
+	periph-99e-supply = <&S2J>;
+	periph-9a1-supply = <&S3J>;
+	periph-9a4-supply = <&S4J>;
+	periph-ac1-supply = <&L1K>;
+	periph-ac2-supply = <&L2K>;
+	periph-ac3-supply = <&L3K>;
+	periph-ac4-supply = <&L4K>;
+	periph-ac5-supply = <&L5K>;
+	periph-ac6-supply = <&L6K>;
+	periph-ac7-supply = <&L7K>;
+	periph-c40-supply = <&L1M>;
+	periph-c41-supply = <&L2M>;
+	periph-c42-supply = <&L3M>;
+	periph-c43-supply = <&L4M>;
+	periph-c44-supply = <&L5M>;
+	periph-c45-supply = <&L6M>;
+	periph-c46-supply = <&L7M>;
+	periph-d40-supply = <&L1N>;
+	periph-d41-supply = <&L2N>;
+	periph-d42-supply = <&L3N>;
+	periph-d43-supply = <&L4N>;
+	periph-d44-supply = <&L5N>;
+	periph-d45-supply = <&L6N>;
+	periph-d46-supply = <&L7N>;
+};

@@ -1,0 +1,162 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/qcom,alor-gcc.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+
+&arch_timer {
+	clock-frequency = <5000000>;
+};
+
+&cam_rsc {
+	status = "disabled";
+};
+
+&soc {
+	usb_emuphy: phy@a784000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x0 0x0a784000 0x0 0x9500>;
+
+		qcom,emu-init-seq = <0xfffff 0x4
+			0xffff0 0x4
+			0x100000 0x20
+			0x0 0x20
+			0x000101F0 0x20
+			0x00100000 0x3c
+			0x0 0x3c
+			0x0 0x4>;
+	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply	= <&L1I_E0>;
+	vdda-phy-max-microamp =	<217500>;
+	/*
+	 * Platforms supporting Gear 5 && Rate B require a different
+	 * voltage supply. Check the Power Grid document.
+	 */
+	vdda-phy-min-microvolt = <912000>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply	= <&L2F_E0>;
+	vdda-pll-max-microamp =	<18340>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2I_E0>;
+	vdda-qref-max-microamp = <850>;
+
+	/*
+	 * Refer to Canoe's Power Grid Analysis document.
+	 * Add vote for REFGEN_VDD_A_0P9/VDD_A_PCIE_0_0P9 regulator.
+	 */
+	vdda-refgen-supply = <&L2I_E0>;
+	vdda-refgen-max-microamp = <3310>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+	limit-rate = <2>; /* HS Rate-B */
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	vcc-supply = <&L17B_E0>;
+	vcc-max-microamp = <1200000>;
+
+	vccq-supply = <&L3F_E0>;
+	vccq-max-microamp = <1200000>;
+
+	/* UFS Rst pin is always on. It is shared with VDD_PX14 */
+	qcom,vddp-ref-clk-supply = <&L1F_E0>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,vccq-parent-supply	= <&S4F_E0>;
+	qcom,vccq-parent-max-microamp = <8176000>;
+
+	reset-gpios = <&tlmm 205 GPIO_ACTIVE_LOW>;
+
+	resets = <&gcc GCC_UFS_PHY_BCR>;
+	reset-names = "rst";
+
+	clock-names =
+		"core_clk",
+		"bus_aggr_clk",
+		"iface_clk",
+		"core_clk_unipro",
+		"core_clk_ice",
+		"ref_clk",
+		"tx_lane0_sync_clk",
+		"rx_lane0_sync_clk",
+		"rx_lane1_sync_clk";
+	clocks =
+		<&gcc GCC_UFS_PHY_AXI_CLK>,
+		<&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
+		<&gcc GCC_UFS_PHY_AHB_CLK>,
+		<&gcc GCC_UFS_PHY_UNIPRO_CORE_CLK>,
+		<&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
+		<&rpmhcc RPMH_CXO_CLK>,
+		<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
+		<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
+
+	qcom,disable-lpm;
+	qcom,iommu-dma = "bypass";
+
+	status = "ok";
+};
+
+&usb0 {
+	dwc3@a600000 {
+		usb-phy = <&usb_emuphy>, <&usb_nop_phy>;
+		dr_mode = "peripheral";
+		maximum-speed = "high-speed";
+	};
+};
+
+&MEDIUM_OFF_C4 {
+	status = "nok";
+};
+
+&LARGE_OFF_C4 {
+	status = "nok";
+};
+
+&MEDIUM_CLUSTER_PWR_DN {
+	status = "nok";
+};
+
+&LARGE_CLUSTER_PWR_DN {
+	status = "nok";
+};
+
+&APSS_OFF {
+	status = "nok";
+};
+
+&cam_crm {
+	status = "disabled";
+};
+
+&disp_crm {
+	status = "disabled";
+};
+
+&pcie_crm {
+	status = "disabled";
+};
+
+&pcie_pdc {
+	status = "disabled";
+};
+
+&rpmhcc {
+	compatible = "fixed-clock";
+	clock-output-names = "rpmh_clocks";
+	clock-frequency = <19200000>;
+};

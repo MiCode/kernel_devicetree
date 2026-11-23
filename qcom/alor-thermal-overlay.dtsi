@@ -1,0 +1,163 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/thermal/thermal_qti.h>
+
+&thermal_zones {
+	pm8550-bcl-lvl0 {
+		polling-delay-passive = <50>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8550_bcl 5>;
+
+		trips {
+			bcl_lvl0: bcl-lvl0 {
+				temperature = <1>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			vph_lvl_0 {
+				trip = <&bcl_lvl0>;
+				cooling-device = <&modem_bcl 0 1>,
+					<&msm_gpu 0 1>;
+			};
+		};
+	};
+
+	pm8550-bcl-lvl1 {
+		polling-delay-passive = <50>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8550_bcl 6>;
+
+		trips {
+			bcl_lvl1: bcl-lvl1 {
+				temperature = <1>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			vph_lvl_1 {
+				trip = <&bcl_lvl1>;
+				cooling-device = <&modem_bcl 0 2>,
+					<&msm_gpu 0 2>;
+			};
+		};
+	};
+
+	pm8550-bcl-lvl2 {
+		polling-delay-passive = <50>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8550_bcl 7>;
+
+		trips {
+			bcl_lvl2: bcl-lvl2 {
+				temperature = <1>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			vph_lvl_2 {
+				trip = <&bcl_lvl2>;
+				cooling-device = <&msm_gpu 0 3>;
+			};
+		};
+	};
+
+	pm8550ve_i_tz {
+		cooling-maps {
+			pm8550ve_apc {
+				trip = <&pm8550ve_i_trip0>;
+				cooling-device = <&APC1_MX_CX_PAUSE 0 1>,
+					<&APC0_MX_CX_PAUSE 0 1>;
+			};
+		};
+	};
+
+	pm8550ve_f_tz {
+		cooling-maps {
+			pm8550ve_gpu {
+				trip = <&pm8550ve_f_trip0>;
+				cooling-device = <&msm_gpu 0 THERMAL_NO_LIMIT>;
+			};
+		};
+	};
+
+	pm8550ve_g_tz {
+		cooling-maps {
+			pm8550ve_cdsp {
+				trip = <&pm8550ve_g_trip0>;
+				cooling-device = <&msm_gpu 0 THERMAL_NO_LIMIT>,
+					<&cdsp_sw 0 THERMAL_NO_LIMIT>,
+					<&modem_lte_dsc 255 255>,
+					<&modem_nr_dsc 255 255>;
+			};
+		};
+	};
+
+	pm8550ve_d_tz {
+		cooling-maps {
+			pm8550ve_modem {
+				trip = <&pm8550ve_d_trip0>;
+				cooling-device = <&cdsp_sw 0 THERMAL_NO_LIMIT>,
+					<&modem_lte_dsc 255 255>,
+					<&modem_nr_dsc 255 255>;
+			};
+		};
+	};
+
+	sys-therm-0 {
+		trips {
+			shutdown-trip {
+				temperature = <90000>;
+				hysteresis = <0>;
+				type = "hot";
+			};
+
+			display_test_config1: display-test-config1 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config2: display-test-config2 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+
+			display_test_config3: display-test-config3 {
+				temperature = <125000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+
+		cooling-maps {
+			display_cdev1 {
+				trip = <&display_test_config1>;
+				cooling-device = <&display_fps 1 1>;
+			};
+
+			display_cdev2 {
+				trip = <&display_test_config2>;
+				cooling-device = <&display_fps 2 2>;
+			};
+
+			display_cdev3 {
+				trip = <&display_test_config3>;
+				cooling-device = <&display_fps 3 3>;
+			};
+		};
+	};
+};

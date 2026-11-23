@@ -1,0 +1,240 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/dts-v1/;
+
+/ {
+	interrupt-parent = <0x01>;
+	compatible = "linux,dummy-virt";
+	#address-cells = <0x02>;
+	#size-cells = <0x02>;
+
+	chosen {
+		linux,pci-probe-only = <0x01>;
+		bootargs = "panic=-1";
+	};
+
+	config {
+		kernel-address = <0x80000000>;
+		kernel-size = <0xf00200>;
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x00 0x80000000 0x00 0x4200000>;
+	};
+
+	reserved-memory {
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+		ranges;
+
+		restricted_dma_reserved@84000000 {
+			reg = <0x00 0x84000000 0x00 0x200000>;
+			phandle = <0x02>;
+			compatible = "restricted-dma-pool";
+			alignment = <0x00 0x1000>;
+		};
+	};
+
+	cpus {
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			enable-method = "psci";
+			reg = <0x00>;
+			phandle = <0x100>;
+		};
+
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			enable-method = "psci";
+			reg = <0x01>;
+			phandle = <0x101>;
+		};
+	};
+
+	pci {
+		compatible = "pci-host-cam-generic";
+		device_type = "pci";
+		ranges = <0x3000000 0x00 0x2c000000 0x00 0x2c000000 0x00 0x2000000 0x43000000 0x00 0x85c00000 0x00 0x85c00000 0xff 0x7a400000>;
+		bus-range = <0x00 0x00>;
+		#address-cells = <0x03>;
+		#size-cells = <0x02>;
+		reg = <0x00 0x2e000000 0x00 0x1000000>;
+		#interrupt-cells = <0x01>;
+		interrupt-map = <0x800 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x04 0x04 0x1000 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x05 0x04 0x1800 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x06 0x04 0x2000 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x07 0x04 0x2800 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x08 0x04 0x3000 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x09 0x04>;
+		interrupt-map-mask = <0xf800 0x00 0x00 0x07 0xf800 0x00 0x00 0x07 0xf800 0x00 0x00 0x07 0xf800 0x00 0x00 0x07 0xf800 0x00 0x00 0x07 0xf800 0x00 0x00 0x07>;
+		dma-coherent;
+		memory-region = <0x02>;
+	};
+
+	intc {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <0x03>;
+		interrupt-controller;
+		reg = <0x00 0x3fff0000 0x00 0x10000 0x00 0x3ffb0000 0x00 0x40000>;
+		phandle = <0x01>;
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+	};
+
+	__symbols__ {
+		intc = "/intc";
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <0x01 0x0d 0x308 0x01 0x0e 0x308 0x01 0x0b 0x308 0x01 0x0a 0x308>;
+		always-on;
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "hvc";
+	};
+
+	pclk@3M {
+		#clock-cells = <0x00>;
+		compatible = "fixed-clock";
+		clock-frequency = <0x2fefd8>;
+		phandle = <0x18>;
+	};
+
+	rtc@2000 {
+		compatible = "arm,primecell";
+		arm,primecell-periphid = <0x41030>;
+		reg = <0x00 0x2000 0x00 0x1000>;
+		interrupts = <0x00 0x01 0x04>;
+		clocks = <0x18>;
+		clock-names = "apb_pclk";
+	};
+
+	qcom,vm-config {
+		memory {
+			#address-cells = <0x02>;
+			#size-cells = <0x02>;
+			base-address = <0x0 0x80000000>;
+			size-max = <0x7 0x80000000>;
+		};
+
+		interrupts {
+			config = <0x01>;
+		};
+
+		vcpus {
+			affinity = "proxy";
+		};
+
+		vdevices {
+			shm-1 {
+				vdevice-type = "shm";
+				peer-default;
+				dma_base = <0x00 0x00>;
+
+				memory {
+					optional;
+					label = <0x01>;
+					#address-cells = <0x02>;
+					base = <0x00 0x84000000>;
+				};
+			};
+
+			bell-f {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-f";
+				label = <0x0f>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x0f 0x01>;
+			};
+
+			bell-7 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-7";
+				label = <0x07>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x07 0x04>;
+			};
+
+			bell-8 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-8";
+				label = <0x08>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x08 0x04>;
+			};
+
+			bell-9 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-9";
+				label = <0x09>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x09 0x04>;
+			};
+
+			bell-5 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-5";
+				label = <0x05>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x05 0x04>;
+			};
+
+			bell-1 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-1";
+				label = <0x01>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x01 0x01>;
+			};
+
+			bell-2 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-2";
+				label = <0x02>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x02 0x01>;
+			};
+
+			bell-4 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-4";
+				label = <0x04>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x04 0x04>;
+			};
+
+			bell-0 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-0";
+				label = <0x00>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x00 0x01>;
+			};
+
+			bell-6 {
+				vdevice-type = "doorbell";
+				generate = "/hypervisor/bell-6";
+				label = <0x06>;
+				peer-default;
+				source-can-clear;
+				interrupts = <0x00 0x06 0x04>;
+			};
+		};
+	};
+};

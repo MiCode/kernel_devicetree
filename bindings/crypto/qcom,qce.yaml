@@ -1,0 +1,343 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/crypto/qcom,qce.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: QTI Crypto Engine Device
+
+maintainers:
+  - Daniel Perez-Zoghbi <quic_dperezzo@quicinc.com>
+  - Gaurav Kashyap <quic_gaurkash@quicinc.com>
+  - Arun Menon <quic_avmenon@quicinc.com>
+  - Udit Tiwari <quic_utiwari@quicinc.com>
+  - Om Prakash Singh <quic_pbhavara@quicinc.com>
+
+description: |
+  This driver provides IOCTLS for user space application to access crypto
+  engine hardware for the qcedev crypto services. The driver supports the
+  following crypto algorithms
+  - AES-128, AES-256 (ECB, CBC and CTR mode)
+  - AES-192, (ECB, CBC and CTR mode)
+    (support exists on platform supporting CE 3.x hardware)
+  - SHA1/SHA256
+  - AES-128, AES-256 (XTS), AES CMAC, SHA1/SHA256 HMAC
+    (support exists on platform supporting CE 4.x hardware)
+
+properties:
+  compatible:
+    const: "qcom,qcedev"
+
+  reg:
+    oneOf:
+      - items:
+        - description: crypto base registers
+      - items:
+        - description: crypto base registers
+        - description: crypto bam base registers
+
+  reg-names:
+    oneOf:
+      - items:
+        - const: crypto-base
+      - items:
+        - const: crypto-base
+        - const: crypto-bam-base
+
+  interconnects:
+    minItems: 1
+
+  interconnect-names:
+    const: data_path
+
+  interrupts:
+    maxItems: 2
+
+  interrupt-names:
+    items:
+      - const: bam-irq
+      - const: core-irq
+
+  iommus:
+    maxItems: 2
+
+  qcom,iommu-dma:
+    description: |
+      default
+        Standard iommu translation behaviour. Calling iommu and DMA apis in
+        atomic context is not allowed.
+      bypass
+        DMA APIs will use 1-to-1 translation between dma_addr and phys_addr.
+      fastmap
+        DMA APIs will run faster, but use several orders of magnitude more
+        memory. Also allows using iommu and DMA apis in atomic context.
+      atomic
+        Allows using iommu and DMA apis in atomic context.
+      disabled
+        The iommu client is responsible for allocating an iommu domain.
+    enum:
+      - default
+      - bypass
+      - fastmap
+      - atomic
+      - disabled
+
+  dma-coherent: true
+
+  qcom_cedev_ns_cb:
+    description: |
+      a non-secure context bank
+
+    type: object
+
+    properties:
+      compatible:
+        const: qcom,qcedev,context-bank
+
+      label:
+        description: |
+          A string name for the context bank
+        minItems: 1
+
+      iommus:
+        maxItems: 1
+
+      dma-coherent: true
+
+    required:
+      - compatible
+      - label
+      - iommus
+      - dma-coherent
+
+    additionalProperties: false
+
+  qcom_cedev_s_cb:
+    description: |
+      a secure context bank
+
+    type: object
+
+    properties:
+      compatible:
+        const: qcom,qcedev,context-bank
+
+      label:
+        description: |
+          A string name for the context bank
+        minItems: 1
+
+      iommus:
+        maxItems: 1
+
+      dma-coherent: true
+
+      qcom,iommu-vmid:
+        $ref: '/schemas/types.yaml#/definitions/uint32'
+        description: |
+          An identifier indicating the security state of the client.
+
+      qcom,secure-context-bank:
+        description: Identify if the context bank is secure
+        type: boolean
+
+    required:
+      - compatible
+      - label
+      - iommus
+      - dma-coherent
+      - qcom,iommu-vmid
+      - qcom,secure-context-bank
+
+    additionalProperties: false
+
+  qcom,bam-pipe-pair:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      An integer corresponding to the pipe number for general purpose
+      use for HLOS kernel operations.
+
+  qcom,offload-ops-support:
+    description: Allow offload operations and load the offload pipes
+    type: boolean
+
+  qcom,bam-pipe-offload-cpb-hlos:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      An integer corresponding to the pipe number for operations
+      from a content protected buffer (cpb) to an hlos buffer.
+
+  qcom,bam-pipe-offload-hlos-cpb:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      An integer corresponding to the pipe number for operations
+      from an hlos buffer to a content protected buffer (cpb).
+
+  qcom,bam-pipe-offload-hlos-cpb-1:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      An integer corresponding to the second pipe number for operations
+      from an hlos buffer to a content protected buffer (cpb).
+
+  qcom,bam-pipe-offload-hlos-hlos:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      An integer corresponding to the pipe number for operations
+      from an hlos buffer to an hlos buffer.
+
+  qcom,bam-pipe-offload-hlos-hlos-1:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      An integer corresponding to the second pipe number for operations
+      from an hlos buffer to an hlos buffer.
+
+  qcom,ce-hw-instance:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Instance number for device
+    minimum: 0
+    maximum: 1
+
+  qcom,ce-device:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      uid number for the device
+
+  qcom,ce-hw-shared:
+    description: Determines if the crypto engine is being shared.
+    type: boolean
+
+  qcom,bam-ee:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Determines the Execution Environment (EE) of BAM.
+      This is defaulted to 1.
+
+  qcom,smmu-s1-enable:
+    description: Enable/Disable the SMMU.
+    type: boolean
+
+  qcom,no-clock-support:
+    description: Disables crypto engine clocks
+    type: boolean
+
+  # all below are optional, some above are optional
+  qcom,icc_avg_bw:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Average bandwidth. Used to set clocks.
+      Default 384 (low)
+
+  qcom,icc_peak_bw:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description: |
+      Peak bandwidth. Used to set clocks.
+      Default 384 (low)
+
+  qcom,use-sw-aes-cbc-ecb-ctr-algo:
+    description: Use software for CBC, ECB, and CTR modes in AES.
+    type: boolean
+
+  qcom,use-sw-aead-algo:
+    description: Use software for AEAD algorithms.
+    type: boolean
+
+  qcom,use-sw-aes-xts-algo:
+    description: Use software for AES XTS
+    type: boolean
+
+  qcom,use-sw-ahash-algo:
+    description: Use software for ahash
+    type: boolean
+
+  qcom,use-sw-hmac-algo:
+    description: Use software for hmac
+    type: boolean
+
+  qcom,use-sw-aes-ccm-algo:
+    description: Use software for AES CCM
+    type: boolean
+
+  qcom,clk-mgmt-sus-res:
+    description: Use clock management suspend request
+    type: boolean
+
+  qcom,support-core-clk-only:
+    description: Only use the core clock
+    type: boolean
+
+  qcom,request-bw-before-clk:
+    description: Request bw before setting clock rate on init
+    type: boolean
+
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - interrupt-names
+  - interconnects
+  - interconnect-names
+  - qcom_cedev_ns_cb
+  - qcom_cedev_s_cb
+  - qcom,bam-pipe-pair
+  - qcom,ce-hw-instance
+  - qcom,ce-device
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    #include <dt-bindings/interconnect/qcom,sun.h>
+
+    soc {
+        #address-cells = <2>;
+        #size-cells = <2>;
+
+        qcedev@1de0000 {
+            compatible = "qcom,qcedev";
+            reg = <0x1de0000 0x20000>,
+                <0x1dc4000 0x28000>;
+            reg-names = "crypto-base","crypto-bam-base";
+            interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>,
+                         <GIC_SPI 274 IRQ_TYPE_EDGE_RISING>;
+            interrupt-names = "bam-irq", "crypto-irq";
+            qcom,bam-pipe-pair = <2>;
+            qcom,offload-ops-support;
+            qcom,bam-pipe-offload-cpb-hlos = <1>;
+            qcom,bam-pipe-offload-hlos-cpb = <3>;
+            qcom,bam-pipe-offload-hlos-cpb-1 = <8>;
+            qcom,bam-pipe-offload-hlos-hlos = <4>;
+            qcom,bam-pipe-offload-hlos-hlos-1 = <9>;
+            qcom,ce-hw-instance = <0>;
+            qcom,ce-device = <0>;
+            qcom,ce-hw-shared;
+            qcom,bam-ee = <0>;
+            qcom,smmu-s1-enable;
+            qcom,no-clock-support;
+            interconnect-names = "data_path";
+            interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+            iommus = <&apps_smmu 0x0480 0x0>,
+                <&apps_smmu 0x0481 0x0>;
+            qcom,iommu-dma = "atomic";
+            dma-coherent;
+
+            qcom_cedev_ns_cb {
+                compatible = "qcom,qcedev,context-bank";
+                label = "ns_context";
+                iommus = <&apps_smmu 0x0481 0x0>;
+                dma-coherent;
+            };
+
+            qcom_cedev_s_cb {
+                compatible = "qcom,qcedev,context-bank";
+                label = "secure_context";
+                iommus = <&apps_smmu 0x0483 0x0>;
+                qcom,iommu-vmid = <0x9>;
+                qcom,secure-context-bank;
+                dma-coherent;
+            };
+        };
+    };
