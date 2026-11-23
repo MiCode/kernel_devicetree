@@ -68,3 +68,4 @@
 | mist-w-oss | REDMI Note 17 5G/REDMI Note 17/POCO M8 Power 5G | Android W | snapdragon-high-mid-2024-spf-2-0_amss_standard_oem r2.0.r1_00009.1 |[mist-w-oss](https://github.com/MiCode/kernel_devicetree/tree/mist-w-oss) |
 | zephyr-w-oss | REDMI Note 17 | Android W | Snapdragon_Mid_2022.SPF.2.0.2 r2.0.2_00004.0.141968.3 |[zephyr-w-oss](https://github.com/MiCode/kernel_devicetree/tree/zephyr-w-oss) |
 | darwin-w-oss | POCO X8s | Android W | LA.VENDOR.15.4.0.r1-15000-pakala.0-1.111359.20 |[darwin-w-oss](https://github.com/MiCode/kernel_devicetree/tree/darwin-w-oss) |
+| songyuan-w-oss | POCO F9 Ultra / REDMI K100 Pro Max | Android W | LA.VENDOR.16.2.0.r1-15300-r1.0.r1_000033.0 |[songyuan-w-oss](https://github.com/MiCode/kernel_devicetree/tree/songyuan-w-oss) |
