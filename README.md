@@ -69,3 +69,4 @@
 | zephyr-w-oss | REDMI Note 17 | Android W | Snapdragon_Mid_2022.SPF.2.0.2 r2.0.2_00004.0.141968.3 |[zephyr-w-oss](https://github.com/MiCode/kernel_devicetree/tree/zephyr-w-oss) |
 | darwin-w-oss | POCO X8s | Android W | LA.VENDOR.15.4.0.r1-15000-pakala.0-1.111359.20 |[darwin-w-oss](https://github.com/MiCode/kernel_devicetree/tree/darwin-w-oss) |
 | songyuan-w-oss | POCO F9 Ultra / REDMI K100 Pro Max | Android W | LA.VENDOR.16.2.0.r1-15300-r1.0.r1_000033.0 |[songyuan-w-oss](https://github.com/MiCode/kernel_devicetree/tree/songyuan-w-oss) |
+| shuntian-w-oss | Xiaomi Pad 9 Pro | Android W | LA.VENDOR.16.2.0.r1-15300-r1.0.r1_000033.0 |[shuntian-w-oss](https://github.com/MiCode/kernel_devicetree/tree/shuntian-w-oss) |
