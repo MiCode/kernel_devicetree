@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include "malabar-mtp.dtsi"
+#include "malabar-pm7250b.dtsi"
+
+&sdhc_1 {
+	status = "ok";
+};
+
+&ufsphy_mem {
+	status = "disabled";
+};
+
+&ufshc_mem {
+	status = "disabled";
+};
+
+&L5E {
+	regulator-min-microvolt = <2952000>;
+	regulator-max-microvolt = <3544000>;
+	qcom,init-voltage = <2952000>;
+};
+
+&pmic_glink_debug {
+	i2c@105 {
+		reg = <0x105>;  /* I2C instance 5 in ADSP for SE4 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1355@c {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x0c>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1355_1_iin {
+		reg = <0x1050c01>;
+		label = "smb1355_1_iin";
+	};
+
+	smb1355_1_ichg {
+		reg = <0x1050c02>;
+		label = "smb1355_1_ichg";
+	};
+
+	smb1355_1_die_temp {
+		reg = <0x1050c03>;
+		label = "smb1355_1_die_temp";
+	};
+};

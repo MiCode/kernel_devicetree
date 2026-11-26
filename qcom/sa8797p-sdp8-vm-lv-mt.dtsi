@@ -1,0 +1,116 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+&reserved_memory {
+	kinfo_mem: debug_kinfo_region {
+		alloc-ranges = <0x0 0x00000000 0xffffffff 0xffffffff>;
+		size = <0x0 0x1000>;
+		no-map;
+	};
+
+	va_md_mem: va_md_mem_region {
+		compatible = "shared-dma-pool";
+		alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+		reusable;
+		size = <0 0x1000000>;
+	};
+
+	dice: dice@0 {
+		compatible = "google,open-dice";
+		no-map;
+		reg = <0x0 0x0 0x0 0x0>;
+		label = "sdv_dice_mem";
+	};
+};
+
+&soc {
+	google_debug_kinfo: google,debug-kinfo {
+		compatible = "google,debug-kinfo";
+		memory-region = <&kinfo_mem>;
+	};
+
+	va_mini_dump: va_mini_dump {
+		compatible = "qcom,va-minidump";
+		memory-region = <&va_md_mem>;
+	};
+};
+
+&virt_scmi {
+	irq_no_suspend;
+	status = "ok";
+};
+
+&scmi {
+	status = "ok";
+};
+
+&qupv3_2 {
+	qcom,iommu-dma = "bypass";
+	status = "disabled";
+};
+
+&qupv3_se14_4uart {
+	status = "disabled";
+};
+
+&qupv3_se17_4uart {
+	status = "disabled";
+};
+
+&usb2 {
+	interrupts-extended = <&pdc 8 IRQ_TYPE_EDGE_RISING>,
+			<&qvm_vdev_gic GIC_SPI 907 IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 7 IRQ_TYPE_EDGE_RISING>;
+	status = "disabled";
+};
+
+&eusb2_phy2 {
+	status = "disabled";
+};
+
+&pcie2 {
+	interrupt-parent = <&qvm_vdev_gic>;
+	status = "disabled";
+};
+
+&pcie3 {
+	interrupt-parent = <&qvm_vdev_gic>;
+	status = "disabled";
+};
+
+&usb1 {
+	interrupts-extended = <&qvm_vdev_gic GIC_SPI 918 IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 41 IRQ_TYPE_LEVEL_HIGH>,
+			<&pdc 13 IRQ_TYPE_EDGE_RISING>,
+			<&pdc 12 IRQ_TYPE_EDGE_RISING>;
+	status = "disabled";
+};
+
+&usb_1_qmp_combo_phy {
+	status = "disabled";
+};
+
+&eusb2_phy1 {
+	status = "disabled";
+};
+
+&usb0 {
+	power-domains = <&scmi_power 20>, <&scmi_power 21>;
+	interrupts-extended = <&qvm_vdev_gic GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>,
+		<&pdc 17 IRQ_TYPE_LEVEL_HIGH>,
+		<&pdc 14 IRQ_TYPE_EDGE_RISING>,
+		<&pdc 15 IRQ_TYPE_EDGE_RISING>;
+	status = "disabled";
+};
+
+&eusb2_phy0 {
+	power-domains = <&scmi_power 22>, <&scmi_power 23>;
+	status = "disabled";
+};
+
+&usb_0_qmp_combo_phy {
+	power-domains = <&scmi_power 24>, <&scmi_power 25>;
+	status = "disabled";
+};

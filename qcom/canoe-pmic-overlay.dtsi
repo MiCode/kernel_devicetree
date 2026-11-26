@@ -1,0 +1,415 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen4-pmh0101.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen4-pmh0110.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen4-pmih010x.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen4-pmk8850.h>
+
+#define PMK8850_SID		0
+#define PMH0101_SID		1
+#define PMH0110_D_SID		3
+#define PMH0110_F_SID		5
+#define PMH0110_G_SID		6
+#define PMIH010X_SID		7
+#define PMH0110_I_SID		8
+
+&spmi0_bus {
+	#include "pmk8850.dtsi"
+	#include "pmh0101.dtsi"
+	#include "pmh0110.dtsi"
+};
+
+&spmi1_bus {
+	#include "pmd802x.dtsi"
+	#include "pmih010x.dtsi"
+	#include "pmh0104.dtsi"
+	#include "pmr735d.dtsi"
+	#include "pm8010.dtsi"
+};
+
+&pmh0101_gpios {
+	qtm_therm_default: qtm-therm-default-state {
+		pins = "gpio2";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	pa_therm2_default: pa-therm2-default-state {
+		pins = "gpio3";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	cam_sensor_1p8_rst0_active: cam-sensor-1p8-rst0-active-state {
+		pins = "gpio4";
+		function = "normal";
+		qcom,drive-strength = <2>;
+		input-disable;
+		output-enable;
+		output-high;
+		power-source = <0>; /* 1.8 V */
+	};
+
+	cam_sensor_1p8_rst0_suspend: cam-sensor-1p8-rst0-suspend-state {
+		pins = "gpio4";
+		function = "normal";
+		qcom,drive-strength = <2>;
+		input-disable;
+		output-enable;
+		output-low;
+	};
+
+	pmh0101_bidir_lvl_shifter1_active: pmh0101-bidir-lvl-shifter1-state {
+		pins = "gpio11", "gpio12";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	pmh0101_bidir_lvl_shifter2_active: pmh0101-bidir-lvl-shifter2-state {
+		pins = "gpio13", "gpio14";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	pmh0101_bidir_lvl_shifter3_active: pmh0101-bidir-lvl-shifter3-state {
+		pins = "gpio15", "gpio16";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	pmh0101_bidir_lvl_shifter4_active: pmh0101-bidir-lvl-shifter4-state {
+		pins = "gpio17", "gpio18";
+		function = "normal";
+		bias-high-impedance;
+	};
+};
+
+&pmh0110_i_gpios {
+	cam_sensor_1p8_rst1_active: cam-sensor-1p8-rst1-active-state {
+		pins = "gpio12";
+		function = "normal";
+		qcom,drive-strength = <2>;
+		input-disable;
+		output-enable;
+		output-high;
+		power-source = <0>; /* 1.8 V */
+	};
+
+	cam_sensor_1p8_rst1_suspend: cam-sensor-1p8-rst1-suspend-state {
+		pins = "gpio12";
+		function = "normal";
+		qcom,drive-strength = <2>;
+		input-disable;
+		output-enable;
+		output-low;
+	};
+};
+
+&led_controller {
+	nvmem = <&pmk8850_sdam_21>, <&pmk8850_sdam_22>;
+	nvmem-names = "lpg_chan_sdam", "lut_sdam";
+};
+
+&pmh0101_tz {
+	io-channels = <&pmk8850_vadc PMH0101_ADC5_GEN4_DIE_TEMP(0, PMH0101_SID)>;
+	io-channel-names = "thermal";
+};
+
+&pmh0110_d_tz {
+	io-channels = <&pmk8850_vadc PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_D_SID)>;
+	io-channel-names = "thermal";
+};
+
+&pmh0110_f_tz {
+	io-channels = <&pmk8850_vadc PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_F_SID)>;
+	io-channel-names = "thermal";
+};
+
+&pmh0110_g_tz {
+	io-channels = <&pmk8850_vadc PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_G_SID)>;
+	io-channel-names = "thermal";
+};
+
+&pmh0110_i_tz {
+	io-channels = <&pmk8850_vadc PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_I_SID)>;
+	io-channel-names = "thermal";
+};
+
+&pmih010x_tz {
+	io-channels = <&pmk8850_vadc PMIH010X_ADC5_GEN4_DIE_TEMP(1, PMIH010X_SID)>;
+	io-channel-names = "thermal";
+};
+
+&pmih010x_lite_tz {
+	io-channels = <&pmk8850_vadc PMIH010X_ADC5_GEN4_TEMP_ALARM_LITE(1, PMIH010X_SID)>;
+	io-channel-names = "thermal";
+};
+
+&soc {
+	reboot_reason {
+		compatible = "qcom,reboot-reason";
+		nvmem-cells = <&restart_reason>;
+		nvmem-cell-names = "restart_reason";
+	};
+
+	pmic-pon-log {
+		compatible = "qcom,pmic-pon-log";
+		nvmem = <&pmk8850_sdam_5>, <&pmk8850_sdam_6>;
+		nvmem-names = "pon_log0", "pon_log1";
+		depends-on-supply = <&wdog>;
+		qcom,pmic-fault-panic;
+	};
+
+	regulator_ocp_notifier: regulator-ocp-notifer {
+		compatible = "qcom,regulator-ocp-notifier";
+		interrupt-parent = <&spmi0_bus>;
+		interrupts = <0x0 0x71 0x1 IRQ_TYPE_EDGE_RISING>,
+			     <0x0 0x85 0x1 IRQ_TYPE_EDGE_RISING>;
+		nvmem-cells = <&ocp_log>, <&alarm_log>;
+		nvmem-cell-names = "ocp_log", "alarm_log";
+	};
+};
+
+&pmk8850_gpios {
+	pinctrl-0 = <&alt_sleep_clk_default>;
+	pinctrl-names = "default";
+
+	alt_sleep_clk_default: alt-sleep-clk-default-state {
+		pins = "gpio3";
+		function = "func1";
+		input-disable;
+		output-enable;
+		power-source = <0>; /* 1.8 V */
+	};
+
+	lcd_bl_pwm_default: lcd-bl-pwm-default-state {
+		pins = "gpio5";
+		function = "func3";
+		input-disable;
+		output-enable;
+		power-source = <0>; /* 1.8 V */
+	};
+
+	xoagg_therm_default: xoagg-therm-default-state {
+		pins = "gpio7";
+		function = "normal";
+		bias-high-impedance;
+	};
+};
+
+&pmih010x_gpios {
+	pinctrl-0 = <&display_therm_default>, <&charger_therm_default>;
+	pinctrl-names = "default";
+
+	display_therm_default: display_therm-default-state {
+		pins = "gpio18";
+		function = "normal";
+		bias-high-impedance;
+	};
+
+	charger_therm_default: charger_therm-default-state {
+		pins = "gpio12";
+		function = "normal";
+		bias-high-impedance;
+	};
+};
+
+&pmk8850_vadc {
+	/* PMK8850 ADC Channels */
+	pmk8850_offset_ref {
+		reg = <PMK8850_ADC5_GEN4_OFFSET_REF(0, PMK8850_SID)>;
+		label = "pmk8850_offset_ref";
+	};
+
+	pmk8850_vref_1p25 {
+		reg = <PMK8850_ADC5_GEN4_1P25VREF(0, PMK8850_SID)>;
+		label = "pmk8850_vref_1p25";
+	};
+
+	pmk8850_die_temp {
+		reg = <PMK8850_ADC5_GEN4_DIE_TEMP(0, PMK8850_SID)>;
+		label = "pmk8850_die_temp";
+	};
+
+	xoagg_therm: pmk8850_xoagg_therm {
+		reg = <PMK8850_ADC5_GEN4_AMUX2_GPIO7_100K_PU(0, PMK8850_SID)>;
+		label = "pmk8850_xoagg_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+		status = "disabled";
+	};
+
+	/* PMH0101 ADC Channels */
+	pmh0101_offset_ref {
+		reg = <PMH0101_ADC5_GEN4_OFFSET_REF(0, PMH0101_SID)>;
+		label = "pmh0101_offset_ref";
+	};
+
+	pmh0101_vref_1p25 {
+		reg = <PMH0101_ADC5_GEN4_1P25VREF(0, PMH0101_SID)>;
+		label = "pmh0101_vref_1p25";
+	};
+
+	pmh0101_die_temp {
+		reg = <PMH0101_ADC5_GEN4_DIE_TEMP(0, PMH0101_SID)>;
+		label = "pmh0101_die_temp";
+	};
+
+	pmh0101_vph_pwr {
+		reg = <PMH0101_ADC5_GEN4_VPH_PWR(0, PMH0101_SID)>;
+		label = "pmh0101_vph_pwr";
+	};
+
+	qtm_therm: pmh0101_qtm_therm {
+		reg = <PMH0101_ADC5_GEN4_AMUX2_GPIO2_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_qtm_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+		status = "disabled";
+	};
+
+	pmh0101_pa_therm2 {
+		reg = <PMH0101_ADC5_GEN4_AMUX_THM6_GPIO3_100K_PU(0, PMH0101_SID)>;
+		label = "pmh0101_pa_therm_2";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};
+
+	/* PMH0110 ADC Channels */
+	pmh0110_d_die_temp {
+		reg = <PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_D_SID)>;
+		label = "pmh0110_d_die_temp";
+	};
+
+	pmh0110_d_vph_pwr {
+		reg = <PMH0110_ADC5_GEN4_VPH_PWR(0, PMH0110_D_SID)>;
+		label = "pmh0110_d_vph_pwr";
+	};
+
+	pmh0110_f_die_temp {
+		reg = <PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_F_SID)>;
+		label = "pmh0110_f_die_temp";
+	};
+
+	pmh0110_f_vph_pwr {
+		reg = <PMH0110_ADC5_GEN4_VPH_PWR(0, PMH0110_F_SID)>;
+		label = "pmh0110_f_vph_pwr";
+	};
+
+	pmh0110_g_die_temp {
+		reg = <PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_G_SID)>;
+		label = "pmh0110_g_die_temp";
+	};
+
+	pmh0110_g_vph_pwr {
+		reg = <PMH0110_ADC5_GEN4_VPH_PWR(0, PMH0110_G_SID)>;
+		label = "pmh0110_g_vph_pwr";
+	};
+
+	pmh0110_i_die_temp {
+		reg = <PMH0110_ADC5_GEN4_DIE_TEMP(0, PMH0110_I_SID)>;
+		label = "pmh0110_i_die_temp";
+	};
+
+	pmh0110_i_vph_pwr {
+		reg = <PMH0110_ADC5_GEN4_VPH_PWR(0, PMH0110_I_SID)>;
+		label = "pmh0110_i_vph_pwr";
+	};
+
+	/* PMIH010X ADC Channels */
+	pmih010x_offset_ref {
+		reg = <PMIH010X_ADC5_GEN4_OFFSET_REF(1, PMIH010X_SID)>;
+		label = "pmih010x_offset_ref";
+	};
+
+	pmih010x_vref_1p25 {
+		reg = <PMIH010X_ADC5_GEN4_1P25VREF(1, PMIH010X_SID)>;
+		label = "pmih010x_vref_1p25";
+	};
+
+	pmih010x_die_temp {
+		reg = <PMIH010X_ADC5_GEN4_DIE_TEMP(1, PMIH010X_SID)>;
+		label = "pmih010x_die_temp";
+	};
+
+	pmih010x_vph_pwr {
+		reg = <PMIH010X_ADC5_GEN4_VPH_PWR(1, PMIH010X_SID)>;
+		label = "pmih010x_vph_pwr";
+	};
+
+	pmih010x_vbat_sns_qbg {
+		reg = <PMIH010X_ADC5_GEN4_VBAT_SNS_QBG(1, PMIH010X_SID)>;
+		label = "pmih010x_vbat_sns_qbg";
+	};
+
+	pmih010x_iin {
+		reg = <PMIH010X_ADC5_GEN4_IIN(1, PMIH010X_SID)>;
+		label = "pmih010x_iin";
+	};
+
+	pmih010x_ichg_fb {
+		reg = <PMIH010X_ADC5_GEN4_ICHG_FB(1, PMIH010X_SID)>;
+		label = "pmih010x_ichg_fb";
+	};
+
+	pmih010x_chg_temp {
+		reg = <PMIH010X_ADC5_GEN4_CHG_TEMP(1, PMIH010X_SID)>;
+		label = "pmih010x_chg_temp";
+	};
+
+	pmih010x_lite_die_temp {
+		reg = <PMIH010X_ADC5_GEN4_TEMP_ALARM_LITE(1, PMIH010X_SID)>;
+		label = "pmih010x_lite_die_temp";
+	};
+
+	/*pmih010x_batt_therm2 {
+		reg = <PMIH010X_ADC5_GEN4_AMUX3_BAT2_THERM_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_batt_therm_2";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+	};*/
+
+	/* PMIH010X ADC Channels */
+	display_therm: pmih010x_display_therm {
+		reg = <PMIH010X_ADC5_GEN4_AMUX5_GPIO18_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_display_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+		status = "disabled";
+	};
+
+	charger_therm: pmih010x_charger_therm {
+		reg = <PMIH010X_ADC5_GEN4_AMUX4_GPIO12_100K_PU(1, PMIH010X_SID)>;
+		label = "pmih010x_charger_therm";
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,adc-tm-type = <1>;
+		status = "disabled";
+	};
+};
+
+&pmih010x_haptics {
+	nvmem-names = "hap_cfg_sdam";
+	nvmem = <&pmk8850_sdam_46>;
+};
+
+&pmih010x_eusb2_repeater {
+	vdd18-supply = <&pmh0101_l15>;
+	vdd3-supply = <&pmh0101_l5>;
+};
+
+&pmd802x_amoled_ecm {
+	interrupt-parent = <&spmi0_bus>;
+	interrupts = <0x0 0xaa 0x1 IRQ_TYPE_EDGE_RISING>,
+		     <0x0 0xab 0x1 IRQ_TYPE_EDGE_RISING>,
+		     <0x0 0xac 0x1 IRQ_TYPE_EDGE_RISING>;
+};

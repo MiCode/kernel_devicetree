@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-devfreq-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. GPU Frequency Cooling Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  The devfreq cooling device will be used by userspace thermal daemon to
+  vote for frequency cap under thermal conditions. This driver will register a
+  cooling device for the GPU phandle specified in the devicetree.
+
+properties:
+  compatible:
+    const: qcom,devfreq-cdev
+
+  qcom,devfreq:
+    $ref: /schemas/types.yaml#/definitions/phandle
+    description: |
+      Phandle to the GPU devfreq. This will register the GPU devfreq as
+      a cooling device with thermal framework.
+
+required:
+  - compatible
+  - qcom,devfreq
+
+additionalProperties: false
+
+examples:
+  - |
+    qcom,devfreq-cdev {
+      compatible = "qcom,devfreq-cdev";
+      qcom,devfreq = <&msm_gpu>;
+    };

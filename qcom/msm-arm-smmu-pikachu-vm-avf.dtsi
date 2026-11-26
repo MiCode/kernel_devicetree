@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	vm-config {
+		vdevices {
+			vsmmu@15000000 {
+				vdevice-type = "vsmmu-v2";
+				smmu-handle = <0x15000000>;
+				num-cbs = <0x7>;
+				num-smrs = <0x9>;
+				patch = "/soc/apps-smmu@15000000";
+			};
+		};
+	};
+};
+
+&soc {
+	apps_smmu: apps-smmu@15000000 {
+		/*
+		 * reg, #global-interrupts & interrupts  properties will
+		 * be added dynamically by bootloader.
+		 */
+		compatible = "qcom,qsmmu-v500", "qcom,virt-smmu";
+		#iommu-cells = <2>;
+		qcom,use-3-lvl-tables;
+		dma-coherent;
+
+		qcom,actlr =
+			/* Compute */
+			<0x0c0b 0x0000 0x00000303>,
+
+			/* Display */
+			<0x19a5 0x0000 0x00000001>,
+			<0x1c04 0x0002 0x00000001>,
+
+			/* EVA */
+			<0x1961 0x0000 0x00000103>,
+			<0x1965 0x0000 0x00000103>,
+			<0x1aa1 0x0000 0x00000103>;
+	};
+};

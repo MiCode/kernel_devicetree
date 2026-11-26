@@ -1,0 +1,603 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
+#include "pm6450-rpm-regulator.dtsi"
+#include "pm8010-rpm-regulator.dtsi"
+
+&rpm_bus {
+	rpm-regulator-smpb2 {
+		status = "okay";
+		VDD_CX_LEVEL:
+		S2B_LEVEL: S2B_E0_LEVEL:
+		pm6450_s2_level: regulator-s2-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s2_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			proxy-supply = <&pm6450_s2_level>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-voltage =
+				<RPM_SMD_REGULATOR_LEVEL_TURBO
+				 RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+
+		VDD_CX_FLOOR_LEVEL:
+		S2B_FLOOR_LEVEL:
+		pm6450_s2_floor_level: regulator-s2-floor-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s2_floor_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+			qcom,always-send-voltage;
+		};
+
+		VDD_CX_LEVEL_A0:
+		S2B_LEVEL_A0:
+		pm6450_s2_level_a0: regulator-s2-level-a0 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s2_level_a0";
+			qcom,set = <1>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+
+		cx_cdev: cx-cdev-lvl {
+			status = "okay";
+			compatible = "qcom,regulator-cooling-device";
+			regulator-cdev-supply = <&S2B_FLOOR_LEVEL>;
+			regulator-levels = <RPM_SMD_REGULATOR_LEVEL_RETENTION
+					RPM_SMD_REGULATOR_LEVEL_SVS_PLUS>;
+			#cooling-cells = <2>;
+		};
+	};
+
+	rpm-regulator-smpb3 {
+		status = "okay";
+		qcom,always-wait-for-ack;
+		VDD_GFX_LEVEL:
+		S3B_LEVEL: S3B_E0_LEVEL:
+		pm6450_s3_level: regulator-s3-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s3_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_NONE>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			proxy-supply = <&pm6450_s3_level>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-voltage =
+				<RPM_SMD_REGULATOR_LEVEL_TURBO
+				 RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,init-voltage-level =
+				<RPM_SMD_REGULATOR_LEVEL_LOW_SVS>;
+			qcom,use-voltage-level;
+		};
+
+		VDD_GFX_FLOOR_LEVEL:
+		S3B_FLOOR_LEVEL:
+		pm6450_s3_floor_level: regulator-s3-floor-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s3_floor_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_NONE>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+			qcom,always-send-voltage;
+		};
+
+		VDD_GFX_LEVEL_A0:
+		S3B_LEVEL_A0:
+		pm6450_s3_level_a0: regulator-s3-level-a0 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s3_level_a0";
+			qcom,set = <1>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_NONE>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+	};
+
+	rpm-regulator-smpb6 {
+		status = "okay";
+		VDD_MX_LEVEL:
+		S6B_LEVEL: S6B_E0_LEVEL:
+		pm6450_s6_level: regulator-s6-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s6_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			proxy-supply = <&pm6450_s6_level>;
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-voltage =
+				<RPM_SMD_REGULATOR_LEVEL_TURBO
+				 RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+
+		VDD_MX_FLOOR_LEVEL:
+		S6B_FLOOR_LEVEL:
+		pm6450_s6_floor_level: regulator-s6-floor-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s6_floor_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+			qcom,always-send-voltage;
+		};
+
+		VDD_MX_LEVEL_A0:
+		S6B_LEVEL_A0:
+		pm6450_s6_level_a0: regulator-s6-level-a0 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_s6_level_a0";
+			qcom,set = <1>;
+			regulator-min-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+					<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+
+		mx_cdev: mx-cdev-lvl {
+			status = "okay";
+			compatible = "qcom,regulator-cooling-device";
+			regulator-cdev-supply = <&S6B_FLOOR_LEVEL>;
+			regulator-levels = <RPM_SMD_REGULATOR_LEVEL_RETENTION
+					RPM_SMD_REGULATOR_LEVEL_NOM>;
+			#cooling-cells = <2>;
+		};
+	};
+
+	rpm-regulator-ldob6 {
+		status = "okay";
+		VDD_LPI_CX_LEVEL:
+		L6B_LEVEL: L6B_E0_LEVEL:
+		pm6450_l6_level: regulator-l6-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_l6_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+				<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+				<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+	};
+
+	rpm-regulator-ldob8 {
+		status = "okay";
+		VDD_LPI_MX_LEVEL:
+		L8B_LEVEL: L8B_E0_LEVEL:
+		pm6450_l8_level: regulator-l8-level {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-name = "pm6450_l8_level";
+			qcom,set = <3>;
+			regulator-min-microvolt =
+				<RPM_SMD_REGULATOR_LEVEL_RETENTION>;
+			regulator-max-microvolt =
+				<RPM_SMD_REGULATOR_LEVEL_BINNING>;
+			qcom,use-voltage-level;
+		};
+	};
+
+	rpm-regulator-smpb7 {
+		status = "okay";
+		S7B: S7B_E0: pm6450_s7: regulator-s7 {
+			regulator-min-microvolt = <1060000>;
+			regulator-max-microvolt = <1170000>;
+			qcom,init-voltage = <1112000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-smpb8 {
+		status = "okay";
+		S8B: S8B_E0: pm6450_s8: regulator-s8 {
+			regulator-min-microvolt = <1224000>;
+			regulator-max-microvolt = <1374000>;
+			qcom,init-voltage = <1352000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-smpb9 {
+		status = "okay";
+		S9B: S9B_E0: pm6450_s9: regulator-s9 {
+			regulator-min-microvolt = <1856000>;
+			regulator-max-microvolt = <2040000>;
+			qcom,init-voltage = <1896000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob1 {
+		status = "okay";
+		L1B: L1B_E0: pm6450_l1: regulator-l1 {
+			regulator-min-microvolt = <570000>;
+			regulator-max-microvolt = <650000>;
+			qcom,init-voltage = <624000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob2 {
+		status = "okay";
+		L2B: L2B_E0: pm6450_l2: regulator-l2 {
+			regulator-min-microvolt = <312000>;
+			regulator-max-microvolt = <752000>;
+			qcom,init-voltage = <752000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob3 {
+		status = "okay";
+		L3B: L3B_E0: pm6450_l3: regulator-l3 {
+			regulator-min-microvolt = <312000>;
+			regulator-max-microvolt = <888000>;
+			qcom,init-voltage = <312000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob4 {
+		status = "okay";
+		L4B: L4B_E0: pm6450_l4: regulator-l4 {
+			regulator-min-microvolt = <504000>;
+			regulator-max-microvolt = <864000>;
+			qcom,init-voltage = <504000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob5 {
+		status = "okay";
+		proxy-supply = <&L5B>;
+		L5B: L5B_E0: pm6450_l5: regulator-l5 {
+			regulator-min-microvolt = <504000>;
+			regulator-max-microvolt = <950000>;
+			qcom,init-voltage = <880000>;
+			status = "okay";
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-current = <97800>;
+		};
+	};
+
+	rpm-regulator-ldob7 {
+		status = "okay";
+		L7B: L7B_E0: pm6450_l7: regulator-l7 {
+			regulator-min-microvolt = <312000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <312000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob9 {
+		status = "okay";
+		L9B: L9B_E0: pm6450_l9: regulator-l9 {
+			regulator-min-microvolt = <751000>;
+			regulator-max-microvolt = <824000>;
+			qcom,init-voltage = <751000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob10 {
+		status = "okay";
+		L10B: L10B_E0: pm6450_l10: regulator-l10 {
+			regulator-min-microvolt = <852000>;
+			regulator-max-microvolt = <950000>;
+			qcom,init-voltage = <852000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob11 {
+		status = "okay";
+		L11B: L11B_E0: pm6450_l11: regulator-l11 {
+			regulator-min-microvolt = <312000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <312000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob12 {
+		status = "okay";
+		L12B: L12B_E0: pm6450_l12: regulator-l12 {
+			regulator-min-microvolt = <1080000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <1080000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob13 {
+		status = "okay";
+		L13B: L13B_E0: pm6450_l13: regulator-l13 {
+			regulator-min-microvolt = <1080000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <1200000>;
+			qcom,init-ldo-mode = <4>;
+			qcom,send-defaults;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob14 {
+		status = "okay";
+		L14B: L14B_E0: pm6450_l14: regulator-l14 {
+			regulator-min-microvolt = <1245000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <1245000>;
+			qcom,init-ldo-mode = <1>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob15 {
+		status = "okay";
+		L15B: L15B_E0: pm6450_l15: regulator-l15 {
+			regulator-min-microvolt = <312000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <312000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob16 {
+		status = "okay";
+		proxy-supply = <&L16B>;
+		L16B: L16B_E0: pm6450_l16: regulator-l16 {
+			regulator-min-microvolt = <1140000>;
+			regulator-max-microvolt = <1260000>;
+			qcom,init-voltage = <1200000>;
+			status = "okay";
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-current = <16600>;
+		};
+	};
+
+	rpm-regulator-ldob17 {
+		status = "okay";
+		L17B: L17B_E0: pm6450_l17: regulator-l17 {
+			regulator-min-microvolt = <1170000>;
+			regulator-max-microvolt = <1304000>;
+			qcom,init-voltage = <1200000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob18 {
+		status = "okay";
+		L18B: L18B_E0: pm6450_l18: regulator-l18 {
+			regulator-min-microvolt = <1504000>;
+			regulator-max-microvolt = <2000000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob19 {
+		status = "okay";
+		L19B: L19B_E0: pm6450_l19: regulator-l19 {
+			regulator-min-microvolt = <1700000>;
+			regulator-max-microvolt = <1950000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+			qcom,init-ldo-mode = <4>;
+			qcom,send-defaults;
+		};
+	};
+
+	rpm-regulator-ldob20 {
+		status = "okay";
+		L20B: L20B_E0: pm6450_l20: regulator-l20 {
+			regulator-min-microvolt = <1700000>;
+			regulator-max-microvolt = <1900000>;
+			qcom,init-voltage = <1700000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob21 {
+		status = "okay";
+		L21B: L21B_E0: pm6450_l21: regulator-l21 {
+			regulator-min-microvolt = <1504000>;
+			regulator-max-microvolt = <2000000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob22 {
+		status = "okay";
+		L22B: L22B_E0: pm6450_l22: regulator-l22 {
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob23 {
+		status = "okay";
+		L23B: L23B_E0: pm6450_l23: regulator-l23 {
+			regulator-min-microvolt = <1504000>;
+			regulator-max-microvolt = <2000000>;
+			qcom,init-voltage = <1504000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob24 {
+		status = "okay";
+		L24B: L24B_E0: pm6450_l24: regulator-l24 {
+			regulator-min-microvolt = <2700000>;
+			regulator-max-microvolt = <3544000>;
+			qcom,init-voltage = <2960000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob25 {
+		status = "okay";
+		L25B: L25B_E0: pm6450_l25: regulator-l25 {
+			regulator-min-microvolt = <2700000>;
+			regulator-max-microvolt = <3544000>;
+			qcom,init-voltage = <3072000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob26 {
+		status = "okay";
+		L26B: L26B_E0: pm6450_l26: regulator-l26 {
+			regulator-min-microvolt = <1504000>;
+			regulator-max-microvolt = <3300000>;
+			qcom,init-voltage = <1504000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob27 {
+		status = "okay";
+		L27B: L27B_E0: pm6450_l27: regulator-l27 {
+			regulator-min-microvolt = <1504000>;
+			regulator-max-microvolt = <3300000>;
+			qcom,init-voltage = <1504000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldob28 {
+		status = "okay";
+		L28B: L28B_E0: pm6450_l28: regulator-l28 {
+			regulator-min-microvolt = <1650000>;
+			regulator-max-microvolt = <3300000>;
+			qcom,init-voltage = <2960000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldom1 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		status = "okay";
+		L1E: L1E_E0: pm8010_l1: regulator-l1 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <528000>;
+			regulator-max-microvolt = <1544000>;
+			qcom,init-voltage = <528000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldom2 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		status = "okay";
+		L2E: L2E_E0: pm8010_l2: regulator-l2 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <528000>;
+			regulator-max-microvolt = <1544000>;
+			qcom,init-voltage = <528000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldom3 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		status = "okay";
+		L3E: L3E_E0: pm8010_l3: regulator-l3 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <1792000>;
+			regulator-max-microvolt = <3312000>;
+			qcom,init-voltage = <1792000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldom4 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		status = "okay";
+		proxy-supply = <&L4E>;
+		L4E: L4E_E0: pm8010_l4: regulator-l4 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <2600000>;
+			regulator-max-microvolt = <3312000>;
+			qcom,init-voltage = <2600000>;
+			status = "okay";
+			qcom,proxy-consumer-enable;
+			qcom,proxy-consumer-current = <10000>;
+		};
+	};
+
+	rpm-regulator-ldom5 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		status = "okay";
+		L5E: L5E_E0: pm8010_l5: regulator-l5 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <2400000>;
+			regulator-max-microvolt = <3544000>;
+			qcom,init-voltage = <2952000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldom6 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		status = "okay";
+		L6E: L6E_E0: pm8010_l6: regulator-l6 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <3000000>;
+			regulator-max-microvolt = <3312000>;
+			qcom,init-voltage = <3000000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldom7 {
+		compatible = "qcom,rpm-smd-regulator-resource";
+		qcom,resource-name = "ldoe";
+		qcom,hpm-min-load = <10000>;
+		status = "okay";
+		L7E: L7E_E0: pm8010_l7: regulator-l7 {
+			compatible = "qcom,rpm-smd-regulator";
+			regulator-min-microvolt = <2500000>;
+			regulator-max-microvolt = <3544000>;
+			qcom,init-voltage = <2500000>;
+			status = "okay";
+		};
+	};
+};

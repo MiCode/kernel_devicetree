@@ -1,0 +1,82 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+&spmi0_bus {
+	#include "pm4125.dtsi"
+	#include "pm8005.dtsi"
+};
+
+&thermal_zones {
+	pm4125-tz {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm4125_tz>;
+
+		trips {
+			pm4125_trip0: trip0 {
+				temperature = <95000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			pm4125_trip1: trip1 {
+				temperature = <115000>;
+				hysteresis = <0>;
+				type = "hot";
+			};
+
+			pm4125_trip2: trip2 {
+				temperature = <145000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+		};
+	};
+
+	pm8005-tz {
+		polling-delay-passive = <100>;
+		polling-delay = <0>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm8005_tz>;
+
+		trips {
+			pm8005_trip0: trip0 {
+				temperature = <95000>;
+				hysteresis = <0>;
+				type = "passive";
+			};
+
+			pm8005_trip1: trip1 {
+				temperature = <115000>;
+				hysteresis = <0>;
+				type = "hot";
+			};
+
+			pm8005_trip2: trip2 {
+				temperature = <145000>;
+				hysteresis = <0>;
+				type = "critical";
+			};
+		};
+
+		cooling-maps {
+			trip0_cpu3 {
+				trip = <&pm8005_trip0>;
+				cooling-device = <&cpu3_pause 0 1>;
+			};
+
+			trip0_gpu {
+				trip = <&pm8005_trip0>;
+				cooling-device = <&msm_gpu 0 THERMAL_NO_LIMIT>;
+			};
+
+			trip0_cdsp {
+				trip = <&pm8005_trip0>;
+				cooling-device = <&cdsp_sw 0 THERMAL_NO_LIMIT>;
+			};
+		};
+	};
+};

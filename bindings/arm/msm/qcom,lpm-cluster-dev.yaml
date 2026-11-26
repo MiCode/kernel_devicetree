@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/arm/msm/qcom,lpm-cluster-dev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Low Power Management Cluster Device
+
+maintainers:
+  - Maulik Shah <quic_mkshah@quicinc.com>
+
+description: |
+  The application processor can do a variety of cluster level low power modes.
+  It does so by predicting the low power mode based on latency and residency
+  information of various CPUs and clusters.
+
+  To make cluster low power mode decision, cluster device use the different prediction
+  algorithms so that chosen the particular low power mode more efficiently.
+
+properties:
+  compatible:
+    const: qcom,lpm-cluster-dev
+
+  power-domains:
+    maxItems: 1
+
+  qcom,pred-prem-cnt:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      Number of premature exits cluster device considers for prediction.
+
+  qcom,sample-invalid-time:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      Time after which past samples are invalidated.
+
+  qcom,use-cluster-bias-timer:
+    type: boolean
+    description:
+      Used to determine if bias timer to be setup for cluster
+
+required:
+  - compatible
+  - power-domains
+
+additionalProperties: false
+
+examples:
+  - |
+
+    cluster-device {
+      compatible =  "qcom,lpm-cluster-dev";
+      power-domains = <&CLUSTER_PD>;
+    };

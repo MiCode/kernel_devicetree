@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/arm/msm/qcom,seccamtest.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Secure camera test driver
+
+maintainers:
+  - Neha singh <quic_nehsin@quicinc.com>
+
+description: |
+  The secure camera test driver allows scipp client on HLOS to call the kernel
+  symbols to execute commands.Firstly, it calls the SMMU Proxy driver to
+  map/ummap the memory buffer to QTVM. call legacy smc commands to QTEE to
+  set the secure camera to protected/unprotected mode. Finally, it also
+  provides API for user clients to get the version number of QTEE trusted camera..
+
+properties:
+  compatible:
+    items:
+      - enum:
+        - qcom,seccamtest
+  qti,smmu-proxy-cb-id:
+    maxItems: 1
+    description: smmu-proxy-cb-id tag in form of <CB_ID>, such that
+      [CB_ID] will be for one of the relevant client context banks.
+
+required:
+  - compatible
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    seccamtest {
+        compatible = "qcom,seccamtest";
+    };
+    qcom,seccamtest {
+        compatible = "seccamtest-camera-cb";
+        qti,smmu-proxy-cb-id = <QTI_SMMU_PROXY_CAMERA_CB>;
+    };

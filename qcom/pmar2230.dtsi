@@ -1,0 +1,242 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/iio/qcom,spmi-adc5-gen4-pmar2230.h>
+
+pmar2230: pmar2230@0 {
+		compatible = "qcom,spmi-pmic";
+		reg = <0 SPMI_USID>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		pmar2230_tz: pmar2230-temp-alarm@a00 {
+			compatible = "qcom,spmi-temp-alarm";
+			reg = <0xa00>;
+			interrupts = <0x0 0xa 0x0 IRQ_TYPE_EDGE_BOTH>;
+			#thermal-sensor-cells = <0>;
+			io-channels = <&pmar2230_vadc PMAR2230_ADC5_GEN4_DIE_TEMP>;
+			io-channel-names = "thermal";
+		};
+
+		pmar2230_gpios: pinctrl@8800 {
+			compatible = "qcom,pmar2230-gpio";
+			reg = <0x8800>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		pon_hlos@C00 {
+			compatible = "qcom,pmk8350-pon";
+			reg = <0xC00>, <0x800>;
+			reg-names = "hlos", "pbs";
+
+			pwrkey {
+				compatible = "qcom,pmk8350-pwrkey";
+				interrupts = <0x0 0xC 0x7 IRQ_TYPE_EDGE_BOTH>;
+				linux,code = <KEY_POWER>;
+			};
+
+			resin {
+				compatible = "qcom,pmk8350-resin";
+				interrupts = <0x0 0xC 0x6 IRQ_TYPE_EDGE_BOTH>;
+				linux,code = <KEY_VOLUMEDOWN>;
+			};
+		};
+
+		pmar2230_rtc: rtc@6400 {
+			compatible = "qcom,pm5100-rtc";
+			reg = <0x6400>, <0x6500>;
+			reg-names = "rtc", "alarm";
+			interrupts = <0x0 0x65 0x1 IRQ_TYPE_EDGE_RISING>;
+		};
+
+		pmar2230_sdam_1: sdam@7000 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x7000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+		};
+
+		pmar2230_sdam_2: sdam@7100 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x7100>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			restart_reason: restart@48 {
+				reg = <0x48 0x1>;
+				bits = <1 7>;
+			};
+		};
+
+		pmar2230_sdam_5: sdam@7400 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x7400>;
+		};
+
+		pmar2230_sdam_22: sdam@8500 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x8500>;
+		};
+
+		pmar2230_sdam_23: sdam@8600 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x8600>;
+		};
+
+		pmar2230_sdam_24: sdam@8700 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x8700>;
+		};
+
+		pmar2230-pwm {
+			compatible = "qcom,pmk8850-pwm", "qcom,pmk8550-pwm";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			#pwm-cells = <2>;
+		};
+
+		pmar2230_extcon: extcon@2700 {
+			compatible = "qcom,pm8941-misc";
+			reg = <0x2700>;
+			interrupts = <0x0 0x27 0x0 IRQ_TYPE_EDGE_BOTH>;
+			interrupt-names = "usb_vbus";
+		};
+
+		sdam@900 {
+			compatible = "qcom,spmi-sdam";
+			reg = <0x900>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+		};
+
+		pmar2230_vdac: vdac@9600 {
+			compatible = "qcom,spmi-vdac";
+			reg = <0x9600>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			io-channels = <&pmar2230_vadc PMAR2230_ADC5_GEN4_ATEST1>,
+				      <&pmar2230_vadc PMAR2230_ADC5_GEN4_ATEST2>;
+			io-channel-names = "ATEST1",
+					   "ATEST2";
+		};
+
+		pmar2230_vadc: vadc@7900 {
+			compatible = "qcom,spmi-adc5-gen4";
+			reg = <0x7900>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			interrupts = <0x0 0x79 0x1 IRQ_TYPE_EDGE_RISING>;
+			interrupt-names = "adc-sdam0";
+			#thermal-sensor-cells = <1>;
+			#io-channel-cells = <1>;
+			io-channel-ranges;
+
+			/* PMAR2230 Channel nodes */
+			pmar2230_offset_ref {
+				reg = <PMAR2230_ADC5_GEN4_OFFSET_REF>;
+				label = "pmar2230_offset_ref";
+				qcom,pre-scaling = <1 1>;
+			};
+
+			pmar2230_vref_1p25 {
+				reg = <PMAR2230_ADC5_GEN4_1P25VREF>;
+				label = "pmar2230_vref_1p25";
+				qcom,pre-scaling = <1 1>;
+			};
+
+			pmar2230_die_temp {
+				reg = <PMAR2230_ADC5_GEN4_DIE_TEMP>;
+				label = "pmar2230_die_temp";
+				qcom,pre-scaling = <1 1>;
+			};
+
+			pmar2230_vph_pwr {
+				reg = <PMAR2230_ADC5_GEN4_VPH_PWR>;
+				label = "pm2230_vph_pwr";
+				qcom,pre-scaling = <1 3>;
+			};
+
+			pmar2230_xo_therm {
+				reg = <PMAR2230_ADC5_GEN4_AMUX_THM5_XO_THERM_100K_PU>;
+				label = "pmar2230_xo_therm";
+				qcom,ratiometric;
+				qcom,hw-settle-time = <200>;
+				qcom,pre-scaling = <1 1>;
+				qcom,adc-tm-type = <1>;
+			};
+
+			pmar2230_atest1 {
+				reg = <PMAR2230_ADC5_GEN4_ATEST1>;
+				label = "pmar2230_atest1";
+				qcom,pre-scaling = <1 1>;
+			};
+
+			pmar2230_atest2 {
+				reg = <PMAR2230_ADC5_GEN4_ATEST2>;
+				label = "pmar2230_atest2";
+				qcom,pre-scaling = <1 1>;
+			};
+
+			pmar2230_soc_therm {
+				reg = <PMAR2230_ADC5_GEN4_AMUX_THM1_100K_PU>;
+				label = "pmar2230_soc_therm";
+				qcom,ratiometric;
+				qcom,hw-settle-time = <200>;
+				qcom,pre-scaling = <1 1>;
+				qcom,adc-tm-type = <1>;
+			};
+
+			pmar2230_wlan_pa_therm {
+				reg = <PMAR2230_ADC5_GEN4_AMUX_THM2_100K_PU>;
+				label = "pmar2230_wlan_pa_therm";
+				qcom,ratiometric;
+				qcom,hw-settle-time = <200>;
+				qcom,pre-scaling = <1 1>;
+				qcom,adc-tm-type = <1>;
+			};
+
+			pmar2230_quiet_therm {
+				reg = <PMAR2230_ADC5_GEN4_AMUX_THM3_100K_PU>;
+				label = "pmar2230_quiet_therm";
+				qcom,ratiometric;
+				qcom,hw-settle-time = <200>;
+				qcom,pre-scaling = <1 1>;
+				qcom,adc-tm-type = <1>;
+			};
+		};
+
+		pmar2230_bcl: bcl@4700 {
+			compatible = "qcom,bcl-v5";
+			reg = <0x4700 0x100>;
+			interrupts = <0x0 0x47 0x0 IRQ_TYPE_NONE>,
+					<0x0 0x47 0x1 IRQ_TYPE_NONE>,
+					<0x0 0x47 0x2 IRQ_TYPE_NONE>;
+			interrupt-names = "bcl-lvl0",
+					"bcl-lvl1",
+					"bcl-lvl2";
+			qcom,pmic7-threshold;
+			#thermal-sensor-cells = <1>;
+		};
+
+		pmar2230_qpt: qcom,power-telemetry-device {
+			compatible = "qcom,power-telemetry";
+			status = "disabled";
+			interrupts = <0x0 0x87 0x1 IRQ_TYPE_EDGE_RISING>,
+				<0x0 0x86 0x1 IRQ_TYPE_EDGE_RISING>;
+			nvmem = <&pmar2230_sdam_22>,
+					<&pmar2230_sdam_23>,
+					<&pmar2230_sdam_24>;
+			nvmem-names = "qpt-config-sdam",
+					"qpt-frac-sdam",
+					"qpt-data-sdam";
+			#powerzone-cells = <1>;
+		};
+};

@@ -1,0 +1,113 @@
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+
+&tlmm {
+    	nova_ts_spi_miso_active: nova_ts_spi_miso_active {
+		mux {
+			pins = "gpio48";
+			function = "qup1_se4_l0";
+		};
+		config {
+			pins = "gpio48";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova_ts_spi_mosi_active: nova_ts_spi_mosi_active {
+		mux {
+			pins = "gpio49";
+			function = "qup1_se4_l1";
+		};
+		config {
+			pins = "gpio49";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova_ts_spi_clk_active: nova_ts_spi_clk_active {
+		mux {
+			pins = "gpio50";
+			function = "qup1_se4_l2";
+		};
+		config {
+			pins = "gpio50";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova_ts_spi_cs_active: nova_ts_spi_cs_active {
+		mux {
+			pins = "gpio51";
+			function = "qup1_se4_l3";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+	nova_ts_spi_cs_suspend: nova_ts_spi_cs_suspend {
+		mux {
+			pins = "gpio51";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+	nova_ts_spi_sleep: nova_ts_spi_sleep {
+		mux {
+			pins = "gpio48", "gpio49", "gpio50";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio48", "gpio49", "gpio50";
+			drive-strength = <2>;
+			bias-disable;
+		};
+	};
+};
+
+&qupv3_se4_i2c {
+  status = "disabled";
+};
+
+&qupv3_se4_spi {
+	status = "ok";
+	qcom,rt;
+	pinctrl-0 = <&nova_ts_spi_mosi_active>, <&nova_ts_spi_miso_active>,
+				<&nova_ts_spi_clk_active>;
+	pinctrl-1 = <&nova_ts_spi_sleep>;
+	novatek@0 {
+		compatible = "novatek,NVT-ts-spi";
+		reg = <0>; 									//Same as CS ID
+		status = "ok";
+		spi-max-frequency = <19200000>;				//4800000,9600000,15000000,19200000
+		novatek,irq-gpio = <&tlmm 55 0x2008>;
+		spi-cs-setup-delay-ns = <300>;
+		spi-cs-hold-delay-ns = <300>;
+		pinctrl-0 = <&nova_ts_spi_cs_active>;
+		pinctrl-1 = <&nova_ts_spi_cs_suspend>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+        novatek,pen-support;
+        novatek,stylus-resol-double;
+
+        mi_tp,game-mode-array = <1 0 0 0 0>;  /* MAX MIN DEF SET GET */
+		mi_tp,active-mode-array = <1 0 0 0 0>;  /* MAX MIN DEF SET GET */
+		mi_tp,up-threshold-array = <4 0 3 3 3>;  /* MAX MIN DEF SET GET */
+		mi_tp,tolerance-array = <4 0 2 2 2>;  /* MAX MIN DEF SET GET */
+		mi_tp,aim-sensitivity-array = <4 0 2 2 2>;  /* MAX MIN DEF SET GET */
+		mi_tp,tap-stability-array = <4 0 2 2 2>;  /* MAX MIN DEF SET GET */
+		mi_tp,expert-mode-array = <3 1 1 1 1>;  /* MAX MIN DEF SET GET */
+		mi_tp,edge-filter-array = <3 0 2 2 2>;  /* MAX MIN DEF SET GET */
+		mi_tp,panel-orien-array = <3 0 0 0 0>;  /* MAX MIN DEF SET GET */
+	};
+};

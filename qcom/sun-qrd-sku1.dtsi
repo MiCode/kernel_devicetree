@@ -1,0 +1,98 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ */
+
+#include <dt-bindings/spmi/spmi.h>
+
+#include "sun-qrd.dtsi"
+
+&pmic_glink_adc {
+	status = "ok";
+
+	smb1396_1_iin {
+		reg = <0x1063401>;
+		label = "smb1396_1_iin";
+	};
+
+	smb1396_1_ichg {
+		reg = <0x1063402>;
+		label = "smb1396_1_ichg";
+	};
+
+	smb1396_1_die_temp {
+		reg = <0x1063403>;
+		label = "smb1396_1_die_temp";
+	};
+
+	smb1396_2_iin {
+		reg = <0x1063501>;
+		label = "smb1396_2_iin";
+	};
+
+	smb1396_2_ichg {
+		reg = <0x1063502>;
+		label = "smb1396_2_ichg";
+	};
+
+	smb1396_2_die_temp {
+		reg = <0x1063503>;
+		label = "smb1396_2_die_temp";
+	};
+};
+
+&battery_charger {
+	qcom,thermal-mitigation-step = <500000>;
+	#cooling-cells = <2>;
+	qcom,wireless-fw-name = "idt9418.bin";
+	qcom,ship-mode-immediate;
+};
+
+&pmic_glink_debug {
+	i2c@106 {
+		reg = <0x106>;	/* I2C instance 6 in ADSP for SE5 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		qcom,bus-type = "i2c";
+
+		qcom,smb1396@34 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x34>;
+			qcom,can-sleep;
+		};
+
+		qcom,smb1396@35 {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x35>;
+			qcom,can-sleep;
+		};
+
+		qcom,idt9418@3b {
+			compatible = "qcom,i2c-pmic";
+			reg = <0x3b>;
+			qcom,can-sleep;
+		};
+	};
+
+	/* SPMI bridge bus 0 with SMB1510 device */
+	spmi@200 {
+		reg = <0x200>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		qcom,bus-type = "spmi";
+
+		qcom,smb1510@d {
+			compatible = "qcom,spmi-pmic";
+			reg = <0xd SPMI_USID>;
+			qcom,can-sleep;
+		};
+	};
+};
+
+&ibat_lvl0 {
+	temperature = <6500>;
+};
+
+&ibat_lvl1 {
+	temperature = <7000>;
+};

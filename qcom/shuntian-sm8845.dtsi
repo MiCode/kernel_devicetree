@@ -1,0 +1,225 @@
+/*
+  this file is for attribution only of shuntian
+  And public attribution of xiaomi platforms(like shuntian)
+*/
+
+#include "sm8845-xiaomi-common.dtsi"
+
+&qupv3_se12_spi {
+	status = "ok";
+	ir-spi@0 {
+		compatible = "ir-spi";
+		reg = <0>;
+		spi-max-frequency = <19200000>;
+		status = "ok";
+	};
+};
+
+&sdhc_2 {
+	status = "disabled";
+};
+
+&L13B {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+	qcom,init-voltage = <1800000>;
+};
+
+&soc {
+	qcom,smp2p-adsp{
+		hall_smp2p_in_lid: qcom,hall-in-lid {
+			qcom,entry-name = "mi_hall_lid";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+		hall_smp2p_in_table: qcom,hall-in-table {
+			qcom,entry-name = "mi_hall_table";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	};
+
+	xiaomi_hall {
+		compatible = "xiaomi-hall";
+		status = "ok";
+
+		lid_hall {
+			label = "lid_hall";
+			gpios = <&tlmm 181 GPIO_ACTIVE_LOW>;
+			linux,input-type = <5>;
+			linux,code = <0>;
+			interrupts-extended = <&hall_smp2p_in_lid 0 0>,<&hall_smp2p_in_lid 1 0>;
+			interrupt-names = "open_irq","close_irq";
+		};
+
+		table_hall {
+			label = "table_hall";
+			gpios = <&tlmm 21 GPIO_ACTIVE_LOW>;
+			linux,input-type = <5>;
+			linux,code = <1>;
+			interrupts-extended = <&hall_smp2p_in_table 0 0>,<&hall_smp2p_in_table 1 0>;
+			interrupt-names = "open_irq","close_irq";
+		};
+	};
+
+	xiaomi_fingerprint {
+		compatible = "xiaomi,xiaomi-fp";
+		xiaomi,gpio_irq = <&tlmm 147 0x0>;
+		xiaomi,vendor_names = "SHUNTIAN_n1_142";
+		reset-pin-enable;
+		reset-flag = <1 0 0 0 0>;
+		fp_3v3_vreg-supply = <&L2B>;
+
+		netlink-event = <25>;
+		pinctrl-names = "reset_high", "reset_low","irq_default";
+		pinctrl-0 = <&fingerprint_reset_high>;
+		pinctrl-1 = <&fingerprint_reset_low>;
+		pinctrl-2 = <&fingerprint_irq_default>;
+		status = "ok";
+	};
+};
+
+&L2B {
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	qcom,init-voltage = <3300000>;
+};
+
+/* <reg_offset, value>*/
+&usb_qmp_dp_phy {
+	usb3,eyegram-tuning;
+	qcom,usb3-phy-eye-seq =
+		<USB3_DP_PCS_G12S1_TXMGN_V0 0x1F
+			USB3_DP_PCS_G12S1_TXDEEMPH_M3P5DB 0x17>;
+	qcom,host-usb3-phy-eye-seq =
+		<USB3_DP_PCS_G12S1_TXMGN_V0 0x1F
+			USB3_DP_PCS_G12S1_TXDEEMPH_M3P5DB 0x17>;
+};
+
+&tlmm {
+	/* FP_RESET_HIGH, state device active*/
+	fingerprint_reset_high: fingerprint_reset_high {
+		mux {
+			pins = "gpio161";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio161";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+	/* FP_RESET_LOW */
+	fingerprint_reset_low: fingerprint_reset_low {
+		mux {
+			pins = "gpio161";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio161";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+	/* FP_INT_N */
+	fingerprint_irq_default: fingerprint_irq_default {
+		mux {
+			pins = "gpio147";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio147";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};
+/* mi_trace */
+&soc {
+	xiaomi_mi_trace {
+		compatible = "xiaomi,mi_trace";
+		mt-size = <0x100000>;
+	};
+};
+
+/* mitee vm */
+&reserved_memory {
+  /* between is swiotlb */
+	oem_vm_shm: shm@fb600000 {
+		compatible = "shared-dma-pool";
+		reusable;
+		guarantee;
+		alignment = <0x0 0x400000>;
+		reg = <0x0 0xfb600000 0x0 0x400000>;
+		gunyah-label = <0x3>;
+	};
+};
+
+&soc {
+
+	mitee: mitee {
+		compatible = "xiaomi,mitee";
+		binding-core = <4 5 6>;
+	};
+
+	mitee-oemvm {
+		compatible = "xiaomi,mitee-hlos-ipc";
+		xiaomi,master;
+		gunyah-shm-label = <0x3>;
+		peer-name = <0x4>;
+		memory-region = <&oem_vm_shm>;
+		dma-coherent;
+	};
+};
+/* mitee vm */
+
+/* millm cma */
+&reserved_memory {
+	llm_mem: llm_mem {
+		compatible = "shared-dma-pool";
+		reusable;
+		guarantee;
+		size = <0x0 0x0>;
+	};
+};
+
+&soc {
+	millm: millm {
+		compatible = "xiaomi,millm";
+		memory-region = <&llm_mem>;
+	};
+};
+/* millm cma */
+
+/* start: remove modem reserve memory and node */
+&mpss_mem {
+	status = "disabled";
+};
+&modem_pas {
+	status = "no";
+};
+&dsm_partition_1_mem {
+	status = "disabled";
+};
+&dsm_partition_2_mem {
+	status = "disabled";
+};
+&q6_mpss_dtb_mem {
+	status = "disabled";
+};
+&qmc_dma_mem {
+	status = "disabled";
+};
+&ipa_fw_mem {
+	status = "disabled";
+};
+&ipa_gsi_mem {
+	status = "disabled";
+};
+/* end: remove modem reserve memory and node */
+
+&qseecom_ta_mem {
+	size = <0x0 0x3800000>;  /* 56MB */
+};

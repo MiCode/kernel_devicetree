@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: "http://devicetree.org/schemas/soc/qcom/qcom,coresight-remote-etm.yaml#"
+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+
+title: The document describes the device tree binding for coresight-remote-etm
+
+maintainers:
+  - Yuanfang Zhang <quic_yuanfang@quicinc.com>
+
+description:
+    This binding describes the coresight component responsible for controlling
+    coresight remote etm, used to enable/disable remote etm.
+
+properties:
+  compatible:
+    items:
+      - const: qcom,coresight-remote-etm
+
+  qcom,inst-id:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    description:
+      QMI instance id for remote ETMs.
+
+  out-ports:
+    $ref: /schemas/graph.yaml#/properties/ports
+    additionalProperties: false
+
+    properties:
+      port:
+        description: Output connection from the ETM to CoreSight Trace bus.
+        $ref: /schemas/graph.yaml#/properties/port
+
+required:
+  - compatible
+  - out-port
+  - qcom,inst-id
+
+additionalProperties: false
+
+examples:
+  - |
+	remote_etm0 {
+		compatible = "qcom,coresight-remote-etm";
+
+		qcom,inst-id = <5>;
+
+		out-ports {
+			port {
+				remote_etm0_out_funnel_qdss: endpoint {
+					remote-endpoint =
+					<&funnel_qdss_in_remote_etm0>;
+				};
+			};
+		};
+	};
+

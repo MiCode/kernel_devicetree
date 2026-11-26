@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-ddr-cdev.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. DDR Cooling Device
+
+maintainers:
+  - Rashid Zafar <quic_rzafar@quicinc.com>
+
+description: |
+  The DDR cooling device will be used to place a DDR frequency vote. This
+  cooling device will be used in those cases where all the subsystem's are
+  thermally throttled and DDR has to be operated with a minimum performance
+  level. This cooling device vote can ensure the same.
+
+properties:
+  compatible:
+    const: qcom,ddr-cooling-device
+
+  qcom,freq-table:
+    $ref: /schemas/types.yaml#/definitions/uint32-matrix
+    description: |
+      List of available DDR frequencies.
+
+  qcom,bus-width:
+    description:
+      Provides the bus width for DDR.
+    $ref: /schemas/types.yaml#/definitions/uint32
+    enum: [1, 4, 8]
+    default: 4
+
+  "#cooling-cells":
+    const: 2
+    description: |
+      Must be 2. Needed for of_thermal as cooling device identifier.
+      Please refer to <devicetree/bindings/thermal/thermal.txt> for
+      more details.
+
+  interconnects:
+    items:
+      - description: Path leading to system memory
+
+required:
+  - compatible
+  - qcom,freq-table
+  - qcom,bus-width
+  - "#cooling-cells"
+  - interconnects
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interconnect/qcom,sc7280.h>
+
+    qcom,ddr-cdev {
+            compatible = "qcom,ddr-cooling-device";
+            qcom,freq-table = <200000>,
+                              <451000>,
+                              <768000>,
+                              <1017000>,
+                              <2092000>,
+                              <2736000>;
+            qcom,bus-width = <4>;
+            #cooling-cells = <2>;
+            interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
+    };

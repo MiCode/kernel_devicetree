@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+&chosen {
+	bootargs = "nokaslr arm-smmu.disable_bypass=0 kvm-arm.mode=none cpuidle.off=1 watchdog_thresh=0 nosoftlockup workqueue.watchdog_thresh=0 printk.devkmsg=on loglevel=8 log_buf_len=512K earlycon arm64.nosme arm64.nomte cpufreq.default_governor=performance no-steal-acc kpti=0 swiotlb=0 loop.max_part=7 irqaffinity=0-4 fw_devlink.strict=1 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 cgroup_disable=pressure cgroup.memory=nokmem,nosocket disable_dma32=on page_poison=on printk.console_no_auto_verbose=1 sysctl.kernel.panic_on_rcu_stall=1 ftrace_dump_on_oops restrict_cma_redirect=false slub_debug=-";
+};
+
+&arch_timer {
+	clock-frequency = <5000000>;
+};
+
+&memtimer {
+	clock-frequency = <5000000>;
+};
+
+&LITTLE_CPU_OFF {
+	status = "disabled";
+};
+
+&LITTLE_CPU_RAIL_OFF {
+	status = "disabled";
+};
+
+&BIG_CPU_OFF {
+	status = "disabled";
+};
+
+&BIG_CPU_RAIL_OFF {
+	status = "disabled";
+};
+
+&CLUSTER_OFF {
+	status = "disabled";
+};
+
+&CX_RET {
+	status = "disabled";
+};
+
+&soc {
+
+	usb_emuphy: phy@a784000 {
+		compatible = "qcom,usb-emu-phy";
+		reg = <0x0 0x0a784000 0x0 0x9500>;
+
+		qcom,emu-init-seq = <0xfffff 0x4
+			0xffff0 0x4
+			0x100000 0x20
+			0x0 0x20
+			0x000101F0 0x20
+			0x00100000 0x3c
+			0x0 0x3c
+			0x0 0x4
+			0x9 0x14>;
+	};
+};
+
+&ufsphy_mem {
+	compatible = "qcom,ufs-phy-qrbtc-sdm845";
+
+	/* VDDA_UFS_CORE */
+	vdda-phy-supply = <&L2B_E0>;
+	vdda-phy-max-microamp = <212340>;
+
+	/* VDDA_UFS_0_1P2 */
+	vdda-pll-supply = <&L3C_E0>;
+	vdda-pll-max-microamp = <18330>;
+
+	/* Qref power supply, Refer Qref diagram */
+	vdda-qref-supply = <&L2B_E0>;
+	vdda-qref-max-microamp = <1750>;
+
+	/* Detect whether RH132 card based sequences to be used */
+	qcom,soc_emulation_type_addr = <0x1fc8004>;
+	qcom,soc_emulation_type_bits = <32>;
+
+	status = "ok";
+};
+
+&ufshc_mem {
+	limit-tx-hs-gear = <1>;
+	limit-rx-hs-gear = <1>;
+	limit-rate = <2>; /* HS Rate-B */
+
+	vcc-supply = <&L12B_E0>;
+	vcc-max-microamp = <800000>;
+
+	vccq-supply = <&L2C_E0>;
+	vccq-max-microamp = <750000>;
+
+	vccq2-supply = <&L2C_E0>;
+	vccq2-max-microamp = <750000>;
+
+	/* VDD_PX10 is voted for the ufs_reset_n */
+	qcom,vddp-ref-clk-supply = <&L5F_E0>;
+	qcom,vddp-ref-clk-max-microamp = <100>;
+
+	qcom,disable-lpm;
+	rpm-level = <0>;
+	spm-level = <0>;
+
+	qcom,iommu-dma = "bypass";
+	status = "ok";
+};
+
+&usb0 {
+	dwc3@a600000 {
+		usb-phy = <&usb_emuphy>, <&usb_nop_phy>;
+		dr_mode = "peripheral";
+		maximum-speed = "high-speed";
+	};
+};

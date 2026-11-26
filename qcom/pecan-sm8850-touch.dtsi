@@ -1,0 +1,131 @@
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+
+
+&tlmm {
+	mi_ts_spi_miso_active: mi_ts_spi_miso_active {
+		mux {
+			pins = "gpio48";
+			function = "qup4_se0_l0";
+		};
+		config {
+			pins = "gpio48";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+
+	mi_ts_spi_mosi_active: mi_ts_spi_mosi_active {
+		mux {
+			pins = "gpio49";
+			function = "qup4_se0_l1";
+		};
+		config {
+			pins = "gpio49";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+
+	mi_ts_spi_clk_active: mi_ts_spi_clk_active {
+		mux {
+			pins = "gpio50";
+			function = "qup4_se0_l2";
+		};
+		config {
+			pins = "gpio50";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+
+	mi_ts_clk_sleep: mi_ts_clk_sleep {
+		mux {
+			pins = "gpio50";
+			function = "qup4_se0_l2";
+		};
+		config {
+			pins = "gpio50";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	mi_ts_spi_cs_active: mi_ts_spi_cs_active {
+		mux {
+			pins = "gpio51";
+			function = "qup4_se0_l3";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+
+
+	mi_ts_spi_cs_suspend: mi_ts_spi_cs_suspend {
+		mux {
+			pins = "gpio51";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+	mi_ts_spi_sleep: mi_ts_spi_sleep {
+		mux {
+			pins = "gpio48", "gpio49",
+                        	"gpio50";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio48", "gpio49",
+                        	"gpio50";
+			drive-strength = <2>;
+			output-low;
+			bias-disable;
+		};
+	};
+};
+
+&qupv3_se19_spi {
+	status = "ok";
+	pinctrl-0 = <&mi_ts_spi_mosi_active>, <&mi_ts_spi_miso_active>,
+				<&mi_ts_spi_clk_active>;
+	pinctrl-1 = <&mi_ts_spi_sleep>, <&mi_ts_clk_sleep>;
+	qcom,la-vm;
+	qcom,rt;
+	novatek@0 {
+		compatible = "novatek,NVT-ts-spi";
+		reg = <0>;
+		status = "ok";
+		spi-max-frequency = <19200000>;
+
+		novatek,irq-gpio = <&tlmm 158 0x2008>;
+		novatek,lcd_id-gpio = <&tlmm 213 0x2008>;
+		novatek,tddi-status;
+
+		nova,touch-type = "primary";
+		qts,trusted-touch-mode = "vm_mode";
+		qts,touch-environment = "tvm";
+		qts,trusted-touch-type = "primary";
+		qts,trusted-touch-spi-irq = <647>;
+		qts,trusted-touch-io-bases = <0x1a80000>;
+		qts,trusted-touch-io-sizes = <0x1000>;
+		pinctrl-0 = <&mi_ts_spi_cs_active>;
+		pinctrl-1 = <&mi_ts_spi_cs_suspend>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		qts,trusted-touch-vm-gpio-list = <&tlmm 48 0 &tlmm 49 0 &tlmm 50 0
+                                          &tlmm 51 0 &tlmm 66 0 &tlmm 158 0x2008>;
+	};
+};

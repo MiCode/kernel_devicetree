@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/thermal/qti-limits-stat.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm Technologies, Inc. Limits Stat driver
+
+maintainers:
+  - Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+
+description: |
+  The QTI Limits stats driver is used to collect different limits stats.
+  It collects CPU average and peak current, CPUs online mask, CPUs Load
+  percentage, CPU temperature, BCL levels, PE current, PE thresholds etc..
+
+properties:
+  compatible:
+    const: qcom,limits-stat
+
+  reg:
+    maxItems: 1
+    description: |
+      <a b> where 'a' is the RDPM PE base register address and
+      'b' is the size of the RDPM PE address space.
+
+  reg-names:
+    maxItems: 1
+    description: |
+       user defined names for the register set. These register names
+       will be used by the drivers to identify the RDPM PE HW block.
+
+  qcom,limits-stat-sensor-names:
+    maxItems: 1
+    description: |
+       This contains list of thermal zone sensors those need to be monitored
+       as part of limits stat collection.
+
+required:
+  - compatible
+  - qcom,limits-stat-sensor-names
+
+additionalProperties: false
+
+examples:
+  - |
+    limits-stat@637000 {
+        compatible = "qcom,limits-stat";
+        reg = <0x637000 0x1000>;
+        reg-names = "rdpm_pe_mx";
+        qcom,limits-stat-sensor-names = "cpu-0-0",
+                                        "cpu-0-1",
+                                        "cpu-0-2",
+                                        "cpu-0-3",
+                                        "cpu-1-0",
+                                        "cpu-1-1",
+                                        "cpu-1-2",
+                                        "cpu-1-3",
+                                        "gpuss-0",
+                                        "gpuss-1",
+                                        "nspss-0";
+                                        "nspss-1";
+                                        "nspss-2";
+    };

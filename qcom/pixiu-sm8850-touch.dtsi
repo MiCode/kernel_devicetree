@@ -1,0 +1,195 @@
+&soc {
+	xiaomi_touch {
+		compatible = "xiaomi-touch";
+		status = "ok";
+		touch,name = "xiaomi-touch";
+	};
+};
+
+&tlmm {
+	// primary screen
+	nova0_ts_spi_miso_active: nova0_ts_spi_miso_active {
+		mux {
+			pins = "gpio48";
+			function = "qup4_se0_l0";
+		};
+		config {
+			pins = "gpio48";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova0_ts_spi_mosi_active: nova0_ts_spi_mosi_active {
+		mux {
+			pins = "gpio49";
+			function = "qup4_se0_l1";
+		};
+		config {
+			pins = "gpio49";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova0_ts_spi_clk_active: nova0_ts_spi_clk_active {
+		mux {
+			pins = "gpio50";
+			function = "qup4_se0_l2";
+		};
+		config {
+			pins = "gpio50";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova0_ts_spi_cs_active: nova0_ts_spi_cs_active {
+		mux {
+			pins = "gpio51";
+			function = "qup4_se0_l3";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+	nova0_ts_spi_cs_suspend: nova0_ts_spi_cs_suspend {
+		mux {
+			pins = "gpio51";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio51";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+	nova0_ts_spi_sleep: nova0_ts_spi_sleep {
+		mux {
+			pins = "gpio48", "gpio49", "gpio50";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio12", "gpio49", "gpio50";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	// secondary screen
+	nova1_ts_spi_miso_active: nova1_ts_spi_miso_active {
+		mux {
+			pins = "gpio12";
+			function = "qup3_se2_l0";
+		};
+		config {
+			pins = "gpio12";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova1_ts_spi_mosi_active: nova1_ts_spi_mosi_active {
+		mux {
+			pins = "gpio13";
+			function = "qup3_se2_l1";
+		};
+		config {
+			pins = "gpio13";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova1_ts_spi_clk_active: nova1_ts_spi_clk_active {
+		mux {
+			pins = "gpio14";
+			function = "qup3_se2_l2";
+		};
+		config {
+			pins = "gpio14";
+			drive-strength = <6>;
+			bias-disable;
+		};
+	};
+	nova1_ts_spi_cs_active: nova1_ts_spi_cs_active {
+		mux {
+			pins = "gpio15";
+			function = "qup3_se2_l3";
+		};
+		config {
+			pins = "gpio15";
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+	};
+	nova1_ts_spi_cs_suspend: nova1_ts_spi_cs_suspend {
+		mux {
+			pins = "gpio15";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio15";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+	nova1_ts_spi_sleep: nova1_ts_spi_sleep {
+		mux {
+			pins = "gpio12", "gpio13", "gpio14";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio12", "gpio13", "gpio14";
+			drive-strength = <2>;
+			output-low;
+			bias-pull-down;
+		};
+	};
+};
+
+// primary screen
+&qupv3_se19_spi {
+	status = "ok";
+	qcom,rt;
+	pinctrl-0 = <&nova0_ts_spi_mosi_active>, <&nova0_ts_spi_miso_active>,
+				<&nova0_ts_spi_clk_active>;
+	pinctrl-1 = <&nova0_ts_spi_sleep>;
+
+	novatek@0 {
+		compatible = "novatek,NVT-ts-spi-0";
+		reg = <0>; 									//Same as CS ID
+		status = "ok";
+		spi-max-frequency = <19200000>;				//4800000,9600000,15000000,19200000
+
+		novatek,irq-gpio = <&tlmm 158 0x2008>;
+		spi-cs-setup-delay-ns = <300>;
+		spi-cs-hold-delay-ns = <300>;
+		pinctrl-0 = <&nova0_ts_spi_cs_active>;
+		pinctrl-1 = <&nova0_ts_spi_cs_suspend>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		novatek,mp-support-dt;
+	};
+};
+
+// second screen
+&qupv3_se15_spi {
+	status = "ok";
+	qcom,rt;
+	pinctrl-0 = <&nova1_ts_spi_mosi_active>, <&nova1_ts_spi_miso_active>,
+				<&nova1_ts_spi_clk_active>;
+	pinctrl-1 = <&nova1_ts_spi_sleep>;
+	/* Novatek device tree node */
+	novatek@0 {
+		compatible = "novatek,NVT-ts-spi-1";
+		reg = <0>; 								//Same as CS ID
+		status = "ok";
+		spi-max-frequency = <19200000>;			//4800000,9600000,15000000,19200000
+
+		novatek,irq-gpio = <&tlmm 79 0x2008>;
+		spi-cs-setup-delay-ns = <300>;
+		spi-cs-hold-delay-ns = <300>;
+		pinctrl-0 = <&nova1_ts_spi_cs_active>;
+		pinctrl-1 = <&nova1_ts_spi_cs_suspend>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+		/* MP */
+		novatek,mp-support-dt;
+	};
+};

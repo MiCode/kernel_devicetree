@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "malabar-cdp-lcd.dtsi"
+#include "malabar-pmiv010x.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. Malabar CDP + LCD";
+	compatible = "qcom,malabar-cdp", "qcom,malabar", "qcom,malabarp-cdp", "qcom,malabarp",
+			"qcom,cdp";
+
+	qcom,msm-id = <733 0x10000>, <757 0x10000>;
+	qcom,board-id = <0x20001 0>;
+};
+
+&tlmm {
+	pmx_ts_active {
+		ts_active: ts_active {
+			mux {
+				pins = "gpio10", "gpio11";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio10", "gpio11";
+				drive-strength = <8>;
+				bias-pull-up;
+			};
+		};
+	};
+
+	pmx_ts_reset_suspend {
+		ts_reset_suspend: ts_reset_suspend {
+			mux {
+				pins = "gpio10";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio10";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pmx_ts_int_suspend {
+		ts_int_suspend: ts_int_suspend {
+			mux {
+				pins = "gpio11";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio11";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	pmx_ts_release {
+		ts_release: ts_release {
+			mux {
+				pins = "gpio10", "gpio11";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio10", "gpio11";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+};
+
+&qupv3_se3_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	status = "okay";
+	qcom,i2c-touch-active = "focaltech,fts_ts";
+
+	focaltech@38 {
+		compatible = "focaltech,fts_ts";
+		reg = <0x38>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <11 0x2008>;
+		focaltech,reset-gpio = <&tlmm 10 0x00>;
+		focaltech,irq-gpio = <&tlmm 11 0x2008>;
+		focaltech,display-coords = <0 0 1080 2408>;
+		focaltech,max-touch-number = <10>;
+		focaltech,ic-type = <0x8726081C>;
+		focaltech,touch-type = "primary";
+
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend","pmx_ts_release";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+	};
+};
+
+&L5E {
+	regulator-min-microvolt = <2952000>;
+	regulator-max-microvolt = <3544000>;
+	qcom,init-voltage = <2952000>;
+};

@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ */
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/spmi/spmi.h>
+
+qcom,pmd802x@4 {
+	compatible = "qcom,spmi-pmic";
+	reg = <4 SPMI_USID>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	pmic-ecid@100 {
+		compatible = "qcom,pmic-ecid";
+		reg = <0x100>;
+		qcom,pmic-name = "pmd802x";
+	};
+
+	pmd802x_tz: pmd802x-temp-alarm@a00 {
+		compatible = "qcom,spmi-temp-alarm";
+		reg = <0xa00>;
+		interrupts = <0x4 0xa 0x0 IRQ_TYPE_EDGE_BOTH>;
+		#thermal-sensor-cells = <0>;
+	};
+
+	pmd802x_gpios: pinctrl@8800 {
+		compatible = "qcom,pmd802x-gpio";
+		reg = <0x8800>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+
+	pmd802x_amoled_ecm: amoled-ecm@f900 {
+		compatible = "qcom,amoled-ecm";
+		reg = <0xf900>;
+		interrupt-names = "ecm-sdam0", "ecm-sdam1", "ecm-sdam2";
+		nvmem-names = "amoled-ecm-sdam0", "amoled-ecm-sdam1",
+			      "amoled-ecm-sdam2";
+		nvmem = <&ecm_sdam_0>, <&ecm_sdam_1>,
+			<&ecm_sdam_2>;
+	};
+
+	pmd802x_amoled: qcom-amoled {
+		compatible = "qcom,amoled-regulator";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		/*
+		 * Following ibb_spur_sqm_timer nvmem cell is specified
+		 * only to show its use. But it won't be used by
+		 * amoled-regulator until qcom,ibb-spur-mitigation-level
+		 * and other related properties are specified under
+		 * ibb subnode.
+		 */
+		nvmem-cells = <&ibb_spur_sqm_timer>;
+		nvmem-cell-names = "ibb_spur_sqm_timer";
+		status = "disabled";
+
+		ibb_vreg: ibb@f800 {
+			reg = <0xf800>;
+			reg-names = "ibb_base";
+			regulator-name = "ibb";
+			regulator-min-microvolt = <800000>;
+			regulator-max-microvolt = <9000000>;
+			regulator-allow-set-load;
+			qcom,swire-control;
+		};
+
+		ab_vreg: elvdd@f900 {
+			reg = <0xf900>;
+			reg-names = "ab_base";
+			regulator-name = "ab";
+			regulator-min-microvolt = <2500000>;
+			regulator-max-microvolt = <5500000>;
+			qcom,swire-control;
+		};
+
+		oledb_vreg: oledb@fa00 {
+			reg = <0xfa00>;
+			reg-names = "oledb_base";
+			regulator-name = "oledb";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <8000000>;
+			qcom,swire-control;
+		};
+	};
+};
